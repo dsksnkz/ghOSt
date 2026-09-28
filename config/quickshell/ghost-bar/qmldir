@@ -1,0 +1,10 @@
+singleton Theme 1.0 Theme.qml
+singleton Desk 1.0 Desk.qml
+Bar 1.0 Bar.qml
+Panel 1.0 Panel.qml
+Label 1.0 Label.qml
+Rule 1.0 Rule.qml
+Key 1.0 Key.qml
+Meter 1.0 Meter.qml
+Material 1.0 Material.qml
+Workspaces 1.0 Workspaces.qml
