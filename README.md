@@ -16,7 +16,7 @@ CPU is measured from Linux counter deltas. GPU utilization is read only when sel
 
 ## Stage
 
-Requires Arch Linux, Hyprland, Quickshell 0.3.1 with Networking/Bluetooth, Python 3 and JetBrains Mono Nerd Font. Turret Road is bundled under the OFL. NVIDIA utilization optionally uses nvidia-smi; supported DRM devices use gpu_busy_percent when available.
+An Arch Linux, Hyprland, Quickshell with networking and bluetooth, and jetbrains as main font. NVIDIA utilization optionally uses nvidia-smi; supported DRM devices use gpu_busy_percent when available.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
