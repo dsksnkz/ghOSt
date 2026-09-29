@@ -31,10 +31,7 @@ PanelWindow {
                 onClicked: bar.open("session", this)
                 Row {
                     anchors.centerIn: parent; spacing: 10
-                    Rectangle {
-                        width: 23; height: 23; radius: 4; color: Theme.orange
-                        Label { anchors.centerIn: parent; text: "g"; color: Theme.base; font.pixelSize: 20; font.weight: Font.Bold; anchors.verticalCenterOffset: -2 }
-                    }
+                    Icon { width: 23; height: 23; name: "ghost"; ink: Theme.text; stroke: 1.45 }
                     Label { anchors.verticalCenter: parent.verticalCenter; text: "ghOSt"; font.pixelSize: 13; font.letterSpacing: 0.8 }
                 }
             }
@@ -50,7 +47,7 @@ PanelWindow {
                 onSecondaryClicked: { if (Desk.player?.canTogglePlaying) Desk.player.togglePlaying(); }
                 Row {
                     x: 7; anchors.verticalCenter: parent.verticalCenter; spacing: 9
-                    Label { text: Desk.playing ? "Ⅱ" : "▷"; color: Desk.playing ? Theme.orange : Theme.muted; font.pixelSize: 15 }
+                    Icon { width: 15; height: 15; name: Desk.playing ? "pause" : "play"; ink: Desk.playing ? Theme.text : Theme.muted; anchors.verticalCenter: parent.verticalCenter }
                     Label { width: media.width - 44; text: Desk.player?.trackTitle || "NO PLAYBACK"; color: Desk.player ? Theme.text : Theme.faint; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 10 }
                 }
                 Rectangle {
@@ -71,7 +68,7 @@ PanelWindow {
                 Label { text: Qt.formatDateTime(Desk.now, "HH:mm"); font.pixelSize: 19; font.weight: Font.Normal }
                 Column {
                     spacing: 2; anchors.verticalCenter: parent.verticalCenter
-                    Label { text: Qt.formatDateTime(Desk.now, "ss"); color: Theme.orange; font.pixelSize: 9 }
+                    Label { text: Qt.formatDateTime(Desk.now, "ss"); color: Theme.text; font.pixelSize: 9 }
                     Rectangle { width: 12; height: 1; color: Theme.line }
                 }
                 Rectangle { visible: bar.width > 1400; width: 1; height: 19; color: Theme.line; anchors.verticalCenter: parent.verticalCenter }
@@ -105,30 +102,46 @@ PanelWindow {
             Rule { visible: SystemTray.items.values.length > 0 }
             Key {
                 id: net
-                text: (Desk.wired ? "󰈀" : "󰤨") + (bar.width > 1450 ? (Desk.wired ? "  ETH" : Desk.connected ? "  WI-FI" : "  OFF") : "")
+                text: bar.width > 1450 ? (Desk.wired ? "ETH" : Desk.connected ? "WI-FI" : "OFF") : ""
                 ink: Desk.connected ? Theme.text : Theme.faint
                 hint: Desk.networkName
                 onClicked: bar.open("network", this)
+                Icon {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 16
+                    height: 16
+                    name: Desk.wired ? "network" : "wifi"
+                    ink: Desk.connected ? Theme.text : Theme.faint
+                }
             }
             Key {
-                text: "󰂯"; ink: Desk.adapter?.enabled ? Theme.text : Theme.faint
+                width: 28
+                ink: Desk.adapter?.enabled ? Theme.text : Theme.faint
                 hint: "Bluetooth"
                 onClicked: bar.open("bluetooth", this)
+                Icon {
+                    anchors.centerIn: parent
+                    width: 16
+                    height: 16
+                    name: "bluetooth"
+                    ink: parent.ink
+                }
             }
             Rule {}
             Key {
                 id: sound
-                width: hovered || Desk.panel === "audio" ? 112 : 88; height: 32
-                Behavior on width { NumberAnimation { duration: Theme.motion; easing.type: Easing.OutCubic } }
+                width: 112; height: 32
                 hint: "Audio · scroll for volume · right-click to mute"
                 onClicked: bar.open("audio", this)
                 onSecondaryClicked: Desk.mute()
                 onScrolled: delta => Desk.setVolume((Desk.volume + (delta > 0 ? 2 : -2)) / 100)
                 Row {
                     anchors.centerIn: parent; spacing: 8
-                    Label { text: Desk.muted ? "󰝟" : "󰕾"; font.pixelSize: 15; color: Desk.muted ? Theme.faint : Theme.text; anchors.verticalCenter: parent.verticalCenter }
+                    Icon { width: 16; height: 16; name: "volume"; ink: Desk.muted ? Theme.faint : Theme.text; anchors.verticalCenter: parent.verticalCenter }
                     Meter { count: 7; value: Desk.muted ? 0 : Desk.volume / 100; anchors.verticalCenter: parent.verticalCenter }
-                    Label { visible: sound.width > 108; text: Desk.volume; font.pixelSize: 10; color: Theme.muted; anchors.verticalCenter: parent.verticalCenter }
+                    Label { text: Desk.volume; font.pixelSize: 10; color: Theme.muted; anchors.verticalCenter: parent.verticalCenter }
                 }
             }
             Rule { visible: Desk.hasBattery }
@@ -139,13 +152,14 @@ PanelWindow {
                 onClicked: bar.open("battery", this)
                 Row {
                     anchors.centerIn: parent; spacing: 9
-                    Meter { visible: bar.width > 1400; count: 7; value: Desk.charge / 100; ink: Desk.charge <= 20 ? Theme.orange : Theme.cream; anchors.verticalCenter: parent.verticalCenter }
+                    Icon { visible: bar.width > 1400; width: 16; height: 16; name: "battery"; ink: Desk.charge <= 20 ? Theme.text : Theme.text; anchors.verticalCenter: parent.verticalCenter }
                     Label { text: Desk.charge + "%"; font.pixelSize: 10 }
                 }
             }
             Key {
-                width: 27; text: "⏻"; hint: "Session"
+                width: 27; hint: "Session"
                 onClicked: bar.open("session", this)
+                Icon { anchors.centerIn: parent; width: 16; height: 16; name: "power"; ink: Theme.text }
             }
         }
     }

@@ -14,6 +14,7 @@ Singleton {
     property string panelScreen: ""
     property real panelX: 0
     property string notice: ""
+    property string performanceMetric: "cpu"
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink?.audio ?? null
     readonly property int volume: audio ? Math.round(audio.volume * 100) : 0
@@ -46,5 +47,6 @@ Singleton {
     function mute() { if (audio) audio.muted = !audio.muted; }
     function launch(args) { close(); Quickshell.execDetached(args); }
     function legacy(name) { launch(["serpantinum", "msg", "toggle", name]); }
+    function setPerformanceMetric(value) { performanceMetric = value; }
     onPanelChanged: if (wifi) wifi.scannerEnabled = panel === "network";
 }

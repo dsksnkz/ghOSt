@@ -8,3 +8,5 @@ Key 1.0 Key.qml
 Meter 1.0 Meter.qml
 Material 1.0 Material.qml
 Workspaces 1.0 Workspaces.qml
+Icon 1.0 Icon.qml
+PerformanceGauge 1.0 PerformanceGauge.qml

@@ -15,7 +15,7 @@ Rectangle {
     implicitWidth: label.implicitWidth + padding * 2
     implicitHeight: 30
     radius: 5
-    color: selected ? Theme.cream : mouse.pressed ? Theme.line : mouse.containsMouse ? Theme.raised : "transparent"
+    color: selected ? Theme.text : mouse.pressed ? Theme.line : "transparent"
     scale: mouse.pressed ? 0.96 : 1
     Behavior on color { ColorAnimation { duration: Theme.fast } }
     Behavior on scale { NumberAnimation { duration: Theme.fast; easing.type: Easing.OutCubic } }

@@ -48,7 +48,10 @@ PanelWindow {
         anchors.fill: parent; focus: true
         Keys.onEscapePressed: Desk.close()
         opacity: popup.reveal
-        transform: Translate { y: -10 * (1 - popup.reveal) }
+        transform: [
+            Translate { y: -8 * (1 - popup.reveal) },
+            Scale { origin.x: popup.width * .5; origin.y: 0; xScale: .96 + .04 * popup.reveal; yScale: .985 + .015 * popup.reveal }
+        ]
         Material { anchors.fill: parent; anchors.margins: 1; radius: 10 }
         Column {
             id: body
@@ -75,7 +78,7 @@ PanelWindow {
     }
     component Action: Key {
         width: body.width; height: 36
-        color: hovered ? Theme.raised : Theme.surface
+        color: Theme.surface
         border.color: Theme.line; border.width: 1
     }
     component Caption: Label { font.pixelSize: 9; font.letterSpacing: 1; color: Theme.muted }
@@ -172,6 +175,12 @@ PanelWindow {
                 Key { text: "←"; width: 34; onClicked: cal.month = new Date(cal.month.getFullYear(), cal.month.getMonth()-1, 1) }
                 Label { width: body.width-68; horizontalAlignment: Text.AlignHCenter; anchors.verticalCenter: parent.verticalCenter; text: Qt.formatDateTime(cal.month,"MMMM yyyy"); color: Theme.cream }
                 Key { text: "→"; width: 34; onClicked: cal.month = new Date(cal.month.getFullYear(), cal.month.getMonth()+1, 1) }
+            }
+            PerformanceGauge {
+                width: parent.width
+                active: popup.opened && popup.page === "calendar"
+                metric: Desk.performanceMetric
+                onMetricSelected: value => Desk.setPerformanceMetric(value)
             }
             Grid {
                 columns: 7; spacing: 4

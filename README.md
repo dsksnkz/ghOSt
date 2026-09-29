@@ -2,19 +2,19 @@
 
 Graphical Hyprland Operating System Toolkit.
 
-A Quickshell desktop for Arch Linux and Hyprland. Graphite surfaces, JetBrains Mono, quiet orange accents.
+A Quickshell desktop for Arch Linux and Hyprland. Monochrome surfaces, JetBrains Mono, deliberate spacing and fast tactile motion.
 
 ![ghOSt top bar](assets/top-bar.png)
 
 ## Top bar
 
-Workspaces, media, calendar, system tray, networking, Bluetooth, PipeWire volume and battery. Native service connections; 120–230 ms interaction animations. No polling subprocesses or continuous decorative animations.
+Workspaces, media, calendar, system tray, networking, Bluetooth, PipeWire volume and battery. Native service connections, click-merge panels and a local 2D monochrome icon pack. Calendar includes a radial CPU/GPU/processor instrument.
 
 ## Install
 
 Requires Hyprland 0.56 with Lua dispatch, Quickshell 0.3.1 (including Networking and Bluetooth), Python 3 and JetBrains Mono Nerd Font. Optional settings applications: `pavucontrol`, `nm-connection-editor`, `blueman-manager`.
 
-This first release integrates with an existing Serpantinum session for launcher, lock and new Wi-Fi authentication. It is not yet a standalone replacement for those services.
+The current stage keeps Serpantinum's launcher, lock, notifications and authentication services intact while ghOSt surfaces are built and verified independently.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
@@ -40,4 +40,6 @@ Theme and timings: `config/quickshell/ghost-bar/Theme.qml`.
 
 ![Sound panel](assets/sound-panel.png)
 
-Visual direction: [design notes](docs/design.md).
+Preview: [ghOSt Pages](https://dsksnkz.github.io/ghOSt/).
+
+Visual direction: [design notes](docs/design.md). Run history: [docs/changes](docs/changes/).
