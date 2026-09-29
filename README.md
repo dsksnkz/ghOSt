@@ -2,7 +2,7 @@
 
 Graphical Hyprland Operating System Toolkit.
 
-A monochrome Quickshell desktop for Arch Linux and Hyprland.
+Quickshell rice with buddy codex
 
 [Preview](https://dsksnkz.github.io/ghOSt/) · [Changes](docs/changes/2026-09-29-telemetry-repair.md)
 
