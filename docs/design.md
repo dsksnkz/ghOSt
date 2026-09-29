@@ -7,9 +7,9 @@ The user's twelve reference photographs are the visual authority for ghOSt. Orig
 | ui6.jpg | Composition, contrast and material reference only; the current ghOSt palette is strict black and white. |
 | ui5.jpg | Clear grouping, fine outlines, precise spacing and restrained selection shapes. |
 | ui4.jpg | Instrument fascia, inset dark display, understated metallic edge. |
-| ui3.jpg | Graphite body, warm white readouts, small orange hardware accent. |
+| ui3.jpg | Graphite body, white readouts and restrained hardware proportions; no colored accent. |
 | ui2.jpg | Layered dark surfaces, muted inactive states, thin rules. |
-| ui.jpg | Monospaced numbers, calibration ticks, orange registration mark, generous negative space. |
+| ui.jpg | Monospaced numbers, calibration ticks and generous negative space, all monochrome. |
 | Image_20260928150913_14_3.jpg | Black field, restrained point texture, architectural order. |
 | Image_20260928150912_13_3.jpg | Clearly separated information hierarchy and quiet contextual controls. |
 | Image_20260928150910_12_3.jpg | Engineering labels, quiet technical typography. |

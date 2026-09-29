@@ -6,48 +6,85 @@ Item {
     id: gauge
     property bool active: false
     property string metric: "cpu"
-    property real cpuLoad: 0
-    property real gpuLoad: 0
-    property real clockMHz: 0
+    property var reading: null
+    property var maximum: null
     signal metricSelected(string value)
-    implicitHeight: 166
-    readonly property real level: metric === "gpu" ? gpuLoad / 100 : metric === "processor" ? Math.min(1, clockMHz / 5000) : cpuLoad / 100
-    readonly property string metricName: metric === "gpu" ? "GPU LOAD" : metric === "processor" ? "PROCESSOR MHZ" : "CPU LOAD"
-    readonly property string metricValue: metric === "processor" ? Math.round(clockMHz) + "" : Math.round(metric === "gpu" ? gpuLoad : cpuLoad) + "%"
-    Timer { interval: 1000; repeat: true; running: gauge.active; triggeredOnStart: true; onTriggered: { sample.running = false; sample.running = true; } }
+    implicitHeight: 208
+    readonly property string metricName: metric === "gpu" ? "GPU UTILIZATION" : metric === "processor" ? "PROCESSOR CLOCK" : "CPU UTILIZATION"
+    readonly property bool available: typeof reading === "number" && isFinite(reading)
+    readonly property real level: available && maximum > 0 ? Math.max(0, Math.min(1, reading / maximum)) : 0
+    property real displayedLevel: level
+    Behavior on displayedLevel { NumberAnimation { duration: Theme.motion; easing.type: Easing.OutCubic } }
+    onMetricChanged: { reading = null; maximum = null; if (active) { sample.running = false; restart.start(); } }
+    onActiveChanged: { reading = null; if (active) restart.start(); else { restart.stop(); sample.running = false; } }
+    Component.onCompleted: if (active) restart.start()
+    Timer { id: restart; interval: 20; onTriggered: if (gauge.active) sample.running = true }
     Process {
         id: sample
-        command: ["bash", "-lc", "awk '{print $1*10,0,0}' /proc/loadavg"]
-        stdout: StdioCollector {
-            id: output
-            onStreamFinished: {
-                const v = output.text.trim().split(/\s+/).map(Number);
-                if (v.length >= 3 && v.every(n => Number.isFinite(n))) { gauge.cpuLoad = Math.max(0, Math.min(100, v[0])); gauge.gpuLoad = Math.max(0, Math.min(100, v[1])); gauge.clockMHz = Math.max(0, v[2]); }
+        command: ["python3", Quickshell.shellPath("metrics.py"), gauge.metric]
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const record = JSON.parse(data);
+                    if (record.metric === gauge.metric) { gauge.reading = record.value; gauge.maximum = record.maximum; stale.restart(); }
+                } catch (error) { gauge.reading = null; }
             }
         }
+        onExited: { gauge.reading = null; stale.stop(); }
     }
-    Canvas {
-        id: dial
-        anchors { left: parent.left; top: parent.top; bottom: parent.bottom; right: metrics.left; rightMargin: 20 }
-        onPaint: {
-            const c = getContext("2d"); c.reset(); c.clearRect(0, 0, width, height);
-            const cx = width / 2, cy = height / 2, radius = Math.min(width, height) * .37, ticks = 48, lit = Math.round(gauge.level * ticks);
-            c.lineWidth = 1.15; c.lineCap = "butt";
-            for (let i = 0; i < ticks; i++) { const a = -Math.PI * .75 + i * Math.PI * 1.5 / (ticks - 1); c.beginPath(); c.moveTo(cx + Math.cos(a) * (radius - 7), cy + Math.sin(a) * (radius - 7)); c.lineTo(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius); c.strokeStyle = i < lit ? Theme.text : Theme.line; c.stroke(); }
-            c.fillStyle = Theme.text; c.font = "600 21px JetBrains Mono"; c.textAlign = "center"; c.fillText(gauge.metricValue, cx, cy + 3);
-            c.fillStyle = Theme.muted; c.font = "9px JetBrains Mono"; c.fillText(gauge.metricName, cx, cy + 22);
+    Timer { id: stale; interval: 3500; onTriggered: gauge.reading = null }
+    Item {
+        id: dialFrame
+        anchors { left: parent.left; right: metrics.left; rightMargin: 20; top: parent.top; bottom: parent.bottom }
+        Canvas {
+            id: dial
+            anchors.fill: parent
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+            onPaint: {
+                const c = getContext("2d"); c.reset(); c.clearRect(0, 0, width, height);
+                const cx = width / 2, cy = height / 2, radius = Math.min(width, height) * .46, ticks = 60;
+                const lit = Math.round(gauge.displayedLevel * ticks);
+                c.lineWidth = 1.6;
+                for (let i = 0; i < ticks; i++) {
+                    const a = Math.PI * .75 + i * Math.PI * 1.5 / (ticks - 1);
+                    const length = i % 5 === 0 ? 12 : 8;
+                    c.beginPath();
+                    c.moveTo(cx + Math.cos(a) * (radius - length), cy + Math.sin(a) * (radius - length));
+                    c.lineTo(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius);
+                    c.strokeStyle = gauge.available && i < lit ? Theme.text : Theme.line;
+                    c.stroke();
+                }
+            }
+            Connections { target: gauge; function onDisplayedLevelChanged() { dial.requestPaint(); } function onAvailableChanged() { dial.requestPaint(); } }
         }
-        Connections { target: gauge; function onLevelChanged() { dial.requestPaint(); } function onMetricChanged() { dial.requestPaint(); } function onCpuLoadChanged() { dial.requestPaint(); } function onGpuLoadChanged() { dial.requestPaint(); } function onClockMHzChanged() { dial.requestPaint(); } }
+        Column {
+            anchors.centerIn: parent
+            spacing: 8
+            Label { anchors.horizontalCenter: parent.horizontalCenter; text: gauge.available ? Math.round(gauge.reading) + (gauge.metric === "processor" ? "" : "%") : "—"; font.pixelSize: 32; font.weight: Font.Medium }
+            Label { anchors.horizontalCenter: parent.horizontalCenter; text: gauge.available ? gauge.metric === "processor" ? "MHz · AVERAGE" : "UTILIZATION" : "UNAVAILABLE"; font.pixelSize: 8; color: Theme.muted; font.letterSpacing: 0.4 }
+        }
     }
     Column {
         id: metrics
-        anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
-        width: 104; spacing: 8
-        Label { text: "PERFORMANCE"; color: Theme.muted; font.pixelSize: 9; font.letterSpacing: 1 }
-        Label { text: "RADIAL / LIVE"; color: Theme.faint; font.pixelSize: 8; font.letterSpacing: 1 }
-        Item { width: 1; height: 5 }
-        Key { width: parent.width; height: 30; text: "CPU"; selected: gauge.metric === "cpu"; onClicked: gauge.metricSelected("cpu") }
-        Key { width: parent.width; height: 30; text: "GPU"; selected: gauge.metric === "gpu"; onClicked: gauge.metricSelected("gpu") }
-        Key { width: parent.width; height: 30; text: "MHZ"; selected: gauge.metric === "processor"; onClicked: gauge.metricSelected("processor") }
+        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+        width: 100; spacing: 8
+        Label { text: "PERFORMANCE"; color: Theme.muted; font.pixelSize: 9; font.letterSpacing: .4 }
+        Item { height: 6; width: 1 }
+        Repeater {
+            model: [{key:"cpu", title:"CPU", icon:"cpu"}, {key:"gpu", title:"GPU", icon:"gpu"}, {key:"processor", title:"CLOCK", icon:"cpu"}]
+            Key {
+                required property var modelData
+                width: 100; height: 34
+                selected: gauge.metric === modelData.key
+                hint: modelData.key === "processor" ? "Average processor frequency in MHz" : modelData.title + " utilization"
+                onClicked: gauge.metricSelected(modelData.key)
+                Row {
+                    anchors.centerIn: parent; spacing: 10
+                    Icon { width: 15; height: 15; name: modelData.icon; ink: gauge.metric === modelData.key ? Theme.base : Theme.text }
+                    Label { text: modelData.title; font.pixelSize: 10; color: gauge.metric === modelData.key ? Theme.base : Theme.text }
+                }
+            }
+        }
     }
 }

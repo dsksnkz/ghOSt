@@ -35,7 +35,7 @@ Item {
                 text: String(modelData).padStart(2, "0")
                 hint: "Workspace " + modelData
                 ink: root.current === modelData ? Theme.base : occupied ? Theme.text : Theme.faint
-                color: hovered && root.current !== modelData ? Theme.raised : "transparent"
+                color: "transparent"
                 onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + modelData + " })")
                 onScrolled: delta => Hyprland.dispatch("hl.dsp.focus({ workspace = '" + (delta > 0 ? "e-1" : "e+1") + "' })")
             }

@@ -10,6 +10,9 @@ Canvas {
     antialiasing: true
     onNameChanged: requestPaint()
     onInkChanged: requestPaint()
+    onStrokeChanged: requestPaint()
+    onWidthChanged: requestPaint()
+    onHeightChanged: requestPaint()
     onPaint: {
         const c = getContext("2d");
         c.reset();
@@ -37,7 +40,7 @@ Canvas {
         case "battery": c.strokeRect(w * .18, h * .27, w * .62, h * .46); c.fillRect(w * .80, h * .42, w * .10, h * .16); c.fillRect(w * .24, h * .33, w * .35, h * .34); break;
         case "network": circle(cx, cy, w * .13); line(cx, cy - w * .13, cx, h * .19); line(cx - w * .11, cy + w * .07, w * .22, h * .71); line(cx + w * .11, cy + w * .07, w * .78, h * .71); circle(cx, h * .17, 1.4); circle(w * .20, h * .75, 1.4); circle(w * .80, h * .75, 1.4); break;
         case "calendar": c.strokeRect(w * .19, h * .23, w * .62, h * .58); line(w * .19, h * .39, w * .81, h * .39); line(w * .35, h * .16, w * .35, h * .30); line(w * .65, h * .16, w * .65, h * .30); break;
-        case "power": c.beginPath(); c.arc(cx, cy, w * .28, -Math.PI * .76, Math.PI * .76); c.stroke(); line(cx, h * .16, cx, h * .52); break;
+        case "power": c.beginPath(); c.arc(cx, cy, w * .28, -Math.PI * .25, Math.PI * 1.25); c.stroke(); line(cx, h * .16, cx, h * .52); break;
         case "close": line(w * .27, h * .27, w * .73, h * .73); line(w * .73, h * .27, w * .27, h * .73); break;
         case "lock": c.strokeRect(w * .25, h * .43, w * .50, h * .37); c.beginPath(); c.arc(cx, h * .43, w * .22, Math.PI, 0); c.stroke(); break;
         case "settings": circle(cx, cy, w * .22); circle(cx, cy, w * .08); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; line(cx + Math.cos(a) * w * .28, cy + Math.sin(a) * w * .28, cx + Math.cos(a) * w * .40, cy + Math.sin(a) * w * .40); } break;

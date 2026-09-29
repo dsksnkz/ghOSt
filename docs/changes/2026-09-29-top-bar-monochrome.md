@@ -1,5 +1,7 @@
 # 2026-09-29 / Top bar surface
 
+Correction: this earlier run's real-metrics claim was inaccurate (load average was substituted for CPU utilization; GPU and clock were constants). The 0.2.1 staged repair replaces it. Screenshots at the paths below have also been replaced with clean component renders to remove the chat window from the current publication. Original images remain in Git history. See [the correction](2026-09-29-telemetry-repair.md).
+
 Four functional changes shipped:
 
 - Replaced the colored identity tile with the ghOSt turret-road G mark and a local Canvas icon pack.

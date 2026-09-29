@@ -15,6 +15,11 @@ Rectangle {
     implicitWidth: label.implicitWidth + padding * 2
     implicitHeight: 30
     radius: 5
+    activeFocusOnTab: true
+    border.width: activeFocus ? 1 : 0
+    border.color: Theme.text
+    Keys.onReturnPressed: clicked()
+    Keys.onSpacePressed: clicked()
     color: selected ? Theme.text : mouse.pressed ? Theme.line : "transparent"
     scale: mouse.pressed ? 0.96 : 1
     Behavior on color { ColorAnimation { duration: Theme.fast } }
@@ -25,6 +30,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+        enabled: root.enabled
         cursorShape: Qt.PointingHandCursor
         onClicked: event => event.button === Qt.LeftButton ? root.clicked() : root.secondaryClicked()
         onWheel: event => root.scrolled(event.angleDelta.y)

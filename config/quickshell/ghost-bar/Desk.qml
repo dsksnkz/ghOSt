@@ -13,6 +13,7 @@ Singleton {
     property string panel: ""
     property string panelScreen: ""
     property real panelX: 0
+    property real panelOrigin: 196
     property string notice: ""
     property string performanceMetric: "cpu"
     readonly property var sink: Pipewire.defaultAudioSink
@@ -34,11 +35,12 @@ Singleton {
     readonly property int activeWorkspace: Hyprland.focusedWorkspace?.id ?? 1
     property SystemClock clock: SystemClock { precision: SystemClock.Seconds }
     PwObjectTracker { objects: root.sink ? [root.sink] : [] }
-    function toggle(name, screenName, x) {
+    function toggle(name, screenName, x, center) {
         if (!["audio", "calendar", "network", "bluetooth", "battery", "media", "session"].includes(name)) return;
         if (panel === name && panelScreen === screenName) { close(); return; }
         panelScreen = screenName;
         panelX = x;
+        panelOrigin = center === undefined ? 196 : Math.max(18, Math.min(374, center - x));
         notice = "";
         panel = name;
     }

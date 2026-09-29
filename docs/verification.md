@@ -1,4 +1,12 @@
-# Verification · 2026-09-28
+# Verification
+
+## 2026-09-29 / staged revision 0.2.1
+
+See [telemetry repair](changes/2026-09-29-telemetry-repair.md) for current checks, clean screenshots and limits. Six telemetry tests pass; actual QML renders show measured CPU/GPU/clock data. The live desktop and keybindings were preserved. This revision has not been activated for a native interaction test.
+
+The earlier 2026-09-29 publication incorrectly claimed real metrics and included application/chat screenshots. Its telemetry was a placeholder. The current revision corrects those claims and replaces the public assets. Old Git commits still retain the earlier images.
+
+## Historical verification · 2026-09-28
 
 Live environment: Arch Linux, Hyprland 0.56.2 (Lua configuration), Quickshell 0.3.1, HDMI-A-1 at 1920 × 1080 / 200 Hz.
 

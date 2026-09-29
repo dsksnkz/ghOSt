@@ -12,6 +12,8 @@ import subprocess
 parser = argparse.ArgumentParser()
 parser.add_argument("--restore", action="store_true", help="restore the last pre-install snapshot")
 parser.add_argument("--no-start", action="store_true", help="install without starting Quickshell")
+parser.add_argument("--activate", action="store_true", help="explicitly replace the current bar and update autostart")
+parser.add_argument("--stage-dir", type=Path, help="optional isolated staging destination")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
 home = Path.home()
@@ -49,6 +51,20 @@ if args.restore:
         elif path.exists() and path == launcher:
             path.unlink()
     print("Restored the previous bar and autostart. ghOSt source and snapshots are retained.")
+    raise SystemExit(0)
+
+if not args.activate:
+    staged = args.stage_dir or data / "ghost/staged/ghost-bar"
+    staged = staged.expanduser().resolve()
+    if staged == target.resolve():
+        raise SystemExit("Staging must not target the live configuration. Use --activate explicitly.")
+    if staged.exists():
+        backup = state / "backups" / ("stage-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f"))
+        shutil.copytree(staged, backup)
+    shutil.copytree(repo / "config/quickshell/ghost-bar", staged, dirs_exist_ok=True)
+    print("ghOSt staged at " + str(staged))
+    print("Live rice, wallpaper, keybindings and autostart were not changed.")
+    print("To replace the active bar deliberately: ./install.sh --activate")
     raise SystemExit(0)
 
 if not lua.exists() and not conf.exists():

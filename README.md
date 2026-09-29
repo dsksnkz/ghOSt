@@ -2,19 +2,21 @@
 
 Graphical Hyprland Operating System Toolkit.
 
-A Quickshell desktop for Arch Linux and Hyprland. Monochrome surfaces, JetBrains Mono, deliberate spacing and fast tactile motion.
+A monochrome Quickshell desktop for Arch Linux and Hyprland.
 
-![ghOSt top bar](assets/top-bar.png)
+[Preview](https://dsksnkz.github.io/ghOSt/) · [Changes](docs/changes/2026-09-29-telemetry-repair.md)
 
-## Top bar
+![Staged ghOSt calendar](site/assets/calendar-performance.png)
 
-Workspaces, media, calendar, system tray, networking, Bluetooth, PipeWire volume and battery. Native service connections, click-merge panels and a local 2D monochrome icon pack. Calendar includes a radial CPU/GPU/processor instrument.
+## Current scope
 
-## Install
+Top rail, calendar, radial performance instrument, audio, network, Bluetooth, media, battery and session panels. JetBrains Mono typography, Turret Road G, custom black/white icons and click-triggered motion.
 
-Requires Hyprland 0.56 with Lua dispatch, Quickshell 0.3.1 (including Networking and Bluetooth), Python 3 and JetBrains Mono Nerd Font. Optional settings applications: `pavucontrol`, `nm-connection-editor`, `blueman-manager`.
+CPU is measured from Linux counter deltas. GPU utilization is read only when selected. Processor means average clock frequency in MHz, scaled to the hardware maximum when available. Missing or stale readings show unavailable. Sampling stops when the calendar closes.
 
-The current stage keeps Serpantinum's launcher, lock, notifications and authentication services intact while ghOSt surfaces are built and verified independently.
+## Stage
+
+Requires Arch Linux, Hyprland, Quickshell 0.3.1 with Networking/Bluetooth, Python 3 and JetBrains Mono Nerd Font. Turret Road is bundled under the OFL. NVIDIA utilization optionally uses nvidia-smi; supported DRM devices use gpu_busy_percent when available.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
@@ -22,24 +24,33 @@ cd ghOSt
 ./install.sh
 ```
 
-The installer backs up the files it touches, installs to `~/.config/quickshell/ghost-bar`, and adds a login entry and a rule allowing ghOSt to control its own animation timing. It preserves keybindings, monitor settings, wallpaper, and other compositor settings. When Serpantinum is installed, only its bar is disabled; its launcher, lock, notifications, authentication and shortcut services remain in use during this first stage.
+Default installation stages a separate copy under ~/.local/share/ghost/staged/ghost-bar. It does not start the shell or change the active rice, wallpaper, keybindings or autostart. Existing staged copies are backed up.
 
-Restore the previous bar with `./install.sh --restore`. Backups are kept in `~/.local/state/ghost/backups/`.
+## Activate deliberately
+
+```sh
+./install.sh --activate
+```
+
+This explicitly installs into ~/.config/quickshell/ghost-bar, adds autostart and a layer animation rule, and disables Serpantinum's bar if present. Existing launcher, lock and Wi-Fi authentication still depend on Serpantinum; this is not a complete independent rice yet. Settings helpers are pavucontrol, nm-connection-editor and blueman-manager.
+
+The legacy restore command is ./install.sh --restore. It verifies tracked integration files before restoring the original snapshot; later edits require manual reconciliation. Backups are under ~/.local/state/ghost/backups. Staging alone needs no live rollback.
 
 ## Controls
 
-- Workspace numbers: switch workspace; scroll to navigate.
-- Clock: calendar, with month navigation.
-- Audio: volume panel; scroll to adjust; right-click to mute.
-- Network / Bluetooth / battery: corresponding panel.
-- Tray icons: left-click activation; right-click native menu.
-- ghOSt / power: launcher, settings, lock.
-- Escape or click outside: close panel.
+- Workspace numbers switch workspace; scroll navigates.
+- Clock opens Calendar; CPU / GPU / CLOCK switch the radial readout.
+- Audio opens volume; scroll adjusts; right-click mutes.
+- Network, Bluetooth, battery and media open their panels.
+- Escape or click outside closes a native panel.
+- Buttons support Tab focus and Return/Space activation.
 
-Theme and timings: `config/quickshell/ghost-bar/Theme.qml`.
+## Verification
 
-![Sound panel](assets/sound-panel.png)
+The 0.2.1 revision is staged, not activated on the laptop. It was rendered with the actual QML components in an isolated offscreen Quickshell instance. Native focus, multi-monitor placement and click-origin motion still need an opt-in live pass.
 
-Preview: [ghOSt Pages](https://dsksnkz.github.io/ghOSt/).
+```sh
+python3 -m unittest discover -s tests -v
+```
 
-Visual direction: [design notes](docs/design.md). Run history: [docs/changes](docs/changes/).
+See [verification](docs/verification.md) for evidence and limitations. Public previews use component-only renders. Private references remain excluded.
