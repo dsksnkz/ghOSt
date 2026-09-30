@@ -24,8 +24,8 @@ Item {
             Key {
                 id: identity
                 width: 102; height: 32
-                hint: "ghOSt · session"
-                onClicked: bar.open("session", this)
+                hint: "ghOSt · applications"
+                onClicked: bar.open("launcher", this)
                 Row {
                     anchors.centerIn: parent; spacing: 10
                     BrandMark { width: 23; height: 23; ink: Theme.text }

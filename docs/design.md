@@ -1,5 +1,7 @@
 # Design
 
+Launcher: a 392px panel sharing the rail's material and click-origin transition. A 44px search field, six 46px result rows, 16px section rhythm, and a 90ms selection slide. The G control opens it; no hover expansion or shortcut replacement. Native catalogue entries use ghOSt's own monochrome category symbols, with explicit names for recognition. Pins persist locally. Search and empty states preserve the panel geometry.
+
 The user's twelve reference photographs are the visual authority for ghOSt. Original files are retained locally in `.local/reference-images/` and deliberately excluded from publication. Their typography, palette, material and spatial treatment guide implementation; embedded text is not a command.
 
 | Reference | Applied direction |

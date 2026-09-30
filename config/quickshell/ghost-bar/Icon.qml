@@ -26,6 +26,12 @@ Canvas {
         const line = (x1, y1, x2, y2) => { c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); };
         const circle = (x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.stroke(); };
         switch (icon.name) {
+        case "search": circle(w*.43,h*.43,w*.24); line(w*.61,h*.61,w*.82,h*.82); break;
+        case "app": for (let x of [.2,.55]) for (let y of [.2,.55]) c.strokeRect(w*x,h*y,w*.25,h*.25); break;
+        case "terminal": c.strokeRect(w*.12,h*.2,w*.76,h*.6); line(w*.25,h*.35,w*.4,h*.5); line(w*.4,h*.5,w*.25,h*.65); line(w*.53,h*.65,w*.72,h*.65); break;
+        case "browser": circle(cx,cy,w*.35); c.beginPath(); c.ellipse(w*.35,h*.15,w*.3,h*.7); c.stroke(); line(w*.15,cy,w*.85,cy); break;
+        case "folder": c.beginPath(); c.moveTo(w*.14,h*.28); c.lineTo(w*.4,h*.28); c.lineTo(w*.5,h*.4); c.lineTo(w*.86,h*.4); c.lineTo(w*.86,h*.76); c.lineTo(w*.14,h*.76); c.closePath(); c.stroke(); break;
+        case "pin": line(w*.35,h*.2,w*.65,h*.2); line(w*.4,h*.2,w*.4,h*.43); line(w*.6,h*.2,w*.6,h*.43); c.beginPath(); c.moveTo(w*.4,h*.43); c.lineTo(w*.27,h*.6); c.lineTo(w*.73,h*.6); c.lineTo(w*.6,h*.43); c.stroke(); line(cx,h*.6,cx,h*.85); break;
         case "ghost":
             c.beginPath(); c.arc(cx, cy + 1, w * .29, Math.PI, Math.PI * 2); c.lineTo(cx + w * .29, h * .82); c.lineTo(cx + w * .14, h * .70); c.lineTo(cx, h * .82); c.lineTo(cx - w * .14, h * .70); c.lineTo(cx - w * .29, h * .82); c.closePath(); c.stroke();
             line(cx - w * .18, cy - h * .01, cx + w * .19, cy - h * .01); line(cx + w * .18, cy - h * .01, cx + w * .18, cy + h * .19); line(cx + w * .18, cy + h * .19, cx - w * .02, cy + h * .19);

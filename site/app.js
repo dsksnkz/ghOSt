@@ -1,4 +1,7 @@
 const views = {
+  launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
+  search: ["launcher-search.png", "Search / ranked name, category description and keyword matches."],
+  empty: ["launcher-empty.png", "Search / clear feedback when there are no matching applications."],
   bar: ["top-bar.png", "Rail / fixed control spacing and the Turret Road G."],
   cpu: ["calendar-performance.png", "CPU / utilization from aggregate counter deltas."],
   gpu: ["calendar-gpu.png", "GPU / NVIDIA utilization sampled while selected."],

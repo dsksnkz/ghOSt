@@ -1,5 +1,11 @@
 # Verification
 
+## 2026-09-30 / staged revision 0.3.0
+
+See [launcher](changes/2026-09-30-launcher.md). Fifteen launcher assertions and six telemetry tests passed. Isolated Quickshell loaded the installed app catalogue and saved/reloaded pins. Search, selection bounds, preview-only dispatch and empty results were exercised through IPC. Screenshots are real QML renders, not native desktop interaction proof. Native keyboard input, application startup and multi-monitor focus remain pending explicit activation.
+
+Both existing desktop shell PIDs survived unchanged; live keybinding JSON matched byte-for-byte and Hyprland reported no config errors. Runtime emitted only expected offscreen/Hyprland isolation warnings and two malformed-line warnings from existing desktop-entry files; no QML runtime errors remained. A staging-only installation succeeded. Web gallery launcher/search states and a 390px layout were checked in the browser with no horizontal overflow.
+
 ## 2026-09-29 / staged revision 0.2.1
 
 See [telemetry repair](changes/2026-09-29-telemetry-repair.md) for current checks, clean screenshots and limits. Six telemetry tests pass; actual QML renders show measured CPU/GPU/clock data. The live desktop and keybindings were preserved. This revision has not been activated for a native interaction test.

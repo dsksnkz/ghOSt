@@ -36,7 +36,7 @@ Singleton {
     property SystemClock clock: SystemClock { precision: SystemClock.Seconds }
     PwObjectTracker { objects: root.sink ? [root.sink] : [] }
     function toggle(name, screenName, x, center) {
-        if (!["audio", "calendar", "network", "bluetooth", "battery", "media", "session"].includes(name)) return;
+        if (!["launcher", "audio", "calendar", "network", "bluetooth", "battery", "media", "session"].includes(name)) return;
         if (panel === name && panelScreen === screenName) { close(); return; }
         panelScreen = screenName;
         panelX = x;

@@ -10,6 +10,17 @@ import Quickshell.Services.UPower
 Item {
     id: content
     required property var popup
+    property bool previewMode: false
+    function focusPage() { if (pageLoader.item?.focusSearch) pageLoader.item.focusSearch(); else content.forceActiveFocus(); }
+    function launcherAction(action, value) {
+        const item = pageLoader.item;
+        if (popup.page !== "launcher" || !item) return "";
+        if (action === "query") item.query = value;
+        if (action === "move") item.move(Number(value));
+        if (action === "pin") item.pin(item.results.find(e => e.id === value));
+        if (action === "launch" && previewMode) item.launch(item.results.find(e => e.id === value));
+        return item.status();
+    }
     function performanceStatus() {
         const gauge = pageLoader.item?.telemetry;
         return JSON.stringify(gauge ? {metric: gauge.metric, value: gauge.reading, maximum: gauge.maximum, active: gauge.active} : {active: false});
@@ -31,7 +42,7 @@ Item {
                 Column {
                     width: parent.width - 32; spacing: 5
                     Label { text: "ghOSt / " + popup.page.toUpperCase(); color: Theme.muted; font.pixelSize: 9; font.letterSpacing: 1.1 }
-                    Label { text: ({audio:"Sound", network:"Connections", bluetooth:"Bluetooth", calendar:Qt.formatDateTime(Desk.now,"MMMM yyyy"),media:"Now playing",battery:"Power",session:"Your session"})[popup.page] || ""; font.pixelSize: 19; font.weight: Font.Normal }
+                    Label { text: ({launcher:"Applications", audio:"Sound", network:"Connections", bluetooth:"Bluetooth", calendar:Qt.formatDateTime(Desk.now,"MMMM yyyy"),media:"Now playing",battery:"Power",session:"Your session"})[popup.page] || ""; font.pixelSize: 19; font.weight: Font.Normal }
                 }
                 Key { width: 30; hint: "Close"; onClicked: Desk.close(); Icon { anchors.centerIn: parent; name: "close"; width: 16; height: 16 } }
             }
@@ -39,8 +50,8 @@ Item {
             Loader {
                 id: pageLoader
                 width: parent.width
-                sourceComponent: ({audio:audioPage, network:networkPage, bluetooth:bluetoothPage, calendar:calendarPage, media:mediaPage, battery:batteryPage, session:sessionPage})[popup.page] || null
-                onLoaded: pageEntrance.restart()
+                sourceComponent: ({launcher:launcherPage, audio:audioPage, network:networkPage, bluetooth:bluetoothPage, calendar:calendarPage, media:mediaPage, battery:batteryPage, session:sessionPage})[popup.page] || null
+                onLoaded: { pageEntrance.restart(); Qt.callLater(content.focusPage); }
                 NumberAnimation { id: pageEntrance; target: pageLoader; property: "opacity"; from: 0.35; to: 1; duration: 120; easing.type: Easing.OutCubic }
             }
             Label { width: parent.width; visible: Desk.notice !== ""; text: Desk.notice; wrapMode: Text.WordWrap; color: Theme.orange }
@@ -51,6 +62,7 @@ Item {
         border.color: Theme.line; border.width: 1
     }
     component Caption: Label { font.pixelSize: 9; font.letterSpacing: 1; color: Theme.muted }
+    Component { id: launcherPage; Launcher { previewMode: content.previewMode } }
     Component {
         id: audioPage
         Column {
@@ -210,7 +222,7 @@ Item {
             spacing: 12
             Label { text: "Graphical Hyprland\nOperating System Toolkit"; font.pixelSize: 12; lineHeight: 1.5; color: Theme.cream }
             Caption { text: "TOP BAR / 0.1" }
-            Action { text: "Launcher                          ↗"; onClicked: Desk.legacy("launcher") }
+            Action { text: "Launcher                          ↗"; onClicked: Desk.panel = "launcher" }
             Action { text: "Desktop settings                  ↗"; onClicked: Desk.legacy("guide") }
             Action { text: "Lock session                      󰌾"; onClicked: Desk.launch(["serpantinum", "lock"]) }
         }

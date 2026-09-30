@@ -17,6 +17,7 @@ ShellRoot {
             Rail { id: rail; anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; previewMode: true }
             PanelContent {
                 id: panel
+                previewMode: true
                 x: frame.width / 2 - width / 2
                 y: 52
                 width: 392
@@ -31,7 +32,7 @@ ShellRoot {
             }
             Material {
                 visible: controller.page === "icons"
-                width: 620; height: 250
+                width: 620; height: 320
                 anchors.centerIn: parent
                 Label { x: 28; y: 24; text: "ghOSt / ICONS"; font.pixelSize: 11; color: Theme.muted }
                 BrandMark { x: 28; y: 65; width: 48; height: 48 }
@@ -53,6 +54,23 @@ ShellRoot {
                         }
                     }
                 }
+                Row {
+                    x: 28; y: 255; spacing: 24
+                    Repeater {
+                        model: ["search", "app", "terminal", "browser", "folder", "pin"]
+                        Icon { required property string modelData; name: modelData; width: 28; height: 28 }
+                    }
+                    Rectangle {
+                        width: 258; height: 40; radius: 4; color: Theme.text
+                        Row {
+                            anchors.centerIn: parent; spacing: 14
+                            Repeater {
+                                model: ["search", "app", "terminal", "browser", "folder", "pin"]
+                                Icon { required property string modelData; name: modelData; width: 24; height: 24; ink: Theme.base }
+                            }
+                        }
+                    }
+                }
             }
             Label { x: 28; anchors.bottom: parent.bottom; anchors.bottomMargin: 24; text: "ghOSt / STAGED RENDER / " + controller.page.toUpperCase(); font.pixelSize: 10; color: "white" }
         }
@@ -61,6 +79,7 @@ ShellRoot {
             function page(name: string): void { controller.page = name; }
             function metric(name: string): void { Desk.setPerformanceMetric(name); }
             function telemetry(): string { return panel.performanceStatus(); }
+            function launcher(action: string, value: string): string { return panel.launcherAction(action, value); }
             function capture(path: string): void { frame.grabToImage(result => { result.saveToFile(path); }); }
             function stop(): void { Qt.quit(); }
         }

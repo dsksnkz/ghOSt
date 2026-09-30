@@ -20,7 +20,7 @@ PanelWindow {
     }
     onOpenedChanged: {
         Qt.callLater(() => {
-            if (opened) content.forceActiveFocus();
+            if (opened) content.focusPage();
             focusGrab.active = opened;
         });
     }
