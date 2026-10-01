@@ -6,3 +6,5 @@ uploaded new screenshot of the calender design. Do not exactly use the image as 
 - the right frame of the calendar  frame with the main calendar is just the default old calendar.
 
 the whole frame's popup animation should be the main frame dropping down into place, then the little frames EACH by EACH like every each flashes in with no direction but "glitches" or "flashes" in, however every time launches in random order. The icons below cpu viewer and stuff is just what is looks like it is. all cpu gpu and clock icons should animated expand when hovered, and all other buttons that is clickable.
+
+the top rail is wip, but the part where you can see it replace with current.
