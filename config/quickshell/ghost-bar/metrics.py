@@ -61,6 +61,36 @@ def maximum_frequency():
     return max(values) if values else None
 
 
+def memory_percent(text):
+    values = {line.split(':')[0]: int(line.split()[1]) for line in text.splitlines() if ':' in line}
+    total, available = values.get('MemTotal', 0), values.get('MemAvailable')
+    if total <= 0 or available is None or not 0 <= available <= total:
+        return None
+    return round(100 * (total - available) / total, 1)
+
+
+def stream_all():
+    previous = None
+    ceiling = maximum_frequency()
+    while True:
+        started = time.monotonic()
+        data = {'cpu': None, 'gpu': None, 'memory': None, 'processor': None, 'maximum': ceiling}
+        try:
+            current = cpu_counters(Path('/proc/stat').read_text())
+            data['cpu'] = cpu_percent(previous, current) if previous else None
+            previous = current
+        except (OSError, ValueError):
+            pass
+        for key, read in [('memory', lambda: memory_percent(Path('/proc/meminfo').read_text())),
+                          ('processor', lambda: frequency(Path('/proc/cpuinfo').read_text())), ('gpu', gpu_percent)]:
+            try:
+                data[key] = read()
+            except (OSError, ValueError):
+                pass
+        print(json.dumps(data), flush=True)
+        time.sleep(max(.05, 1 - (time.monotonic() - started)))
+
+
 def stream(metric):
     previous = None
     ceiling = maximum_frequency()
@@ -85,9 +115,9 @@ def stream(metric):
 
 if __name__ == '__main__':
     metric = sys.argv[1] if len(sys.argv) == 2 else 'cpu'
-    if metric not in ('cpu', 'gpu', 'processor'):
-        raise SystemExit('Expected cpu, gpu or processor')
+    if metric not in ('cpu', 'gpu', 'processor', 'all'):
+        raise SystemExit('Expected cpu, gpu, processor or all')
     try:
-        stream(metric)
+        stream_all() if metric == 'all' else stream(metric)
     except BrokenPipeError:
         pass

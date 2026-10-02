@@ -17,19 +17,18 @@ Item {
     }
     Material {
         id: rail
-        x: 6; y: 4; width: parent.width - 12; height: 40; radius: 6
+        x: 19; y: 9; width: parent.width - 38; height: 46; radius: Theme.outerRadius
         Row {
             id: left
             x: 10; anchors.verticalCenter: parent.verticalCenter; spacing: 13
             Key {
                 id: identity
-                width: 102; height: 32
-                hint: "ghOSt · applications"
-                onClicked: bar.open("launcher", this)
+                width: 42; height: 32
+                hint: "Open controls"
+                onClicked: Desk.toggleSidebar(bar.screenName)
                 Row {
                     anchors.centerIn: parent; spacing: 10
-                    BrandMark { width: 23; height: 23; ink: Theme.text }
-                    Label { anchors.verticalCenter: parent.verticalCenter; text: "ghOSt"; font.pixelSize: 13; font.letterSpacing: 0.8 }
+                    SvgIcon { width: 20; height: 20; name:"menu" }
                 }
             }
             Rule {}
@@ -44,7 +43,7 @@ Item {
                 onSecondaryClicked: { if (Desk.player?.canTogglePlaying) Desk.player.togglePlaying(); }
                 Row {
                     x: 7; anchors.verticalCenter: parent.verticalCenter; spacing: 9
-                    Icon { width: 15; height: 15; name: Desk.playing ? "pause" : "play"; ink: Desk.playing ? Theme.text : Theme.muted; anchors.verticalCenter: parent.verticalCenter }
+                    SvgIcon { width: 15; height: 15; name: Desk.playing ? "pause" : "play"; opacity:Desk.playing?1:.5; anchors.verticalCenter: parent.verticalCenter }
                     Label { width: media.width - 44; text: bar.previewMode ? "MEDIA" : Desk.player?.trackTitle || "NO PLAYBACK"; color: Desk.player ? Theme.text : Theme.faint; anchors.verticalCenter: parent.verticalCenter; font.pixelSize: 10 }
                 }
                 Rectangle {
@@ -56,23 +55,22 @@ Item {
         }
         Key {
             id: time
-            width: bar.width > 1400 ? 208 : 110; height: 36
+            width: bar.width > 1400 ? 230 : 130; height: 36
             anchors.centerIn: parent
             hint: "Calendar"
             onClicked: bar.open("calendar", this)
             Row {
                 anchors.centerIn: parent; spacing: 11
-                Label { text: Qt.formatDateTime(Desk.now, "HH:mm"); font.pixelSize: 19; font.weight: Font.Normal }
-                Column {
-                    spacing: 2; anchors.verticalCenter: parent.verticalCenter
-                    Label { text: Qt.formatDateTime(Desk.now, "ss"); color: Theme.text; font.pixelSize: 9 }
-                    Rectangle { width: 12; height: 1; color: Theme.line }
-                }
-                Rectangle { visible: bar.width > 1400; width: 1; height: 19; color: Theme.line; anchors.verticalCenter: parent.verticalCenter }
+                SvgIcon { width: 22; height: 22; name:"calendar"; anchors.verticalCenter:parent.verticalCenter }
+                Label { text: Qt.formatDateTime(Desk.now, "HH:mm"); font.pixelSize: 24; font.weight: Font.Normal }
+                Rectangle { visible: bar.width > 1400; width: 1; height: 29; color: Theme.muted; anchors.verticalCenter: parent.verticalCenter }
                 Column {
                     visible: bar.width > 1400; spacing: 1; anchors.verticalCenter: parent.verticalCenter
-                    Label { text: Qt.formatDateTime(Desk.now, "ddd").toUpperCase(); font.pixelSize: 9; color: Theme.muted }
-                    Label { text: Qt.formatDateTime(Desk.now, "dd MMM").toUpperCase(); font.pixelSize: 9 }
+                    Label { text: Qt.formatDateTime(Desk.now, "MM.dd"); font.pixelSize: 12 }
+                    Row { spacing:4
+                        SvgIcon { width:13;height:13;name:Desk.weatherSummary.condition==="clear"?"brightness":Desk.weatherSummary.condition==="unknown"?"cloud":Desk.weatherSummary.condition }
+                        Label { text:typeof Desk.weatherSummary.temperature==="number"?Math.round(Desk.weatherSummary.temperature)+"°":"—";font.pixelSize:11;color:Theme.muted }
+                    }
                 }
             }
         }
@@ -98,33 +96,6 @@ Item {
             }
             Rule { visible: !bar.previewMode && SystemTray.items.values.length > 0 }
             Key {
-                id: net
-                width: bar.width > 1450 ? 80 : 32
-                ink: Desk.connected ? Theme.text : Theme.faint
-                hint: Desk.networkName
-                onClicked: bar.open("network", this)
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 9
-                    Icon { width: 16; height: 16; name: Desk.wired ? "network" : "wifi"; ink: net.ink }
-                    Label { visible: bar.width > 1450; anchors.verticalCenter: parent.verticalCenter; text: Desk.wired ? "ETH" : Desk.connected ? "WI-FI" : "OFF"; color: net.ink; font.pixelSize: 10 }
-                }
-            }
-            Key {
-                width: 28
-                ink: Desk.adapter?.enabled ? Theme.text : Theme.faint
-                hint: "Bluetooth"
-                onClicked: bar.open("bluetooth", this)
-                Icon {
-                    anchors.centerIn: parent
-                    width: 16
-                    height: 16
-                    name: "bluetooth"
-                    ink: parent.ink
-                }
-            }
-            Rule {}
-            Key {
                 id: sound
                 width: 112; height: 32
                 hint: "Audio · scroll for volume · right-click to mute"
@@ -133,27 +104,52 @@ Item {
                 onScrolled: delta => Desk.setVolume((Desk.volume + (delta > 0 ? 2 : -2)) / 100)
                 Row {
                     anchors.centerIn: parent; spacing: 8
-                    Icon { width: 16; height: 16; name: "volume"; ink: Desk.muted ? Theme.faint : Theme.text; anchors.verticalCenter: parent.verticalCenter }
+                    SvgIcon { width: 16; height: 16; name: Desk.muted?"mute":"volume"; opacity: Desk.muted?.45:1; anchors.verticalCenter: parent.verticalCenter }
                     Meter { count: 7; value: Desk.muted ? 0 : Desk.volume / 100; anchors.verticalCenter: parent.verticalCenter }
                     Label { text: Desk.volume; font.pixelSize: 10; color: Theme.muted; anchors.verticalCenter: parent.verticalCenter }
+                }
+            }
+            Key {
+                id: net
+                width: 32
+                ink: Desk.connected ? Theme.text : Theme.faint
+                hint: Desk.networkName
+                onClicked: Desk.toggleSidebar(bar.screenName)
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 9
+                    SvgIcon { width: 16; height: 16; name: Desk.wired ? "ethernet" : "wifi"; opacity:Desk.connected?1:.45 }
+                }
+            }
+            Key {
+                width: 28
+                ink: Desk.adapter?.enabled ? Theme.text : Theme.faint
+                hint: "Bluetooth"
+                onClicked: Desk.toggleSidebar(bar.screenName)
+                SvgIcon {
+                    anchors.centerIn: parent
+                    width: 16
+                    height: 16
+                    name: "bluetooth"
+                    opacity: Desk.adapter?.enabled ? 1 : .4
                 }
             }
             Rule { visible: Desk.hasBattery }
             Key {
                 visible: Desk.hasBattery
-                width: bar.width > 1400 ? 112 : 65; height: 32
+                width: bar.width > 1400 ? 78 : 65; height: 32
                 hint: "Battery"
-                onClicked: bar.open("battery", this)
+                onClicked: Desk.toggleSidebar(bar.screenName)
                 Row {
                     anchors.centerIn: parent; spacing: 9
-                    Icon { visible: bar.width > 1400; width: 16; height: 16; name: "battery"; ink: Theme.text; anchors.verticalCenter: parent.verticalCenter }
+                    SvgIcon { visible: bar.width > 1400; width: 16; height: 16; name: "battery"; anchors.verticalCenter: parent.verticalCenter }
                     Label { text: Desk.charge + "%"; font.pixelSize: 10 }
                 }
             }
             Key {
                 width: 27; hint: "Session"
                 onClicked: bar.open("session", this)
-                Icon { anchors.centerIn: parent; width: 16; height: 16; name: "power"; ink: Theme.text }
+                SvgIcon { anchors.centerIn: parent; width: 16; height: 16; name: "power" }
             }
         }
     }

@@ -2,42 +2,44 @@ import QtQuick
 import Quickshell.Hyprland
 
 Item {
-    id: root
+    id: wheel
     property var monitor
-    readonly property int current: monitor?.activeWorkspace?.id ?? Desk.activeWorkspace
-    readonly property var ids: {
-        let list = [1, 2, 3, 4, 5];
-        for (const ws of Hyprland.workspaces.values)
-            if (ws.id > 5 && !list.includes(ws.id)) list.push(ws.id);
-        if (current > 0 && !list.includes(current)) list.push(current);
-        return list.sort((a,b) => a-b);
-    }
-    width: ids.length * 34
-    height: 32
-    Rectangle {
-        x: Math.max(0, root.ids.indexOf(root.current)) * 34 + 2
-        y: 3; width: 30; height: 25; radius: 4
-        color: Theme.cream
-        Behavior on x { NumberAnimation { duration: Theme.motion; easing.type: Easing.OutCubic } }
-    }
-    Rectangle {
-        x: Math.max(0, root.ids.indexOf(root.current)) * 34 + 14
-        y: 31; width: 6; height: 2; color: Theme.orange
-        Behavior on x { NumberAnimation { duration: 230; easing.type: Easing.OutQuint } }
-    }
+    readonly property int current: Math.max(1, monitor?.activeWorkspace?.id ?? Desk.activeWorkspace)
+    width: 118
+    height: 34
+
     Row {
+        anchors.centerIn: parent
+        spacing: 2
         Repeater {
-            model: root.ids
+            model: [-1, 0, 1]
             Key {
                 required property int modelData
-                readonly property bool occupied: Hyprland.workspaces.values.some(w => w.id === modelData && w.toplevels.values.length > 0)
-                width: 34; height: 30; padding: 0
-                text: String(modelData).padStart(2, "0")
-                hint: "Workspace " + modelData
-                ink: root.current === modelData ? Theme.base : occupied ? Theme.text : Theme.faint
+                readonly property int workspace: wheel.current + modelData
+                readonly property bool central: modelData === 0
+                width: central ? 40 : 35
+                height: 32
+                padding: 0
+                enabled: workspace > 0
                 color: "transparent"
-                onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + modelData + " })")
+                ink: central ? Theme.text : Theme.muted
+                text: workspace > 0 ? String(workspace).padStart(2, "0") : ""
+                hint: "Workspace " + workspace
+                onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + workspace + " })")
                 onScrolled: delta => Hyprland.dispatch("hl.dsp.focus({ workspace = '" + (delta > 0 ? "e-1" : "e+1") + "' })")
+
+                Canvas {
+                    visible: parent.central
+                    x: (parent.width - width) / 2
+                    y: 28
+                    width: 12
+                    height: 5
+                    onPaint: {
+                        const c = getContext("2d"); c.reset();
+                        c.beginPath(); c.moveTo(0, 5); c.lineTo(6, 0); c.lineTo(12, 5);
+                        c.closePath(); c.fillStyle = "#dddddd"; c.fill();
+                    }
+                }
             }
         }
     }

@@ -16,6 +16,11 @@ Singleton {
     property real panelOrigin: 196
     property string notice: ""
     property string performanceMetric: "cpu"
+    property var weatherSummary: ({condition:"unknown", temperature:null})
+    property bool sidebarOpen: false
+    property bool settingsRequested: false
+    function toggleSidebar(screenName) { panelScreen=screenName; panel=""; settingsRequested=false; sidebarOpen = !sidebarOpen; }
+    function openSettings(screenName) { panelScreen=screenName; panel=""; settingsRequested=true; sidebarOpen=true; }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink?.audio ?? null
     readonly property int volume: audio ? Math.round(audio.volume * 100) : 0
@@ -44,11 +49,10 @@ Singleton {
         notice = "";
         panel = name;
     }
-    function close() { panel = ""; }
+    function close() { panel = ""; sidebarOpen = false; settingsRequested=false; }
     function setVolume(value) { if (audio) audio.volume = Math.max(0, Math.min(1, value)); }
     function mute() { if (audio) audio.muted = !audio.muted; }
     function launch(args) { close(); Quickshell.execDetached(args); }
-    function legacy(name) { launch(["serpantinum", "msg", "toggle", name]); }
     function setPerformanceMetric(value) { performanceMetric = value; }
     onPanelChanged: if (wifi) wifi.scannerEnabled = panel === "network";
 }

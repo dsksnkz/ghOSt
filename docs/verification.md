@@ -1,5 +1,9 @@
 # Verification
 
+## 2026-10-03 / calendar, rail and staged sidebar
+
+See [frame change record](changes/2026-10-03-frames.md) and [progress](PROGRESS.md). The user explicitly approved live activation of calendar and rail only. The sidebar is staged and independently rendered with labeled sample device names; it is not active on the desktop pending separate approval. Fifteen Python tests, fifteen launcher assertions, an isolated calendar animation check, native Quickshell reload/layer inspection and desktop/mobile website screenshots passed. `hyprctl configerrors` was empty; the live keybind JSON SHA-256 was unchanged before/after. Actual user pointer clicks, independent lock/notification handling and completion of the old-rice audit remain unverified. No session or power action was executed.
+
 ## 2026-09-30 / staged revision 0.3.0
 
 See [launcher](changes/2026-09-30-launcher.md). Fifteen launcher assertions and six telemetry tests passed. Isolated Quickshell loaded the installed app catalogue and saved/reloaded pins. Search, selection bounds, preview-only dispatch and empty results were exercised through IPC. Screenshots are real QML renders, not native desktop interaction proof. Native keyboard input, application startup and multi-monitor focus remain pending explicit activation.

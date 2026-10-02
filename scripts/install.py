@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install only the ghOSt bar. Preserve compositor settings and keybindings."""
+"""Stage or opt in to ghOSt without editing another rice's source."""
 import argparse
 import datetime
 import hashlib
@@ -12,7 +12,7 @@ import subprocess
 parser = argparse.ArgumentParser()
 parser.add_argument("--restore", action="store_true", help="restore the last pre-install snapshot")
 parser.add_argument("--no-start", action="store_true", help="install without starting Quickshell")
-parser.add_argument("--activate", action="store_true", help="explicitly replace the current bar and update autostart")
+parser.add_argument("--activate", action="store_true", help="explicitly install ghOSt and add its autostart")
 parser.add_argument("--stage-dir", type=Path, help="optional isolated staging destination")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
@@ -25,7 +25,6 @@ target = config / "quickshell/ghost-bar"
 launcher = home / ".local/bin/ghost-bar"
 lua = config / "hypr/config/autostart.lua"
 conf = config / "hypr/hyprland.conf"
-serpent = data / "serpantinum/src/quickshell/Shell.qml"
 keybinds = config / "hypr/config/keybinds.lua"
 
 def digest(path):
@@ -64,7 +63,7 @@ if not args.activate:
     shutil.copytree(repo / "config/quickshell/ghost-bar", staged, dirs_exist_ok=True)
     print("ghOSt staged at " + str(staged))
     print("Live rice, wallpaper, keybindings and autostart were not changed.")
-    print("To replace the active bar deliberately: ./install.sh --activate")
+    print("To install and start ghOSt deliberately: ./install.sh --activate")
     raise SystemExit(0)
 
 if not lua.exists() and not conf.exists():
@@ -77,7 +76,7 @@ if record is None:
     backup = state / "backups" / stamp
     backup.mkdir(parents=True)
     entries = []
-    for index, path in enumerate([lua if lua.exists() else conf, serpent, launcher]):
+    for index, path in enumerate([lua if lua.exists() else conf, launcher]):
         saved = backup / (str(index) + "-" + path.name)
         if path.exists():
             shutil.copy2(path, saved)
@@ -103,10 +102,6 @@ else:
     text = conf.read_text()
     if "# ghOSt top bar" not in text:
         conf.write_text(text + '\n# ghOSt top bar\nexec-once = ' + str(launcher) + '\n')
-if serpent.exists():
-    text = serpent.read_text()
-    if "    Bar {}" in text:
-        serpent.write_text(text.replace("    Bar {}", "    // ghOSt owns the top bar. Services remain available for existing keybinds.", 1))
 if before != digest(keybinds):
     raise SystemExit("Keybinding verification failed.")
 for entry in record["files"]:

@@ -10,6 +10,11 @@ spec.loader.exec_module(metrics)
 
 
 class Telemetry(unittest.TestCase):
+    def test_memory_uses_available_not_free(self):
+        self.assertEqual(metrics.memory_percent('MemTotal: 1000 kB\nMemAvailable: 750 kB\nMemFree: 100 kB'), 25)
+        for sample in ['MemTotal: 0 kB', 'MemTotal: 100 kB', 'MemTotal: 100 kB\nMemAvailable: 101 kB']:
+            self.assertIsNone(metrics.memory_percent(sample))
+
     def test_guest_is_not_counted_twice(self):
         self.assertEqual(metrics.cpu_counters('cpu 10 2 3 80 5 0 0 0 7 1\ncpu0 0'), (100, 85))
 

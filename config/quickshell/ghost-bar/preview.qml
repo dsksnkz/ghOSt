@@ -7,27 +7,34 @@ ShellRoot {
     FloatingWindow {
         id: preview
         visible: true
-        implicitWidth: 1600
-        implicitHeight: 820
+        implicitWidth: 1920
+        implicitHeight: 1080
         color: "#080808"
         Item {
             id: frame
             anchors.fill: parent
-            Image { anchors.fill: parent; source: Quickshell.env("GHOST_WALLPAPER"); fillMode: Image.PreserveAspectCrop }
+            Image { anchors.fill: parent; source: Quickshell.env("GHOST_WALLPAPER") || ""; fillMode: Image.PreserveAspectCrop }
             Rail { id: rail; anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; previewMode: true }
+            SidebarBody {
+                visible: controller.page === "sidebar"
+                x: 16; y: 82; width: 360; height: 800
+                screen: ({name:"HDMI-A-1"})
+                previewMode: true
+            }
             PanelContent {
                 id: panel
                 previewMode: true
                 x: frame.width / 2 - width / 2
-                y: 52
-                width: 392
+                y: controller.page === "calendar" ? 82 : 68
+                width: controller.page === "calendar" ? Math.floor(Math.min(frame.width * 733/1920, (frame.height - 100) * 1200 / 505)) : 392
                 height: implicitHeight
-                visible: controller.page !== "rail" && controller.page !== "icons"
+                visible: controller.page !== "rail" && controller.page !== "icons" && controller.page !== "sidebar"
                 popup: QtObject {
                     id: controller
                     property string page: "calendar"
                     property bool opened: true
-                    property real reveal: 1
+                    property real reveal: opened ? 1 : 0
+                    Behavior on reveal { NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.panel; easing.type: Easing.OutCubic } }
                 }
             }
             Material {
@@ -72,13 +79,15 @@ ShellRoot {
                     }
                 }
             }
-            Label { x: 28; anchors.bottom: parent.bottom; anchors.bottomMargin: 24; text: "ghOSt / STAGED RENDER / " + controller.page.toUpperCase(); font.pixelSize: 10; color: "white" }
+            Label { x: 28; anchors.bottom: parent.bottom; anchors.bottomMargin: 24; text: "ghOSt / STAGED RENDER / " + controller.page.toUpperCase() + (Quickshell.env("GHOST_CALENDAR_FIXTURE") === "1" ? " / SAMPLE DATA" : ""); font.pixelSize: 10; color: "white" }
         }
         IpcHandler {
             target: "preview"
             function page(name: string): void { controller.page = name; }
             function metric(name: string): void { Desk.setPerformanceMetric(name); }
             function telemetry(): string { return panel.performanceStatus(); }
+            function calendar(action: string, value: string): string { return panel.calendarAction(action,value); }
+            function opened(value: bool): void { controller.opened = value; }
             function launcher(action: string, value: string): string { return panel.launcherAction(action, value); }
             function capture(path: string): void { frame.grabToImage(result => { result.saveToFile(path); }); }
             function stop(): void { Qt.quit(); }

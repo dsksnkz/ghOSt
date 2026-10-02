@@ -22,10 +22,13 @@ button{cursor:pointer;border:1px solid var(--line);border-radius:3px;background:
 button[aria-pressed=true]{background:var(--ink);color:#080808;border-color:var(--ink)}
 button:active{transform:translateY(1px)}
 figure{margin:0;border:1px solid var(--line);background:#0c0c0c}
-figure img{display:block;width:100%;height:auto;aspect-ratio:1600/820;object-fit:contain}
+.surface-stage{overflow:hidden;aspect-ratio:1920/650;background:#0c0c0c}
+figure[data-view="sidebar"] .surface-stage{aspect-ratio:1920/950}
+figure img{display:block;width:100%;height:auto;object-fit:contain}
+figure[data-view="cpu"] .surface-stage,figure[data-view="gpu"] .surface-stage,figure[data-view="clock"] .surface-stage,figure[data-view="audio"] .surface-stage,figure[data-view="icons"] .surface-stage,figure[data-view="launcher"] .surface-stage,figure[data-view="search"] .surface-stage,figure[data-view="empty"] .surface-stage{aspect-ratio:1600/820}
 figcaption{border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;padding:18px 20px;color:var(--muted);font-size:10px;line-height:1.7}
 .notes{display:grid;grid-template-columns:1fr 1fr;gap:80px;padding:42px 0 64px}
 h2{font-size:12px;font-weight:500;margin:0 0 12px}.notes p{color:var(--muted);line-height:1.9;font-size:11px;margin:0 0 18px}.notes a{font-size:10px;text-decoration:underline;text-underline-offset:4px}
 footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding-top:24px;padding-bottom:32px;color:var(--muted);font-size:10px}
-@media(max-width:700px){header,main,footer{padding-left:18px;padding-right:18px}.intro{display:block;padding-top:40px}.description{margin-top:20px}.notes{grid-template-columns:1fr;gap:28px}figcaption{display:block}.version{display:none}footer span{max-width:220px;text-align:right}}
+@media(max-width:700px){header,main,footer{padding-left:18px;padding-right:18px}.intro{display:block;padding-top:40px}.description{margin-top:20px}.notes{grid-template-columns:1fr;gap:28px}figcaption{display:flex;flex-wrap:wrap}.version{display:none}footer span{max-width:220px;text-align:right}.surface-stage{aspect-ratio:4/3}figure[data-view="sidebar"] .surface-stage{aspect-ratio:4/3}figure img{width:900px;max-width:none}figure[data-view="calendar"] img,figure[data-view="power"] img{transform:translateX(-250px)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}

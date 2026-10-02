@@ -22,36 +22,55 @@ Item {
         return item.status();
     }
     function performanceStatus() {
+        if (pageLoader.item?.status) return pageLoader.item.status();
         const gauge = pageLoader.item?.telemetry;
         return JSON.stringify(gauge ? {metric: gauge.metric, value: gauge.reading, maximum: gauge.maximum, active: gauge.active} : {active: false});
     }
-    implicitHeight: body.implicitHeight + 46
+    function calendarAction(action, value) {
+        const item=pageLoader.item;
+        if(popup.page!=="calendar" || !item)return "";
+        if(action==="reveal")item.beginReveal();
+        if(action==="month")item.monthStep(Number(value));
+        if(action==="reduced")Theme.reducedMotion=value==="true";
+        if(action==="weather" && previewMode)item.weather={condition:value,temperature:15,days:[]};
+        if(action==="level" && previewMode)item.readings={cpu:Number(value),gpu:Number(value),memory:Number(value),processor:2100,maximum:4500};
+        if(action==="clock" && previewMode)item.clockMetric=value==="true";
+        if(action==="action" && previewMode)item.actionPage=value;
+        return item.status();
+    }
+    implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : 46)
         focus: true
-        Keys.onEscapePressed: Desk.close()
+        Keys.onEscapePressed: {
+            if (popup.page === "calendar" && pageLoader.item?.actionPage) pageLoader.item.actionPage = "";
+            else if (content.previewMode) popup.opened = false;
+            else Desk.close();
+        }
         opacity: popup.reveal
         transform: [
-            Translate { y: -8 * (1 - popup.reveal) },
-            Scale { origin.x: Desk.panelOrigin; origin.y: 0; xScale: .18 + .82 * popup.reveal; yScale: .1 + .9 * popup.reveal }
+            Translate { y: (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal) },
+            Scale { origin.x: Desk.panelOrigin; origin.y: 0; xScale: popup.page === "calendar" ? 1 : .18 + .82 * popup.reveal; yScale: popup.page === "calendar" ? 1 : .1 + .9 * popup.reveal }
         ]
-        Material { anchors.fill: parent; anchors.margins: 1; radius: 10 }
+        Material { visible: popup.page !== "calendar"; anchors.fill: parent; anchors.margins: 1; radius: Theme.outerRadius }
+        Rectangle { visible: popup.page === "calendar"; anchors.fill: parent; anchors.margins: 1; radius: Theme.outerRadius; color: "#151515"; border.color: "#454545"; border.width: 1 }
         Column {
             id: body
-            x: 22; y: 19; width: parent.width - 44; spacing: 17
+            x: popup.page === "calendar" ? 0 : 22; y: popup.page === "calendar" ? 0 : 19; width: parent.width - (popup.page === "calendar" ? 0 : 44); spacing: popup.page === "calendar" ? 0 : 17
             Row {
+                visible: popup.page !== "calendar"
                 width: parent.width
                 Column {
                     width: parent.width - 32; spacing: 5
-                    Label { text: "ghOSt / " + popup.page.toUpperCase(); color: Theme.muted; font.pixelSize: 9; font.letterSpacing: 1.1 }
-                    Label { text: ({launcher:"Applications", audio:"Sound", network:"Connections", bluetooth:"Bluetooth", calendar:Qt.formatDateTime(Desk.now,"MMMM yyyy"),media:"Now playing",battery:"Power",session:"Your session"})[popup.page] || ""; font.pixelSize: 19; font.weight: Font.Normal }
+                    Label { text: popup.page === "session" ? "ghOSt" : "ghOSt / " + popup.page.toUpperCase(); color: Theme.muted; font.pixelSize: 9; font.letterSpacing: 1.1 }
+                    Label { text: ({launcher:"Applications", audio:"Sound", network:"Connections", bluetooth:"Bluetooth", calendar:Qt.formatDateTime(Desk.now,"MMMM yyyy"),media:"Now playing",battery:"Power",session:"Power"})[popup.page] || ""; font.pixelSize: 19; font.weight: Font.Normal }
                 }
                 Key { width: 30; hint: "Close"; onClicked: Desk.close(); Icon { anchors.centerIn: parent; name: "close"; width: 16; height: 16 } }
             }
-            Rectangle { width: parent.width; height: 1; color: Theme.line }
+            Rectangle { visible: popup.page !== "calendar"; width: parent.width; height: 1; color: Theme.line }
             Loader {
                 id: pageLoader
                 width: parent.width
                 sourceComponent: ({launcher:launcherPage, audio:audioPage, network:networkPage, bluetooth:bluetoothPage, calendar:calendarPage, media:mediaPage, battery:batteryPage, session:sessionPage})[popup.page] || null
-                onLoaded: { pageEntrance.restart(); Qt.callLater(content.focusPage); }
+                onLoaded: { if(popup.page!=="calendar")pageEntrance.restart();else pageLoader.opacity=1; Qt.callLater(content.focusPage); }
                 NumberAnimation { id: pageEntrance; target: pageLoader; property: "opacity"; from: 0.35; to: 1; duration: 120; easing.type: Easing.OutCubic }
             }
             Label { width: parent.width; visible: Desk.notice !== ""; text: Desk.notice; wrapMode: Text.WordWrap; color: Theme.orange }
@@ -116,7 +135,7 @@ Item {
                     onClicked: {
                         if (modelData.connected) return;
                         if (modelData.known) { modelData.connect(); Desk.notice = "Connecting to " + modelData.name + "…"; }
-                        else Desk.launch(["serpantinum", "msg", "toggle", "network"]);
+                        else Desk.launch(["nm-connection-editor"]);
                     }
                     Connections {
                         target: modelData
@@ -146,42 +165,10 @@ Item {
     }
     Component {
         id: calendarPage
-        Column {
-            id: cal
-            property alias telemetry: performance
-            property date month: new Date(Desk.now.getFullYear(), Desk.now.getMonth(), 1)
-            readonly property int offset: (month.getDay()+6)%7
-            spacing: 14
-            Row {
-                width: parent.width
-                Key { text: "←"; width: 34; onClicked: cal.month = new Date(cal.month.getFullYear(), cal.month.getMonth()-1, 1) }
-                Label { width: body.width-68; horizontalAlignment: Text.AlignHCenter; anchors.verticalCenter: parent.verticalCenter; text: Qt.formatDateTime(cal.month,"MMMM yyyy"); color: Theme.cream }
-                Key { text: "→"; width: 34; onClicked: cal.month = new Date(cal.month.getFullYear(), cal.month.getMonth()+1, 1) }
-            }
-            PerformanceGauge {
-                id: performance
-                width: parent.width
-                active: popup.opened && popup.page === "calendar"
-                metric: Desk.performanceMetric
-                onMetricSelected: value => Desk.setPerformanceMetric(value)
-            }
-            Grid {
-                columns: 7; spacing: 4
-                Repeater { model: ["M","T","W","T","F","S","S"]; Label { required property string modelData; text: modelData; width: (body.width-24)/7; horizontalAlignment: Text.AlignHCenter; color: Theme.faint; height: 19 } }
-                Repeater {
-                    model: 42
-                    Rectangle {
-                        required property int index
-                        readonly property date day: new Date(cal.month.getFullYear(), cal.month.getMonth(), index-cal.offset+1)
-                        readonly property bool today: day.toDateString() === Desk.now.toDateString()
-                        width: (body.width-24)/7; height: 30; radius: 4
-                        color: today ? Theme.cream : "transparent"
-                        Label { anchors.centerIn: parent; text: parent.day.getDate(); color: parent.today ? Theme.base : parent.day.getMonth() === cal.month.getMonth() ? Theme.text : Theme.faint }
-                        Rectangle { visible: parent.today; width: 4; height: 2; color: Theme.orange; anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: 2 } }
-                    }
-                }
-            }
-            Caption { text: Qt.formatDateTime(Desk.now,"dddd, dd MMMM").toUpperCase() }
+        CalendarPanel {
+            active: popup.opened && popup.page === "calendar"
+            previewMode: content.previewMode
+            onNavigateRequested: page => { if(content.previewMode) popup.page=page; else Desk.panel=page; }
         }
     }
     Component {
@@ -219,12 +206,44 @@ Item {
     Component {
         id: sessionPage
         Column {
-            spacing: 12
-            Label { text: "Graphical Hyprland\nOperating System Toolkit"; font.pixelSize: 12; lineHeight: 1.5; color: Theme.cream }
-            Caption { text: "TOP BAR / 0.1" }
-            Action { text: "Launcher                          ↗"; onClicked: Desk.panel = "launcher" }
-            Action { text: "Desktop settings                  ↗"; onClicked: Desk.legacy("guide") }
-            Action { text: "Lock session                      󰌾"; onClicked: Desk.launch(["serpantinum", "lock"]) }
+            id: sessionBody
+            property string pending: ""
+            width: body.width
+            spacing: 8
+            Repeater {
+                model: [
+                    {label:"Lock", icon:"lock", command:[]},
+                    {label:"Sleep", icon:"sleep", command:["systemctl","suspend"]},
+                    {label:"Log out", icon:"logout", command:["hyprctl","dispatch","exit"]},
+                    {label:"Restart", icon:"restart", command:["systemctl","reboot"]},
+                    {label:"Shut down", icon:"power", command:["systemctl","poweroff"]}
+                ]
+                Key {
+                    required property var modelData
+                    width: sessionBody.width; height: 42
+                    radius: Theme.innerRadius(3)
+                    color: sessionBody.pending === modelData.label ? "#373737" : "#222222"
+                    border.color: Theme.line; border.width: 1
+                    hint: modelData.label
+                    onClicked: {
+                        if (modelData.command.length === 0) { Desk.notice = "Lock needs an independent ghOSt configuration"; return; }
+                        if (sessionBody.pending === modelData.label) { Desk.launch(modelData.command); return; }
+                        sessionBody.pending = modelData.label;
+                        Desk.notice = "Confirm " + modelData.label.toLowerCase() + " or cancel";
+                    }
+                    Row {
+                        x: 13; anchors.verticalCenter: parent.verticalCenter; spacing: 12
+                        SvgIcon { width: 19; height: 19; name: modelData.icon; anchors.verticalCenter: parent.verticalCenter }
+                        Label { text: sessionBody.pending === modelData.label ? "Confirm " + modelData.label : modelData.label; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                }
+            }
+            Key {
+                width: sessionBody.width; height: 34; text: "Cancel"
+                visible: sessionBody.pending !== ""
+                hint: "Cancel power action"
+                onClicked: { sessionBody.pending = ""; Desk.notice = ""; }
+            }
         }
     }
 }

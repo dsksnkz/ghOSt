@@ -2,6 +2,9 @@ pragma Singleton
 import QtQuick
 
 QtObject {
+    property bool reducedMotion: false
+    readonly property real outerRadius: 7
+    function innerRadius(padding) { return Math.max(0, outerRadius-padding); }
     readonly property string font: "JetBrainsMono Nerd Font"
     readonly property color base: "#080808"
     readonly property color surface: "#101010"

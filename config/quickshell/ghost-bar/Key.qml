@@ -8,6 +8,7 @@ Rectangle {
     property bool selected: false
     property color ink: selected ? Theme.base : Theme.text
     property real padding: 12
+    property int fontSize: 11
     property alias hovered: mouse.containsMouse
     signal clicked()
     signal secondaryClicked()
@@ -21,10 +22,10 @@ Rectangle {
     Keys.onReturnPressed: clicked()
     Keys.onSpacePressed: clicked()
     color: selected ? Theme.text : mouse.pressed ? Theme.line : "transparent"
-    scale: mouse.pressed ? 0.96 : 1
+    scale: mouse.pressed ? 0.96 : mouse.containsMouse ? 1.04 : 1
     Behavior on color { ColorAnimation { duration: Theme.fast } }
-    Behavior on scale { NumberAnimation { duration: Theme.fast; easing.type: Easing.OutCubic } }
-    Label { id: label; anchors.centerIn: parent; text: root.text; color: root.ink }
+    Behavior on scale { NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast; easing.type: Easing.OutCubic } }
+    Label { id: label; anchors.centerIn: parent; text: root.text; color: root.ink; font.pixelSize:root.fontSize }
     MouseArea {
         id: mouse
         anchors.fill: parent
@@ -35,7 +36,7 @@ Rectangle {
         onClicked: event => event.button === Qt.LeftButton ? root.clicked() : root.secondaryClicked()
         onWheel: event => root.scrolled(event.angleDelta.y)
     }
-    Controls.ToolTip.visible: mouse.containsMouse && root.hint !== ""
+    Controls.ToolTip.visible: false
     Controls.ToolTip.delay: 550
     Controls.ToolTip.text: hint
     Accessible.role: Accessible.Button

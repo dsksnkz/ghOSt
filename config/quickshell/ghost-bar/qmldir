@@ -15,3 +15,9 @@ BrandMark 1.0 BrandMark.qml
 PanelContent 1.0 PanelContent.qml
 Launcher 1.0 Launcher.qml
 SvgIcon 1.0 SvgIcon.qml
+LiquidMeter 1.0 LiquidMeter.qml
+WeatherGlyph 1.0 WeatherGlyph.qml
+CalendarPanel 1.0 CalendarPanel.qml
+CalendarWindow 1.0 CalendarWindow.qml
+Sidebar 1.0 Sidebar.qml
+SidebarBody 1.0 SidebarBody.qml

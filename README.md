@@ -2,21 +2,19 @@
 
 Graphical Hyprland Operating System Toolkit.
 
-Quickshell rice with buddy codex
+[Preview](https://dsksnkz.github.io/ghOSt/) · [SVG icons](https://dsksnkz.github.io/ghOSt/icons.html) · [Progress](docs/PROGRESS.md)
 
-[Preview](https://dsksnkz.github.io/ghOSt/) · [SVG icons](https://dsksnkz.github.io/ghOSt/icons.html) · [Changes](docs/changes/2026-10-02-svg-icons.md)
+60 standalone transparent SVG icons, each in black and white. [Usage and rebuilding](docs/icons.md).
 
-60 standalone transparent SVG icons, each in black and white. [Usage and rebuilding](docs/icons.md). This asset update does not replace the existing Canvas controls or activate a new desktop configuration.
-
-![Staged ghOSt calendar](site/assets/calendar-performance.png)
+![ghOSt calendar preview with sample readings](site/assets/calendar-frame.webp)
 
 ## Current scope
 
-Top rail, application launcher, calendar, radial performance instrument, audio, network, Bluetooth, media, battery and session panels. JetBrains Mono typography, Turret Road G, custom black/white icons and click-triggered motion.
+Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation, staged left sidebar, audio, network, Bluetooth, media, battery and a confirmation-based power panel. JetBrains Mono typography, a separate monochrome SVG icon pack and click-triggered motion.
 
 The launcher searches installed desktop entries by name, generic name and keywords. Pins are saved in `$XDG_STATE_HOME/ghost/launcher.ini` (default `~/.local/state/ghost/launcher.ini`). It uses native desktop-entry execution, not shell-parsed search text.
 
-CPU is measured from Linux counter deltas. GPU utilization is read only when selected. Processor means average clock frequency in MHz, scaled to the hardware maximum when available. Missing or stale readings show unavailable. Sampling stops when the calendar closes.
+CPU is measured from Linux counter deltas. GPU and RAM usage use system telemetry. The CPU diamond switches to average processor clock frequency in MHz. Missing or stale readings show unavailable; sampling stops when the calendar closes. London weather is configured in `config/ghost/weather.json` from the user's chosen location.
 
 ## Stage
 
@@ -36,23 +34,24 @@ Default installation stages a separate copy under ~/.local/share/ghost/staged/gh
 ./install.sh --activate
 ```
 
-This explicitly installs into ~/.config/quickshell/ghost-bar, adds autostart and a layer animation rule, and disables Serpantinum's bar if present. Existing keyboard shortcuts, lock and Wi-Fi authentication still depend on Serpantinum; this is not a complete independent rice yet. The G control opens ghOSt's own launcher without replacing any shortcut. Settings helpers are pavucontrol, nm-connection-editor and blueman-manager.
+This installs ghOSt into `~/.config/quickshell/ghost-bar` and adds its own autostart. It does not edit another rice. If another bar is active, the bars may overlap; do not activate until that session is deliberately switched. This opt-in installer is not a complete independent-rice migration yet. The launcher is native to ghOSt. Network and Bluetooth controls use standard system utilities where needed; the independent lock and notifications surfaces remain pending.
 
 The legacy restore command is ./install.sh --restore. It verifies tracked integration files before restoring the original snapshot; later edits require manual reconciliation. Backups are under ~/.local/state/ghost/backups. Staging alone needs no live rollback.
 
 ## Controls
 
-- G opens Applications; type to search, Up/Down to select, Enter to open. Pins keep favorites first among equally ranked results.
-- Workspace numbers switch workspace; scroll navigates.
-- Clock opens Calendar; CPU / GPU / CLOCK switch the radial readout.
+- The menu control opens the staged sidebar; the separate launcher searches applications by name or keywords. Pins keep favorites first among equally ranked results.
+- The three-position workspace wheel switches workspace; scroll navigates.
+- Clock opens the whole calendar frame; clicking the CPU diamond switches it to processor clock.
 - Audio opens volume; scroll adjusts; right-click mutes.
-- Network, Bluetooth, battery and media open their panels.
+- In the staged design, network, Bluetooth and battery open the sidebar; the currently installed rail retains its older separate panels until sidebar approval.
+- Power opens a HUD. Sleep, log out, restart and shut down require a second confirmation click. Lock is unavailable until its independent configuration is complete.
 - Escape or click outside closes a native panel.
 - Buttons support Tab focus and Return/Space activation.
 
 ## Verification
 
-The 0.3.0 revision is staged, not activated on the laptop. It was rendered with the actual QML components in an isolated offscreen Quickshell instance. Native focus, application startup, multi-monitor placement and click-origin motion still need an opt-in live pass.
+The user approved live activation of the tested rail and calendar. The sidebar remains staged pending separate approval. An isolated offscreen Quickshell instance produced public previews with sample values; native crops and layer state were also inspected. Physical Wayland pointer interaction, independent lock and notifications, and a complete old-rice dependency audit remain pending. See [progress](docs/PROGRESS.md).
 
 ```sh
 python3 -m unittest discover -s tests -v

@@ -6,8 +6,8 @@ import Quickshell.Hyprland
 PanelWindow {
     id: bar
     anchors { top: true; left: true; right: true }
-    implicitHeight: 48
-    exclusiveZone: 48
+    implicitHeight: 64
+    exclusiveZone: 64
     color: "transparent"
     WlrLayershell.namespace: "ghost-bar"
     WlrLayershell.layer: WlrLayer.Top
