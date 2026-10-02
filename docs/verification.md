@@ -29,3 +29,8 @@ Live environment: Arch Linux, Hyprland 0.56.2 (Lua configuration), Quickshell 0.
 Wi-Fi reassociation, Bluetooth pairing, suspend/lock and logout/login were not exercised on the active user session. Multiple-monitor and narrow-screen behavior needs further live verification. No claim of zero possible bugs is made.
 
 API references: [Quickshell panel exclusion](https://quickshell.org/docs/v0.3.1/types/Quickshell/PanelWindow/), [PipeWire service](https://quickshell.org/docs/v0.3.1/types/Quickshell.Services.Pipewire/Pipewire/), [Hyprland layer rules](https://wiki.hypr.land/configuring/core/rules/layer-rules/).
+# SVG icon verification / 2026-10-02
+
+60 icons, 120 tone variants, mirrored byte-for-byte between shell and website. XML safety, transparent bounds, pure black/white pixels, and identical tone alpha masks passed at 24px and 48px (240 renders). All 120 images loaded in isolated offscreen Quickshell. Nine Python tests and 15 launcher assertions passed. Browser checks covered all 60 loaded images, both tone modes, hardware search (3 results), empty search, and 390px layout without horizontal overflow. Staging installer passed. Existing desktop keybindings and active rice were preserved.
+
+Screenshots and limitations: [2026-10-02 change record](changes/2026-10-02-svg-icons.md). Offscreen testing does not establish native Wayland interaction behavior. SVGs are reusable assets; existing Canvas controls have not been migrated.

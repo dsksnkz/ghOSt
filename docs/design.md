@@ -19,6 +19,12 @@ The user's twelve reference photographs are the visual authority for ghOSt. Orig
 | Image_20260928150907_10_3.jpg | Simple geometric controls, active inversion, exact alignment. |
 | Image_20260928150905_9_3.jpg | Machined housing, inset controls, precision borders. |
 
-Serpantinum is a motion reference, not a visual template. ghOSt uses its own short material/press transitions and click-triggered merge panels. Hover never expands a control. Every action starts immediately; no startup cascade delays interaction. Service data is event driven. The clock ticks once per second. The calendar performance instrument uses illuminated radial ticks with no needle and can switch between CPU, GPU and processor MHz.
+Current direction (2026-10-01, implementation pending): an independent, clean monochrome HUD with meaningful real instrumentation. Serpantinum is no longer a design or runtime reference. Remove its dependencies without hiding functionality or changing live shortcuts. Controlled visual hover expansion is allowed; rail hover text/tooltips must be removed. Clicks reveal panels from their controls without delaying input.
+
+The supplied mainDesigns calendar replaces the radial-only direction: weather left, liquid hardware meters centrally, calendar right. The frame reveals downward, followed by subframes in a newly randomized order over approximately 1.5 seconds. Keep input immediate, honor reduced motion, avoid rapid high-contrast flashes, and never fabricate weather or telemetry. The shipped staged calendar still uses radial ticks until this replacement is verified.
+
+Terminal work may inspect TemperedOS only as the explicitly authorized terminal visual reference, with more spacing and monochrome treatment. No unrelated legacy code or systems may be imported. The compact power HUD must open first and require deliberate confirmation for disruptive actions; tests must disable those actions.
+
+Icon system 01: 60 separate transparent 24px SVGs with 1.5px rounded outline strokes, explicit pure black/white variants, and a font-derived Turret Road G. Existing Canvas controls are not yet migrated. See icons.md.
 
 The top bar is the scope of version 0.1. Other desktop surfaces will follow the user's designs. Existing keybindings are never edited.

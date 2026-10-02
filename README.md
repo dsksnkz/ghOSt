@@ -4,7 +4,9 @@ Graphical Hyprland Operating System Toolkit.
 
 Quickshell rice with buddy codex
 
-[Preview](https://dsksnkz.github.io/ghOSt/) · [Changes](docs/changes/2026-09-30-launcher.md)
+[Preview](https://dsksnkz.github.io/ghOSt/) · [SVG icons](https://dsksnkz.github.io/ghOSt/icons.html) · [Changes](docs/changes/2026-10-02-svg-icons.md)
+
+60 standalone transparent SVG icons, each in black and white. [Usage and rebuilding](docs/icons.md). This asset update does not replace the existing Canvas controls or activate a new desktop configuration.
 
 ![Staged ghOSt calendar](site/assets/calendar-performance.png)
 

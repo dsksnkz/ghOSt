@@ -1,0 +1,242 @@
+[
+  {
+    "name": "settings",
+    "category": "System"
+  },
+  {
+    "name": "wifi",
+    "category": "Connections"
+  },
+  {
+    "name": "network",
+    "category": "Connections"
+  },
+  {
+    "name": "ethernet",
+    "category": "Connections"
+  },
+  {
+    "name": "bluetooth",
+    "category": "Connections"
+  },
+  {
+    "name": "display",
+    "category": "System"
+  },
+  {
+    "name": "brightness",
+    "category": "System"
+  },
+  {
+    "name": "volume",
+    "category": "System"
+  },
+  {
+    "name": "mute",
+    "category": "System"
+  },
+  {
+    "name": "microphone",
+    "category": "System"
+  },
+  {
+    "name": "notifications",
+    "category": "System"
+  },
+  {
+    "name": "appearance",
+    "category": "Personal"
+  },
+  {
+    "name": "wallpaper",
+    "category": "Personal"
+  },
+  {
+    "name": "keyboard",
+    "category": "Input"
+  },
+  {
+    "name": "mouse",
+    "category": "Input"
+  },
+  {
+    "name": "touchpad",
+    "category": "Input"
+  },
+  {
+    "name": "accessibility",
+    "category": "Input"
+  },
+  {
+    "name": "language",
+    "category": "Input"
+  },
+  {
+    "name": "calendar",
+    "category": "System"
+  },
+  {
+    "name": "clock",
+    "category": "System"
+  },
+  {
+    "name": "battery",
+    "category": "System"
+  },
+  {
+    "name": "power",
+    "category": "Session"
+  },
+  {
+    "name": "storage",
+    "category": "System"
+  },
+  {
+    "name": "app",
+    "category": "Personal"
+  },
+  {
+    "name": "accounts",
+    "category": "Personal"
+  },
+  {
+    "name": "privacy",
+    "category": "Personal"
+  },
+  {
+    "name": "security",
+    "category": "Personal"
+  },
+  {
+    "name": "lock",
+    "category": "Session"
+  },
+  {
+    "name": "updates",
+    "category": "System"
+  },
+  {
+    "name": "info",
+    "category": "Actions"
+  },
+  {
+    "name": "search",
+    "category": "Actions"
+  },
+  {
+    "name": "close",
+    "category": "Actions"
+  },
+  {
+    "name": "check",
+    "category": "Actions"
+  },
+  {
+    "name": "plus",
+    "category": "Actions"
+  },
+  {
+    "name": "minus",
+    "category": "Actions"
+  },
+  {
+    "name": "back",
+    "category": "Actions"
+  },
+  {
+    "name": "forward",
+    "category": "Actions"
+  },
+  {
+    "name": "up",
+    "category": "Actions"
+  },
+  {
+    "name": "down",
+    "category": "Actions"
+  },
+  {
+    "name": "menu",
+    "category": "Actions"
+  },
+  {
+    "name": "pin",
+    "category": "Actions"
+  },
+  {
+    "name": "folder",
+    "category": "Personal"
+  },
+  {
+    "name": "terminal",
+    "category": "Personal"
+  },
+  {
+    "name": "browser",
+    "category": "Personal"
+  },
+  {
+    "name": "cpu",
+    "category": "Hardware"
+  },
+  {
+    "name": "gpu",
+    "category": "Hardware"
+  },
+  {
+    "name": "memory",
+    "category": "Hardware"
+  },
+  {
+    "name": "play",
+    "category": "Media"
+  },
+  {
+    "name": "pause",
+    "category": "Media"
+  },
+  {
+    "name": "previous",
+    "category": "Media"
+  },
+  {
+    "name": "next",
+    "category": "Media"
+  },
+  {
+    "name": "logout",
+    "category": "Session"
+  },
+  {
+    "name": "restart",
+    "category": "Session"
+  },
+  {
+    "name": "sleep",
+    "category": "Session"
+  },
+  {
+    "name": "cloud",
+    "category": "Weather"
+  },
+  {
+    "name": "rain",
+    "category": "Weather"
+  },
+  {
+    "name": "storm",
+    "category": "Weather"
+  },
+  {
+    "name": "snow",
+    "category": "Weather"
+  },
+  {
+    "name": "dot",
+    "category": "Actions"
+  },
+  {
+    "name": "ghost",
+    "category": "Brand"
+  }
+]

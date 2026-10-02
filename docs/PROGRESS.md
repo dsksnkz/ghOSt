@@ -1,5 +1,11 @@
 # ghOSt progress
 
+## 2026-10-02 / 0.3.1 assets staged
+
+Published 60 standalone SVG icons in black and white, a QML wrapper and isolated catalogue, and a searchable responsive download gallery. Nine Python tests (including 240 raster checks), 15 launcher assertions, and all 120 QML icon images passed. No live desktop activation. See [change record](changes/2026-10-02-svg-icons.md).
+
+Remaining: supplied calendar composition/motion, rail tooltip removal, terminal reference matching, compact power HUD, and complete removal of old-rice runtime dependencies. prompts.md remains pending, not completed. Usage at start 0% five-hour / 16% weekly; publication preparation 52% / 24%. No reset credit used.
+
 ## 2026-09-30 / 0.3.0 staged
 
 Added the independent launcher: ranked native application search, bounded keyboard selection, persistent pins, empty results, and six new monochrome icons. The G control and session launcher action now target this component in staged source. No shortcut changed. Actual component renders and Pages cover launcher, search, empty results and the expanded icon pack.
