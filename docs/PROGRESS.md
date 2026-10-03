@@ -4,7 +4,7 @@
 
 Continued the manual pass. Fourteen-page Settings and the latest rail/calendar/sidebar polish are implemented and isolated-tested. The user's new direct request authorized the live rail-autostart replacement: ghOSt is running, the previous rail is disabled, and its unrelated services remain active. Native Settings is 1024 × 699; transparent reservation now protects 64px, calendar is 806 × 310 and existing binds are unchanged. [Change record, screenshots, recovery and remaining gaps](changes/2026-10-03-settings-polish.md).
 
-36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and default staging install passed. Native QML logs, layers, work area and private screenshots were inspected; no setters or disruptive actions were executed. Publication pending until the release commit and Pages deployment are verified. The prompt revision remains pending for the explicit gaps, not completed.
+36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and default staging install passed. Native QML logs, layers, work area and private screenshots were inspected; no setters or disruptive actions were executed. Release `6c500a7` was pushed; Pages workflow `37155289952` succeeded. The live site loaded the new Settings controls and 1100 × 760 screenshot; a 390px browser layout had no horizontal overflow. The prompt revision remains pending for the explicit gaps, not completed.
 
 ## 2026-10-03 / manual polish paused; schedule resumed
 
