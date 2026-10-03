@@ -1,7 +1,9 @@
 const views = {
+  settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
+  desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
   calendar: ["calendar-frame.webp", "Calendar · sample storm and performance readings"],
   rail: ["rail-frame.webp", "Rail · three-position workspace wheel and grouped controls"],
-  sidebar: ["sidebar-frame.webp", "Sidebar · sample network and Bluetooth names; staged"],
+  sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards with sample device names"],
   power: ["power-frame.webp", "Power · a second click confirms disruptive actions"],
   launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
   search: ["launcher-search.png", "Search / ranked name, category description and keyword matches."],
@@ -12,6 +14,18 @@ const views = {
   audio: ["audio-panel.png", "Audio / PipeWire volume and output controls."],
   icons: ["icons.png", "Icons / the same shapes rendered in white and black."]
 };
+const settingsPages = ["sound", "battery", "widgets", "brightness", "wallpaper", "notifications", "network", "bluetooth", "airplane", "accessibility", "storage", "applications", "about"];
+const settingsNav = document.querySelector("#settings-nav");
+for (const page of settingsPages) {
+  const label = page === "widgets" ? "Sidebar widgets" : page[0].toUpperCase() + page.slice(1);
+  views["settings-" + page] = ["settings-" + page + ".webp", "Settings / " + label + " · sample data; system actions disabled"];
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.view = "settings-" + page;
+  button.setAttribute("aria-pressed", "false");
+  button.textContent = label;
+  settingsNav.append(button);
+}
 const surface = document.querySelector("#surface");
 let selection = "calendar";
 document.querySelectorAll("[data-view]").forEach(button => {

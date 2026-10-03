@@ -8,7 +8,7 @@ Row {
     spacing: 3
     Repeater {
         model: root.count
-        Rectangle {
+        G2Surface {
             required property int index
             width: root.segmentWidth
             height: 10

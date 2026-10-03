@@ -9,22 +9,26 @@ Item {
     property bool active: false
     property bool reducedMotion: false
     property real phase: 0
+    property real titleY: 54
+    property real valueY: 84
     readonly property bool available: typeof value === "number" && isFinite(value)
     readonly property real level: available && maximum > 0 ? Math.max(0, Math.min(1, value / maximum)) : 0
     property real displayedLevel: level
     // Invert the diamond's cross-sectional area, so 20% fills 20% of its area.
     readonly property real fillHeight: displayedLevel <= .5 ? Math.sqrt(displayedLevel / 2) : 1 - Math.sqrt((1-displayedLevel) / 2)
+    readonly property real waterLine: (height-8) - (height-16)*fillHeight
     signal clicked()
-    width: 188; height: 188
+    width: 123; height: 123
     FontLoader { id: instrumentFace; source: "fonts/TurretRoad-Bold.ttf" }
+    FontLoader { id: valueFace; source: "fonts/TurretRoad-Medium.ttf" }
     activeFocusOnTab: true
-    scale: hover.hovered || activeFocus ? 1.045 : 1
+    scale: tap.pressed ? .97 : 1
     Behavior on scale { NumberAnimation { duration: meter.reducedMotion ? 0 : 130; easing.type: Easing.OutCubic } }
     Behavior on displayedLevel { NumberAnimation { duration: meter.reducedMotion ? 0 : 400 } }
     Keys.onReturnPressed: clicked()
     Keys.onSpacePressed: clicked()
-    HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor }
-    TapHandler { onTapped: meter.clicked() }
+    HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor; onHoveredChanged: liquid.requestPaint() }
+    TapHandler { id: tap; onTapped: meter.clicked() }
     Accessible.role: Accessible.Button
     Accessible.name: title + ": " + (available ? Math.round(value) + unit : "Unavailable")
     Timer { running: meter.active && meter.visible && meter.available && !meter.reducedMotion; repeat: true; interval: 16; onTriggered: { meter.phase = (meter.phase + .032) % (Math.PI*2); liquid.requestPaint(); } }
@@ -36,14 +40,16 @@ Item {
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
         onPaint: {
-            const c = getContext("2d"), w = width, h = height, mid = w/2, r = 16;
+            const c = getContext("2d"), w = width, h = height, side = 87, r = 15, half = side/2;
             c.reset(); c.clearRect(0, 0, w, h);
+            c.save(); c.translate(w/2,h/2); c.rotate(Math.PI/4);
             c.beginPath();
-            c.moveTo(mid-r, r); c.quadraticCurveTo(mid, 0, mid+r, r);
-            c.lineTo(w-r, h/2-r); c.quadraticCurveTo(w, h/2, w-r, h/2+r);
-            c.lineTo(mid+r, h-r); c.quadraticCurveTo(mid, h, mid-r, h-r);
-            c.lineTo(r, h/2+r); c.quadraticCurveTo(0, h/2, r, h/2-r); c.closePath();
-            c.fillStyle = "#303030"; c.fill();
+            c.moveTo(-half+r,-half); c.lineTo(half-r,-half); c.bezierCurveTo(half,-half,half,-half,half,-half+r);
+            c.lineTo(half,half-r); c.bezierCurveTo(half,half,half,half,half-r,half);
+            c.lineTo(-half+r,half); c.bezierCurveTo(-half,half,-half,half,-half,half-r);
+            c.lineTo(-half,-half+r); c.bezierCurveTo(-half,-half,-half,-half,-half+r,-half); c.closePath();
+            c.restore();
+            c.fillStyle = hover.hovered ? "#3b3b3b" : "#313131"; c.fill();
             if (meter.activeFocus) { c.strokeStyle = "#efefef"; c.lineWidth = 2; c.stroke(); }
             c.save(); c.clip();
             if (meter.available && meter.displayedLevel > 0) {
@@ -54,13 +60,27 @@ Item {
                         const amplitude = meter.displayedLevel >= .999 ? 0 : 5;
                         c.lineTo(x, waterY + Math.sin(x/w * 6.28 + meter.phase + wave*1.5) * amplitude);
                     }
-                    c.lineTo(w,h); c.closePath(); c.fillStyle = wave ? "#d8d8d8" : "#9c9c9c"; c.fill();
+                    c.lineTo(w,h); c.closePath(); c.fillStyle = wave ? "#f1f1f1" : "#b8b8b8"; c.fill();
                 }
             }
             c.restore();
         }
         Connections { target: meter; function onActiveFocusChanged() { liquid.requestPaint(); } }
     }
-    Label { anchors.horizontalCenter: parent.horizontalCenter; y: parent.height*.40; text: meter.title; font.family: instrumentFace.status === FontLoader.Ready ? instrumentFace.name : Theme.font; font.pixelSize: 23; color: meter.displayedLevel > .6 ? "#141414" : "#f4f4f4" }
-    Label { anchors.horizontalCenter: parent.horizontalCenter; y: parent.height*.64; text: meter.available ? Math.round(meter.value).toString().padStart(2,"0") + meter.unit : "—"; font.family: instrumentFace.status === FontLoader.Ready ? instrumentFace.name : Theme.font; font.pixelSize: meter.unit === "MHz" ? 19 : 25; color: meter.displayedLevel > .29 ? "#141414" : "#f4f4f4" }
+    Label {
+        anchors.horizontalCenter: parent.horizontalCenter; y: meter.titleY
+        text: meter.title; font.family: instrumentFace.name; font.weight: Font.Bold; font.pixelSize: 15
+        color: meter.available && meter.titleY+8>meter.waterLine ? "#181818" : "#ffffff"
+        // Only while a real wave crosses the glyphs: keep the reading legible.
+        style: meter.available && meter.waterLine>y-6 && meter.waterLine<y+height+6 ? Text.Outline : Text.Normal
+        styleColor: meter.titleY+8>meter.waterLine ? "#ffffff" : "#181818"
+    }
+    Label {
+        anchors.horizontalCenter: parent.horizontalCenter; y: meter.valueY
+        text: meter.available ? Math.round(meter.value).toString().padStart(2,"0") + meter.unit : "—"
+        font.family: valueFace.name; font.weight: Font.Medium; font.pixelSize: meter.unit === "MHz" ? 12 : 15
+        color: meter.available && meter.valueY+8>meter.waterLine ? "#181818" : "#ffffff"
+        style: meter.available && meter.waterLine>y-6 && meter.waterLine<y+height+6 ? Text.Outline : Text.Normal
+        styleColor: meter.valueY+8>meter.waterLine ? "#ffffff" : "#181818"
+    }
 }

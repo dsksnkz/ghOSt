@@ -15,13 +15,15 @@ Item {
     property var readings: fixtureMode ? ({cpu:20,gpu:2,memory:12,processor:2100,maximum:4500}) : ({})
     property var weather: fixtureMode ? ({condition:"storm",temperature:15,days:[{date:"2026-09-27",condition:"rain",temperature:15},{date:"2026-09-28",condition:"rain",temperature:16},{date:"2026-09-29",condition:"storm",temperature:15},{date:"2026-09-30",condition:"clear",temperature:20},{date:"2026-10-01",condition:"clear",temperature:15}]}) : ({condition:"unknown",days:[]})
     property bool clockMetric: false
+    property int forecastIndex: 2
+    property bool forecastSelected: false
     signal navigateRequested(string page)
     onWeatherChanged: if(!previewMode)Desk.weatherSummary=weather
     property string actionPage: ""
     property string notice: ""
     property int elapsed: 1500
     property var order: [0,1,2,3,4,5]
-    implicitHeight: width * 505 / 1200
+    implicitHeight: width * 310 / 806.3
     function beginReveal() {
         let shuffled = [0,1,2,3,4,5];
         for (let i=shuffled.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); const t=shuffled[i];shuffled[i]=shuffled[j];shuffled[j]=t; }
@@ -66,55 +68,70 @@ Item {
         stdout: StdioCollector { onStreamFinished: { try{cal.weather=JSON.parse(text);}catch(e){cal.weather={condition:"unknown",days:[]};} } }
     }
     Item {
-        width: 1200; height: 505; scale: cal.width/1200; transformOrigin: Item.TopLeft
+        width: 806.3; height: 310; scale: cal.width/806.3; transformOrigin: Item.TopLeft
         // Positions match the user's mainDesigns composition; all text is functional.
         Item {
-            x: 72; y: 70; width: 294; height: 325; opacity: cal.groupOpacity(0)
-            WeatherGlyph { id:weatherArt; x: 0; y: 0; condition: cal.weather.condition; active: cal.active; reducedMotion: cal.reducedMotion }
-            Column { x: 124; y: 8; spacing: 13
-                Label { text: cal.weather.condition === "unknown" ? "WEATHER" : cal.weather.condition.toUpperCase(); font.pixelSize: 31 }
-                Rectangle { width: 102; height: 2; color: Theme.text }
-                Label { text: typeof cal.weather.temperature === "number" ? Math.round(cal.weather.temperature)+"°" : "—"; font.pixelSize: 34; anchors.horizontalCenter: parent.horizontalCenter }
-            }
-            Column { x: 0; y: 155; spacing: 20
-                Repeater {
-                    model: cal.weather.days || []
-                    Row { required property var modelData; required property int index; spacing: 10; opacity: index===2?1:index===0||index===4?.45:.75
-                        SvgIcon { width: 23; height: 23; name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition }
-                        Label { anchors.verticalCenter: parent.verticalCenter; text: cal.labelDay(modelData.date)+" · "+modelData.condition+" "+Math.round(modelData.temperature)+"°"; font.pixelSize: index===2?19:16 }
+            id: weatherSection
+            x: 43; y: 44; width: 194; height: 208; opacity: cal.groupOpacity(0)
+            readonly property var selectedForecast: cal.forecastSelected ? cal.weather.days?.[cal.forecastIndex] : null
+            readonly property string condition: selectedForecast?.condition || cal.weather.condition
+            readonly property var temperature: selectedForecast?.temperature ?? cal.weather.temperature
+            WeatherGlyph { id:weatherArt; x: 0; y: 0; scale: 63/108; transformOrigin: Item.TopLeft; condition: weatherSection.condition; active: cal.active; reducedMotion: cal.reducedMotion }
+            Label { x: 77; y: 0; width: 117; height: 26; text: weatherSection.condition === "unknown" ? "WEATHER" : weatherSection.condition.toUpperCase(); font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff" }
+            G2Surface { x: 77; y: 32; width: 60; height: 1; color: "#ffffff" }
+            Label { x: 81; y: 41; width: 48; height: 26; text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature)+"°" : "—"; font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff"; horizontalAlignment: Text.AlignHCenter }
+            Item {
+                x: 0; y: 83; width: 194; height: 130; clip: true
+                Column {
+                    width: parent.width; y: (2-cal.forecastIndex)*26
+                    Behavior on y { NumberAnimation { duration: cal.reducedMotion ? 0 : 180; easing.type: Easing.OutCubic } }
+                    Repeater {
+                        model: cal.weather.days || []
+                        Key {
+                            required property var modelData; required property int index
+                            width: 194; height: 26; color: "transparent"
+                            opacity: index===cal.forecastIndex ? 1 : Math.abs(index-cal.forecastIndex)>1 ? .45 : .75
+                            hint: cal.labelDay(modelData.date)+" forecast"
+                            onClicked: { cal.forecastIndex=index; cal.forecastSelected=true; }
+                            SvgIcon { x: 0; y: 0; width: 17; height: 17; name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition }
+                            Label { x: 24; y: 0; width: 170; height: 26; text: cal.labelDay(modelData.date)+" - "+modelData.condition+" "+Math.round(modelData.temperature)+"°"; font.pixelSize: index===cal.forecastIndex?13:11; font.weight: Font.Light; color: "#ffffff" }
+                        }
                     }
                 }
-                Label { visible: !(cal.weather.days?.length); text: cal.weather.error || "Weather unavailable"; font.pixelSize: 12; color: Theme.muted; width: 270; wrapMode: Text.WordWrap }
+                MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; onWheel: event => { cal.forecastIndex=Math.max(0,Math.min((cal.weather.days?.length||1)-1,cal.forecastIndex+(event.angleDelta.y>0?-1:1))); cal.forecastSelected=true; } }
+                Label { visible: !(cal.weather.days?.length); text: cal.weather.error || "Weather unavailable"; font.pixelSize: 10; color: Theme.muted; width: 190; wrapMode: Text.WordWrap }
             }
         }
-        LiquidMeter { x: 391; y: 47; width: 194; height: 194; title: "GPU"; value: cal.readings.gpu ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(1); onClicked: cal.notice = "GPU · " + (available ? Math.round(value)+"%" : "Unavailable") }
-        LiquidMeter { x: 623; y: 47; width: 194; height: 194; title: "RAM"; value: cal.readings.memory ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(2); onClicked: cal.notice = "RAM · " + (available ? Math.round(value)+"%" : "Unavailable") }
-        LiquidMeter { x: 507; y: 163; width: 194; height: 194; title: cal.clockMetric?"CLOCK":"CPU"; value: cal.clockMetric ? cal.readings.processor ?? null : cal.readings.cpu ?? null; maximum: cal.clockMetric ? cal.readings.maximum ?? 0 : 100; unit: cal.clockMetric?"MHz":"%"; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(3); onClicked: cal.clockMetric = !cal.clockMetric }
+        LiquidMeter { x: 271.65; y: 27; title: "GPU"; value: cal.readings.gpu ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(1); onClicked: cal.notice = "GPU · " + (available ? Math.round(value)+"%" : "Unavailable") }
+        LiquidMeter { x: 411.65; y: 27; title: "RAM"; value: cal.readings.memory ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(2); onClicked: cal.notice = "RAM · " + (available ? Math.round(value)+"%" : "Unavailable") }
+        LiquidMeter { x: 341.65; y: 97; valueY: 80; title: cal.clockMetric?"CLOCK":"CPU"; value: cal.clockMetric ? cal.readings.processor ?? null : cal.readings.cpu ?? null; maximum: cal.clockMetric ? cal.readings.maximum ?? 0 : 100; unit: cal.clockMetric?"MHz":"%"; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(3); onClicked: cal.clockMetric = !cal.clockMetric }
         Item {
-            x: 839; y: 87; width: 316; height: 308; opacity: cal.groupOpacity(4)
-            Row { width: parent.width; y: -20
-                Key { width: 24; height: 25; text:"‹"; fontSize:19; hint:"Previous month"; onClicked: cal.monthStep(-1) }
-                Label { width: 268; height: 25; text: Qt.formatDateTime(cal.month,"MMMM yyyy"); font.pixelSize: 17; color: Theme.muted; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                Key { width: 24; height: 25; text:"›"; fontSize:19; hint:"Next month"; onClicked: cal.monthStep(1) }
+            x: 571.3; y: 73; width: 231; height: 173; opacity: cal.groupOpacity(4)
+            Keys.onPressed: event => {
+                if(event.key === Qt.Key_PageUp) { cal.monthStep(-1); event.accepted=true; }
+                else if(event.key === Qt.Key_PageDown) { cal.monthStep(1); event.accepted=true; }
             }
-            Grid { y: 16; columns: 7; columnSpacing: 4; rowSpacing: 7
-                Repeater { model:["M","T","W","T","F","S","S"]; Label { required property string modelData; text:modelData; width:41; height:22; horizontalAlignment:Text.AlignHCenter; color:Theme.muted; font.pixelSize:15 } }
+            Row { x: 15; y: -18; width: 205
+                Key { width: 20; height: 18; text:"‹"; fontSize:10; hint:"Previous month"; onClicked: cal.monthStep(-1) }
+                Label { width: 165; height: 18; text: Qt.formatDateTime(cal.month,"MMMM yyyy"); font.pixelSize: 7; color: Theme.muted; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                Key { width: 20; height: 18; text:"›"; fontSize:10; hint:"Next month"; onClicked: cal.monthStep(1) }
+            }
+            Grid { x: 15; y: 7; columns: 7; columnSpacing: 5; rowSpacing: 3
+                Repeater { model:["M","T","W","T","F","S","S"]; Label { required property string modelData; text:modelData; width:25; height:16; horizontalAlignment:Text.AlignHCenter; color:Theme.muted; font.pixelSize:6 } }
                 Repeater { model:42
-                    Key { required property int index; readonly property date day:new Date(cal.month.getFullYear(),cal.month.getMonth(),index-cal.offset+1); width:41; height:29; text:day.getDate(); fontSize:16; selected: day.toDateString()===cal.selectedDate.toDateString(); ink: selected?Theme.base:day.getMonth()===cal.month.getMonth()?Theme.text:Theme.faint; hint:Qt.formatDateTime(day,"dddd dd MMMM yyyy"); onClicked:cal.selectedDate=day }
+                    Key { required property int index; readonly property date day:new Date(cal.month.getFullYear(),cal.month.getMonth(),index-cal.offset+1); width:25; height:18; radius: 2; text:day.getDate(); fontSize:7; selected: day.toDateString()===cal.selectedDate.toDateString(); ink: selected?Theme.base:day.getMonth()===cal.month.getMonth()?Theme.text:Theme.faint; hint:Qt.formatDateTime(day,"dddd dd MMMM yyyy"); onClicked:cal.selectedDate=day }
                 }
             }
-            Label { y: 293; width: parent.width; horizontalAlignment:Text.AlignHCenter; text:Qt.formatDateTime(cal.selectedDate,"dddd, dd MMMM").toUpperCase(); font.pixelSize:14; color:Theme.muted; font.letterSpacing:1 }
+            Label { y: 163; width: parent.width; horizontalAlignment:Text.AlignHCenter; text:Qt.formatDateTime(cal.selectedDate,"dddd, dd MMMM").toUpperCase(); font.pixelSize:5; color:Theme.muted; font.letterSpacing:.5 }
         }
-        Row { x: 516; y: 405; height: 58; spacing: 17; opacity: cal.groupOpacity(5)
-            Key { width:40; height:40; anchors.bottom:parent.bottom; color:"#d8d8d8"; radius:14; hint:"Applications"; onClicked: cal.navigateRequested("launcher"); SvgIcon { anchors.centerIn:parent; width:27; height:27; name:"search"; black:true } }
-            Key { width:58; height:58; color:"#d8d8d8"; radius:16; hint:"Settings"; onClicked:cal.navigateRequested("settings");
-                Canvas { anchors.centerIn:parent; width:35;height:35;onPaint:{const c=getContext("2d");c.reset();c.translate(17.5,17.5);c.beginPath();for(let i=0;i<32;i++){const a=i*Math.PI/16;const r=i%4===0||i%4===3?16:12;const x=Math.cos(a)*r,y=Math.sin(a)*r;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);}c.closePath();c.fillStyle="#151515";c.fill();c.globalCompositeOperation="destination-out";c.beginPath();c.arc(0,0,6,0,Math.PI*2);c.fill();} }
-            }
-            Key { width:40; height:40; anchors.bottom:parent.bottom; color:"#d8d8d8"; radius:14; hint:"Power"; onClicked:cal.navigateRequested("session"); SvgIcon { anchors.centerIn:parent; width:27; height:27; name:"power"; black:true } }
+        Item { x: 350.65; y: 245; width: 105; height: 36; opacity: cal.groupOpacity(5)
+            Key { x: 0; y: 11; width:24; height:24; color:"#d9d9d9"; radius:9; hint:"Applications"; onClicked: cal.navigateRequested("launcher"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"search"; black:true } }
+            Key { x: 35; y: 0; width:36; height:36; color:"#d9d9d9"; radius:10; hint:"Settings"; onClicked:cal.navigateRequested("settings"); SvgIcon { anchors.centerIn:parent; width:25; height:25; name:"settings"; black:true } }
+            Key { x: 81; y: 11; width:24; height:24; color:"#d9d9d9"; radius:9; hint:"Power"; onClicked:cal.navigateRequested("session"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"power"; black:true } }
         }
-        Label { x:410; y:476; width:390; horizontalAlignment:Text.AlignHCenter; text:cal.notice; font.pixelSize:10; color:Theme.muted }
-        Rectangle {
-            visible:cal.actionPage!==""; x:400;y:115;width:410;height:250;radius:Theme.outerRadius;color:"#181818";border.color:Theme.line
+        Label { x: 250; y: 291; width: 240; horizontalAlignment:Text.AlignHCenter; text:cal.notice; font.pixelSize:7; color:Theme.muted }
+        G2Surface {
+            visible:cal.actionPage!==""; x:250;y:70;width:410;height:230;radius:Theme.outerRadius;color:"#181818";border.color:Theme.line
             Label { x:24;y:20;text:cal.actionPage==="power"?"Power":"Settings";font.pixelSize:21 }
             Key { x:356;y:16;width:32;text:"×";hint:"Close";onClicked:cal.actionPage="" }
             Column { x:24;y:67;spacing:12

@@ -7,6 +7,8 @@ import Quickshell.Hyprland
 PanelWindow {
     id: window
     property var companion
+    property var peers: []
+    property bool managedFocus: false
     property bool opened: false
     function sync() { opened = Desk.panel === "calendar" && Desk.panelScreen === screen.name; }
     Component.onCompleted: sync()
@@ -16,11 +18,12 @@ PanelWindow {
         function onPanelScreenChanged() { window.sync(); }
     }
     property real reveal: opened ? 1 : 0
+    readonly property real designScale: screen.width / 1920
     anchors { top: true; left: true }
-    margins.top: 82
+    margins.top: 82 * designScale
     margins.left: Math.round((screen.width-implicitWidth)/2)
-    implicitWidth: Math.floor(Math.min(screen.width*733/1920, (screen.height-100)*1200/505))
-    implicitHeight: implicitWidth*505/1200
+    implicitWidth: Math.floor(Math.min(screen.width*806.3/1920, (screen.height-100)*806.3/310))
+    implicitHeight: Math.round(implicitWidth*310/806.3)
     color: "transparent"
     visible: opened || reveal > .001
     exclusionMode: ExclusionMode.Ignore
@@ -29,18 +32,17 @@ PanelWindow {
     WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     Behavior on reveal { NumberAnimation { duration:Theme.reducedMotion?0:260; easing.type:Easing.OutCubic } }
     onOpenedChanged: {
-        if(opened)Qt.callLater(()=>{ frame.forceActiveFocus(); grab.active=true; });
-        else grab.active=false;
+        if(opened)Qt.callLater(()=>{ frame.forceActiveFocus(); if(!window.managedFocus)grab.active=true; });
+        else if(!window.managedFocus)grab.active=false;
     }
-    HyprlandFocusGrab { id:grab; windows:window.companion?[window,window.companion]:[window]; onCleared: Qt.callLater(()=>{if(window.opened)Desk.close();}) }
-    Rectangle {
+    HyprlandFocusGrab { id:grab; windows:window.peers.length?[window].concat(window.peers):window.companion?[window,window.companion]:[window]; onCleared: Qt.callLater(()=>{if(!window.managedFocus && window.opened)Desk.close();}) }
+    G2Surface {
         id:frame
-        anchors.fill:parent; anchors.margins:1
-        radius:Theme.outerRadius; color:"#151515"; border.color:"#454545"
+        anchors.fill:parent
+        radius:Theme.outerRadius * window.designScale; color:"#151515"; border.color:"#474747"
         gradient:Gradient {
-            GradientStop { position:0; color:"#151515" }
-            GradientStop { position:.72; color:"#202020" }
-            GradientStop { position:1; color:"#171717" }
+            GradientStop { position:0; color:"#161616" }
+            GradientStop { position:1; color:"#1c1c1c" }
         }
         opacity:window.reveal
         transform:Translate { y:-28*(1-window.reveal) }
@@ -60,7 +62,7 @@ PanelWindow {
         Loader {
             id:search; active:false
             anchors.centerIn:parent; width:392; height:480
-            sourceComponent: Rectangle {
+            sourceComponent: G2Surface {
                 color:Theme.surface; radius:10; border.color:Theme.line
                 function focusSearch(){ launcher.focusSearch(); }
                 Key { x:344;y:8;width:32;height:28;text:"×";hint:"Close applications";onClicked:search.active=false }

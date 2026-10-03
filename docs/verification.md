@@ -1,5 +1,13 @@
 # Verification
 
+## 2026-10-03 / Settings and native rail transition
+
+36 Python tests, 15 launcher assertions, isolated Settings/sidebar geometry/captures and calendar motion checks pass. New native Settings/window rule, rail transparency/work-area reservation and old rail removal were checked. Native ghOSt log has no QML warnings; configuration errors are empty; bind file and JSON hashes match pre-transition values. Startup persistence is configured, not reboot-tested. [Detailed evidence, screenshots and honest gaps](changes/2026-10-03-settings-polish.md). No destructive actions or hardware/service setters ran.
+
+## 2026-10-03 / Figma property inspection
+
+The latest direct request authorized launching rail, calendar and sidebar. [Specification and limits](figma-spec.md), [current progress](PROGRESS.md). Fifteen Python tests, fifteen launcher assertions, icon parity and isolated randomized reveal/weather/ratio tests passed. Live QML loading, simultaneous sidebar/calendar state, screenshots and layer geometry were inspected. Existing binds were unchanged and Hyprland configuration errors empty. This supersedes the earlier sidebar approval status below. Physical pointer automation, notification history and the independent lock remain unverified or unfinished; no disruptive action was tested.
+
 ## 2026-10-03 / calendar, rail and staged sidebar
 
 See [frame change record](changes/2026-10-03-frames.md) and [progress](PROGRESS.md). The user explicitly approved live activation of calendar and rail only. The sidebar is staged and independently rendered with labeled sample device names; it is not active on the desktop pending separate approval. Fifteen Python tests, fifteen launcher assertions, an isolated calendar animation check, native Quickshell reload/layer inspection and desktop/mobile website screenshots passed. `hyprctl configerrors` was empty; the live keybind JSON SHA-256 was unchanged before/after. Actual user pointer clicks, independent lock/notification handling and completion of the old-rice audit remain unverified. No session or power action was executed.

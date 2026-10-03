@@ -1,5 +1,31 @@
 # ghOSt progress
 
+## 2026-10-03 / Settings and rail-autostart transition
+
+Continued the manual pass. Fourteen-page Settings and the latest rail/calendar/sidebar polish are implemented and isolated-tested. The user's new direct request authorized the live rail-autostart replacement: ghOSt is running, the previous rail is disabled, and its unrelated services remain active. Native Settings is 1024 × 699; transparent reservation now protects 64px, calendar is 806 × 310 and existing binds are unchanged. [Change record, screenshots, recovery and remaining gaps](changes/2026-10-03-settings-polish.md).
+
+36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and default staging install passed. Native QML logs, layers, work area and private screenshots were inspected; no setters or disruptive actions were executed. Publication pending until the release commit and Pages deployment are verified. The prompt revision remains pending for the explicit gaps, not completed.
+
+## 2026-10-03 / manual polish paused; schedule resumed
+
+The user requested stopping now and carrying unfinished work into the existing weekday five-hour schedule. [Continuation checkpoint](pending-polish.md) records partial G2/material/calendar/sidebar/workspace changes, exact measured new Settings nodes and remaining verification. The full Settings app is not built; the rail work-area fix is not verified. Most polish remains staged. No new publication or completed prompt revision is claimed. Preserve current dirty work and snapshots. The scheduled prompt was updated with latest Figma and user corrections and resumed as ACTIVE.
+
+## 2026-10-03 / measured Figma implementation
+
+Supersedes earlier sidebar staging notes: the user directly requested applying and launching the sidebar, rail and full calendar. Inspected the signed-in Figma's nested layer properties, fonts/weights, dimensions, colors, stroke alignment, radii and gradient stops. [Measured specification](figma-spec.md). Rebuilt the rail on a 1920 × 1080 coordinate plane; calendar is 733 × 310; sidebar background is 391 × 790 with its left 37 px outside the artboard. WLAN/Bluetooth now have the measured housing, list well and cap layers. Inner card radius is 15 − 4 = 11. Added bundled Turret Road Regular/Medium, corrected the calendar gear icon and instrument type, and straight-ended clipped slider fills.
+
+The tested ghOSt rail/calendar/sidebar were installed and opened by direct user request; only the named ghOSt process was restarted. Existing rice process, keybindings, wallpaper and autostart were preserved. Rail uses an overlay layer so another installed shell cannot intercept it; calendar/sidebar share a focus group so opening one does not dismiss the other. London weather and real telemetry remain connected. Brightness on HDMI and notifications without an independent daemon are honestly unavailable. Full Settings, notification history, independent lock and the remaining old-rice audit are pending.
+
+Verification: 15 Python tests, 15 launcher assertions, 60 two-tone icon parity checks and the isolated calendar animation/ratio check passed. Native ghOSt loaded without QML warnings; visible layers and private live screenshot were inspected. Bind JSON SHA-256 before/after this pass: `ec0f696afa82d444033071247e554ef4675897d570b5954c4eb9cdea5f45b2b5`; Hyprland config errors empty. IPC exercises the same open handlers as the controls; physical Wayland mouse-click automation remains unverified. No power/session action executed.
+
+Prompt/design hashes remain `f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d` / `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe`. Clean actual-QML captures: [composition](../site/assets/desktop-frame.webp), [calendar](../site/assets/calendar-frame.webp), [sidebar](../site/assets/sidebar-frame.webp), [rail](../site/assets/rail-frame.webp). These label sample data and do not expose nearby network names or desktop chat. The site wallpaper was separately exported from the currently selected laptop wallpaper; the original was not changed. Local snapshot: `.local/backups/2026-10-03-figma-pass/` (project and installed ghOSt paths). Copy its installed snapshots back into the named ghOSt configuration and restart only ghOSt for rollback; new profile-only assets can remain unused. The user prompt stays pending for the explicitly listed gaps.
+
+## 2026-10-03 / sidebar slide
+
+Follow-up: fixed the installed shell's missing Sidebar instance and connected the rail menu button to toggleSidebar. The previous animation-only change had not activated the sidebar. After reload, opening through that same toggle created the visible 360 × 800 ghost-sidebar layer at (16,82).
+
+Applied a 280 ms left-to-right slide to the running ghOSt sidebar and matched the staged component. Reduced motion remains immediate. The live Quickshell configuration reloaded successfully; direct pointer verification was unavailable. Only the sidebar animation was activated. Backups: `.local/backups/2026-10-03-sidebar-slide/`.
+
 ## 2026-10-03 / reference-matched frame refinement in progress
 
 The 2026-10-03 annotated screenshots establish the intended composition. The tested live rail and calendar now use 7 px outer radii; the calendar is 733 × 308 px on the 1920 × 1080 monitor, directly below the 46 px rail. The calendar font sizes were corrected after inspecting a native crop. Its weather comes from the user-selected London location, real CPU/GPU/RAM/processor readings drive the liquid meters, and the storm/rain motion was exercised in an isolated fixture. The workspace control is a three-position wheel. Rail controls use ghOSt SVG icons; the compact power HUD opens without invoking any power action and requires a second confirmation click for disruptive commands. Lock is explicitly unavailable until an independent ghOSt lock configuration exists.

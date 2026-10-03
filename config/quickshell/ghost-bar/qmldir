@@ -1,10 +1,18 @@
 singleton Theme 1.0 Theme.qml
 singleton Desk 1.0 Desk.qml
+singleton Settings 1.0 Settings.qml
+SettingsPanel 1.0 SettingsPanel.qml
+SettingsWindow 1.0 SettingsWindow.qml
+SettingsToggle 1.0 SettingsToggle.qml
+SettingsSlider 1.0 SettingsSlider.qml
 Bar 1.0 Bar.qml
+RailReservation 1.0 RailReservation.qml
 Panel 1.0 Panel.qml
 Label 1.0 Label.qml
 Rule 1.0 Rule.qml
 Key 1.0 Key.qml
+G2Surface 1.0 G2Surface.qml
+FadeLabel 1.0 FadeLabel.qml
 Meter 1.0 Meter.qml
 Material 1.0 Material.qml
 Workspaces 1.0 Workspaces.qml
@@ -21,3 +29,4 @@ CalendarPanel 1.0 CalendarPanel.qml
 CalendarWindow 1.0 CalendarWindow.qml
 Sidebar 1.0 Sidebar.qml
 SidebarBody 1.0 SidebarBody.qml
+SidebarFigmaBody 1.0 SidebarFigmaBody.qml

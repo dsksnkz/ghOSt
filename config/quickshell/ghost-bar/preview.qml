@@ -4,8 +4,10 @@ import Quickshell.Io
 
 // Separate entry point: never shares the production ShellId or Wayland connection.
 ShellRoot {
+    SettingsWindow {}
     FloatingWindow {
         id: preview
+        property bool composition: false
         visible: true
         implicitWidth: 1920
         implicitHeight: 1080
@@ -15,20 +17,28 @@ ShellRoot {
             anchors.fill: parent
             Image { anchors.fill: parent; source: Quickshell.env("GHOST_WALLPAPER") || ""; fillMode: Image.PreserveAspectCrop }
             Rail { id: rail; anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; previewMode: true }
-            SidebarBody {
-                visible: controller.page === "sidebar"
-                x: 16; y: 82; width: 360; height: 800
+            SettingsPanel {
+                id:settingsPreview
+                visible:controller.page==="settings"
+                width:1024;height:699;anchors.centerIn:parent;previewMode:true
+                onCloseRequested:controller.page="rail"
+            }
+            SidebarFigmaBody {
+                id: sidebarPreview
+                visible: controller.page === "sidebar" || preview.composition
+                x: 0; y: 146; width: 354; height: 790
                 screen: ({name:"HDMI-A-1"})
                 previewMode: true
             }
             PanelContent {
                 id: panel
                 previewMode: true
+                onSettingsPreviewRequested: { settingsPreview.choose("general"); controller.page="settings"; }
                 x: frame.width / 2 - width / 2
                 y: controller.page === "calendar" ? 82 : 68
-                width: controller.page === "calendar" ? Math.floor(Math.min(frame.width * 733/1920, (frame.height - 100) * 1200 / 505)) : 392
+                width: controller.page === "calendar" ? Math.floor(Math.min(frame.width * 806.3/1920, (frame.height - 100) * 806.3 / 310)) : 392
                 height: implicitHeight
-                visible: controller.page !== "rail" && controller.page !== "icons" && controller.page !== "sidebar"
+                visible: controller.page !== "rail" && controller.page !== "icons" && controller.page !== "sidebar" && controller.page !== "settings"
                 popup: QtObject {
                     id: controller
                     property string page: "calendar"
@@ -50,7 +60,7 @@ ShellRoot {
                         Icon { required property string modelData; name: modelData; width: 28; height: 28 }
                     }
                 }
-                Rectangle {
+                G2Surface {
                     x: 22; y: 140; width: parent.width - 44; height: 80; radius: 5; color: Theme.text
                     BrandMark { x: 10; y: 12; width: 48; height: 48; ink: Theme.base }
                     Row {
@@ -67,7 +77,7 @@ ShellRoot {
                         model: ["search", "app", "terminal", "browser", "folder", "pin"]
                         Icon { required property string modelData; name: modelData; width: 28; height: 28 }
                     }
-                    Rectangle {
+                    G2Surface {
                         width: 258; height: 40; radius: 4; color: Theme.text
                         Row {
                             anchors.centerIn: parent; spacing: 14
@@ -83,10 +93,21 @@ ShellRoot {
         }
         IpcHandler {
             target: "preview"
-            function page(name: string): void { controller.page = name; }
+            function page(name: string): void { preview.composition = name === "desktop"; controller.page = preview.composition ? "calendar" : name; }
             function metric(name: string): void { Desk.setPerformanceMetric(name); }
             function telemetry(): string { return panel.performanceStatus(); }
             function calendar(action: string, value: string): string { return panel.calendarAction(action,value); }
+            function settings(action: string, value: string): string {
+                if(action==="page")settingsPreview.choose(value);
+                if(action==="query")settingsPreview.query=value;
+                return settingsPreview.status();
+            }
+            function sidebar(action: string): string {
+                if(action==="reveal")sidebarPreview.beginEntrance();
+                if(action==="long")sidebarPreview.previewLongNames=true;
+                if(action==="normal")sidebarPreview.previewLongNames=false;
+                return JSON.stringify({order:sidebarPreview.entranceOrder,elapsed:sidebarPreview.entranceTime});
+            }
             function opened(value: bool): void { controller.opened = value; }
             function launcher(action: string, value: string): string { return panel.launcherAction(action, value); }
             function capture(path: string): void { frame.grabToImage(result => { result.saveToFile(path); }); }

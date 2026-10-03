@@ -96,7 +96,9 @@ if lua.exists():
     if "-- ghOSt top bar" not in text:
         text += '\n-- ghOSt top bar\nhl.on("hyprland.start", function()\n  hl.exec_cmd(' + json.dumps(str(launcher)) + ')\nend)\n'
     if "-- ghOSt motion" not in text:
-        text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel)" }, no_anim = true })\n'
+        text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })\n'
+    if 'name = "ghost-settings"' not in text:
+        text += '\n-- ghOSt Settings only.\nhl.window_rule({ name = "ghost-settings", match = { class = "org.quickshell", title = "ghOSt Settings" }, float = true, size = { 1024, 699 }, center = true, decorate = false, rounding = 0, opacity = "1 override" })\n'
     lua.write_text(text)
 else:
     text = conf.read_text()

@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
 
-Rectangle {
+G2Surface {
     id: root
     property string text: ""
     property string hint: ""
@@ -22,9 +22,15 @@ Rectangle {
     Keys.onReturnPressed: clicked()
     Keys.onSpacePressed: clicked()
     color: selected ? Theme.text : mouse.pressed ? Theme.line : "transparent"
-    scale: mouse.pressed ? 0.96 : mouse.containsMouse ? 1.04 : 1
+    scale: mouse.pressed ? 0.97 : 1
     Behavior on color { ColorAnimation { duration: Theme.fast } }
     Behavior on scale { NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast; easing.type: Easing.OutCubic } }
+    G2Surface {
+        anchors.fill:parent; radius:root.radius
+        color:root.color.r>.5 ? "#111111" : "#ffffff"
+        opacity:mouse.pressed ? .16 : mouse.containsMouse ? .09 : 0
+        Behavior on opacity { NumberAnimation { duration:Theme.reducedMotion?0:Theme.fast } }
+    }
     Label { id: label; anchors.centerIn: parent; text: root.text; color: root.ink; font.pixelSize:root.fontSize }
     MouseArea {
         id: mouse

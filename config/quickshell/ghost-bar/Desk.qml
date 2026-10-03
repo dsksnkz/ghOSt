@@ -19,8 +19,9 @@ Singleton {
     property var weatherSummary: ({condition:"unknown", temperature:null})
     property bool sidebarOpen: false
     property bool settingsRequested: false
-    function toggleSidebar(screenName) { panelScreen=screenName; panel=""; settingsRequested=false; sidebarOpen = !sidebarOpen; }
-    function openSettings(screenName) { panelScreen=screenName; panel=""; settingsRequested=true; sidebarOpen=true; }
+    property string settingsPage: "general"
+    function toggleSidebar(screenName) { panelScreen=screenName; settingsRequested=false; sidebarOpen = !sidebarOpen; }
+    function openSettings(screenName, page="general") { panelScreen=screenName; panel=""; sidebarOpen=false; settingsPage=page; settingsRequested=true; }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink?.audio ?? null
     readonly property int volume: audio ? Math.round(audio.volume * 100) : 0

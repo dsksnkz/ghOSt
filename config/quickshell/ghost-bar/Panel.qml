@@ -10,6 +10,7 @@ import Quickshell.Services.UPower
 PanelWindow {
     id: panelWindow
     property var companion
+    property bool managedFocus: false
     property string page: ""
     property bool opened: false
     property real reveal: opened ? 1 : 0
@@ -21,7 +22,7 @@ PanelWindow {
     onOpenedChanged: {
         Qt.callLater(() => {
             if (opened) content.focusPage();
-            focusGrab.active = opened;
+            if (!panelWindow.managedFocus) focusGrab.active = opened;
         });
     }
     Component.onCompleted: syncPanel()
@@ -42,6 +43,6 @@ PanelWindow {
     color: "transparent"
     visible: opened || reveal > 0.001
     Behavior on reveal { NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.panel; easing.type: Easing.OutCubic } }
-    HyprlandFocusGrab { id: focusGrab; windows: panelWindow.companion ? [panelWindow, panelWindow.companion] : [panelWindow]; onCleared: Qt.callLater(Desk.close) }
+    HyprlandFocusGrab { id: focusGrab; windows: panelWindow.companion ? [panelWindow, panelWindow.companion] : [panelWindow]; onCleared: if(!panelWindow.managedFocus)Qt.callLater(Desk.close) }
     PanelContent { id: content; anchors.fill: parent; popup: panelWindow }
 }

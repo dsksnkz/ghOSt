@@ -11,6 +11,7 @@ Item {
     id: content
     required property var popup
     property bool previewMode: false
+    signal settingsPreviewRequested()
     function focusPage() { if (pageLoader.item?.focusSearch) pageLoader.item.focusSearch(); else content.forceActiveFocus(); }
     function launcherAction(action, value) {
         const item = pageLoader.item;
@@ -36,6 +37,7 @@ Item {
         if(action==="level" && previewMode)item.readings={cpu:Number(value),gpu:Number(value),memory:Number(value),processor:2100,maximum:4500};
         if(action==="clock" && previewMode)item.clockMetric=value==="true";
         if(action==="action" && previewMode)item.actionPage=value;
+        if(action==="navigate" && previewMode)item.navigateRequested(value);
         return item.status();
     }
     implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : 46)
@@ -51,7 +53,7 @@ Item {
             Scale { origin.x: Desk.panelOrigin; origin.y: 0; xScale: popup.page === "calendar" ? 1 : .18 + .82 * popup.reveal; yScale: popup.page === "calendar" ? 1 : .1 + .9 * popup.reveal }
         ]
         Material { visible: popup.page !== "calendar"; anchors.fill: parent; anchors.margins: 1; radius: Theme.outerRadius }
-        Rectangle { visible: popup.page === "calendar"; anchors.fill: parent; anchors.margins: 1; radius: Theme.outerRadius; color: "#151515"; border.color: "#454545"; border.width: 1 }
+        Material { visible: popup.page === "calendar"; anchors.fill: parent; radius: Theme.outerRadius }
         Column {
             id: body
             x: popup.page === "calendar" ? 0 : 22; y: popup.page === "calendar" ? 0 : 19; width: parent.width - (popup.page === "calendar" ? 0 : 44); spacing: popup.page === "calendar" ? 0 : 17
@@ -65,7 +67,7 @@ Item {
                 }
                 Key { width: 30; hint: "Close"; onClicked: Desk.close(); Icon { anchors.centerIn: parent; name: "close"; width: 16; height: 16 } }
             }
-            Rectangle { visible: popup.page !== "calendar"; width: parent.width; height: 1; color: Theme.line }
+            G2Surface { visible: popup.page !== "calendar"; width: parent.width; height: 1; color: Theme.line }
             Loader {
                 id: pageLoader
                 width: parent.width
@@ -101,7 +103,7 @@ Item {
                     width: volumeSlider.availableWidth; height: 18
                     Meter { count: 40; segmentWidth: 5; spacing: 3; value: volumeSlider.visualPosition; ink: Theme.cream; anchors.verticalCenter: parent.verticalCenter }
                 }
-                handle: Rectangle {
+                handle: G2Surface {
                     x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
                     y: (volumeSlider.height-height)/2; width: 4; height: 24; radius: 1; color: Theme.orange
                 }
@@ -168,7 +170,13 @@ Item {
         CalendarPanel {
             active: popup.opened && popup.page === "calendar"
             previewMode: content.previewMode
-            onNavigateRequested: page => { if(content.previewMode) popup.page=page; else Desk.panel=page; }
+            onNavigateRequested: page => {
+                if(page==="settings") {
+                    if(content.previewMode)content.settingsPreviewRequested();
+                    else Desk.openSettings(Desk.panelScreen);
+                } else if(content.previewMode)popup.page=page;
+                else Desk.panel=page;
+            }
         }
     }
     Component {
@@ -226,6 +234,7 @@ Item {
                     border.color: Theme.line; border.width: 1
                     hint: modelData.label
                     onClicked: {
+                        if(content.previewMode) { Desk.notice="Preview — system actions disabled";return; }
                         if (modelData.command.length === 0) { Desk.notice = "Lock needs an independent ghOSt configuration"; return; }
                         if (sessionBody.pending === modelData.label) { Desk.launch(modelData.command); return; }
                         sessionBody.pending = modelData.label;

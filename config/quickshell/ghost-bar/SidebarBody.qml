@@ -12,12 +12,11 @@ Item {
     property bool opened: true
     property real reveal: 1
     signal closeRequested()
-    Rectangle {
+    G2Surface {
         id:content
         anchors.fill:parent; anchors.margins:1
         radius:Theme.outerRadius; color:"#181818"; border.color:"#555555"
-        opacity:sidebar.reveal
-        transform:Translate { x:-16*(1-sidebar.reveal) }
+        transform:Translate { x:-(sidebar.width+16)*(1-sidebar.reveal) }
         Keys.onEscapePressed: { if(sidebar.settingsOpen)sidebar.settingsOpen=false; else sidebar.closeRequested(); }
         readonly property real pad:20
         readonly property real inner:Math.max(0,Theme.outerRadius-3)
@@ -50,7 +49,7 @@ Item {
                     Key { width:parent.width; height:34; radius:content.inner; color:sidebar.previewMode||Networking.wifiEnabled?"#dddddd":"#555555";ink:Theme.base;hint:"Toggle Wi-Fi";onClicked:if(!sidebar.previewMode)Networking.wifiEnabled=!Networking.wifiEnabled
                         Row {anchors.centerIn:parent;spacing:6;SvgIcon{width:17;height:17;name:"wifi";black:true}Label{anchors.verticalCenter:parent.verticalCenter;text:"WLAN";font.pixelSize:12;color:Theme.base}}
                     }
-                    Rectangle {
+                    G2Surface {
                         width:parent.width;height:195;radius:content.inner;color:"#303030";clip:true
                         Flickable {
                             anchors.fill:parent; anchors.margins:5
@@ -73,7 +72,7 @@ Item {
                     Key {width:parent.width;height:34;radius:content.inner;color:sidebar.previewMode||Desk.adapter?.enabled?"#dddddd":"#555555";hint:"Toggle Bluetooth";enabled:sidebar.previewMode||!!Desk.adapter;onClicked:if(!sidebar.previewMode)Desk.adapter.enabled=!Desk.adapter.enabled
                         Row {anchors.centerIn:parent;spacing:6;SvgIcon{width:17;height:17;name:"bluetooth";black:true}Label{anchors.verticalCenter:parent.verticalCenter;text:"Bluetooth";font.pixelSize:12;color:Theme.base}}
                     }
-                    Rectangle {
+                    G2Surface {
                         width:parent.width;height:195;radius:content.inner;color:"#303030";clip:true
                         Flickable {
                             anchors.fill:parent;anchors.margins:5;contentHeight:btList.height;boundsBehavior:Flickable.StopAtBounds
@@ -92,20 +91,20 @@ Item {
             Column {width:parent.width;spacing:10
                 Label{text:"VOLUME";font.pixelSize:9;color:Theme.muted;opacity:.8}
                 Controls.Slider {id:volume;width:parent.width;height:26;from:0;to:1;value:sidebar.previewMode?.62:Desk.volume/100;enabled:sidebar.previewMode||!!Desk.audio;onMoved:if(!sidebar.previewMode)Desk.setVolume(value);Accessible.name:"Output volume"
-                    background:Rectangle{x:volume.leftPadding;y:(volume.height-height)/2;width:volume.availableWidth;height:22;radius:content.inner;color:"#292929";border.color:Theme.line
-                        Rectangle{width:volume.visualPosition*parent.width;height:parent.height;radius:Math.min(content.inner,width/2);color:"#d9d9d9"}
+                    background:G2Surface {x:volume.leftPadding;y:(volume.height-height)/2;width:volume.availableWidth;height:22;radius:content.inner;color:"#292929";border.color:Theme.line
+                        G2Surface {width:volume.visualPosition*parent.width;height:parent.height;radius:Math.min(content.inner,width/2);color:"#d9d9d9"}
                     }
                     handle:SvgIcon{x:volume.leftPadding+volume.visualPosition*(volume.availableWidth-width);y:(volume.height-height)/2;width:18;height:18;name:"volume";black:volume.visualPosition>.06}
                 }
                 Label{text:sidebar.previewMode||sidebar.screen.name.startsWith("eDP-")?"BRIGHTNESS":"MONITOR BRIGHTNESS UNAVAILABLE";font.pixelSize:9;color:Theme.muted;opacity:.8}
                 Controls.Slider {id:brightness;width:parent.width;height:26;from:0;to:100;value:sidebar.previewMode?75:50;enabled:sidebar.previewMode||sidebar.screen.name.startsWith("eDP-");opacity:enabled?1:.35;onMoved:if(!sidebar.previewMode)Quickshell.execDetached(["brightnessctl","set",Math.round(value)+"%"]);Accessible.name:"Display brightness"
-                    background:Rectangle{x:brightness.leftPadding;y:(brightness.height-height)/2;width:brightness.availableWidth;height:22;radius:content.inner;color:"#292929";border.color:Theme.line
-                        Rectangle{width:brightness.visualPosition*parent.width;height:parent.height;radius:Math.min(content.inner,width/2);color:"#d9d9d9"}
+                    background:G2Surface {x:brightness.leftPadding;y:(brightness.height-height)/2;width:brightness.availableWidth;height:22;radius:content.inner;color:"#292929";border.color:Theme.line
+                        G2Surface {width:brightness.visualPosition*parent.width;height:parent.height;radius:Math.min(content.inner,width/2);color:"#d9d9d9"}
                     }
                     handle:SvgIcon{x:brightness.leftPadding+brightness.visualPosition*(brightness.availableWidth-width);y:(brightness.height-height)/2;width:18;height:18;name:"brightness";black:brightness.visualPosition>.06}
                 }
             }
-            Rectangle {width:parent.width;height:1;color:Theme.line}
+            G2Surface {width:parent.width;height:1;color:Theme.line}
             Column {width:parent.width;spacing:10
                 Label{text:"NOTIFICATIONS";font.pixelSize:9;color:Theme.muted}
                 Key {width:parent.width;height:64;radius:content.inner;color:"#222222";border.color:Theme.line;border.width:1;hint:"Notification service unavailable";enabled:false
@@ -114,7 +113,7 @@ Item {
             }
         }
         }
-        Rectangle {
+        G2Surface {
             anchors.fill:parent;anchors.margins:12;radius:Theme.innerRadius(4)
             visible:sidebar.settingsOpen;color:Theme.surface;border.color:Theme.line
             Column {x:18;y:20;width:parent.width-36;spacing:16

@@ -10,7 +10,11 @@ Graphical Hyprland Operating System Toolkit.
 
 ## Current scope
 
-Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation, staged left sidebar, audio, network, Bluetooth, media, battery and a confirmation-based power panel. JetBrains Mono typography, a separate monochrome SVG icon pack and click-triggered motion.
+Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation, left sidebar, Settings, audio, network, Bluetooth, media, battery and a confirmation-based power panel. Measured Figma spacing, JetBrains Mono/Turret Road typography, monochrome SVG icons and click-triggered motion.
+
+Settings has fourteen pages. PipeWire output/input selection, volume and mute; existing EasyEffects editor access; battery and opt-in local display-on history; sidebar widget visibility; laptop brightness; local wallpaper selection through a running awww daemon; independent Swaync notifications; wireless/Bluetooth; reduced motion; storage and system information. Unavailable services are shown explicitly. The equalizer band editor, independent lock and notification service are not implemented yet.
+
+Preferences use `$XDG_CONFIG_HOME/ghost/settings.json`. History is off by default and, when enabled, uses `$XDG_STATE_HOME/ghost/usage.json`. It counts observed display-on intervals while ghOSt runs, not user engagement; missed intervals are not backfilled. No history is uploaded.
 
 The launcher searches installed desktop entries by name, generic name and keywords. Pins are saved in `$XDG_STATE_HOME/ghost/launcher.ini` (default `~/.local/state/ghost/launcher.ini`). It uses native desktop-entry execution, not shell-parsed search text.
 
@@ -40,18 +44,19 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 
 ## Controls
 
-- The menu control opens the staged sidebar; the separate launcher searches applications by name or keywords. Pins keep favorites first among equally ranked results.
-- The three-position workspace wheel switches workspace; scroll navigates.
+- The menu control opens the sliding sidebar; the separate launcher searches applications by name or keywords. Pins keep favorites first among equally ranked results.
+- The stationary triangle marks the center of the sliding workspace numbers. Scroll includes all desktops 1–5 and populated higher desktops, with accumulated notches.
 - Clock opens the whole calendar frame; clicking the CPU diamond switches it to processor clock.
 - Audio opens volume; scroll adjusts; right-click mutes.
-- In the staged design, network, Bluetooth and battery open the sidebar; the currently installed rail retains its older separate panels until sidebar approval.
+- Network, Bluetooth and battery open the sidebar. Its three-layer cards use standard Linux services, not another rice's shell.
+- Sidebar and calendar gear controls open Settings. Search filters its navigation.
 - Power opens a HUD. Sleep, log out, restart and shut down require a second confirmation click. Lock is unavailable until its independent configuration is complete.
 - Escape or click outside closes a native panel.
 - Buttons support Tab focus and Return/Space activation.
 
 ## Verification
 
-The user approved live activation of the tested rail and calendar. The sidebar remains staged pending separate approval. An isolated offscreen Quickshell instance produced public previews with sample values; native crops and layer state were also inspected. Physical Wayland pointer interaction, independent lock and notifications, and a complete old-rice dependency audit remain pending. See [progress](docs/PROGRESS.md).
+The user requested replacing the previous rail's autostart with ghOSt. The rail is running, its transparent reservation protects 64px at 1920 width, and the previous rail is disabled. Unrelated legacy services and shortcuts remain untouched; this is not a complete session migration. The installer still stages by default. Public previews are actual isolated Quickshell renders with labeled sample values. Native Settings, calendar/sidebar layers and runtime logs were inspected. Physical Wayland pointer automation, independent lock/notification history and broader session migration remain pending. See [latest change record](docs/changes/2026-10-03-settings-polish.md).
 
 ```sh
 python3 -m unittest discover -s tests -v

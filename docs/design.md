@@ -19,12 +19,14 @@ The user's twelve reference photographs are the visual authority for ghOSt. Orig
 | Image_20260928150907_10_3.jpg | Simple geometric controls, active inversion, exact alignment. |
 | Image_20260928150905_9_3.jpg | Machined housing, inset controls, precision borders. |
 
-Current direction (2026-10-01, implementation pending): an independent, clean monochrome HUD with meaningful real instrumentation. Serpantinum is no longer a design or runtime reference. Remove its dependencies without hiding functionality or changing live shortcuts. Controlled visual hover expansion is allowed; rail hover text/tooltips must be removed. Clicks reveal panels from their controls without delaying input.
+Current direction (2026-10-03): implement the supplied Figma, a clean monochrome HUD with real instrumentation. New controls use hover color only, never hover scaling; press feedback is allowed. Rail tooltips are disabled while accessible names remain. Main rail/calendar/sidebar radii are 7px, continuous cubic G2 corners; inset radius is max(0, outer radius minus padding). Older-rice appearances may be inspected only as visual references under the user's latest exception; they must not supply runtime code, helpers or imports.
 
-The supplied mainDesigns calendar replaces the radial-only direction: weather left, liquid hardware meters centrally, calendar right. The frame reveals downward, followed by subframes in a newly randomized order over approximately 1.5 seconds. Keep input immediate, honor reduced motion, avoid rapid high-contrast flashes, and never fabricate weather or telemetry. The shipped staged calendar still uses radial ticks until this replacement is verified.
+The supplied mainDesigns calendar replaces the radial-only direction: weather left, liquid hardware meters centrally, calendar right. Its latest design plane is 806.3 × 310 (733 × 1.1 width), with unchanged type/height and translated column positions. The frame reveals downward, followed by subframes in a newly randomized order over 1.5 seconds. London is the user-approved weather location. Rain moves and storm lightning pulses occasionally; reduced motion stops both. Never fabricate weather or telemetry.
+
+Settings uses the measured 1024 × 699 frame: 262px navigation and 762px content. Colors, portrait geometry, first navigation positions, 11px navigation type and 54 × 20 toggle geometry follow the inspected nodes. The portrait asset has not been exported; the ghOSt G is an explicit placeholder. Undrawn pages reuse those materials. Full pixel parity with every Figma layer is not claimed.
 
 Terminal work may inspect TemperedOS only as the explicitly authorized terminal visual reference, with more spacing and monochrome treatment. No unrelated legacy code or systems may be imported. The compact power HUD must open first and require deliberate confirmation for disruptive actions; tests must disable those actions.
 
 Icon system 01: 60 separate transparent 24px SVGs with 1.5px rounded outline strokes, explicit pure black/white variants, and a font-derived Turret Road G. Existing Canvas controls are not yet migrated. See icons.md.
 
-The top bar is the scope of version 0.1. Other desktop surfaces will follow the user's designs. Existing keybindings are never edited.
+Existing shortcut combinations are preserved. Staged migration mappings are not activated automatically. The October 3 manual rail-autostart replacement was explicitly authorized and keeps unrelated services intact.

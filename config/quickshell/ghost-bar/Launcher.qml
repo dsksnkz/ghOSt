@@ -42,7 +42,7 @@ Item {
     Column {
         anchors.fill: parent
         spacing: 16
-        Rectangle {
+        G2Surface {
             width: parent.width; height: 44; radius: 5
             color: Theme.base; border.color: search.activeFocus ? Theme.muted : Theme.line
             Icon { x: 13; anchors.verticalCenter: parent.verticalCenter; name: "search" }
@@ -72,7 +72,7 @@ Item {
             currentIndex: 0
             boundsBehavior: Flickable.StopAtBounds
             highlightMoveDuration: 90
-            highlight: Rectangle { radius: 5; color: Theme.text }
+            highlight: G2Surface { radius: 5; color: Theme.text }
             keyNavigationEnabled: false
             delegate: Item {
                 id: row
@@ -105,7 +105,7 @@ Item {
                 Icon { anchors.horizontalCenter: parent.horizontalCenter; name: "search"; width: 28; height: 28; ink: Theme.muted }
                 Label { text: "No matching applications"; color: Theme.muted }
             }
-            Controls.ScrollBar.vertical: Controls.ScrollBar { policy: Controls.ScrollBar.AsNeeded; width: 3; contentItem: Rectangle { color: Theme.muted; radius: 1 } }
+            Controls.ScrollBar.vertical: Controls.ScrollBar { policy: Controls.ScrollBar.AsNeeded; width: 3; contentItem: G2Surface { color: Theme.muted; radius: 1 } }
         }
         Label { text: "↑ ↓  SELECT     ↵  OPEN     ESC  CLOSE"; font.pixelSize: 9; color: Theme.muted }
     }

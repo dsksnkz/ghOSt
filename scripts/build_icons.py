@@ -4,6 +4,7 @@ from pathlib import Path
 from html import escape
 import argparse
 import json
+import math
 
 ROOT = Path(__file__).resolve().parents[1]
 DESTINATIONS = (ROOT / "config/quickshell/ghost-bar/icons", ROOT / "site/assets/icons")
@@ -21,10 +22,20 @@ def rect(x, y, w, h, radius=1):
     return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{radius}"/>'
 
 
+def gear():
+    points = []
+    for i in range(32):
+        radius = 10 if i % 4 in (0, 3) else 7.5
+        angle = i * math.pi / 16
+        points.append(f'{12 + math.cos(angle) * radius:.4f} {12 + math.sin(angle) * radius:.4f}')
+    outline = 'M' + 'L'.join(points) + 'Z M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8Z'
+    return f'<path d="{outline}" fill="currentColor" stroke="none" fill-rule="evenodd"/>'
+
+
 # No external icon set, font symbols or raster embeds. Brand outline is the
 # user's requested Turret Road G; its separately bundled OFL remains applicable.
 ICONS = {
-    "settings": ("System", circle(12, 12, 5) + circle(12, 12, 1.5) + path("M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2")),
+    "settings": ("System", gear()),
     "wifi": ("Connections", path("M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4.5 4.5 0 0 1 6 0") + circle(12, 19, .7)),
     "network": ("Connections", rect(9, 3, 6, 5) + rect(3, 16, 6, 5) + rect(15, 16, 6, 5) + path("M12 8v4M6 16v-4h12v4")),
     "ethernet": ("Connections", path("M6 3h12v7l-3 3H9l-3-3ZM9 3v4m3-4v4m3-4v4M12 13v8m-5 0h10")),

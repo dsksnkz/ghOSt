@@ -19,13 +19,13 @@ ShellRoot {
                 Repeater {
                     id: icons
                     model: Catalogue.names
-                    delegate: Rectangle {
+                    delegate: G2Surface {
                         id: tile
                         required property string modelData
                         property bool ready: light.status === Image.Ready && dark.status === Image.Ready
                         width: 186; height: 85; color: "#151515"; radius: 3
                         SvgIcon { id: light; x: 26; y: 12; width: 28; height: 28; name: tile.modelData }
-                        Rectangle {
+                        G2Surface {
                             x: 104; y: 6; width: 54; height: 40; radius: 3; color: "#ffffff"
                             SvgIcon { id: dark; anchors.centerIn: parent; name: tile.modelData; black: true; width: 28; height: 28 }
                         }

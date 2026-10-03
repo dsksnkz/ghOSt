@@ -52,7 +52,7 @@ Item {
     }
     Repeater {
         model: weather.condition === "rain" ? 6 : 0
-        Rectangle {
+        G2Surface {
             required property int index
             readonly property real travel: (weather.rainPhase + index*.167)%1
             x: 25 + index*11 - travel*5; y: 77 + travel*27
