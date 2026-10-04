@@ -12,6 +12,15 @@ Item {
     readonly property date displayTime: fixtureMode ? new Date(2026,8,29,9,21) : Desk.now
     readonly property int displayVolume: fixtureMode ? 33 : Desk.volume
     readonly property var displayWeather: fixtureMode ? ({condition:"rain",temperature:20}) : Desk.weatherSummary
+    function workspaceAction(action, value) {
+        if (!fixtureMode) return "{}";
+        if (action==="current")workspaceWheel.fixtureWorkspace=Number(value);
+        if (action==="scroll")workspaceWheel.scroll(Number(value));
+        if (action==="windows")workspaceWheel.fixtureWindows=JSON.parse(value.slice(5));
+        if (action==="pose")workspaceWheel.fixturePose(Number(value));
+        if (action==="reduced")Theme.reducedMotion=value==="true";
+        return JSON.stringify(workspaceWheel.status());
+    }
     implicitHeight: 64
     readonly property real designScale: width/1920
     function open(name, item) {
@@ -32,7 +41,7 @@ Item {
                 onClicked: Desk.toggleSidebar(bar.screenName)
                 SvgIcon { x: 10; y: 4; width: 24; height: 24; name: "menu" }
             }
-            Workspaces { x: 132; y: 0; monitor: bar.monitor;fixtureWorkspace:bar.fixtureMode?5:-1 }
+            Workspaces { id:workspaceWheel; x:132; y:0; monitor:bar.monitor;fixtureWorkspace:bar.fixtureMode?5:-1 }
             G2Surface { x:1598;y:5;width:1;height:36;color:"#3a3a3a" }
             G2Surface { x:1821;y:5;width:1;height:36;color:"#3a3a3a" }
             Key {

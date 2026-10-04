@@ -1,5 +1,7 @@
 # Next scheduled corrections — 2026-10-03
 
+2026-10-04 explicit Sunday build: 3D workspace wheel is staged and isolated-tested, including wrap, fractional/multiple scrolling, stable indicator and retargeting. [Evidence](changes/2026-10-04-workspace-wheel.md). The left rail divider/alignment pass, independent notification/lock backends and other documented gaps remain pending. Scheduled substantive builds stay weekdays; a direct user request authorizes a scoped Sunday build. No new live activation.
+
 2026-10-04: Settings category frames, portrait chooser/private copies, PC-name flow and creator Info are implemented in isolated staging. Earlier sidebar direction/radii/status sizes, calendar action radii and Nerd rail/triangle corrections pass regression. [Current evidence](changes/2026-10-04-settings.md) supersedes historical unimplemented states below. Notifications/lock, 3D wheel and left rail divider/alignment remain pending. No scheduled live activation.
 
 Update2026-10-04: the user explicitly authorized some manual work before the next scheduled run. [Verified local subset](changes/2026-10-04-small-corrections.md): sidebar left-to-right groups/radii/larger status icons, calendar action radii, Nerd rail fonts and centered triangle. Earlier statements below saying none are implemented now apply only to the remaining requests. Work remains staged/unpublished; notification backend, Settings corrections, 3D wheel and left rail dividers still need implementation. Preserve this local work during the next pass.

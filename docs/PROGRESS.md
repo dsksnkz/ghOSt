@@ -1,5 +1,9 @@
 # ghOSt progress
 
+## 2026-10-04 / explicitly requested Sunday workspace build
+
+Staged the detailed cylindrical workspace wheel, stable triangle/hit targets, continuous mid-turn retargeting, eligible displayed neighbors and fractional/multiple-notch scrolling. Added actual QML motion/still captures and reduced-motion web preview. [Output and verification](changes/2026-10-04-workspace-wheel.md). 41 Python tests, 15 launcher assertions, JS projection/ring tests, native QML fixture motion/input-model checks and prior Settings/sidebar/calendar regressions pass. Active desktop, shortcuts/autostart and existing processes unchanged; no automatic activation. Publication status is recorded in the change record; full prompt remains pending for left rail alignment/dividers, independent notifications/lock and other gaps.
+
 ## 2026-10-04 / scheduled Settings correction pass
 
 Published source release `bcd8e3e`; Pages run37171957777 succeeded. Live HTML/new Settings controls loaded; all changed screenshot/wallpaper/pencil assets matched local bytes. [Publication details and browser-check limits](changes/2026-10-04-settings.md#publication).

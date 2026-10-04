@@ -47,7 +47,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 ## Controls
 
 - The menu control opens the sliding sidebar; the separate launcher searches applications by name or keywords. Pins keep favorites first among equally ranked results.
-- The stationary triangle marks the center of the sliding workspace numbers. Scroll includes all desktops 1–5 and populated higher desktops, with accumulated notches.
+- The stationary triangle marks the center of a projected 3D workspace wheel. Numbers curve, recede and rotate while their hit targets stay fixed. Rapid input retargets the current pose; reduced motion snaps immediately. Scroll includes empty desktops 1–5 and populated higher desktops, accumulating fractional and multiple notches.
 - Clock opens the whole calendar frame; clicking the CPU diamond switches it to processor clock.
 - Audio opens volume; scroll adjusts; right-click mutes.
 - Network, Bluetooth and battery open the sidebar. Its three-layer cards use standard Linux services, not another rice's shell.
@@ -58,7 +58,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 
 ## Verification
 
-The earlier user-authorized rail-autostart transition is separate from this update. Current Settings, sidebar and typography changes were verified only in an isolated preview; the running desktop, keybindings and autostart were not changed. The installer stages by default. Public previews are actual Quickshell renders with labeled sample values. Physical Wayland input, independent lock/notification history, 3D workspace motion and broader migration remain pending. See [latest change record](docs/changes/2026-10-04-settings.md).
+The earlier user-authorized rail-autostart transition is separate from this update. Current Settings, sidebar, typography and workspace-wheel changes were verified only in isolated previews; the running desktop, keybindings and autostart were not changed. The installer stages by default. Public previews are actual Quickshell renders with labeled sample values. Physical Wayland input, independent lock/notification history, remaining Figma layers and broader migration remain pending. See [latest change record](docs/changes/2026-10-04-workspace-wheel.md).
 
 ```sh
 python3 -m unittest discover -s tests -v

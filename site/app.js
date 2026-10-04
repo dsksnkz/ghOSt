@@ -2,7 +2,8 @@ const views = {
   settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
   desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
   calendar: ["calendar-frame.webp", "Calendar · sample storm and performance readings"],
-  rail: ["rail-frame.webp", "Rail · three-position workspace wheel and grouped controls"],
+  rail: ["rail-frame.webp", "Rail · cylindrical workspace wheel, fixed indicator and grouped controls"],
+  wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
   sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards with sample device names"],
   power: ["power-frame.webp", "Power · a second click confirms disruptive actions"],
   launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
@@ -45,7 +46,9 @@ let selection = "calendar";
 document.querySelectorAll("[data-view]").forEach(button => {
   button.addEventListener("click", () => {
     selection = button.dataset.view;
-    const chosen = selection, [file, description] = views[chosen];
+    const chosen = selection;
+    let [file, description] = views[chosen];
+    if (chosen === "wheel" && matchMedia("(prefers-reduced-motion: reduce)").matches) file = "workspace-wheel-still.webp";
     const next = new Image();
     next.onload = () => {
       if (selection !== chosen) return;

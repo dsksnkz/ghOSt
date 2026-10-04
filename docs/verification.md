@@ -1,5 +1,9 @@
 # Verification
 
+## 2026-10-04 · Workspace wheel
+
+41 Python tests, 15 launcher assertions, deterministic JS ring/projection checks and actual QML transient depth/rotation, fixed-triangle, wraparound, partial/multiple-notch, retargeting and reduced-motion checks pass. Prior Settings/sidebar/calendar regression passes. Actual screenshots and native QML motion frames captured; installer stages in an isolated directory. No live pointer/keyboard dispatch or activation. [Evidence and limits](changes/2026-10-04-workspace-wheel.md).
+
 ## 2026-10-04 / isolated Settings corrections
 
 41 Python tests,15 launcher assertions,61 two-tone icon checks,14 Settings pages plus profile/name/search flows, runtime sidebar/rail properties and calendar motion/weather/reduced-motion checks passed. Isolated staging installer succeeds. Real Qt popup overlay is included in captures. Both portraits visibly change in fixtures; original preservation/private file permissions are unit-tested. Invalid PC names cannot dispatch; permission errors cannot fake success. Native image picker, real hostname setter and power actions were not exercised. Active keybinding/autostart hashes match starting values; Hyprland config errors empty. [Evidence and limits](changes/2026-10-04-settings.md).

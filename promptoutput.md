@@ -1,5 +1,9 @@
 prompts outputs here
 
+## 2026-10-04 · Explicit Sunday workspace build
+
+Built and isolated-tested the projected workspace wheel: curved depth/rotation, fixed triangle, smooth rapid retargeting, reduced motion and accumulated scrolling through empty 1–5/populated higher desktops. [Rail](site/assets/rail-frame.webp) · [Motion](site/assets/workspace-wheel-motion.webp) · [Composition](site/assets/desktop-frame.webp) · [Verification and remaining gaps](docs/changes/2026-10-04-workspace-wheel.md) · [Pages](https://dsksnkz.github.io/ghOSt/). Active desktop unchanged. Same prompt/design blobs f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d / 9cc34c7e555a0cbfbff777d194a13ac3b799e6fe; full revision remains pending. Publication status follows in the change record.
+
 ## 2026-10-04 — Settings groups, portraits, PC-name editor and Info
 
 Published release `bcd8e3e`; Pages deployment37171957777 succeeded. Actual output links below are live, with every changed screenshot byte-verified. [Verification limits](docs/changes/2026-10-04-settings.md#publication).

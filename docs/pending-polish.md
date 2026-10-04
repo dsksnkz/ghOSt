@@ -1,5 +1,7 @@
 # 2026-10-03 / continuation checkpoint
 
+2026-10-04 explicit Sunday build: projected 3D workspace motion, stable triangle, continuous retargeting and eligible displayed neighbors are now staged and isolated-tested. [Current wheel record](changes/2026-10-04-workspace-wheel.md). Left rail dividers/alignment and native physical-input/GPU verification remain pending; do not reapply the older simple translation as the final wheel.
+
 2026-10-04 scheduled continuation: Settings grouping, both portrait entry points/private copies, PC-name editor and creator Info are staged and isolated-tested alongside earlier corrections. [Current record](changes/2026-10-04-settings.md) supersedes historical pending states below. Next: independent notifications, 3D workspace motion and left rail alignment/dividers; then remaining measured-layer/native parity and backends. Preserve activation boundaries; full prompt remains pending.
 
 2026-10-04 manual continuation: [small corrections](changes/2026-10-04-small-corrections.md) implemented and isolated-tested sidebar entrance direction/radii/status sizes, calendar action radii and rail font/triangle alignment. These are no longer unimplemented. Settings grouping/portrait/name/credits, independent notifications, 3D wheel and left rail dividers remain pending. Source/output remains unpublished and inactive; preserve the dirty tree.

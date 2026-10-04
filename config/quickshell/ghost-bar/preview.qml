@@ -112,6 +112,7 @@ ShellRoot {
                 return JSON.stringify({railFonts,sidebarControls,panelControls});
             }
             function telemetry(): string { return panel.performanceStatus(); }
+            function workspace(action: string, value: string): string { return rail.workspaceAction(action,value); }
             function calendar(action: string, value: string): string { return panel.calendarAction(action,value); }
             function settings(action: string, value: string): string {
                 if(action==="page")settingsPreview.choose(value);
