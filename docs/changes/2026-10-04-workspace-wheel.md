@@ -8,7 +8,7 @@ Directly requested Sunday build. Staged implementation, not live activation.
 - Kept the triangle and keyboard/pointer hit targets stationary. Retargeting starts from the current fractional pose, not a new settled digit. Reduced motion cancels the turn and snaps to its destination.
 - Unified visible neighbors with the eligible workspace ring: empty 1–5, then populated higher desktops. A manually opened empty higher desktop remains visible but is not a scroll destination. No shortcut changed.
 - Accumulated partial wheel notches instead of rounding every event; multiple notches retain their direction and count. Gaps between controls also accept scrolling. Native dispatch still uses the independently implemented serialized helper.
-- Published actual frame captures and a 24 KB animated WebP of the native QML fixture. The website selects a still image when reduced motion is requested.
+- Published actual frame captures and a compact animated WebP of the native QML fixture, including the final 5-to-1 turn for a closed loop. The website selects a still image when reduced motion is requested.
 
 Files: `Workspaces.qml`, `WorkspaceWheel.js`, `Rail.qml`, `preview.qml`, `tests/test_workspace_wheel.cjs`, `scripts/verify_workspace_wheel.py`, README, site and these progress records.
 
@@ -32,4 +32,4 @@ Local evidence: `.local/verification/2026-10-04-wheel/`; reversible snapshots: `
 
 Pending: native physical input/GPU rendering/multi-monitor validation; measured left rail divider/alignment pass; independent notifications/lock; embedded equalizer; remaining Figma raster/image transforms and wider migration. No 100% parity or full-prompt completion claim.
 
-Publication: pending until the pushed release and Pages deployment are verified.
+Publication: source release `0b19c9e17310b94375425a5c3cd8440c745bfa2d` pushed; [Pages run 37193540728](https://github.com/dsksnkz/ghOSt/actions/runs/37193540728) succeeded. The live HTML includes the new wheel preview; remotely fetched rail/composition/still images match local SHA-256 bytes. The follow-up export closes the motion loop without changing the native component or static screenshots. Local desktop and 390 px browser previews loaded the animation and had no horizontal overflow. No whole-prompt completion or live activation is implied.

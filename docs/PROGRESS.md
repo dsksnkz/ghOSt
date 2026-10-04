@@ -2,7 +2,7 @@
 
 ## 2026-10-04 / explicitly requested Sunday workspace build
 
-Staged the detailed cylindrical workspace wheel, stable triangle/hit targets, continuous mid-turn retargeting, eligible displayed neighbors and fractional/multiple-notch scrolling. Added actual QML motion/still captures and reduced-motion web preview. [Output and verification](changes/2026-10-04-workspace-wheel.md). 41 Python tests, 15 launcher assertions, JS projection/ring tests, native QML fixture motion/input-model checks and prior Settings/sidebar/calendar regressions pass. Active desktop, shortcuts/autostart and existing processes unchanged; no automatic activation. Publication status is recorded in the change record; full prompt remains pending for left rail alignment/dividers, independent notifications/lock and other gaps.
+Staged the detailed cylindrical workspace wheel, stable triangle/hit targets, continuous mid-turn retargeting, eligible displayed neighbors and fractional/multiple-notch scrolling. Added actual QML motion/still captures and reduced-motion web preview. [Output and verification](changes/2026-10-04-workspace-wheel.md). 41 Python tests, 15 launcher assertions, JS projection/ring tests, native QML fixture motion/input-model checks and prior Settings/sidebar/calendar regressions pass. Active desktop, shortcuts/autostart and existing processes unchanged; no automatic activation. Published source `0b19c9e`; Pages run37193540728 succeeded and static output bytes match remotely. Full prompt remains pending for left rail alignment/dividers, independent notifications/lock and other gaps.
 
 ## 2026-10-04 / scheduled Settings correction pass
 

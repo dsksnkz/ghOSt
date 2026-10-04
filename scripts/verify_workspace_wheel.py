@@ -112,10 +112,10 @@ call('page', 'desktop')
 time.sleep(1.7)
 capture('desktop-frame')
 call('page', 'rail')
-for target in (2,3,4,5):
+for turn, target in enumerate((2,3,4,5,1)):
     wheel('current', str(target))
     start = time.monotonic()
     for frame in range(12):
-        capture('motion-%03d' % ((target-2)*12+frame))
+        capture('motion-%03d' % (turn*12+frame))
         time.sleep(max(0, start+(frame+1)*.04-time.monotonic()))
 print('PASS: projected rotation/depth, stationary triangle, wrap, eligible higher desktops, accumulated notches, continuous retarget, reduced motion and actual captures')
