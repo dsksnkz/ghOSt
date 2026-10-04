@@ -76,10 +76,11 @@ class Settings(unittest.TestCase):
         with patch.object(backend,'status',return_value={'notifications':None}),patch.object(backend,'run') as run:
             with self.assertRaises(ValueError):backend.action('dnd','true')
             run.assert_not_called()
-    def test_dnd_sets_explicit_state_not_toggle(self):
+    def test_notifications_use_the_owned_bridge_not_swaync(self):
         with patch.object(backend,'status',return_value={'notifications':{}}),patch.object(backend,'run') as run:
-            backend.action('dnd','true');backend.action('dnd','false')
-            self.assertEqual([c.args[0][-1] for c in run.call_args_list],['-dn','-df'])
+            for name,value in (('dnd','true'),('dnd','false'),('notifications','')):
+                with self.assertRaises(ValueError):backend.action(name,value)
+            run.assert_not_called()
     def test_unknown_action_is_rejected(self):
         with patch.object(backend,'run') as run:
             with self.assertRaises(ValueError):backend.action('reboot','')

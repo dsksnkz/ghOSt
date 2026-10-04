@@ -133,6 +133,12 @@ ShellRoot {
                 return JSON.stringify({order:sidebarPreview.entranceOrder,elapsed:sidebarPreview.entranceTime});
             }
             function opened(value: bool): void { controller.opened = value; }
+            function notifications(action: string): string {
+                if(action==="sample")Notifications.sample();
+                if(action==="clear")Notifications.clear();
+                if(action==="dnd")Notifications.setDnd(!Notifications.dnd);
+                return JSON.stringify({ready:Notifications.ready,count:Notifications.count,dnd:Notifications.dnd});
+            }
             function launcher(action: string, value: string): string { return panel.launcherAction(action, value); }
             function capture(path: string): void { frame.grabToImage(result => { result.saveToFile(path); }); }
             function stop(): void { Qt.quit(); }

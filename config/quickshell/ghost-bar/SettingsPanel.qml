@@ -90,6 +90,7 @@ Item {
         else apply("hostname",nameDraft);
     }
     function cancelName() { nameDialog.close(); }
+    function cancelPortrait() { portraitDialog.close();portraitChooserRequested=false; }
     function apply(name,value) { if(!previewMode)Settings.apply(name,value); }
     function preference(name,value) { if(!previewMode)Settings.preference(name,value); }
     function gigabytes(value) { return typeof value==="number"?(value/1e9).toFixed(1)+" GB":"Unavailable"; }
@@ -104,7 +105,7 @@ Item {
             airplaneSnapshot=null;
         }
     }
-    function status() { return JSON.stringify({page,query,x,y,width:scene.width,height:scene.height,scale:scene.scale,navHeight:navFlick.height,groupHeights:filteredGroups.map(g=>g.length*42+5.2),groupCategories:filteredGroups.map(g=>g.map(c=>c.id)),profileFont:Theme.textFont,portraitSource:portraitSource.toString(),portraitOrigin,portraitChooserRequested,nameEditor:nameDialog.visible,nameDraft,nameValid:validName(nameDraft),displayHost,categories:categories.length,preview:previewMode,visible,error:Settings.error}); }
+    function status() { return JSON.stringify({page,query,x,y,width:scene.width,height:scene.height,scale:scene.scale,navHeight:navFlick.height,groupHeights:filteredGroups.map(g=>g.length*42+5.2),groupCategories:filteredGroups.map(g=>g.map(c=>c.id)),profileFont:Theme.textFont,portraitSource:portraitSource.toString(),portraitOrigin,portraitChooserRequested,portraitChooserVisible:portraitDialog.visible,nameEditor:nameDialog.visible,nameDraft,nameValid:validName(nameDraft),displayHost,categories:categories.length,preview:previewMode,visible,error:Settings.error}); }
     Connections { target:Settings;function onStateChanged(){if(nameSubmitted&&nameDialog.visible&&Settings.state.host===settings.nameDraft)nameDialog.close();} }
     Timer { id:brightnessCommit;interval:180;onTriggered:settings.apply("brightness",String(settings.pendingBrightness)) }
     PwObjectTracker { objects:settings.outputs.concat(settings.inputs) }
@@ -367,9 +368,14 @@ Item {
     Component { id:notificationsPage
         Column {
             width:body.width;spacing:24
-            ToggleRow { name:"Do not disturb";icon:"notifications";checked:!!settings.details.notifications?.dnd;enabled:!!settings.details.notifications;onToggled:value=>settings.apply("dnd",String(value)) }
-            DeviceRow { icon:"notifications";name:"Notification history";value:settings.details.notifications?String(settings.details.notifications.count):"Unavailable";enabled:!!settings.details.notifications;onClicked:settings.apply("notifications","") }
-            Note { visible:!settings.details.notifications;text:"No independent notification service is running" }
+            ToggleRow { name:"Do not disturb";icon:"notifications";checked:Notifications.dnd;enabled:Notifications.ready;onToggled:value=>Notifications.setDnd(value) }
+            Note { visible:Notifications.mode==="observe";text:"History starts when ghOSt opens. Do not disturb silences ghOSt banners only while another notification service is active." }
+            Note { visible:!Notifications.ready;text:Notifications.error || "Notification connection unavailable" }
+            Section {
+                title:"Notification history"
+                NotificationList { width:parent.width;height:320;previewMode:settings.previewMode }
+                Key { width:110;height:32;radius:8;text:"Dismiss all";hint:"Dismiss notifications";enabled:Notifications.count>0;onClicked:Notifications.clear() }
+            }
         }
     }
     Component { id:networkPage

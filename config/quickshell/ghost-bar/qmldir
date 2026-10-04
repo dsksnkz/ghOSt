@@ -1,6 +1,9 @@
 singleton Theme 1.0 Theme.qml
 singleton Desk 1.0 Desk.qml
 singleton Settings 1.0 Settings.qml
+singleton Notifications 1.0 Notifications.qml
+NotificationList 1.0 NotificationList.qml
+NotificationToast 1.0 NotificationToast.qml
 SettingsPanel 1.0 SettingsPanel.qml
 SettingsWindow 1.0 SettingsWindow.qml
 SettingsToggle 1.0 SettingsToggle.qml

@@ -1,5 +1,7 @@
 # Verification
 
+2026-10-04 desktop-visible pass:45 Python tests including isolated session-bus notification protocol/ownership tests;15 launcher assertions, JS wheel checks,14 QML Settings pages/flows, sidebar radii/fonts/motion and calendar/wheel animation checks pass. Native ghOSt loading,1024×699 Settings mapping and real notification observation were checked; stale Settings-focus transition fixed. Existing service ownership, shortcuts/autostart and wallpaper preserved. [Evidence and limits](changes/2026-10-04-desktop.md). This supersedes earlier staging-only verification for the explicitly authorized ghOSt surfaces, not the broader pending migration.
+
 ## 2026-10-04 · Workspace wheel
 
 41 Python tests, 15 launcher assertions, deterministic JS ring/projection checks and actual QML transient depth/rotation, fixed-triangle, wraparound, partial/multiple-notch, retargeting and reduced-motion checks pass. Prior Settings/sidebar/calendar regression passes. Actual screenshots and native QML motion frames captured; installer stages in an isolated directory. No live pointer/keyboard dispatch or activation. [Evidence and limits](changes/2026-10-04-workspace-wheel.md).

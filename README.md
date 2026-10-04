@@ -12,7 +12,9 @@ Graphical Hyprland Operating System Toolkit.
 
 Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation, left sidebar, Settings, audio, network, Bluetooth, media, battery and a confirmation-based power panel. Measured Figma spacing, JetBrains Mono/Turret Road typography, monochrome SVG icons and click-triggered motion.
 
-Settings has fourteen pages. PipeWire output/input selection, volume and mute; existing EasyEffects editor access; battery and opt-in local display-on history; sidebar widget visibility; laptop brightness; local wallpaper selection through a running awww daemon; independent Swaync notifications; wireless/Bluetooth; reduced motion; storage and system information. Unavailable services are shown explicitly. The equalizer band editor, independent lock and notification service are not implemented yet.
+Settings has fourteen pages. PipeWire output/input selection, volume and mute; existing EasyEffects editor access; battery and opt-in local display-on history; sidebar widget visibility; laptop brightness; local wallpaper selection through a running awww daemon; ghOSt notification history; wireless/Bluetooth; reduced motion; storage and system information. Unavailable services are shown explicitly. The embedded equalizer band editor and independent lock remain pending.
+
+Notifications use Python GObject/Gio (`python-gobject` on Arch). ghOSt becomes the standard Freedesktop server only when its name is vacant. With an existing server it observes new notifications and dismisses through the standard API, without taking ownership. History starts with ghOSt and stays in memory; only DND preference is saved locally. In observation mode DND cannot silence another server's banners, and its actions must be used in that application. No existing service is stopped or replaced.
 
 Preferences use `$XDG_CONFIG_HOME/ghost/settings.json`. History is off by default and, when enabled, uses `$XDG_STATE_HOME/ghost/usage.json`. It counts observed display-on intervals while ghOSt runs, not user engagement; missed intervals are not backfilled. No history is uploaded.
 
@@ -40,7 +42,7 @@ Default installation stages a separate copy under ~/.local/share/ghost/staged/gh
 ./install.sh --activate
 ```
 
-This installs ghOSt into `~/.config/quickshell/ghost-bar` and adds its own autostart. It does not edit another rice. If another bar is active, the bars may overlap; do not activate until that session is deliberately switched. This opt-in installer is not a complete independent-rice migration yet. The launcher is native to ghOSt. Network and Bluetooth controls use standard system utilities where needed; the independent lock and notifications surfaces remain pending.
+This installs ghOSt into `~/.config/quickshell/ghost-bar` and adds its own autostart. It does not edit another rice. If another bar is active, the bars may overlap; do not activate until that session is deliberately switched. This opt-in installer is not a complete independent-rice migration yet. The launcher and notification implementation are owned by ghOSt. Network/Bluetooth use standard Linux services; independent lock remains pending.
 
 The legacy restore command is ./install.sh --restore. It verifies tracked integration files before restoring the original snapshot; later edits require manual reconciliation. Backups are under ~/.local/state/ghost/backups. Staging alone needs no live rollback.
 
@@ -58,7 +60,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 
 ## Verification
 
-The earlier user-authorized rail-autostart transition is separate from this update. Current Settings, sidebar, typography and workspace-wheel changes were verified only in isolated previews; the running desktop, keybindings and autostart were not changed. The installer stages by default. Public previews are actual Quickshell renders with labeled sample values. Physical Wayland input, independent lock/notification history, remaining Figma layers and broader migration remain pending. See [latest change record](docs/changes/2026-10-04-workspace-wheel.md).
+2026-10-04: the user explicitly requested desktop-visible updates. Tested rail/sidebar/calendar/Settings corrections are deployed to the existing ghOSt profile; only ghOSt was restarted. Keybindings, wallpaper, autostart and legacy processes are preserved. The installer still requires deliberate activation on other machines. Public captures use labeled samples, not a remote desktop feed. Native loading, Settings mapping and notification observation were checked; physical pointer/GPU pixel parity, independent lock, further Figma layers and broader migration remain pending. [Latest change record and rollback](docs/changes/2026-10-04-desktop.md).
 
 ```sh
 python3 -m unittest discover -s tests -v

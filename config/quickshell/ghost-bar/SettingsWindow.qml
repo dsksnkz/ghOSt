@@ -8,6 +8,14 @@ FloatingWindow {
     implicitWidth:1024;implicitHeight:699
     minimumSize:Qt.size(720,490)
     color:"transparent"
+    function inspect(action) {
+        if(action==="portrait-general")content.requestPortrait("general");
+        if(action==="portrait-sidebar")content.requestPortrait("sidebar");
+        if(action==="portrait-cancel")content.cancelPortrait();
+        if(action==="name-open")content.editName();
+        if(action==="name-cancel")content.cancelName();
+        return JSON.stringify({windowVisible:visible,content:JSON.parse(content.status())});
+    }
     Component.onCompleted:Settings.active=visible
     onVisibleChanged: { Settings.active=visible;if(visible)Qt.callLater(()=>{content.choose(Desk.settingsPage);content.forceActiveFocus();}); }
     onClosed:Desk.settingsRequested=false

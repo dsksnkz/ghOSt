@@ -12,9 +12,9 @@ Item {
     property bool previewLongNames: false
     property bool opened: true
     property real reveal: 1
-    property bool dnd: false
-    property bool notificationsAvailable: false
-    property int notificationCount: 0
+    readonly property bool dnd: Notifications.dnd
+    readonly property bool notificationsAvailable: Notifications.ready
+    readonly property int notificationCount: Notifications.count
     property var brightnessPercent: null
     property var entranceOrder: [0,1,2,3,4,5]
     property real entranceTime: 900
@@ -30,7 +30,6 @@ Item {
     signal closeRequested()
     function refresh() {
         if (previewMode || !opened) return;
-        notificationOwner.running = true;
         if(screen?.name?.startsWith("eDP-"))brightnessQuery.running = true;
     }
     onOpenedChanged: { if(opened)beginEntrance();else itemEntrance.stop();refresh(); }
@@ -43,31 +42,7 @@ Item {
             sidebar.brightnessPercent=isFinite(value)?value:null;
         } }
     }
-    Process {
-        id: notificationOwner
-        command: ["gdbus", "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path", "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "org.erikreider.swaync.cc"]
-        stdout: StdioCollector { onStreamFinished: {
-            sidebar.notificationsAvailable = text.indexOf("true") !== -1;
-            if (sidebar.notificationsAvailable) { dndQuery.running = true; countQuery.running = true; }
-        } }
-    }
     Timer { interval: 3000; repeat: true; running: sidebar.opened && !sidebar.previewMode; onTriggered: sidebar.refresh() }
-    Process {
-        id: dndQuery
-        command: ["timeout", "2", "swaync-client", "-sw", "-D"]
-        stdout: StdioCollector { onStreamFinished: sidebar.dnd = text.trim() === "true" }
-    }
-    Process {
-        id: dndToggle
-        command: ["timeout", "2", "swaync-client", "-sw", "-d"]
-        stdout: StdioCollector { onStreamFinished: sidebar.dnd = text.trim() === "true" }
-    }
-    Process {
-        id: countQuery
-        command: ["timeout", "2", "swaync-client", "-sw", "-c"]
-        stdout: StdioCollector { onStreamFinished: sidebar.notificationCount = Math.max(0, parseInt(text) || 0) }
-    }
-    Process { id: dismissNotifications; command: ["timeout", "2", "swaync-client", "-sw", "-C"]; onExited: countQuery.running = true }
 
     // The Figma artboard is 1920 × 1080. This panel occupies x=0..354;
     // its nested controls use the measured artboard coordinates minus y=146.
@@ -155,10 +130,7 @@ Item {
             enabled: sidebar.previewMode || sidebar.notificationsAvailable
             opacity:sidebar.itemProgress(0)
             transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
-            onClicked: {
-                if (sidebar.previewMode) sidebar.dnd = !sidebar.dnd;
-                else dndToggle.running = true;
-            }
+            onClicked: Notifications.setDnd(!sidebar.dnd)
             SvgIcon { anchors.centerIn: parent; width: 22; height: 22; name: "notifications"; black: true }
             G2Surface { visible: sidebar.dnd; anchors.centerIn: parent; width: 27; height: 1.5; rotation: -45; color: "#111111" }
         }
@@ -314,25 +286,17 @@ Item {
                 color: "#292929"; border.color: "#323232"
                 SvgIcon { x: 12; y: 19; width: 25; height: 25; name: "notifications" }
                 Label { x: 75; y: 15; text: "Notifications"; font.pixelSize: 11; font.weight: Font.Bold; color: "#ffffff" }
-                Label { x: 75; y: 42; width: 209; text: sidebar.previewMode ? "No notifications" : !sidebar.notificationsAvailable ? "Notifications unavailable" : sidebar.notificationCount ? sidebar.notificationCount + " notifications" : "No notifications"; font.pixelSize: 11; font.weight: Font.Light; color: "#ffffff" }
-                MouseArea { anchors.fill: parent; enabled: !sidebar.previewMode && sidebar.notificationsAvailable; onClicked: Quickshell.execDetached(["swaync-client", "-sw", "-op"]) }
+                Label { x:75;y:42;width:209;text:!sidebar.notificationsAvailable?"Notifications unavailable":sidebar.notificationCount?sidebar.notificationCount+" notifications":"No notifications";font.pixelSize:11;font.weight:Font.Light;color:"#ffffff" }
             }
-            Flickable {
-                id: notificationsFlick
-                layer.enabled: true
+            NotificationList {
                 x: 5; y: 80; width: parent.width-10; height: parent.height-109
-                contentHeight: noMessages.height; clip: true
-                Item {
-                    id: noMessages; width: parent.width; height: notificationsFlick.height
-                    SvgIcon { anchors.horizontalCenter: parent.horizontalCenter; y: 57; width: 37; height: 37; name: "notifications"; opacity: .6 }
-                    Label { anchors.horizontalCenter: parent.horizontalCenter; y: 117; text: sidebar.previewMode || sidebar.notificationsAvailable && !sidebar.notificationCount ? "No more messages" : sidebar.notificationsAvailable ? "Open notification history" : "Notifications unavailable"; font.pixelSize: 11; font.weight: Font.Light; color: "#ffffff" }
-                }
+                previewMode:sidebar.previewMode
             }
             Key {
                 x: parent.width-75; y: parent.height-27; width: 68; height: 22
                 text: "Dismiss"; fontSize: 9; hint: "Dismiss notifications"
-                enabled: !sidebar.previewMode && sidebar.notificationsAvailable && sidebar.notificationCount > 0
-                onClicked: dismissNotifications.running = true
+                enabled:sidebar.notificationsAvailable && sidebar.notificationCount > 0
+                onClicked: Notifications.clear()
             }
         }
 

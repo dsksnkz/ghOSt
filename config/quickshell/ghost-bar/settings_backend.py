@@ -126,16 +126,6 @@ def status():
             result['brightness'] = {'device': value[0], 'percent': int(value[3].rstrip('%'))}
     except (OSError, ValueError, subprocess.TimeoutExpired):
         pass
-    try:
-        owner = run(['gdbus','call','--session','--dest','org.freedesktop.DBus',
-                     '--object-path','/org/freedesktop/DBus','--method',
-                     'org.freedesktop.DBus.NameHasOwner','org.erikreider.swaync.cc'])
-        if 'true' in owner:
-            result['notifications'] = {
-                'dnd': run(['swaync-client','-sw','-D']) == 'true',
-                'count': int(run(['swaync-client','-sw','-c']))}
-    except (OSError, ValueError, subprocess.TimeoutExpired):
-        pass
     disk = shutil.disk_usage(Path.home())
     result['storage'] = {'used': disk.used, 'total': disk.total, 'free': disk.free}
     return result
@@ -201,14 +191,8 @@ def action(name, value):
         profile_picture(value)
     elif name == 'hostname':
         hostname(value)
-    elif name == 'dnd' and value in ('true','false'):
-        if status()['notifications'] is None:
-            raise ValueError('Notification service unavailable')
-        run(['swaync-client','-sw','-dn' if value=='true' else '-df'])
-    elif name == 'notifications':
-        if status()['notifications'] is None:
-            raise ValueError('Notification service unavailable')
-        run(['swaync-client','-sw','-op'])
+    elif name in ('dnd','notifications'):
+        raise ValueError('Use the ghOSt notification controls')
     else:
         raise ValueError('Unknown action')
 

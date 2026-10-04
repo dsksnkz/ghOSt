@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-04 · Desktop-visible corrections
+
+Applied and deployed the requested rail/sidebar/calendar/Settings corrections. Added left rail hairlines and ghOSt notification history/backend; repaired a stale-focus transition that dismissed Settings. Grouped frames, picture chooser, PC-name editor, creator Info,15/11/21/10/8px G2 controls, larger statuses, randomized left-to-right entry and cylindrical workspace wheel are now in the installed ghOSt profile. Shortcuts, wallpaper, autostart and unrelated services preserved.
+
+[Sidebar/history](site/assets/sidebar-frame.webp) · [Settings notifications](site/assets/settings-notifications.webp) · [Settings](site/assets/settings-general.webp) · [Rail](site/assets/rail-frame.webp) · [Composition](site/assets/desktop-frame.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/) · [Checks, recovery and remaining limits](docs/changes/2026-10-04-desktop.md).
+
+Current GitHub/local prompt/design blobs match `f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d` / `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe`.45 Python tests plus native/fixture checks pass. History starts with ghOSt; observation cannot control another server's banners or action signals. Independent server actions/replacement/expiry/DND/dismissal tested on a private bus. Broader Figma parity, independent lock, embedded EQ and terminal/migration remain pending; the full revision is not marked completed.
+
 ## 2026-10-04 · Explicit Sunday workspace build
 
 Built and isolated-tested the projected workspace wheel: curved depth/rotation, fixed triangle, smooth rapid retargeting, reduced motion and accumulated scrolling through empty 1–5/populated higher desktops. [Rail](site/assets/rail-frame.webp) · [Motion](site/assets/workspace-wheel-motion.webp) · [Composition](site/assets/desktop-frame.webp) · [Verification and remaining gaps](docs/changes/2026-10-04-workspace-wheel.md) · [Pages](https://dsksnkz.github.io/ghOSt/). Active desktop unchanged. Published source0b19c9e; Pages run37193540728 succeeded; static output bytes verified remotely. Same prompt/design blobs f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d / 9cc34c7e555a0cbfbff777d194a13ac3b799e6fe; full revision remains pending.

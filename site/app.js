@@ -4,7 +4,7 @@ const views = {
   calendar: ["calendar-frame.webp", "Calendar · sample storm and performance readings"],
   rail: ["rail-frame.webp", "Rail · cylindrical workspace wheel, fixed indicator and grouped controls"],
   wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
-  sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards with sample device names"],
+  sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards and notification history; sample data"],
   power: ["power-frame.webp", "Power · a second click confirms disruptive actions"],
   launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
   search: ["launcher-search.png", "Search / ranked name, category description and keyword matches."],
@@ -53,7 +53,7 @@ document.querySelectorAll("[data-view]").forEach(button => {
     next.onload = () => {
       if (selection !== chosen) return;
       surface.src = next.src;
-      surface.alt = "Staged ghOSt preview: " + description;
+      surface.alt = "ghOSt component preview: " + description;
       document.querySelector("#caption").textContent = description;
       document.querySelector("#fullsize").href = next.src;
       document.querySelector("figure").dataset.view = selection;

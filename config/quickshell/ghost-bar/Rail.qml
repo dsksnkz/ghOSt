@@ -42,6 +42,9 @@ Item {
                 SvgIcon { x: 10; y: 4; width: 24; height: 24; name: "menu" }
             }
             Workspaces { id:workspaceWheel; x:132; y:0; monitor:bar.monitor;fixtureWorkspace:bar.fixtureMode?5:-1 }
+            // Hairlines bisect the measured free space between left-hand groups.
+            G2Surface { x:96.5;y:5;width:1;height:36;color:"#3a3a3a" }
+            G2Surface { x:272.5;y:5;width:1;height:36;color:"#3a3a3a" }
             G2Surface { x:1598;y:5;width:1;height:36;color:"#3a3a3a" }
             G2Surface { x:1821;y:5;width:1;height:36;color:"#3a3a3a" }
             Key {

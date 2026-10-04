@@ -4,21 +4,40 @@ import Quickshell.Io
 import Quickshell.Hyprland
 
 ShellRoot {
-    SettingsWindow {}
+    SettingsWindow { id:settingsWindow }
     Variants {
         model: Quickshell.screens
         delegate: Scope {
             id: output
             required property var modelData
+            property int focusRevision:0
+            readonly property bool wantsFocus:Desk.panelScreen===modelData.name&&(Desk.sidebarOpen||Desk.panel!=="")
+            function refreshFocus() {
+                focusRevision++;
+                if(wantsFocus)focusDelay.restart();else focusDelay.stop();
+                focusGrab.active=false;
+            }
+            Connections {
+                target:Desk
+                function onPanelChanged(){output.refreshFocus();}
+                function onSidebarOpenChanged(){output.refreshFocus();}
+                function onPanelScreenChanged(){output.refreshFocus();}
+            }
+            Timer { id:focusDelay;interval:50;onTriggered:if(output.wantsFocus)focusGrab.active=true }
             Bar { id: barWindow; screen: output.modelData }
             RailReservation { screen: output.modelData }
+            NotificationToast { displayScreen:output.modelData }
             Panel { id: panelWindow; screen: output.modelData; companion: barWindow; managedFocus: true }
             Sidebar { id: sidebarWindow; screen: output.modelData; companion: barWindow; managedFocus: true }
             CalendarWindow { id: calendarWindow; screen: output.modelData; companion: barWindow; managedFocus: true }
             HyprlandFocusGrab {
-                active: Desk.panelScreen === output.modelData.name && (Desk.sidebarOpen || Desk.panel !== "")
+                id:focusGrab
                 windows: [barWindow, panelWindow, sidebarWindow, calendarWindow]
-                onCleared: Qt.callLater(() => { if(Desk.panelScreen === output.modelData.name)Desk.close(); })
+                onCleared: {
+                    const revision=output.focusRevision;
+                    if(focusDelay.running)return;
+                    Qt.callLater(()=>{if(revision===output.focusRevision&&output.wantsFocus&&!focusDelay.running&&!Desk.settingsRequested)Desk.close();});
+                }
             }
         }
     }
@@ -31,8 +50,10 @@ ShellRoot {
         function close(): void { Desk.close(); }
         function sidebar(): void { const screen = Quickshell.screens[0]; if(screen)Desk.toggleSidebar(screen.name); }
         function settings(page: string): void { const screen=Quickshell.screens[0];if(screen)Desk.openSettings(screen.name,page||"general"); }
+        function settingsFlow(action: string): string { return settingsWindow.inspect(action); }
+        function notifications(): string { return JSON.stringify({ready:Notifications.ready,mode:Notifications.mode,count:Notifications.count,dnd:Notifications.dnd,error:Notifications.error}); }
         function status(): string {
-            return JSON.stringify({panel: Desk.panel, sidebar: Desk.sidebarOpen, volume: Desk.volume, network: Desk.networkName, battery: Desk.charge, workspace: Desk.activeWorkspace});
+            return JSON.stringify({panel: Desk.panel, sidebar: Desk.sidebarOpen,settings:Desk.settingsRequested,volume: Desk.volume, network: Desk.networkName, battery: Desk.charge, workspace: Desk.activeWorkspace});
         }
     }
 }
