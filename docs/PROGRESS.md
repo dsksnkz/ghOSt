@@ -14,6 +14,12 @@ Keybindings/autostart/wallpaper and legacy processes preserved. No new preview
 website build; broader prompt remains pending. Source publication is recorded
 in the change record after verification.
 
+Published source `cd1de19`; fresh Git-archive50 tests/JS checks pass. Four native
+screenshots and the shader package match GitHub blob hashes. No preview-site
+UI/assets changed; existing push-triggered CI is left intact. Native calendar
+and sidebar are open; GPU shaders compile/move with empty logs. Only unrelated
+pre-existing untracked files remain outside the release.
+
 ## 2026-10-04 / Rail fullscreen behavior
 
 Per-monitor fullscreen hides the rail until exit or a normal workspace.48 Python tests and actual Qt state-transition/dismissal assertions pass; native mapping/logs checked, user confirmed fullscreen works. Prior six Sidebar/Settings/notification/alignment/calendar fixes deployed; spacing/motion/weather rechecks pass. [Output and recovery](changes/2026-10-04-fullscreen.md). Shortcuts/autostart/game settings unchanged; broader prompt pending.

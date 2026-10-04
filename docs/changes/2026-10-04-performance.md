@@ -2,8 +2,9 @@
 
 Built on the owner's Arch/Hyprland laptop by explicit Sunday request. The latest
 instruction supersedes separate visual previews: changes hot-reload into the
-existing native ghOSt profile and remain visible while building. No new preview
-website is built. The opt-in installer behavior on other machines is unchanged.
+existing native ghOSt profile and remain visible while building. No preview-site
+UI/assets are changed; existing push-triggered repository CI is left intact.
+The opt-in installer behavior on other machines is unchanged.
 
 ## Changes
 
@@ -101,4 +102,12 @@ properties were inspected; composition/type/radii are retained. The prompt text
 was not changed. Full revision stays pending for remaining reference parity,
 embedded EQ, independent lock, terminal reference and broader migration.
 
-Source and native-output publication status is appended after verification.
+## Publication
+
+Source release [cd1de19](https://github.com/dsksnkz/ghOSt/commit/cd1de19b056908c50ca7e47c830253bafb04a953)
+is pushed to `main`. The shipped shader and all four native output images match
+GitHub's Git blob hashes. A fresh archive of that committed tree passes all50
+Python tests and the wave/corner/wheel/launcher checks; no ignored development
+asset is needed to install this runtime. Only the pre-existing unrelated
+untracked files remain outside the release. Native ghOSt remains active with
+the calendar/sidebar open; shaders report compiled, moving and empty logs.

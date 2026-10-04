@@ -15,6 +15,11 @@ preview/site build after that correction. Source prompt/design hashes remain
 f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d /9cc34c7e555a0cbfbff777d194a13ac3b799e6fe.
 Broader Figma/lock/EQ/terminal/migration requests are not marked complete.
 
+Published source `cd1de19`; all four native output images and the shader package
+match GitHub blob hashes. Fresh committed-archive50 Python tests and JS checks
+pass; native calendar/sidebar remain open. No preview-site UI/assets changed;
+existing push-triggered repository CI is left intact.
+
 ## 2026-10-04 · Rail fullscreen behavior
 
 Rail hides on its monitor's fullscreen workspace and returns afterward. Tested/deployed; user confirmed fullscreen works.48 Python tests and actual Qt transition/dismissal assertions pass. Previous six corrections remain deployed. [Native output](site/assets/rail-native.png) · [Verification/recovery](docs/changes/2026-10-04-fullscreen.md) · [Pages](https://dsksnkz.github.io/ghOSt/). No shortcut/autostart/game/session changes; broader prompt pending.
