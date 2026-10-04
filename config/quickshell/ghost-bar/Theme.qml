@@ -6,6 +6,11 @@ QtObject {
     readonly property real outerRadius: 7
     function innerRadius(padding) { return Math.max(0, outerRadius-padding); }
     readonly property string font: "JetBrainsMono Nerd Font Mono"
+    readonly property FontLoader jetRegular: FontLoader { source:"fonts/JetBrainsMono-Regular.ttf" }
+    readonly property FontLoader jetLight: FontLoader { source:"fonts/JetBrainsMono-Light.ttf" }
+    readonly property FontLoader jetMedium: FontLoader { source:"fonts/JetBrainsMono-Medium.ttf" }
+    readonly property FontLoader jetBold: FontLoader { source:"fonts/JetBrainsMono-Bold.ttf" }
+    readonly property string textFont: jetRegular.name
     readonly property color base: "#080808"
     readonly property color surface: "#101010"
     readonly property color raised: "#181818"

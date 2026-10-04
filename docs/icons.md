@@ -1,6 +1,6 @@
 # Icons
 
-60 separate icons, each available as a transparent black or white SVG. Common settings, input, connectivity, hardware, session, weather and actions share a 24 × 24 viewBox and 1.5px rounded stroke. The Turret Road G is a filled font outline, not the retired ghost mascot.
+61 separate icons, each available as a transparent black or white SVG. Common settings, input, connectivity, hardware, session, weather and actions share a 24 × 24 viewBox and 1.5px rounded stroke. The pencil added for PC-name editing is also a standalone asset. The Turret Road G is a filled font outline, not the retired ghost mascot.
 
 [Browse and download](https://dsksnkz.github.io/ghOSt/icons.html).
 

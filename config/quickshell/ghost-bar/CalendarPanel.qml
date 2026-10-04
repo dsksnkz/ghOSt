@@ -23,7 +23,7 @@ Item {
     property string notice: ""
     property int elapsed: 1500
     property var order: [0,1,2,3,4,5]
-    implicitHeight: width * 310 / 806.3
+    implicitHeight: width * 310 / 733
     function beginReveal() {
         let shuffled = [0,1,2,3,4,5];
         for (let i=shuffled.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); const t=shuffled[i];shuffled[i]=shuffled[j];shuffled[j]=t; }
@@ -68,7 +68,7 @@ Item {
         stdout: StdioCollector { onStreamFinished: { try{cal.weather=JSON.parse(text);}catch(e){cal.weather={condition:"unknown",days:[]};} } }
     }
     Item {
-        width: 806.3; height: 310; scale: cal.width/806.3; transformOrigin: Item.TopLeft
+        width: 733; height: 310; scale: cal.width/733; transformOrigin: Item.TopLeft
         // Positions match the user's mainDesigns composition; all text is functional.
         Item {
             id: weatherSection
@@ -77,9 +77,9 @@ Item {
             readonly property string condition: selectedForecast?.condition || cal.weather.condition
             readonly property var temperature: selectedForecast?.temperature ?? cal.weather.temperature
             WeatherGlyph { id:weatherArt; x: 0; y: 0; scale: 63/108; transformOrigin: Item.TopLeft; condition: weatherSection.condition; active: cal.active; reducedMotion: cal.reducedMotion }
-            Label { x: 77; y: 0; width: 117; height: 26; text: weatherSection.condition === "unknown" ? "WEATHER" : weatherSection.condition.toUpperCase(); font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff" }
+            Label { x: 77; y: 0; width: 117; height: 26; text: weatherSection.condition === "unknown" ? "WEATHER" : weatherSection.condition.toUpperCase(); font.family:Theme.textFont; font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff" }
             G2Surface { x: 77; y: 32; width: 60; height: 1; color: "#ffffff" }
-            Label { x: 81; y: 41; width: 48; height: 26; text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature)+"°" : "—"; font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff"; horizontalAlignment: Text.AlignHCenter }
+            Label { x: 81; y: 41; width: 48; height: 26; text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature)+"°" : "—"; font.family:Theme.textFont; font.pixelSize: 20; font.weight: Font.Light; color: "#ffffff"; horizontalAlignment: Text.AlignHCenter }
             Item {
                 x: 0; y: 83; width: 194; height: 130; clip: true
                 Column {
@@ -94,7 +94,7 @@ Item {
                             hint: cal.labelDay(modelData.date)+" forecast"
                             onClicked: { cal.forecastIndex=index; cal.forecastSelected=true; }
                             SvgIcon { x: 0; y: 0; width: 17; height: 17; name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition }
-                            Label { x: 24; y: 0; width: 170; height: 26; text: cal.labelDay(modelData.date)+" - "+modelData.condition+" "+Math.round(modelData.temperature)+"°"; font.pixelSize: index===cal.forecastIndex?13:11; font.weight: Font.Light; color: "#ffffff" }
+                            Label { x: 24; y: 0; width: 170; height: 26; text: cal.labelDay(modelData.date)+" - "+modelData.condition+" "+Math.round(modelData.temperature)+"°"; font.family:Theme.textFont; font.pixelSize: index===cal.forecastIndex?13:11; font.weight: Font.Light; color: "#ffffff" }
                         }
                     }
                 }
@@ -102,11 +102,11 @@ Item {
                 Label { visible: !(cal.weather.days?.length); text: cal.weather.error || "Weather unavailable"; font.pixelSize: 10; color: Theme.muted; width: 190; wrapMode: Text.WordWrap }
             }
         }
-        LiquidMeter { x: 271.65; y: 27; title: "GPU"; value: cal.readings.gpu ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(1); onClicked: cal.notice = "GPU · " + (available ? Math.round(value)+"%" : "Unavailable") }
-        LiquidMeter { x: 411.65; y: 27; title: "RAM"; value: cal.readings.memory ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(2); onClicked: cal.notice = "RAM · " + (available ? Math.round(value)+"%" : "Unavailable") }
-        LiquidMeter { x: 341.65; y: 97; valueY: 80; title: cal.clockMetric?"CLOCK":"CPU"; value: cal.clockMetric ? cal.readings.processor ?? null : cal.readings.cpu ?? null; maximum: cal.clockMetric ? cal.readings.maximum ?? 0 : 100; unit: cal.clockMetric?"MHz":"%"; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(3); onClicked: cal.clockMetric = !cal.clockMetric }
+        LiquidMeter { x: 235; y: 27; title: "GPU"; value: cal.readings.gpu ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(1); onClicked: cal.notice = "GPU · " + (available ? Math.round(value)+"%" : "Unavailable") }
+        LiquidMeter { x: 375.01; y: 27; title: "RAM"; value: cal.readings.memory ?? null; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(2); onClicked: cal.notice = "RAM · " + (available ? Math.round(value)+"%" : "Unavailable") }
+        LiquidMeter { x: 305; y: 97; valueY: 80; title: cal.clockMetric?"CLOCK":"CPU"; value: cal.clockMetric ? cal.readings.processor ?? null : cal.readings.cpu ?? null; maximum: cal.clockMetric ? cal.readings.maximum ?? 0 : 100; unit: cal.clockMetric?"MHz":"%"; active: cal.active; reducedMotion: cal.reducedMotion; opacity: cal.groupOpacity(3); onClicked: cal.clockMetric = !cal.clockMetric }
         Item {
-            x: 571.3; y: 73; width: 231; height: 173; opacity: cal.groupOpacity(4)
+            x: 498; y: 73; width: 231; height: 173; opacity: cal.groupOpacity(4)
             Keys.onPressed: event => {
                 if(event.key === Qt.Key_PageUp) { cal.monthStep(-1); event.accepted=true; }
                 else if(event.key === Qt.Key_PageDown) { cal.monthStep(1); event.accepted=true; }
@@ -124,10 +124,10 @@ Item {
             }
             Label { y: 163; width: parent.width; horizontalAlignment:Text.AlignHCenter; text:Qt.formatDateTime(cal.selectedDate,"dddd, dd MMMM").toUpperCase(); font.pixelSize:5; color:Theme.muted; font.letterSpacing:.5 }
         }
-        Item { x: 350.65; y: 245; width: 105; height: 36; opacity: cal.groupOpacity(5)
-            Key { x: 0; y: 11; width:24; height:24; color:"#d9d9d9"; radius:9; hint:"Applications"; onClicked: cal.navigateRequested("launcher"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"search"; black:true } }
-            Key { x: 35; y: 0; width:36; height:36; color:"#d9d9d9"; radius:10; hint:"Settings"; onClicked:cal.navigateRequested("settings"); SvgIcon { anchors.centerIn:parent; width:25; height:25; name:"settings"; black:true } }
-            Key { x: 81; y: 11; width:24; height:24; color:"#d9d9d9"; radius:9; hint:"Power"; onClicked:cal.navigateRequested("session"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"power"; black:true } }
+        Item { x: 314; y: 245; width: 105; height: 36; opacity: cal.groupOpacity(5)
+            Key { x: 0; y: 11; width:24; height:24; color:"#d9d9d9"; radius:15; hint:"Applications"; onClicked: cal.navigateRequested("launcher"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"search"; black:true } }
+            Key { x: 35; y: 0; width:36; height:36; color:"#d9d9d9"; radius:15; hint:"Settings"; onClicked:cal.navigateRequested("settings"); SvgIcon { anchors.centerIn:parent; width:25; height:25; name:"settings"; black:true } }
+            Key { x: 81; y: 11; width:24; height:24; color:"#d9d9d9"; radius:15; hint:"Power"; onClicked:cal.navigateRequested("session"); SvgIcon { anchors.centerIn:parent; width:17; height:17; name:"power"; black:true } }
         }
         Label { x: 250; y: 291; width: 240; horizontalAlignment:Text.AlignHCenter; text:cal.notice; font.pixelSize:7; color:Theme.muted }
         G2Surface {

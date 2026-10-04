@@ -1,5 +1,25 @@
 prompts outputs here
 
+## 2026-10-04 — Settings groups, portraits, PC-name editor and Info
+
+Implemented original five-function frame plus separate added category frames; both picture-chooser controls/private immutable local copies; validated PC-name edit/Save/Cancel flow; measured pencil placement; exact `ghOSt - by you and Dsksnkz` creator Info. Added two-tone pencil SVG (61 icons). Reverified earlier local sidebar/calendar/rail corrections without activating them.
+
+[Settings](site/assets/settings-general.webp) · [PC-name editor](site/assets/settings-name-editor.webp) · [Picture fixture](site/assets/settings-portrait-fixture.webp) · [Search](site/assets/settings-search-sound.webp) · [Composition](site/assets/desktop-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/) · [Files, checks and remaining items](docs/changes/2026-10-04-settings.md).
+
+GitHub prompts.md blob `f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d`; design blob `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe` matched local copies.41 Python tests,15 launcher assertions, isolated Settings/property/motion/capture checks and staging install passed. No live desktop, autostart, shortcut, wallpaper or hostname change. The same heartbeat is restored to five hours; weekday-only builds after this first 03:20 Sunday run. Pending: independent notifications/lock, 3D wheel, left rail dividers, native input/GPU/multi-monitor parity, embedded EQ and broader migration. This partial prompt revision is not marked completed.
+
+## 2026-10-04 — sidebar, calendar and rail corrections staged
+
+Implemented the requested left-to-right grouped sidebar entrances,15/11 px control radii, larger right-anchored status icons, calendar action corners, all-Nerd rail typography and centered stationary workspace triangle. [Actual output, checks and remaining requests](docs/changes/2026-10-04-small-corrections.md). Runtime geometry/font/motion checks,14 Settings pages, calendar animation checks,36 Python tests,15 launcher assertions and isolated staging installer passed. No active desktop/config/autostart changes; no publication. Independent notifications, Settings correction flows, 3D wheel and remaining Figma parity stay queued. The user prompt revision is not complete.
+
+## 2026-10-03 — latest corrections queued, not implemented
+
+Manual build stopped. Next scheduled start: **03:20 Europe/London, 2026-10-04**. [Saved corrections and unfinished state](docs/next-scheduled-corrections.md). Existing heartbeat is active, anchored to03:20 for its first run; that run restores the previous five-hour weekday workflow. No new UI screenshot, activation, commit or publication here. The preceding reference pass and its images remain local/unpublished and require corrections plus final verification. Prompt revision remains pending.
+
+## 2026-10-03 — Desktop 1 and Settings reference pass
+
+Measured both current Figma desktops; staged the original profile artwork, actual plain JetBrains Mono fonts/weights, compact Settings navigation/search/separators, sparse General composition, right-anchored sidebar statuses and three-button header, rail fill/dividers and 733 × 310 calendar. Preview Settings origin is (524,212). [Output and honest remaining gaps](docs/changes/2026-10-03-exact-figma.md) · [Settings](site/assets/settings-general.webp) · [Desktop 1](site/assets/desktop-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/). Current pass is staging-only; active desktop is unchanged. Prompt/design blobs remain f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d / 9cc34c7e555a0cbfbff777d194a13ac3b799e6fe. Full 100% parity is not claimed and this prompt revision remains pending.
+
 Latest result: [Settings, rail-autostart replacement and verified calendar/sidebar polish](docs/changes/2026-10-03-settings-polish.md). [Settings screenshot](site/assets/settings-general.webp). Earlier partial-state entries below are historical.
 
 ## 2026-10-03 — scheduled continuation checkpoint
@@ -38,7 +58,7 @@ Read prompts.md at blob f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d and the mainDes
 The ghOSt sidebar now slides in from the left instead of fading in place. Live configuration reloaded; direct pointer verification remains pending. The active calendar, rail and keybindings were not changed.
 # 2026-10-03 · Settings, rail, calendar and sidebar
 
-Added fourteen-page Settings; continuous G2 corners; wider calendar; grouped sidebar entrances and long-name fades; stationary workspace indicator and soft power glow. The user explicitly requested replacing the old rail's autostart: ghOSt now starts from the existing start handler, the previous rail is disabled, and unrelated services/keybindings remain intact. Native transparent work-area reservation is verified at 64px.
+Added fourteen-page Settings; continuous G2 corners; wider calendar; grouped sidebar entrances and long-name fades; stationary workspace indicator and soft power glow. The user explicitly requested replacing the old rail's autostart: ghOSt now starts from the existing start handler, the previous rail is disabled, and unrelated services/keybindings remain intact. Native transparent work-area reservation is verified at 64 px.
 
 [Settings](site/assets/settings-general.webp) · [Sound](site/assets/settings-sound.webp) · [Battery](site/assets/settings-battery.webp) · [Calendar](site/assets/calendar-frame.webp) · [Sidebar](site/assets/sidebar-frame.webp) · [Composition](site/assets/desktop-frame.webp) · [All Pages previews](https://dsksnkz.github.io/ghOSt/) · [Verification and remaining items](docs/changes/2026-10-03-settings-polish.md).
 

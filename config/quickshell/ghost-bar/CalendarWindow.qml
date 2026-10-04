@@ -22,8 +22,8 @@ PanelWindow {
     anchors { top: true; left: true }
     margins.top: 82 * designScale
     margins.left: Math.round((screen.width-implicitWidth)/2)
-    implicitWidth: Math.floor(Math.min(screen.width*806.3/1920, (screen.height-100)*806.3/310))
-    implicitHeight: Math.round(implicitWidth*310/806.3)
+    implicitWidth: Math.floor(Math.min(screen.width*733/1920, (screen.height-100)*733/310))
+    implicitHeight: Math.round(implicitWidth*310/733)
     color: "transparent"
     visible: opened || reveal > .001
     exclusionMode: ExclusionMode.Ignore

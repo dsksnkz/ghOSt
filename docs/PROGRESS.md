@@ -1,10 +1,28 @@
 # ghOSt progress
 
+## 2026-10-04 / scheduled Settings correction pass
+
+First requested 03:20 London run restored the same heartbeat to five hours; future substantive builds remain weekdays. Staged four Settings category frames, both picture-chooser entry points/private original-preserving copies, validated deliberate PC-name edit flow, measured pencil placement and exact creator Info. Added standalone two-tone pencil SVG (61 icons). Preserved and regression-tested preceding exact-reference/manual sidebar/calendar/rail changes. [Output, files, checks and remaining gaps](changes/2026-10-04-settings.md).
+
+41 Python tests,15 launcher assertions,14 Settings pages plus portrait/name/search flows, runtime rail/sidebar checks, calendar motion,61 two-tone SVG checks and isolated installer passed. Actual fixture captures exclude private network/chat data. Active desktop/config/autostart/keybindings unchanged; no real hostname or power action executed. Publication verification is recorded in the change record. Full prompt remains pending for notifications/lock, 3D wheel, left rail dividers and other gaps; no 100% parity claim.
+
+## 2026-10-04 / small manual corrections staged
+
+User requested some work now. Corrected sidebar grouped left-to-right entrances,15/11 px corners and larger aligned right-anchored status icons; calendar action radii; all-Nerd rail fonts/date fit and centered workspace triangle. [Changes, actual screenshots and remaining gaps](changes/2026-10-04-small-corrections.md). Runtime polish checks,14 Settings pages, calendar animation/weather checks,36 Python tests,15 launcher assertions and isolated installer pass. Only the owned isolated preview was started/stopped. No live change or publication; full prompt remains pending.
+
+## 2026-10-03 / stopped; latest corrections queued
+
+Next scheduled start: **03:20 Europe/London, 2026-10-04**. [Latest authoritative corrections](next-scheduled-corrections.md) supersede conflicting earlier notes. Existing dirty source/output is preserved; final regression was interrupted and newer screenshots are unpublished. No UI/live-desktop change in this checkpoint. Existing heartbeat updated and active; its first 03:20 run restores the previous five-hour weekday workflow. Prompt revisions remain pending.
+
+## 2026-10-03 / Desktop 1 and Settings exact-reference pass
+
+Both Figma desktops inspected. Staged measured plain-font loading, original portrait crops, sparse General layout, compact navigation/search/separators, right-anchored sidebar statuses and three-button header, rail fill/dividers, and restored 733 × 310 calendar geometry. Isolated preview uses the measured Settings origin (524,212). [Changes, screenshots, verification and remaining parity gaps](changes/2026-10-03-exact-figma.md). No active desktop/autostart/config/process change in this pass under current AGENTS.md. Do not claim 100% parity or mark the prompt revision completed. Continue from these source changes; the previous live deployment is unchanged.
+
 ## 2026-10-03 / Settings and rail-autostart transition
 
-Continued the manual pass. Fourteen-page Settings and the latest rail/calendar/sidebar polish are implemented and isolated-tested. The user's new direct request authorized the live rail-autostart replacement: ghOSt is running, the previous rail is disabled, and its unrelated services remain active. Native Settings is 1024 × 699; transparent reservation now protects 64px, calendar is 806 × 310 and existing binds are unchanged. [Change record, screenshots, recovery and remaining gaps](changes/2026-10-03-settings-polish.md).
+Continued the manual pass. Fourteen-page Settings and the latest rail/calendar/sidebar polish are implemented and isolated-tested. The user's new direct request authorized the live rail-autostart replacement: ghOSt is running, the previous rail is disabled, and its unrelated services remain active. Native Settings is 1024 × 699; transparent reservation now protects 64 px, calendar is 806 × 310 and existing binds are unchanged. [Change record, screenshots, recovery and remaining gaps](changes/2026-10-03-settings-polish.md).
 
-36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and default staging install passed. Native QML logs, layers, work area and private screenshots were inspected; no setters or disruptive actions were executed. Release `6c500a7` was pushed; Pages workflow `37155289952` succeeded. The live site loaded the new Settings controls and 1100 × 760 screenshot; a 390px browser layout had no horizontal overflow. The prompt revision remains pending for the explicit gaps, not completed.
+36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and default staging install passed. Native QML logs, layers, work area and private screenshots were inspected; no setters or disruptive actions were executed. Release `6c500a7` was pushed; Pages workflow `37155289952` succeeded. The live site loaded the new Settings controls and 1100 × 760 screenshot; a 390 px browser layout had no horizontal overflow. The prompt revision remains pending for the explicit gaps, not completed.
 
 ## 2026-10-03 / manual polish paused; schedule resumed
 
@@ -34,7 +52,7 @@ An independently authored left sidebar is staged with 7 px outer radius and nest
 
 Verification: GitHub `prompts.md` and `mainDesigns/Screenshot 2026-09-30 212732.png` matched local blob hashes `f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d` and `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe`. Fifteen Python tests and fifteen launcher assertions passed. Isolated QML preview loaded; IPC verified random reveal ordering, 1.5 s completion, rain motion, periodic storm lightning, reduced motion and stopping animation when closed. Native Quickshell reloads reported `Configuration Loaded`; `hyprctl configerrors` was empty and the live bind JSON SHA-256 was unchanged (`b2b4875462ecbc112533f0a6c6101116d715b1870ed98cf4c95b37c931de0651`). Native panel layers and cropped screenshots were checked. Physical mouse clicks on the Wayland rail and all sidebar list actions were not independently automated.
 
-Local evidence: `.local/verification/calendar-refinement/calendar-native-final-crop.png`, `calendar-final-preview.png`, `sidebar-final-preview.png`, `power-final-preview.png`, `rail-final-preview.png`, `site-desktop.png`, `site-mobile.png`, and `power-native.png`. The older `sidebar-7px-live.png` contains real nearby SSIDs and must never be published. Public-ready sample-data renders are `site/assets/{calendar,sidebar,power,rail}-frame.webp`. Snapshot: `.local/backups/calendar-refinement/`. The previous entry below describes the earlier staging point and is superseded where activation or weather status differs.
+Local evidence: `.local/verification/calendar-refinement/calendar-native-final-crop.png`, `calendar-final-preview.png`, `sidebar-final-preview.png`, `power-final-preview.png`, `rail-final-preview.png`, `site-desktop.png`, `site-mobile.png`, and `power-native.png`. The older `sidebar-7 px-live.png` contains real nearby SSIDs and must never be published. Public-ready sample-data renders are `site/assets/{calendar,sidebar,power,rail}-frame.webp`. Snapshot: `.local/backups/calendar-refinement/`. The previous entry below describes the earlier staging point and is superseded where activation or weather status differs.
 
 Commit `b935b77` was pushed and the [Pages preview](https://dsksnkz.github.io/ghOSt/) deployed successfully; the live HTML and all four screenshot assets returned HTTP 200. [Change record](changes/2026-10-03-frames.md). Remaining before full prompt delivery: obtain sidebar activation answer; finish the old-rice dependency audit (the untouched staged `config/hypr/hyprland.lua` still has references, and some older components may too); build an independent lock entry and notification surface; verify direct Wayland pointer interaction. The installer no longer rewrites another rice's shell. Do not mark `prompts.md` complete yet. The next scheduled run should continue this work, without usage-threshold deferral.
 
@@ -56,7 +74,7 @@ Remaining: supplied calendar composition/motion, rail tooltip removal, terminal 
 
 Added the independent launcher: ranked native application search, bounded keyboard selection, persistent pins, empty results, and six new monochrome icons. The G control and session launcher action now target this component in staged source. No shortcut changed. Actual component renders and Pages cover launcher, search, empty results and the expanded icon pack.
 
-Checks: 15 launcher assertions, six telemetry tests, isolated QML load, 112 desktop entries, pin persistence after restart, selection boundaries, preview-safe launch dispatch, staging installer, unchanged live bind JSON and native PIDs. Desktop and 390px web layouts reviewed. Native keyboard events and actual app startup remain untested; the installed older bar is unchanged.
+Checks: 15 launcher assertions, six telemetry tests, isolated QML load, 112 desktop entries, pin persistence after restart, selection boundaries, preview-safe launch dispatch, staging installer, unchanged live bind JSON and native PIDs. Desktop and 390 px web layouts reviewed. Native keyboard events and actual app startup remain untested; the installed older bar is unchanged.
 
 Usage at start: 0% five-hour / 50% weekly; verification milestone: 35% / 56%. No resets used. Keep remaining runs bounded by the account-wide daily/weekly guard.
 

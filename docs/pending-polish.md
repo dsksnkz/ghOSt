@@ -1,5 +1,13 @@
 # 2026-10-03 / continuation checkpoint
 
+2026-10-04 scheduled continuation: Settings grouping, both portrait entry points/private copies, PC-name editor and creator Info are staged and isolated-tested alongside earlier corrections. [Current record](changes/2026-10-04-settings.md) supersedes historical pending states below. Next: independent notifications, 3D workspace motion and left rail alignment/dividers; then remaining measured-layer/native parity and backends. Preserve activation boundaries; full prompt remains pending.
+
+2026-10-04 manual continuation: [small corrections](changes/2026-10-04-small-corrections.md) implemented and isolated-tested sidebar entrance direction/radii/status sizes, calendar action radii and rail font/triangle alignment. These are no longer unimplemented. Settings grouping/portrait/name/credits, independent notifications, 3D wheel and left rail dividers remain pending. Source/output remains unpublished and inactive; preserve the dirty tree.
+
+Latest corrections and next03:20 London start: [next-scheduled-corrections.md](next-scheduled-corrections.md). This overrides historical notes below, especially plain rail fonts, one Settings housing, right-to-left item entrances and omitted author attribution. New corrections are not implemented. Existing source/output remains unfinished and unpublished.
+
+Newest: [Desktop 1 and Settings reference pass](changes/2026-10-03-exact-figma.md) is staged and isolated-tested. Both Figma desktops are in scope. Plain fonts, original portraits, compact navigation, exact preview placement, sidebar status/header geometry, rail fill/dividers and 733 × 310 calendar replace the older approximations. Do not reapply the superseded 10% widening. Active installed files remain from the previous deployment. Next: exact raster/date-grid and pattern/scrollbar parity, pencil function/image transforms, native placement/input/GPU-render verification, then remaining independent backends. Current AGENTS.md requires isolated work, no automatic activation.
+
 Latest: manual work resumed and the user explicitly authorized the rail-autostart replacement. Settings is now built; native rail reservation and old rail removal are verified. [Current change record](changes/2026-10-03-settings-polish.md) supersedes the old partial-state entries below. Continue with exact Figma asset/layer matching, embedded equalizer controls, independent notifications/lock, external brightness and native input/multi-monitor verification. Preserve all snapshots and live shortcut combinations. Scheduled work still must not broaden activation beyond explicit user requests.
 
 ## Earlier pause checkpoint

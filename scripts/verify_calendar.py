@@ -16,6 +16,7 @@ def call(*args):
 def state():
     return json.loads(call('telemetry'))
 
+call('page', 'calendar')
 call('calendar', 'reduced', 'false')
 call('opened', 'true')
 first = json.loads(call('calendar', 'reveal', ''))
@@ -24,7 +25,7 @@ second = json.loads(call('calendar', 'reveal', ''))
 assert sorted(second['order']) == list(range(6)) and first['order'] != second['order']
 time.sleep(1.65)
 assert state()['elapsed'] == 1500
-assert abs(state()['width']/state()['height'] - 806.3/310) < .01
+assert abs(state()['width']/state()['height'] - 733/310) < .01
 call('calendar', 'weather', 'rain')
 a = state()['weatherMotion']['rain']
 time.sleep(.25)

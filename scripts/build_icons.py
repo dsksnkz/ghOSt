@@ -66,6 +66,7 @@ ICONS = {
     "updates": ("System", path("M20 9a8 8 0 0 0-14-4L3 8m0-5v5h5M4 15a8 8 0 0 0 14 4l3-3m0 5v-5h-5")),
     "info": ("Actions", circle(12, 12, 9) + path("M12 11v6m-2 0h4") + circle(12, 7, .5)),
     "search": ("Actions", circle(10, 10, 6) + path("m15 15 6 6")),
+    "edit": ("Actions", path("M4 20l1-5L16 4a2.12 2.12 0 0 1 3 3L8 18ZM14 6l4 4")),
     "close": ("Actions", path("m6 6 12 12M18 6 6 18")),
     "check": ("Actions", path("m4 12 5 5L20 6")),
     "plus": ("Actions", path("M12 4v16M4 12h16")),

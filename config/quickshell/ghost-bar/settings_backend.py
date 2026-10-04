@@ -3,11 +3,13 @@
 import argparse
 from datetime import datetime
 import fcntl
+import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import subprocess
 import time
@@ -52,8 +54,9 @@ def preferences():
     for key in result['widgets']:
         if isinstance(data.get('widgets'),dict) and type(data['widgets'].get(key)) is bool:
             result['widgets'][key] = data['widgets'][key]
-    if isinstance(data.get('wallpaper'), str):
-        result['wallpaper'] = data['wallpaper']
+    for key in ('wallpaper', 'profilePicture'):
+        if isinstance(data.get(key), str):
+            result[key] = data[key]
     return result
 
 def setting(key, value):
@@ -146,6 +149,39 @@ def wallpaper_path(value):
         raise ValueError('Select PNG, JPEG, WebP or BMP')
     return path
 
+def profile_picture(value):
+    """Keep an immutable local copy; never alter or publish the chosen original."""
+    path = wallpaper_path(value)
+    limit = 16 * 1024 * 1024
+    with path.open('rb') as source:
+        data = source.read(limit + 1)
+    if len(data) > limit:
+        raise ValueError('Choose an image smaller than 16 MB')
+    signatures = ((b'\x89PNG\r\n\x1a\n', '.png'), (b'\xff\xd8\xff', '.jpg'), (b'BM', '.bmp'))
+    suffix = next((suffix for prefix, suffix in signatures if data.startswith(prefix)), None)
+    if data[:4] == b'RIFF' and data[8:12] == b'WEBP':
+        suffix = '.webp'
+    if suffix is None:
+        raise ValueError('Select a PNG, JPEG, WebP or BMP image')
+    directory = paths()[0].parent / 'profile-pictures'
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / (hashlib.sha256(data).hexdigest() + suffix)
+    if not destination.exists():
+        temporary = destination.with_suffix('.tmp')
+        with temporary.open('wb') as target:
+            target.write(data)
+        temporary.chmod(0o600)
+        temporary.replace(destination)
+    settings = preferences()
+    settings['profilePicture'] = destination.as_uri()
+    save(paths()[0], settings)
+
+def hostname(value):
+    if not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', value):
+        raise ValueError('Use 1–63 lowercase letters, numbers or hyphens; no edge hyphens')
+    # Existing system authorization is respected; no elevation or password handling.
+    run(['hostnamectl', '--no-ask-password', '--static', 'hostname', value])
+
 def action(name, value):
     if name == 'preference':
         key, enabled = value.split('=', 1)
@@ -161,6 +197,10 @@ def action(name, value):
         data = preferences()
         data['wallpaper'] = str(path)
         save(paths()[0], data)
+    elif name == 'profile-picture':
+        profile_picture(value)
+    elif name == 'hostname':
+        hostname(value)
     elif name == 'dnd' and value in ('true','false'):
         if status()['notifications'] is None:
             raise ValueError('Notification service unavailable')

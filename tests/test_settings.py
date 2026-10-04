@@ -1,4 +1,5 @@
 import importlib.util
+import base64
 import json
 import os
 from pathlib import Path
@@ -83,6 +84,43 @@ class Settings(unittest.TestCase):
         with patch.object(backend,'run') as run:
             with self.assertRaises(ValueError):backend.action('reboot','')
             run.assert_not_called()
+    def test_hostname_invalid_input_never_dispatches(self):
+        for value in ('', '--reboot', 'name with spaces', 'UPPERCASE', '-edge', 'edge-', 'x'*64, 'host\n'):
+            with self.subTest(value=value), patch.object(backend, 'run') as run:
+                with self.assertRaises(ValueError):backend.action('hostname', value)
+                run.assert_not_called()
+    def test_hostname_is_explicit_bounded_argument_vector(self):
+        with patch.object(backend, 'run') as run:
+            backend.action('hostname', 'unit-001')
+            run.assert_called_once_with(['hostnamectl','--no-ask-password','--static','hostname','unit-001'])
+        self.assertFalse(backend.paths()[0].exists())
+    def test_profile_copy_preserves_original_and_preferences(self):
+        image=Path(self.directory.name)/'my picture.png'
+        data=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aFfsAAAAASUVORK5CYII=')
+        image.write_bytes(data)
+        backend.setting('widgets.network','false')
+        with patch.object(backend,'run') as run:
+            backend.action('profile-picture',image.as_uri())
+            run.assert_not_called()
+        selected=Path(backend.unquote(backend.urlparse(backend.preferences()['profilePicture']).path))
+        self.assertNotEqual(selected,image)
+        self.assertEqual(selected.read_bytes(),data)
+        self.assertEqual(image.read_bytes(),data)
+        self.assertEqual(selected.stat().st_mode&0o777,0o600)
+        self.assertFalse(backend.preferences()['widgets']['network'])
+        backend.action('profile-picture',image.as_uri())
+        self.assertEqual(len(list(selected.parent.glob('*.png'))),1)
+    def test_profile_rejects_nonimage_and_remote_without_preference_change(self):
+        image=Path(self.directory.name)/'not-image.png';image.write_bytes(b'not an image')
+        for value in (str(image),'https://example.com/picture.png','file://remote/image.png'):
+            with self.subTest(value=value), patch.object(backend,'run') as run:
+                with self.assertRaises(ValueError):backend.action('profile-picture',value)
+                run.assert_not_called()
+        self.assertNotIn('profilePicture',backend.preferences())
+    def test_failed_hostname_does_not_fake_new_name(self):
+        with patch.object(backend,'run',side_effect=ValueError('Permission denied')):
+            with self.assertRaises(ValueError):backend.action('hostname','unit-002')
+        self.assertFalse(backend.paths()[0].exists())
     def test_history_counts_only_observed_display_on_intervals(self):
         backend.setting('usageTracking','true')
         with patch.object(backend.time,'time',side_effect=[100,160,220]),patch.object(backend,'battery',return_value=None),patch.object(backend,'run',side_effect=[json.dumps([{'dpmsStatus':True}]),json.dumps([{'dpmsStatus':False}])]):

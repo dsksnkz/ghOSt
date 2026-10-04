@@ -37,7 +37,11 @@ Item {
         if(action==="level" && previewMode)item.readings={cpu:Number(value),gpu:Number(value),memory:Number(value),processor:2100,maximum:4500};
         if(action==="clock" && previewMode)item.clockMetric=value==="true";
         if(action==="action" && previewMode)item.actionPage=value;
-        if(action==="navigate" && previewMode)item.navigateRequested(value);
+        if(action==="navigate" && previewMode) {
+            const previousStatus=item.status();
+            item.navigateRequested(value);
+            return previousStatus;
+        }
         return item.status();
     }
     implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : 46)

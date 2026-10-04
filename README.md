@@ -4,7 +4,7 @@ Graphical Hyprland Operating System Toolkit.
 
 [Preview](https://dsksnkz.github.io/ghOSt/) · [SVG icons](https://dsksnkz.github.io/ghOSt/icons.html) · [Progress](docs/PROGRESS.md)
 
-60 standalone transparent SVG icons, each in black and white. [Usage and rebuilding](docs/icons.md).
+61 standalone transparent SVG icons, each in black and white. [Usage and rebuilding](docs/icons.md).
 
 ![ghOSt calendar preview with sample readings](site/assets/calendar-frame.webp)
 
@@ -15,6 +15,8 @@ Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation
 Settings has fourteen pages. PipeWire output/input selection, volume and mute; existing EasyEffects editor access; battery and opt-in local display-on history; sidebar widget visibility; laptop brightness; local wallpaper selection through a running awww daemon; independent Swaync notifications; wireless/Bluetooth; reduced motion; storage and system information. Unavailable services are shown explicitly. The equalizer band editor, independent lock and notification service are not implemented yet.
 
 Preferences use `$XDG_CONFIG_HOME/ghost/settings.json`. History is off by default and, when enabled, uses `$XDG_STATE_HOME/ghost/usage.json`. It counts observed display-on intervals while ghOSt runs, not user engagement; missed intervals are not backfilled. No history is uploaded.
+
+Settings navigation keeps the original five categories together, with separate audio/power, desktop and system frames. Either profile picture opens a local image chooser; private copies are retained under `$XDG_CONFIG_HOME/ghost/profile-pictures/`, without altering the originals. The pencil opens a PC-name editor. Only an explicit Save requests a hostname change; validation and system permission errors are shown. No computer was renamed during verification.
 
 The launcher searches installed desktop entries by name, generic name and keywords. Pins are saved in `$XDG_STATE_HOME/ghost/launcher.ini` (default `~/.local/state/ghost/launcher.ini`). It uses native desktop-entry execution, not shell-parsed search text.
 
@@ -56,7 +58,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 
 ## Verification
 
-The user requested replacing the previous rail's autostart with ghOSt. The rail is running, its transparent reservation protects 64px at 1920 width, and the previous rail is disabled. Unrelated legacy services and shortcuts remain untouched; this is not a complete session migration. The installer still stages by default. Public previews are actual isolated Quickshell renders with labeled sample values. Native Settings, calendar/sidebar layers and runtime logs were inspected. Physical Wayland pointer automation, independent lock/notification history and broader session migration remain pending. See [latest change record](docs/changes/2026-10-03-settings-polish.md).
+The earlier user-authorized rail-autostart transition is separate from this update. Current Settings, sidebar and typography changes were verified only in an isolated preview; the running desktop, keybindings and autostart were not changed. The installer stages by default. Public previews are actual Quickshell renders with labeled sample values. Physical Wayland input, independent lock/notification history, 3D workspace motion and broader migration remain pending. See [latest change record](docs/changes/2026-10-04-settings.md).
 
 ```sh
 python3 -m unittest discover -s tests -v

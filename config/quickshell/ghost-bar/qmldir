@@ -12,6 +12,7 @@ Label 1.0 Label.qml
 Rule 1.0 Rule.qml
 Key 1.0 Key.qml
 G2Surface 1.0 G2Surface.qml
+G2Image 1.0 G2Image.qml
 FadeLabel 1.0 FadeLabel.qml
 Meter 1.0 Meter.qml
 Material 1.0 Material.qml

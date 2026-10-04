@@ -74,8 +74,9 @@ Item {
     readonly property real designWidth: 354
     readonly property real designHeight: 790
     readonly property real fit: Math.min(width/designWidth, height/designHeight)
-    readonly property real outerRadius: 7
+    readonly property real outerRadius: Theme.outerRadius
     readonly property real cardRadius: 15
+    readonly property real itemRadius: 15
     readonly property real cardInset: 4
     readonly property real innerRadius: Math.max(0, cardRadius-cardInset)
 
@@ -85,8 +86,8 @@ Item {
         onFractionChanged: requestPaint()
         onWidthChanged: requestPaint()
         onPaint: {
-            const c=getContext("2d"), r=(height-2)/2, w=width-2, h=height-2;
-            c.reset(); c.clearRect(0,0,width,height); c.translate(1,1);
+            const c=getContext("2d"), w=width-1, h=height-1, r=Math.min(sidebar.itemRadius-.5,w/2,h/2);
+            c.reset(); c.clearRect(0,0,width,height); c.translate(.5,.5);
             c.beginPath(); c.moveTo(r,0); c.lineTo(w-r,0); c.bezierCurveTo(w,0,w,0,w,r);
             c.bezierCurveTo(w,h,w,h,w-r,h); c.lineTo(r,h); c.bezierCurveTo(0,h,0,h,0,r); c.bezierCurveTo(0,0,0,0,r,0); c.closePath();
             c.clip(); c.fillStyle="#cecece"; c.fillRect(0,0,w*fraction,h);
@@ -119,33 +120,41 @@ Item {
         Label {
             x: 28; y: 33; width: 144; height: 63
             opacity:sidebar.itemProgress(0)
-            transform:Translate { x:24*(1-sidebar.itemProgress(0)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
             text: sidebar.previewMode ? "09:21" : Qt.formatDateTime(Desk.now, "HH:mm")
             font.pixelSize: 48; font.weight: Font.Normal; color: "#ffffff"
         }
-        Row {
-            anchors.right:parent.right; anchors.rightMargin:21; y:13; spacing:7
+        Item {
+            id: statusGroup
+            anchors.right:parent.right; anchors.rightMargin:21; y:13; width:136;height:26
             opacity:sidebar.itemProgress(0)
-            transform:Translate { x:24*(1-sidebar.itemProgress(0)) }
-            SvgIcon { width:14; height:16; name:Desk.wired?"ethernet":"wifi"; opacity:Desk.connected?1:.45 }
-            SvgIcon { width:14; height:16; name:"bluetooth"; opacity:Desk.adapter?.enabled?1:.45 }
-            Label { text:sidebar.previewMode?"100%":Desk.hasBattery?Desk.charge+"%":"AC"; font.pixelSize:11; height:16; verticalAlignment:Text.AlignVCenter }
-            SvgIcon { width:24; height:16; name:"battery"; visible:Desk.hasBattery||sidebar.previewMode }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
+            SvgIcon { id: statusWifi; x:0;anchors.verticalCenter:parent.verticalCenter;width:22;height:22;name:sidebar.previewMode?"wifi":Desk.wired?"ethernet":"wifi";opacity:sidebar.previewMode||Desk.connected?1:.45 }
+            SvgIcon { id: statusBluetooth; x:32;anchors.verticalCenter:parent.verticalCenter;width:22;height:22;name:"bluetooth";opacity:sidebar.previewMode||Desk.adapter?.enabled?1:.45 }
+            Label { x:64;anchors.verticalCenter:parent.verticalCenter;text:sidebar.previewMode?"100%":Desk.hasBattery?Desk.charge+"%":"AC";font.pixelSize:14;font.weight:Font.Bold;width:34;height:22;verticalAlignment:Text.AlignVCenter;color:"#ffffff" }
+            SvgIcon { id: statusBattery; x:106;anchors.verticalCenter:parent.verticalCenter;width:30;height:26;name:"battery";visible:Desk.hasBattery||sidebar.previewMode }
         }
         Key {
-            x: 223; y: 46; width: 37; height: 37; radius: 16
+            x:192;y:46;width:37;height:37;radius:sidebar.itemRadius;color:"#d9d9d9";hint:"Power"
+            opacity:sidebar.itemProgress(0)
+            transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
+            onClicked:if(!sidebar.previewMode)Desk.toggle("session",sidebar.screen.name,Math.max(6,192*sidebar.fit))
+            SvgIcon { anchors.centerIn:parent;width:22;height:22;name:"power";black:true }
+        }
+        Key {
+            x: 244; y: 46; width: 37; height: 37; radius: sidebar.itemRadius
             color: "#d9d9d9"; hint: "Settings"
             opacity:sidebar.itemProgress(0)
-            transform:Translate { x:24*(1-sidebar.itemProgress(0)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
             onClicked: if(!sidebar.previewMode)Desk.openSettings(sidebar.screen.name)
             SvgIcon { anchors.centerIn:parent; width:23; height:23; name:"settings"; black:true }
         }
         Key {
-            x: 296; y: 46; width: 37; height: 37; radius: 19
+            x: 296; y: 46; width: 37; height: 37; radius: sidebar.itemRadius
             color: "#d9d9d9"; hint: sidebar.dnd ? "Disable do not disturb" : "Enable do not disturb"
             enabled: sidebar.previewMode || sidebar.notificationsAvailable
             opacity:sidebar.itemProgress(0)
-            transform:Translate { x:24*(1-sidebar.itemProgress(0)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(0)) }
             onClicked: {
                 if (sidebar.previewMode) sidebar.dnd = !sidebar.dnd;
                 else dndToggle.running = true;
@@ -160,7 +169,7 @@ Item {
             id: wifiHousing
             visible:Settings.widget("network")
             opacity:sidebar.itemProgress(1)
-            transform:Translate { x:24*(1-sidebar.itemProgress(1)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(1)) }
             x: 28; y: 120; width: 144; height: 222
             radius: sidebar.cardRadius; color: "#262626"
             border.color: "#323232"; border.width: 1
@@ -187,7 +196,7 @@ Item {
                         model: sidebar.previewMode ? [{name:sidebar.previewLongNames?"A very long wireless network name":"Network 01",connected:true,known:true},{name:"Studio",connected:false,known:true},{name:"Guest",connected:false,known:false}] : Desk.wifi?.networks.values?.slice().sort((a,b)=>Number(b.connected)-Number(a.connected)||b.signalStrength-a.signalStrength).slice(0,12) ?? []
                         Key {
                             required property var modelData
-                            width: wifiList.width; height: 24; radius: 2
+                            width: wifiList.width; height: 24; radius: sidebar.innerRadius
                             hint: modelData.name
                             onClicked: {
                                 if (sidebar.previewMode || modelData.connected) return;
@@ -206,7 +215,7 @@ Item {
             id: btHousing
             visible:Settings.widget("bluetooth")
             opacity:sidebar.itemProgress(2)
-            transform:Translate { x:24*(1-sidebar.itemProgress(2)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(2)) }
             x: 189; y: 120; width: 144; height: 222
             radius: sidebar.cardRadius; color: "#262626"
             border.color: "#323232"; border.width: 1
@@ -236,13 +245,13 @@ Item {
                         model: sidebar.previewMode ? [{name:sidebar.previewLongNames?"A very long Bluetooth device name":"Mouse",connected:true},{name:"Keyboard",connected:true}] : Bluetooth.devices.values.filter(d=>d.paired||d.connected).slice(0,12)
                         Key {
                             required property var modelData
-                            width: btList.width; height: 24; radius: 2; hint: modelData.name
+                            width: btList.width; height: 24; radius: sidebar.innerRadius; hint: modelData.name
                             onClicked: if (!sidebar.previewMode) Desk.launch(["blueman-manager"])
                             SvgIcon { x: 10; anchors.verticalCenter: parent.verticalCenter; width: 17; height: 17; name: "check"; visible: modelData.connected }
                             FadeLabel { x:44; y:6; width:86; height:17; text:modelData.name; font.pixelSize:11; color:"#ffffff" }
                         }
                     }
-                    Key { width: btList.width; height: 24; text: "Manage devices"; hint: "Manage Bluetooth devices"; onClicked: if (!sidebar.previewMode) Desk.launch(["blueman-manager"]) }
+                    Key { width: btList.width; height: 24; radius:sidebar.innerRadius; text: "Manage devices"; hint: "Manage Bluetooth devices"; onClicked: if (!sidebar.previewMode) Desk.launch(["blueman-manager"]) }
                 }
             }
         }
@@ -251,7 +260,7 @@ Item {
             id: volume
             visible:Settings.widget("volume")
             opacity:sidebar.itemProgress(3)
-            transform:Translate { x:24*(1-sidebar.itemProgress(3)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(3)) }
             x: 29; y: 361; width: 304; height: 34
             padding: 0
             from: 0; to: 1; value: sidebar.previewMode ? .62 : Desk.volume/100
@@ -260,7 +269,7 @@ Item {
             Accessible.name: "Output volume"
             background: G2Surface {
                 x: volume.leftPadding; y: 0; width: volume.availableWidth; height: 34
-                radius: height/2; color: "#262626"; border.color: "#323232"; clip: true
+                radius: sidebar.itemRadius; color: "#262626"; border.color: "#323232"; clip: true
                 SliderFill { fraction: volume.visualPosition }
             }
             handle: SvgIcon { x: 11; y: 9; width: 16; height: 16; name: "volume"; black: volume.visualPosition > .09 }
@@ -268,7 +277,7 @@ Item {
         Controls.Slider {
             id: brightness
             visible:Settings.widget("brightness")
-            transform:Translate { x:24*(1-sidebar.itemProgress(4)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(4)) }
             x: 29; y: 415; width: 304; height: 34
             padding: 0
             from: 0; to: 100; value: sidebar.previewMode ? 75 : sidebar.brightnessPercent ?? 0
@@ -278,7 +287,7 @@ Item {
             Accessible.name: "Display brightness"
             background: G2Surface {
                 x: brightness.leftPadding; y: 0; width: brightness.availableWidth; height: 34
-                radius: height/2; color: "#262626"; border.color: "#323232"; clip: true
+                radius: sidebar.itemRadius; color: "#262626"; border.color: "#323232"; clip: true
                 SliderFill { fraction: brightness.visualPosition }
             }
             handle: SvgIcon { x: 11; y: 9; width: 16; height: 16; name: "brightness"; black: brightness.visualPosition > .09 }
@@ -288,9 +297,9 @@ Item {
             id: notificationFrame
             visible:Settings.widget("notifications")
             opacity:sidebar.itemProgress(5)
-            transform:Translate { x:24*(1-sidebar.itemProgress(5)) }
+            transform:Translate { x:-24*(1-sidebar.itemProgress(5)) }
             x: 29; y: 470; width: 304; height: 284
-            radius: 15; color: "#262626"; border.color: "#323232"; clip: true
+            radius: sidebar.itemRadius; color: "#262626"; border.color: "#323232"; clip: true
             Canvas {
                 anchors.fill: parent; opacity: .15
                 onPaint: {

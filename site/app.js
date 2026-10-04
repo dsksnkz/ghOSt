@@ -15,10 +15,24 @@ const views = {
   icons: ["icons.png", "Icons / the same shapes rendered in white and black."]
 };
 const settingsPages = ["sound", "battery", "widgets", "brightness", "wallpaper", "notifications", "network", "bluetooth", "airplane", "accessibility", "storage", "applications", "about"];
+const settingsFlows = [
+  ["name-editor", "PC name", "PC-name editor · fixture only; no computer renamed"],
+  ["portrait-fixture", "Profile picture", "Profile-picture selection · sample wallpaper crop; originals preserved"],
+  ["search-sound", "Navigation search", "Navigation search · grouped Sound result"]
+];
 const settingsNav = document.querySelector("#settings-nav");
 for (const page of settingsPages) {
   const label = page === "widgets" ? "Sidebar widgets" : page[0].toUpperCase() + page.slice(1);
   views["settings-" + page] = ["settings-" + page + ".webp", "Settings / " + label + " · sample data; system actions disabled"];
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.view = "settings-" + page;
+  button.setAttribute("aria-pressed", "false");
+  button.textContent = label;
+  settingsNav.append(button);
+}
+for (const [page, label, description] of settingsFlows) {
+  views["settings-" + page] = ["settings-" + page + ".webp", "Settings / " + description];
   const button = document.createElement("button");
   button.type = "button";
   button.dataset.view = "settings-" + page;

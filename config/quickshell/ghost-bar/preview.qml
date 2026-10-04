@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls as Controls
 import Quickshell
 import Quickshell.Io
 
@@ -11,16 +12,20 @@ ShellRoot {
         visible: true
         implicitWidth: 1920
         implicitHeight: 1080
-        color: "#080808"
+        color: "#151515"
         Item {
             id: frame
             anchors.fill: parent
+            // Keep the real Qt popup overlay inside the captureable fixture root.
+            function attachOverlay() { if (Controls.Overlay.overlay) Controls.Overlay.overlay.parent = frame; }
+            Timer { interval:100;running:true;onTriggered:frame.attachOverlay() }
+            Rectangle { anchors.fill:parent;color:"#151515" }
             Image { anchors.fill: parent; source: Quickshell.env("GHOST_WALLPAPER") || ""; fillMode: Image.PreserveAspectCrop }
-            Rail { id: rail; anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; previewMode: true }
+            Rail { id: rail; z:10;anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; previewMode: true }
             SettingsPanel {
                 id:settingsPreview
                 visible:controller.page==="settings"
-                width:1024;height:699;anchors.centerIn:parent;previewMode:true
+                x:524;y:212;width:1024;height:699;previewMode:true
                 onCloseRequested:controller.page="rail"
             }
             SidebarFigmaBody {
@@ -36,7 +41,7 @@ ShellRoot {
                 onSettingsPreviewRequested: { settingsPreview.choose("general"); controller.page="settings"; }
                 x: frame.width / 2 - width / 2
                 y: controller.page === "calendar" ? 82 : 68
-                width: controller.page === "calendar" ? Math.floor(Math.min(frame.width * 806.3/1920, (frame.height - 100) * 806.3 / 310)) : 392
+                width: controller.page === "calendar" ? Math.floor(Math.min(frame.width * 733/1920, (frame.height - 100) * 733 / 310)) : 392
                 height: implicitHeight
                 visible: controller.page !== "rail" && controller.page !== "icons" && controller.page !== "sidebar" && controller.page !== "settings"
                 popup: QtObject {
@@ -95,11 +100,29 @@ ShellRoot {
             target: "preview"
             function page(name: string): void { preview.composition = name === "desktop"; controller.page = preview.composition ? "calendar" : name; }
             function metric(name: string): void { Desk.setPerformanceMetric(name); }
+            function geometry(): string { return JSON.stringify({page:controller.page,composition:preview.composition,rail:{visible:rail.visible,opacity:rail.opacity,width:rail.width,height:rail.height,z:rail.z}}); }
+            function polish(): string {
+                function inspect(item, fonts, controls) {
+                    if(item.font && typeof item.text==="string" && item.text)fonts.push({text:item.text,family:item.font.family});
+                    if(item.hint)controls.push({hint:item.hint,radius:item.radius,width:item.width,height:item.height,offset:item.transform?.[0]?.x ?? 0});
+                    for(const child of item.children ?? [])inspect(child,fonts,controls);
+                }
+                const railFonts=[],railControls=[],sidebarFonts=[],sidebarControls=[],panelFonts=[],panelControls=[];
+                inspect(rail,railFonts,railControls);inspect(sidebarPreview,sidebarFonts,sidebarControls);inspect(panel,panelFonts,panelControls);
+                return JSON.stringify({railFonts,sidebarControls,panelControls});
+            }
             function telemetry(): string { return panel.performanceStatus(); }
             function calendar(action: string, value: string): string { return panel.calendarAction(action,value); }
             function settings(action: string, value: string): string {
                 if(action==="page")settingsPreview.choose(value);
                 if(action==="query")settingsPreview.query=value;
+                if(action==="portrait")settingsPreview.requestPortrait(value);
+                if(action==="portrait-select")settingsPreview.selectPortrait(value);
+                if(action==="name-open")settingsPreview.editName();
+                if(action==="name-draft")settingsPreview.nameDraft=value;
+                if(action==="name-save")settingsPreview.saveName();
+                if(action==="name-cancel")settingsPreview.cancelName();
+                if(action==="reset"){settingsPreview.fixtureHost="Unit-01";settingsPreview.fixturePortrait="";settingsPreview.portraitChooserRequested=false;}
                 return settingsPreview.status();
             }
             function sidebar(action: string): string {

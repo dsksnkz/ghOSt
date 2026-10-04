@@ -15,6 +15,15 @@ Item {
     property real fixtureInput:74
     property var airplaneSnapshot:null
     property real pendingBrightness:0
+    property string fixtureHost:"Unit-01"
+    property url fixturePortrait:""
+    property string portraitOrigin:""
+    property bool portraitChooserRequested:false
+    property string portraitError:""
+    property string nameDraft:""
+    property bool nameSubmitted:false
+    readonly property string displayHost:previewMode?fixtureHost:details.host||"Computer"
+    readonly property url portraitSource:previewMode?(fixturePortrait.toString()||Qt.resolvedUrl("artwork/profile.jpg")):(details.preferences?.profilePicture||Qt.resolvedUrl("artwork/profile.jpg"))
     readonly property real fit:Math.min(width/1024,height/699)
     readonly property var details:previewMode?({host:"unit-001",kernel:"Linux",battery:{percent:82,status:"Discharging"},brightness:{percent:69,device:"Laptop display"},equalizer:true,notifications:{count:0,dnd:false},storage:{used:120e9,total:512e9,free:392e9},usage:{seconds:0,samples:[]},preferences:{usageTracking:false,reducedMotion:false,widgets:{}}}):Settings.state
     readonly property var outputs:Pipewire.nodes.values.filter(n=>!n.isStream&&n.isSink&&n.audio)
@@ -36,16 +45,51 @@ Item {
         {id:"applications",name:"Applications",icon:"app"},
         {id:"about",name:"System information",icon:"info"}]
     readonly property var filteredCategories:categories.filter(c=>!query||c.name.toLowerCase().includes(query.toLowerCase()))
+    readonly property var categoryGroups:[
+        ["network","bluetooth","general","airplane","accessibility"],
+        ["sound","battery","brightness"],
+        ["widgets","wallpaper","notifications"],
+        ["storage","applications","about"]]
+    readonly property var filteredGroups:categoryGroups.map(group=>group.map(id=>filteredCategories.find(c=>c.id===id)).filter(c=>!!c)).filter(group=>group.length)
     signal closeRequested()
     function choose(id) {
         if(!categories.some(c=>c.id===id))return;
         page=id;pageFlick.contentY=0;entrance.restart();
-        const index=filteredCategories.findIndex(c=>c.id===id), y=index*43;
-        if(index>=0) {
-            if(y<navFlick.contentY)navFlick.contentY=y;
-            else if(y+42>navFlick.contentY+navFlick.height)navFlick.contentY=y+42-navFlick.height;
+        let y=0;
+        for(const group of filteredGroups) {
+            const index=group.findIndex(c=>c.id===id);
+            if(index>=0) {
+                y+=index*42;
+                if(categoryGroups[0].includes(id))navFlick.contentY=0;
+                else if(y<navFlick.contentY)navFlick.contentY=y;
+                else if(y+47.2>navFlick.contentY+navFlick.height)navFlick.contentY=y+47.2-navFlick.height;
+                break;
+            }
+            y+=group.length*42+5.2+12;
         }
     }
+    onQueryChanged:navFlick.contentY=0
+    function requestPortrait(origin) {
+        portraitOrigin=origin;portraitChooserRequested=true;portraitError="";
+        if(!previewMode)portraitDialog.open();
+    }
+    function selectPortrait(value) {
+        portraitChooserRequested=false;
+        if(previewMode)fixturePortrait=value;
+        else portraitProbe.source=value;
+    }
+    function editName() {
+        nameDraft=details.host||"";nameSubmitted=false;
+        nameDialog.open();
+    }
+    function validName(value) { return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(value); }
+    function saveName() {
+        if(!validName(nameDraft)||Settings.busy)return;
+        nameSubmitted=true;
+        if(previewMode){fixtureHost=nameDraft;nameDialog.close();}
+        else apply("hostname",nameDraft);
+    }
+    function cancelName() { nameDialog.close(); }
     function apply(name,value) { if(!previewMode)Settings.apply(name,value); }
     function preference(name,value) { if(!previewMode)Settings.preference(name,value); }
     function gigabytes(value) { return typeof value==="number"?(value/1e9).toFixed(1)+" GB":"Unavailable"; }
@@ -60,7 +104,8 @@ Item {
             airplaneSnapshot=null;
         }
     }
-    function status() { return JSON.stringify({page,query,width:scene.width,height:scene.height,categories:categories.length,preview:previewMode,visible,error:Settings.error}); }
+    function status() { return JSON.stringify({page,query,x,y,width:scene.width,height:scene.height,scale:scene.scale,navHeight:navFlick.height,groupHeights:filteredGroups.map(g=>g.length*42+5.2),groupCategories:filteredGroups.map(g=>g.map(c=>c.id)),profileFont:Theme.textFont,portraitSource:portraitSource.toString(),portraitOrigin,portraitChooserRequested,nameEditor:nameDialog.visible,nameDraft,nameValid:validName(nameDraft),displayHost,categories:categories.length,preview:previewMode,visible,error:Settings.error}); }
+    Connections { target:Settings;function onStateChanged(){if(nameSubmitted&&nameDialog.visible&&Settings.state.host===settings.nameDraft)nameDialog.close();} }
     Timer { id:brightnessCommit;interval:180;onTriggered:settings.apply("brightness",String(settings.pendingBrightness)) }
     PwObjectTracker { objects:settings.outputs.concat(settings.inputs) }
     focus:true
@@ -117,8 +162,8 @@ Item {
         G2Surface { x:262;width:762;height:699;radius:10;color:"#252525" }
         SvgIcon { x:17;y:24;width:32;height:32;name:"settings" }
         G2Surface {
-            x:62;y:29;width:186;height:24.17;radius:3;color:"#4c4c4c"
-            SvgIcon { x:7;y:6;width:12;height:12;name:"search" }
+            x:62;y:29;width:186;height:24.17;radius:4;color:Qt.rgba(217/255,217/255,217/255,.17)
+            SvgIcon { x:7;y:3;width:16;height:16;name:"search" }
             TextInput {
                 id:search;x:26;y:4;width:152;height:17;color:"#ffffff";font.family:Theme.font;font.pixelSize:11
                 text:settings.query;onTextChanged:settings.query=text
@@ -128,34 +173,46 @@ Item {
         Key {
             x:17;y:78;width:231;height:82;radius:10;color:"#6b6b6b";border.width:1;border.color:"#898989"
             hint:"General";onClicked:settings.choose("general")
-            G2Surface { x:10;y:10;width:62;height:62;radius:12;color:"#393939";BrandMark { anchors.centerIn:parent;width:38;height:38 } }
-            Label { x:88;y:27;width:134;text:settings.details.host||"Computer";font.pixelSize:15;font.weight:Font.Bold }
-            Label { x:88;y:49;text:"Your PC";font.pixelSize:10;color:"#ffffff" }
+            G2Image { x:10;y:9;width:63.95;height:63.95;radius:21;source:settings.portraitSource }
+            Key { x:10;y:9;width:63.95;height:63.95;radius:21;hint:"Choose profile picture";onClicked:settings.requestPortrait("sidebar") }
+            Label { x:89.52;y:25.1;width:133;height:22.14;text:settings.displayHost;font.family:Theme.textFont;font.pixelSize:16;font.weight:Font.Bold;color:"#ffffff" }
+            Label { x:90.06;y:51.59;width:122.91;height:12.9;text:"Your PC";font.family:Theme.textFont;font.pixelSize:10;color:"#ffffff" }
         }
         Flickable {
             id:navFlick
-            x:17;y:175;width:231;height:493;contentHeight:nav.height;clip:true;boundsBehavior:Flickable.StopAtBounds
+            x:17;y:175;width:231;height:500;contentHeight:nav.height;clip:true;boundsBehavior:Flickable.StopAtBounds
             layer.enabled:true
             Controls.ScrollBar.vertical:Controls.ScrollBar { policy:Controls.ScrollBar.AsNeeded }
-            G2Surface { width:231;height:nav.height;radius:10;color:"#6b6b6b";border.width:1;border.color:"#898989" }
             Column {
-                id:nav;width:231;spacing:1
+                id:nav;width:231;spacing:12
                 Repeater {
-                    model:settings.filteredCategories
-                    Key {
+                    model:settings.filteredGroups
+                    G2Surface {
                         required property var modelData
-                        width:231;height:42;radius:0
-                        hint:modelData.name;color:settings.page===modelData.id?"#535353":"transparent"
-                        onClicked:settings.choose(modelData.id)
-                        G2Surface { x:10;y:10;width:28;height:28;radius:8;color:"#2f2f2f";SvgIcon { anchors.centerIn:parent;width:19;height:19;name:modelData.icon } }
-                        Label { x:50;y:15;width:modelData.id==="airplane"?112:166;text:modelData.name;font.pixelSize:11 }
-                        SettingsToggle { visible:modelData.id==="airplane";x:165;y:12;checked:!Networking.wifiEnabled&&!Desk.adapter?.enabled;hint:"Airplane Mode";onToggled:settings.toggleAirplane() }
+                        width:231;height:modelData.length*42+5.2;radius:10;color:"#6b6b6b";border.width:1;border.color:"#898989"
+                        Column {
+                            width:231;spacing:0
+                            Repeater {
+                                model:parent.parent.modelData
+                                Key {
+                                    required property var modelData
+                                    required property int index
+                                    width:231;height:42;radius:10
+                                    hint:modelData.name;color:"transparent"
+                                    onClicked:settings.choose(modelData.id)
+                                    G2Surface { y:2;width:231;height:43;radius:10;color:"#535353";visible:settings.page===modelData.id }
+                                    G2Surface { x:10;y:10;width:modelData.id==="accessibility"?27.83:35;height:width;radius:8;color:"#2f2f2f";SvgIcon { anchors.centerIn:parent;width:24;height:24;name:modelData.icon } }
+                                    Label { x:50;y:15;width:modelData.id==="airplane"?112:165.93;height:18;text:modelData.name;font.pixelSize:11;color:"#ffffff" }
+                                    G2Surface { x:45;y:44.5;width:162;height:1;color:"#ffffff";visible:index<parent.parent.parent.modelData.length-1 }
+                                    SettingsToggle { visible:modelData.id==="airplane";x:165;y:12;checked:!Networking.wifiEnabled&&!Desk.adapter?.enabled;hint:"Airplane Mode";onToggled:settings.toggleAirplane() }
+                                }
+                            }
+                        }
                     }
                 }
                 Label { visible:settings.filteredCategories.length===0;text:"No results";font.pixelSize:11 }
             }
         }
-        Key { x:974;y:18;width:30;height:30;hint:"Close Settings";onClicked:settings.closeRequested();SvgIcon { anchors.centerIn:parent;width:16;height:16;name:"close" } }
 
         Flickable {
             id:pageFlick;x:298;y:53;width:690;height:602;clip:true
@@ -172,27 +229,21 @@ Item {
                     sourceComponent:({general:generalPage,network:networkPage,bluetooth:bluetoothPage,airplane:airplanePage,accessibility:accessibilityPage,sound:soundPage,battery:batteryPage,widgets:widgetsPage,brightness:brightnessPage,wallpaper:wallpaperPage,notifications:notificationsPage,storage:storagePage,applications:applicationsPage,about:aboutPage})[settings.page]
                 }
                 Note { visible:!settings.previewMode&&Settings.error!=="";text:Settings.error }
-                Note { visible:settings.previewMode;text:"Preview — sample data; system actions disabled" }
+                Note { visible:settings.portraitError!=="";text:settings.portraitError }
             }
         }
     }
 
     Component { id:generalPage
-        Column {
-            width:body.width;spacing:24
-            Item {
-                width:parent.width;height:204
-                G2Surface { x:(parent.width-116)/2;y:0;width:116;height:116;radius:21;color:"#393939";BrandMark { anchors.centerIn:parent;width:66;height:66 } }
-                Label { y:138;anchors.horizontalCenter:parent.horizontalCenter;text:settings.details.host||"Computer";font.pixelSize:20;font.weight:Font.Bold }
-            }
-            Card {
-                height:144
-                Column {
-                    width:parent.width
-                    DeviceRow { icon:"volume";name:"Sound";value:settings.previewMode?"62%":Desk.volume+"%";onClicked:settings.choose("sound") }
-                    DeviceRow { icon:"battery";name:"Battery";value:settings.details.battery?settings.details.battery.percent+"%":"AC power";onClicked:settings.choose("battery") }
-                    DeviceRow { icon:"storage";name:"Storage";value:settings.gigabytes(settings.details.storage?.free)+" free";onClicked:settings.choose("storage") }
-                }
+        Item {
+            width:body.width;height:390
+            G2Image { x:287;y:0;width:116;height:116;radius:21;source:settings.portraitSource }
+            Key { x:287;y:0;width:116;height:116;radius:21;hint:"Choose profile picture";onClicked:settings.requestPortrait("general") }
+            Label { x:303;y:130;width:96;height:28;text:settings.displayHost;font.family:Theme.textFont;font.pixelSize:20;font.weight:Font.Bold;color:"#ffffff" }
+            Key { x:389.5;y:131.5;width:26;height:26;radius:8;hint:"Rename PC";onClicked:settings.editName();SvgIcon { anchors.centerIn:parent;width:11;height:11;name:"edit" } }
+            Key { x:245;y:172;width:199;height:18;hint:"System information";onClicked:settings.choose("about")
+                SvgIcon { x:0;y:0;width:18;height:18;name:"info" }
+                Label { x:27;y:1;width:172;height:15;text:"ghOSt - by you and Dsksnkz";font.family:Theme.textFont;font.pixelSize:11;color:"#ffffff" }
             }
         }
     }
@@ -283,6 +334,36 @@ Item {
         }
     }
     FileDialog { id:wallpaperDialog;title:"Choose wallpaper";nameFilters:["Images (*.png *.jpg *.jpeg *.webp *.bmp)"];onAccepted:settings.apply("wallpaper",selectedFile.toString()) }
+    FileDialog { id:portraitDialog;title:"Choose profile picture";nameFilters:["Images (*.png *.jpg *.jpeg *.webp *.bmp)"];onAccepted:settings.selectPortrait(selectedFile.toString());onRejected:settings.portraitChooserRequested=false }
+    Image {
+        id:portraitProbe;visible:false
+        onStatusChanged: {
+            if(status===Image.Ready)settings.apply("profile-picture",source.toString());
+            else if(status===Image.Error)settings.portraitError="Could not open this image. Choose another picture.";
+        }
+    }
+    Controls.Popup {
+        id:nameDialog
+        parent:scene;x:302;y:240;width:420;height:218;padding:20
+        modal:true;focus:true;closePolicy:Controls.Popup.CloseOnEscape|Controls.Popup.CloseOnPressOutside
+        background:G2Surface { radius:10;color:"#2f2f2f";border.width:1;border.color:"#898989" }
+        onOpened:nameInput.forceActiveFocus()
+        onClosed:settings.nameSubmitted=false
+        contentItem:Item {
+            Label { text:"PC name";font.pixelSize:16;font.weight:Font.Bold }
+            Controls.TextField {
+                id:nameInput;y:36;width:380;height:36
+                text:settings.nameDraft;onTextChanged:settings.nameDraft=text
+                font.family:Theme.font;font.pixelSize:12;color:"#ffffff";selectByMouse:true
+                enabled:!Settings.busy;Accessible.name:"PC name"
+                background:G2Surface { radius:8;color:"#252525";border.width:1;border.color:nameInput.activeFocus?"#d9d9d9":"#535353" }
+                onAccepted:if(settings.validName(text))settings.saveName()
+            }
+            Label { y:82;width:380;wrapMode:Text.WordWrap;elide:Text.ElideNone;font.pixelSize:10;color:"#b8b8b8";text:settings.nameSubmitted&&Settings.error?Settings.error:"1–63 lowercase letters, numbers or hyphens. No edge hyphens." }
+            Key { x:180;y:140;width:92;height:34;radius:8;text:"Cancel";hint:"Cancel rename";onClicked:nameDialog.close() }
+            Key { x:284;y:140;width:96;height:34;radius:8;text:"Save";hint:"Save PC name";selected:true;enabled:settings.validName(settings.nameDraft)&&!Settings.busy;onClicked:settings.saveName() }
+        }
+    }
     Component { id:notificationsPage
         Column {
             width:body.width;spacing:24
@@ -353,13 +434,17 @@ Item {
         }
     }
     Component { id:aboutPage
-        Card {
-            height:144
-            Column { width:parent.width
-                DeviceRow { icon:"info";name:"Computer";value:settings.details.host||"Unavailable";enabled:false }
-                DeviceRow { icon:"terminal";name:"Kernel";value:settings.details.kernel||"Unavailable";enabled:false }
-                DeviceRow { icon:"settings";name:"Desktop";value:"Hyprland / ghOSt";enabled:false }
+        Column {
+            width:body.width;spacing:24
+            Card {
+                height:144
+                Column { width:parent.width
+                    DeviceRow { icon:"info";name:"Computer";value:settings.displayHost;onClicked:settings.editName() }
+                    DeviceRow { icon:"terminal";name:"Kernel";value:settings.details.kernel||"Unavailable";enabled:false }
+                    DeviceRow { icon:"settings";name:"Desktop";value:"Hyprland / ghOSt";enabled:false }
+                }
             }
+            Label { text:"ghOSt - by you and Dsksnkz";font.family:Theme.textFont;font.pixelSize:11;color:"#ffffff" }
         }
     }
 }

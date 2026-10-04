@@ -124,6 +124,10 @@
     "category": "Actions"
   },
   {
+    "name": "edit",
+    "category": "Actions"
+  },
+  {
     "name": "close",
     "category": "Actions"
   },
