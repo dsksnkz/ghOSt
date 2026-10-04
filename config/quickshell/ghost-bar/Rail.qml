@@ -150,18 +150,19 @@ Item {
                 hint: "Calendar"
                 onClicked: bar.open("calendar", this)
                 SvgIcon {
+                    id: calendarIcon
                     x: 0
-                    y: 6
+                    y: 8
                     width: 19
                     height: 20
                     name: "calendar"
                 }
-                Label {
+                InkLabel {
                     id: railTime
                     x: 27
-                    y: 4
+                    y: 0
                     width: 94
-                    height: 28
+                    height: 36
                     text: Qt.formatDateTime(bar.displayTime, "HH:mm")
                     font.family: Theme.font
                     font.pixelSize: 26
@@ -279,11 +280,12 @@ Item {
                 height: 32
                 hint: "Battery controls"
                 onClicked: Desk.toggleSidebar(bar.screenName)
-                Label {
+                InkLabel {
+                    id: batteryText
                     x: 0
-                    y: 5
+                    y: 0
                     width: 38
-                    height: 22
+                    height: 32
                     text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
                     font.pixelSize: 12
                     font.weight: Font.Bold
@@ -335,6 +337,10 @@ Item {
         const icons = [soundIcon, networkIcon, bluetoothIcon, batteryIcon, powerIcon];
         return {
             clockGap: clockDivider.x - railTime.x - railTime.contentWidth,
+            clockInkCenter: railTime.mapToItem(bar, 0, railTime.inkCenterY).y,
+            calendarIconCenter: calendarIcon.mapToItem(bar, 0, calendarIcon.height / 2).y,
+            batteryInkCenter: batteryText.mapToItem(bar, 0, batteryText.inkCenterY).y,
+            batteryIconCenter: batteryIcon.mapToItem(bar, 0, batteryIcon.height / 2).y,
             rightIcons: icons.map(icon => ({
                         width: icon.width,
                         height: icon.height,

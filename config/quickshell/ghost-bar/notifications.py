@@ -105,7 +105,7 @@ class Service:
     def emit(self, toast=None):
         state = dict(ready=self.owned or self.monitoring,mode='server' if self.owned else 'observe',
                      dnd=self.dnd,items=self.history.items,error=self.error)
-        if toast and not self.dnd and self.owned: state['toast'] = toast
+        if toast and not self.dnd: state['toast'] = toast
         print(json.dumps(state,ensure_ascii=False),flush=True)
     def acquire(self):
         answer = self.connection.call_sync('org.freedesktop.DBus','/org/freedesktop/DBus',
@@ -178,8 +178,8 @@ class Service:
         if pending and kind == Gio.DBusMessageType.METHOD_RETURN:
             values = body.unpack()
             if len(values)==1 and isinstance(values[0],int):
-                self.history.add(values[0],pending[0],owner,False)
-                self.emit()
+                item = self.history.add(values[0],pending[0],owner,False)
+                self.emit(item)
         return GLib.SOURCE_REMOVE
     def observed_close(self,owner,identifier):
         self.history.close(identifier,owner)

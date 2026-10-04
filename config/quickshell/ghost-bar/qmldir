@@ -4,6 +4,10 @@ singleton Settings 1.0 Settings.qml
 singleton Notifications 1.0 Notifications.qml
 NotificationList 1.0 NotificationList.qml
 NotificationToast 1.0 NotificationToast.qml
+NotificationBanner 1.0 NotificationBanner.qml
+SidebarDismissal 1.0 SidebarDismissal.qml
+DismissArea 1.0 DismissArea.qml
+InkLabel 1.0 InkLabel.qml
 SettingsPanel 1.0 SettingsPanel.qml
 SettingsWindow 1.0 SettingsWindow.qml
 SettingsToggle 1.0 SettingsToggle.qml

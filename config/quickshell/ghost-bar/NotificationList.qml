@@ -6,6 +6,7 @@ Flickable {
 
     property var entries: Notifications.items
     property bool previewMode: false
+    property bool textOnlyEmpty: false
 
     contentHeight: Math.max(height, cards.height)
     clip: true
@@ -122,6 +123,7 @@ Flickable {
         visible: list.entries.length === 0
 
         SvgIcon {
+            visible: !list.textOnlyEmpty
             anchors.horizontalCenter: parent.horizontalCenter
             y: Math.max(10, (parent.height - 100) / 2)
             width: 37
@@ -132,8 +134,8 @@ Flickable {
 
         Label {
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: 25
-            text: Notifications.ready || list.previewMode ? "No more messages" : "Notification connection unavailable"
+            anchors.verticalCenterOffset: list.textOnlyEmpty ? 0 : 25
+            text: list.textOnlyEmpty || Notifications.ready || list.previewMode ? "No more messages" : "Notification connection unavailable"
             font.pixelSize: 10
             color: Theme.muted
         }

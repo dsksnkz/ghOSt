@@ -27,7 +27,7 @@ node tests/test_corners.js
 git diff --check
 ```
 
-`test_distribution.py` performs a fresh installation in temporary XDG directories and byte-compares all source/assets without starting ghOSt or editing live config. Run native/fixture checks from the change record, never session/power actions to test.
+`test_distribution.py` performs a fresh installation in temporary XDG directories and byte-compares all source/assets without starting ghOSt or editing live config. `python3 scripts/verify_input.py` uses the installed QtTest module inside a separate offscreen Quickshell entry to send actual Qt Escape/pointer events to the same sidebar/dismissal widgets. This is a widget event test, not a claim of physical compositor input automation. Run native/fixture checks from the change record, never session/power actions to test.
 
 Requirements: Arch/Hyprland, Quickshell with networking/Bluetooth/PipeWire services, Python3/GObject-Gio and JetBrainsMono Nerd Font Mono. Plain JetBrains Mono/Turret Road fonts are included. GPU instrumentation uses available system telemetry. Optional tools/services expose honest unavailable states. Weather reads the user's explicit `$XDG_CONFIG_HOME/ghost/weather.json`; installation does not infer a location or overwrite preferences. The existing approved London configuration is unchanged on the owner's laptop.
 

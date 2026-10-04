@@ -5,6 +5,7 @@ const views = {
   rail: ["rail-frame.webp", "Rail · cylindrical workspace wheel, fixed indicator and grouped controls"],
   wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
   sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards and notification history; sample data"],
+  notification: ["notification-popup.webp", "Notification popup · actual QML; explicitly labeled sample data"],
   power: ["power-frame.webp", "Power · a second click confirms disruptive actions"],
   launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
   search: ["launcher-search.png", "Search / ranked name, category description and keyword matches."],

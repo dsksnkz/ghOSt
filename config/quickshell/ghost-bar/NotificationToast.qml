@@ -1,75 +1,55 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 
 PanelWindow {
+    id: popup
     property var displayScreen
     screen: displayScreen
-    visible: Notifications.mode === "server" && Notifications.toast !== null && !Notifications.dnd
+    readonly property bool showing: Notifications.toast !== null && !Notifications.dnd && displayScreen.name === (Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name)
+    property real reveal: showing ? 1 : 0
+    visible: showing || reveal > .001
     anchors {
         top: true
-        right: true
+        left: true
     }
     margins.top: 76
-    margins.right: 20
-    implicitWidth: 330
-    implicitHeight: Math.min(180, body.height + 32)
+    margins.left: Math.round((screen.width - implicitWidth) / 2)
+    implicitWidth: 360
+    implicitHeight: banner.implicitHeight + 8
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-notification"
     WlrLayershell.layer: WlrLayer.Overlay
-    G2Surface {
-        anchors.fill: parent
-        radius: 15
-        color: "#252525"
-        border.width: 1
-        border.color: "#4d4d4d"
-        Column {
-            id: body
-            x: 16
-            y: 16
-            width: 280
-            spacing: 7
-            Label {
-                width: parent.width
-                text: Notifications.toast?.app || ""
-                font.pixelSize: 9
-                color: Theme.muted
-                textFormat: Text.PlainText
-            }
-            Label {
-                width: parent.width
-                text: Notifications.toast?.summary || ""
-                font.pixelSize: 12
-                font.weight: Font.Bold
-                textFormat: Text.PlainText
-                wrapMode: Text.Wrap
-            }
-            Label {
-                width: parent.width
-                text: Notifications.toast?.body || ""
-                font.pixelSize: 10
-                textFormat: Text.PlainText
-                wrapMode: Text.Wrap
-                maximumLineCount: 4
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    NotificationBanner {
+        id: banner
+        property var retained: null
+        Connections {
+            target: Notifications
+            function onToastChanged() {
+                if (Notifications.toast)
+                    banner.retained = Notifications.toast;
             }
         }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                Desk.toggleSidebar(displayScreen.name);
-                Notifications.toast = null;
-            }
+        notification: Notifications.toast || retained
+        width: popup.width
+        height: implicitHeight
+        opacity: popup.reveal
+        transform: Translate {
+            y: -8 * (1 - popup.reveal)
         }
-        Key {
-            x: parent.width - 28
-            y: 5
-            width: 24
-            height: 24
-            radius: 8
-            text: "×"
-            hint: "Close notification banner"
-            onClicked: Notifications.toast = null
+        onActivated: {
+            Desk.toggleSidebar(popup.displayScreen.name);
+            Notifications.toast = null;
+        }
+        onDismissed: Notifications.toast = null
+    }
+    Behavior on reveal {
+        NumberAnimation {
+            duration: Theme.reducedMotion ? 0 : 140
+            easing.type: Easing.OutCubic
         }
     }
 }

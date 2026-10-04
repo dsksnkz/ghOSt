@@ -1,5 +1,9 @@
 prompts outputs here
 
+## 2026-10-04 · Settings, rail, notifications and sidebar dismissal
+
+Implemented/deployed latest six corrections. [Settings selection](site/assets/settings-general.webp) · [Rail alignment](site/assets/rail-frame.webp) · [Empty sidebar](site/assets/sidebar-frame.webp) · [Notification popup](site/assets/notification-popup.webp) · [Calendar border](site/assets/calendar-frame.webp) · [Changes,48 tests, native checks and recovery](docs/changes/2026-10-04-dismissal.md) · [Pages](https://dsksnkz.github.io/ghOSt/). Actual isolated Qt Escape/pointer events pass; native focus/mask loading and a real incoming banner verified. Physical compositor event automation is not claimed. User prompt unchanged; broader revision still pending. Private native captures remain ignored, source/screenshot publication tracked below.
+
 ## 2026-10-04 · Rail, sidebar, Settings and calendar spacing
 
 Implemented/deployed the latest eight corrections: clock spacing and right-icon alignment; root sidebar Escape;40% Settings glyphs with larger rows/groups; separate pencil gap; complete public runtime/installer/readable QML; larger calendar. [Actual output, tests and recovery](docs/changes/2026-10-04-spacing.md) · [Source](docs/source.md) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).47 Python tests and fixture/native checks pass; no private native capture published. Full prompt remains pending for unrelated documented backlog.

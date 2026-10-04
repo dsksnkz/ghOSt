@@ -661,45 +661,13 @@ Item {
                             c.fillRect(xx, yy, 1, 1);
                 }
             }
-            G2Surface {
+            NotificationList {
                 x: 5
                 y: 5
                 width: parent.width - 10
-                height: 68
-                radius: Math.max(0, notificationFrame.radius - 5)
-                color: "#292929"
-                border.color: "#323232"
-                SvgIcon {
-                    x: 12
-                    y: 19
-                    width: 25
-                    height: 25
-                    name: "notifications"
-                }
-                Label {
-                    x: 75
-                    y: 15
-                    text: "Notifications"
-                    font.pixelSize: 11
-                    font.weight: Font.Bold
-                    color: "#ffffff"
-                }
-                Label {
-                    x: 75
-                    y: 42
-                    width: 209
-                    text: !sidebar.notificationsAvailable ? "Notifications unavailable" : sidebar.notificationCount ? sidebar.notificationCount + " notifications" : "No notifications"
-                    font.pixelSize: 11
-                    font.weight: Font.Light
-                    color: "#ffffff"
-                }
-            }
-            NotificationList {
-                x: 5
-                y: 80
-                width: parent.width - 10
-                height: parent.height - 109
+                height: parent.height - (sidebar.notificationCount > 0 ? 34 : 10)
                 previewMode: sidebar.previewMode
+                textOnlyEmpty: true
             }
             Key {
                 x: parent.width - 75
@@ -709,6 +677,7 @@ Item {
                 text: "Dismiss"
                 fontSize: 9
                 hint: "Dismiss notifications"
+                visible: sidebar.notificationCount > 0
                 enabled: sidebar.notificationsAvailable && sidebar.notificationCount > 0
                 onClicked: Notifications.clear()
             }

@@ -587,7 +587,8 @@ Item {
                                         x: 6
                                         width: 219
                                         height: parent.height
-                                        radius: 0
+                                        radius: 10
+                                        smoothing: .6
                                         color: "#535353"
                                         visible: settings.page === modelData.id
                                     }

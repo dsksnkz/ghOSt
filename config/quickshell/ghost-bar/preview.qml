@@ -43,6 +43,17 @@ ShellRoot {
                 anchors.right: parent.right
                 previewMode: true
             }
+            NotificationBanner {
+                id: bannerPreview
+                x: (frame.width - width) / 2
+                y: 76
+                width: 360
+                height: implicitHeight
+                visible: controller.page === "notification"
+                notification: Notifications.toast
+                onDismissed: controller.page = "rail"
+                onActivated: controller.page = "sidebar"
+            }
             SettingsPanel {
                 id: settingsPreview
                 visible: controller.page === "settings"
@@ -76,7 +87,7 @@ ShellRoot {
                 y: controller.page === "calendar" ? 82 : 68
                 width: controller.page === "calendar" ? Theme.calendarWidth(frame.width, frame.height) : 392
                 height: implicitHeight
-                visible: controller.page !== "rail" && controller.page !== "icons" && controller.page !== "sidebar" && controller.page !== "settings"
+                visible: !["rail", "icons", "sidebar", "settings", "notification"].includes(controller.page)
                 popup: QtObject {
                     id: controller
                     property string page: "calendar"
@@ -303,6 +314,11 @@ ShellRoot {
             function notifications(action: string): string {
                 if (action === "sample")
                     Notifications.sample();
+                if (action === "popup") {
+                    Notifications.sample();
+                    Notifications.toast = Notifications.items[0];
+                    controller.page = "notification";
+                }
                 if (action === "clear")
                     Notifications.clear();
                 if (action === "dnd")

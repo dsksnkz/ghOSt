@@ -27,7 +27,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-sidebar"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // Opening from a keyboard-less rail must focus the sidebar immediately.
+    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     onOpenedChanged: {
         if (opened)
             Qt.callLater(() => {

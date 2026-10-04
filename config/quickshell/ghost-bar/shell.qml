@@ -12,8 +12,11 @@ ShellRoot {
         delegate: Scope {
             id: output
             required property var modelData
+            readonly property var sidebarSurface: sidebarWindow
+            readonly property var calendarSurface: calendarWindow
+            readonly property var panelSurface: panelWindow
             property int focusRevision: 0
-            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && (Desk.sidebarOpen || Desk.panel !== "")
+            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && !Desk.sidebarOpen && Desk.panel !== ""
             function refreshFocus() {
                 focusRevision++;
                 if (wantsFocus)
@@ -48,6 +51,7 @@ ShellRoot {
                 screen: output.modelData
             }
             NotificationToast {
+                id: toastWindow
                 displayScreen: output.modelData
             }
             Panel {
@@ -61,6 +65,14 @@ ShellRoot {
                 screen: output.modelData
                 companion: barWindow
                 managedFocus: true
+            }
+            SidebarDismissal {
+                screen: output.modelData
+                sidebarWindow: output.sidebarSurface
+                calendarWindow: output.calendarSurface
+                panelWindow: output.panelSurface
+                railWindow: barWindow
+                notificationWindow: toastWindow
             }
             CalendarWindow {
                 id: calendarWindow
@@ -114,6 +126,9 @@ ShellRoot {
                 dnd: Notifications.dnd,
                 error: Notifications.error
             });
+        }
+        function dismissNotification(key: string): void {
+            Notifications.dismiss(key);
         }
         function status(): string {
             return JSON.stringify({

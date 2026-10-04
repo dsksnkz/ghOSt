@@ -69,6 +69,7 @@ PanelWindow {
         radius: Theme.outerRadius * window.designScale
         color: "#151515"
         border.color: "#474747"
+        border.width: 1
         gradient: Gradient {
             GradientStop {
                 position: 0

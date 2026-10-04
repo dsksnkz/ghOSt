@@ -15,6 +15,8 @@ output = subprocess.check_output(
 )
 state = json.loads(output)
 assert state["rail"]["clockGap"] >= 16, state
+assert abs(state["rail"]["clockInkCenter"] - state["rail"]["calendarIconCenter"]) < .01, state
+assert abs(state["rail"]["batteryInkCenter"] - state["rail"]["batteryIconCenter"]) < .01, state
 icons = state["rail"]["rightIcons"]
 assert len(icons) == 5
 assert all(icon["height"] == 22 for icon in icons)
