@@ -13,6 +13,7 @@ SettingsWindow 1.0 SettingsWindow.qml
 SettingsToggle 1.0 SettingsToggle.qml
 SettingsSlider 1.0 SettingsSlider.qml
 Bar 1.0 Bar.qml
+FullscreenState 1.0 FullscreenState.qml
 RailReservation 1.0 RailReservation.qml
 Panel 1.0 Panel.qml
 Label 1.0 Label.qml

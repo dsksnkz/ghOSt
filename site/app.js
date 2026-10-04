@@ -1,9 +1,9 @@
-const assetVersion = "20261004-notifications";
+const assetVersion = "20261004-fullscreen";
 const views = {
   settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
   desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
   calendar: ["calendar-frame.webp", "Calendar · enlarged frame; sample weather and readings"],
-  rail: ["rail-frame.webp", "Rail · cylindrical workspace wheel, fixed indicator and grouped controls"],
+  rail: ["rail-frame.webp", "Rail · workspace wheel and grouped controls; hides on fullscreen"],
   wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
   sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards and notification history; sample data"],
   notification: ["notification-popup.webp", "Notification popup · actual QML; explicitly labeled sample data"],

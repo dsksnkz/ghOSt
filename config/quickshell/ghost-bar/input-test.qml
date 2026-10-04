@@ -17,6 +17,18 @@ ShellRoot {
             height: 900
             property int outsideEvents: 0
             property int escapeEvents: 0
+            QtObject {
+                id: workspace
+                property bool hasFullscreen: false
+            }
+            QtObject {
+                id: fixtureMonitor
+                property var activeWorkspace: workspace
+            }
+            FullscreenState {
+                id: fullscreenState
+                monitor: fixtureMonitor
+            }
             SidebarFigmaBody {
                 id: sidebar
                 width: 354
@@ -47,6 +59,24 @@ ShellRoot {
                 mouseClick(outside, 50, 50);
                 compare(outsideEvents, 1);
                 console.info("PASS: outside pointer event");
+            }
+            function test_fullscreen_visibility() {
+                compare(fullscreenState.active, false);
+                workspace.hasFullscreen = true;
+                compare(fullscreenState.active, true);
+                workspace.hasFullscreen = false;
+                compare(fullscreenState.active, false);
+                // Moving to an empty/non-fullscreen workspace restores the rail.
+                workspace.hasFullscreen = true;
+                fixtureMonitor.activeWorkspace = null;
+                compare(fullscreenState.active, false);
+                fixtureMonitor.activeWorkspace = workspace;
+                compare(fullscreenState.active, true);
+                fullscreenState.monitor = null;
+                compare(fullscreenState.active, false);
+                fullscreenState.monitor = fixtureMonitor;
+                workspace.hasFullscreen = false;
+                console.info("PASS: per-output fullscreen visibility and restoration");
             }
             function cleanupTestCase() {
                 Qt.quit();

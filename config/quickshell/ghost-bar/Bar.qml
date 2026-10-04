@@ -6,11 +6,19 @@ import Quickshell.Wayland
 PanelWindow {
     id: bar
 
+    readonly property var monitor: Hyprland.monitorFor(screen)
+    visible: !fullscreenState.active
     implicitHeight: 64 * screen.width / 1920
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     WlrLayershell.namespace: "ghost-bar"
+    // Keep normal controls above other shells; fullscreen unmaps this surface.
     WlrLayershell.layer: WlrLayer.Overlay
+
+    FullscreenState {
+        id: fullscreenState
+        monitor: bar.monitor
+    }
 
     anchors {
         top: true
@@ -20,7 +28,7 @@ PanelWindow {
 
     Rail {
         anchors.fill: parent
-        monitor: Hyprland.monitorFor(bar.screen)
+        monitor: bar.monitor
         trayWindow: bar
         screenName: bar.screen.name
     }

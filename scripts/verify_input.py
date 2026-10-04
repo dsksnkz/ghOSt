@@ -12,6 +12,7 @@ entry = Path(__file__).resolve().parents[1] / "config/quickshell/ghost-bar/input
 result = subprocess.run(["quickshell", "-p", str(entry)], env=environment,
                         capture_output=True, text=True, timeout=15, check=True)
 output = result.stdout + result.stderr
-for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event"):
+for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
+                  "PASS: per-output fullscreen visibility and restoration"):
     assert assertion in output, output
-print("PASS: isolated Qt Escape and outside-pointer events reach dismissal routes")
+print("PASS: isolated Qt dismissal events and fullscreen visibility/restoration")

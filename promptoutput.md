@@ -1,5 +1,9 @@
 prompts outputs here
 
+## 2026-10-04 · Rail fullscreen behavior
+
+Rail hides on its monitor's fullscreen workspace and returns afterward. Tested/deployed; user confirmed fullscreen works.48 Python tests and actual Qt transition/dismissal assertions pass. Previous six corrections remain deployed. [Native output](site/assets/rail-native.png) · [Verification/recovery](docs/changes/2026-10-04-fullscreen.md) · [Pages](https://dsksnkz.github.io/ghOSt/). No shortcut/autostart/game/session changes; broader prompt pending.
+
 ## 2026-10-04 · Settings, rail, notifications and sidebar dismissal
 
 Implemented/deployed latest six corrections. [Settings selection](site/assets/settings-general.webp) · [Rail alignment](site/assets/rail-frame.webp) · [Empty sidebar](site/assets/sidebar-frame.webp) · [Notification popup](site/assets/notification-popup.webp) · [Calendar border](site/assets/calendar-frame.webp) · [Changes,48 tests, native checks and recovery](docs/changes/2026-10-04-dismissal.md) · [Pages](https://dsksnkz.github.io/ghOSt/). Actual isolated Qt Escape/pointer events pass; native focus/mask loading and a real incoming banner verified. Physical compositor event automation is not claimed. User prompt unchanged; broader revision still pending. Private native captures remain ignored, source/screenshot publication tracked below.

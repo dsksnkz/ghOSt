@@ -50,6 +50,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 
 ## Controls
 
+- The rail hides on its monitor's fullscreen workspace and returns afterward or on a normal workspace. Shortcuts and work-area reservation are unchanged.
 - The menu control opens the sliding sidebar; the separate launcher searches applications by name or keywords. Pins keep favorites first among equally ranked results.
 - The stationary triangle marks the center of a projected 3D workspace wheel. Numbers curve, recede and rotate while their hit targets stay fixed. Rapid input retargets the current pose; reduced motion snaps immediately. Scroll includes empty desktops 1–5 and populated higher desktops, accumulating fractional and multiple notches.
 - Clock opens the whole calendar frame; clicking the CPU diamond switches it to processor clock.
