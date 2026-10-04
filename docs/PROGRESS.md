@@ -4,6 +4,8 @@
 
 Per-monitor fullscreen hides the rail until exit or a normal workspace.48 Python tests and actual Qt state-transition/dismissal assertions pass; native mapping/logs checked, user confirmed fullscreen works. Prior six Sidebar/Settings/notification/alignment/calendar fixes deployed; spacing/motion/weather rechecks pass. [Output and recovery](changes/2026-10-04-fullscreen.md). Shortcuts/autostart/game settings unchanged; broader prompt pending.
 
+Published source72b60e2; Pages37208796866 succeeded. HTML/script/native screenshot match remotely; fresh archive installation,48 tests and Qt assertions pass. Owned previews closed; ghOSt remains active.
+
 ## 2026-10-04 / Settings selection, optical alignment and notification popup
 
 Applied/deployed the six latest corrections: rounded selected Settings row, optical rail clock/calendar and battery alignment, top real-notification popup in both backend modes, empty sidebar without header, keyboard focus/dedicated outside-click mask, and explicit grey calendar outline. [Output, verification and recovery](changes/2026-10-04-dismissal.md).48 Python tests, actual isolated Qt Escape/pointer events, Settings/spacing/motion/calendar and JS checks pass. Native types/logs and real360×96 notification mapping checked; existing owner/legacy services preserved. Physical compositor input automation and broader prompt gaps remain pending.
