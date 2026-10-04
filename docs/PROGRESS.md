@@ -2,6 +2,8 @@
 
 ## 2026-10-04 / scheduled Settings correction pass
 
+Published source release `bcd8e3e`; Pages run37171957777 succeeded. Live HTML/new Settings controls loaded; all changed screenshot/wallpaper/pencil assets matched local bytes. [Publication details and browser-check limits](changes/2026-10-04-settings.md#publication).
+
 First requested 03:20 London run restored the same heartbeat to five hours; future substantive builds remain weekdays. Staged four Settings category frames, both picture-chooser entry points/private original-preserving copies, validated deliberate PC-name edit flow, measured pencil placement and exact creator Info. Added standalone two-tone pencil SVG (61 icons). Preserved and regression-tested preceding exact-reference/manual sidebar/calendar/rail changes. [Output, files, checks and remaining gaps](changes/2026-10-04-settings.md).
 
 41 Python tests,15 launcher assertions,14 Settings pages plus portrait/name/search flows, runtime rail/sidebar checks, calendar motion,61 two-tone SVG checks and isolated installer passed. Actual fixture captures exclude private network/chat data. Active desktop/config/autostart/keybindings unchanged; no real hostname or power action executed. Publication verification is recorded in the change record. Full prompt remains pending for notifications/lock, 3D wheel, left rail dividers and other gaps; no 100% parity claim.

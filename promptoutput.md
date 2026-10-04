@@ -2,6 +2,8 @@ prompts outputs here
 
 ## 2026-10-04 — Settings groups, portraits, PC-name editor and Info
 
+Published release `bcd8e3e`; Pages deployment37171957777 succeeded. Actual output links below are live, with every changed screenshot byte-verified. [Verification limits](docs/changes/2026-10-04-settings.md#publication).
+
 Implemented original five-function frame plus separate added category frames; both picture-chooser controls/private immutable local copies; validated PC-name edit/Save/Cancel flow; measured pencil placement; exact `ghOSt - by you and Dsksnkz` creator Info. Added two-tone pencil SVG (61 icons). Reverified earlier local sidebar/calendar/rail corrections without activating them.
 
 [Settings](site/assets/settings-general.webp) · [PC-name editor](site/assets/settings-name-editor.webp) · [Picture fixture](site/assets/settings-portrait-fixture.webp) · [Search](site/assets/settings-search-sound.webp) · [Composition](site/assets/desktop-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/) · [Files, checks and remaining items](docs/changes/2026-10-04-settings.md).
