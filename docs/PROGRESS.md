@@ -2,7 +2,9 @@
 
 ## 2026-10-04 / Rail, sidebar, Settings and calendar spacing
 
-Latest eight corrections applied and deployed: roomier clock, aligned22px right glyphs, root Escape dismissal,40% Settings glyphs,52px rows/16px groups,18px name-pencil gap and12% larger820×347 calendar. Runtime QML expanded with Qt6 formatting; complete source/installer documented and fresh isolated install byte-tested. [Output, verification, source and recovery](changes/2026-10-04-spacing.md).46 Python tests, spacing/corner geometry/pixels,14 Settings pages/flows, sidebar/calendar motion and JS regressions pass. Native output/logs inspected; only named ghOSt restarted. Shortcuts/autostart/wallpaper/legacy preserved. Physical pointer/keyboard automation and broader backlog remain honestly pending.
+Latest eight corrections applied and deployed: roomier clock, aligned22px right glyphs, root Escape dismissal,40% Settings glyphs,52px rows/16px groups,18px name-pencil gap and12% larger820×347 calendar. Runtime QML expanded with Qt6 formatting; complete source/installer documented and fresh isolated install byte-tested. [Output, verification, source and recovery](changes/2026-10-04-spacing.md).47 Python tests, spacing/corner geometry/pixels,14 Settings pages/flows, sidebar/calendar motion and JS regressions pass. Fresh-release testing caught and fixed notification filter ownership; five notification-suite passes plus fresh Git-archive installation/full47 tests pass. Native output/logs inspected; only named ghOSt restarted. Shortcuts/autostart/wallpaper/legacy preserved. Physical pointer/keyboard automation and broader backlog remain honestly pending.
+
+Published UI release `e6e06d6` and backend correction `7311088`; Pages run37204033956 succeeded. All30 changed public assets match local bytes; the public Settings preview loads. Panels subsequently closed by desktop interaction remain closed; rail active, notification observer ready, owned fixture stopped.
 
 ## 2026-10-04 / Figma corner renderer corrected and live
 

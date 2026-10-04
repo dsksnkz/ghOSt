@@ -2,7 +2,9 @@ prompts outputs here
 
 ## 2026-10-04 · Rail, sidebar, Settings and calendar spacing
 
-Implemented/deployed the latest eight corrections: clock spacing and right-icon alignment; root sidebar Escape;40% Settings glyphs with larger rows/groups; separate pencil gap; complete public runtime/installer/readable QML; larger calendar. [Actual output, tests and recovery](docs/changes/2026-10-04-spacing.md) · [Source](docs/source.md) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).46 Python tests and fixture/native checks pass; no private native capture published. Full prompt remains pending for unrelated documented backlog.
+Implemented/deployed the latest eight corrections: clock spacing and right-icon alignment; root sidebar Escape;40% Settings glyphs with larger rows/groups; separate pencil gap; complete public runtime/installer/readable QML; larger calendar. [Actual output, tests and recovery](docs/changes/2026-10-04-spacing.md) · [Source](docs/source.md) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).47 Python tests and fixture/native checks pass; no private native capture published. Full prompt remains pending for unrelated documented backlog.
+
+Published UI/source `e6e06d6` and notification release-test correction `7311088`; Pages run37204033956 succeeded. Fresh tracked-archive installation and all47 tests pass; all30 changed public assets match local bytes and the public Settings image loads. User prompts/designs untouched; pending full revision retained. Keybindings/autostart/wallpaper and notification owner preserved.
 
 ## 2026-10-04 · Figma corner renderer corrected and live
 
