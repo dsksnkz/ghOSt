@@ -1,4 +1,5 @@
 import QtQuick
+import "Corners.js" as Corners
 
 Item {
     id: meter
@@ -43,11 +44,8 @@ Item {
             const c = getContext("2d"), w = width, h = height, side = 87, r = 15, half = side/2;
             c.reset(); c.clearRect(0, 0, w, h);
             c.save(); c.translate(w/2,h/2); c.rotate(Math.PI/4);
-            c.beginPath();
-            c.moveTo(-half+r,-half); c.lineTo(half-r,-half); c.bezierCurveTo(half,-half,half,-half,half,-half+r);
-            c.lineTo(half,half-r); c.bezierCurveTo(half,half,half,half,half-r,half);
-            c.lineTo(-half+r,half); c.bezierCurveTo(-half,half,-half,half,-half,half-r);
-            c.lineTo(-half,-half+r); c.bezierCurveTo(-half,-half,-half,-half,-half+r,-half); c.closePath();
+            c.translate(-half,-half);
+            Corners.trace(c,side,side,r,0);
             c.restore();
             c.fillStyle = hover.hovered ? "#3b3b3b" : "#313131"; c.fill();
             if (meter.activeFocus) { c.strokeStyle = "#efefef"; c.lineWidth = 2; c.stroke(); }

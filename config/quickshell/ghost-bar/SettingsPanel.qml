@@ -119,7 +119,7 @@ Item {
         Label { text:parent.title;font.pixelSize:11;color:"#b8b8b8";font.weight:Font.Medium;visible:text!=="" }
     }
     component Card:G2Surface {
-        width:body.width;radius:10;color:"#2f2f2f";border.width:1;border.color:"#3b3b3b"
+        width:body.width;radius:10;smoothing:.6;color:"#2f2f2f";border.width:1;border.color:"#3b3b3b"
     }
     component DeviceRow:Key {
         property string icon:""
@@ -159,8 +159,8 @@ Item {
     Item {
         id:scene;width:1024;height:699;scale:settings.fit;transformOrigin:Item.TopLeft
         x:(settings.width-width*scale)/2;y:(settings.height-height*scale)/2
-        G2Surface { anchors.fill:parent;radius:10;color:"#2c2c2c" }
-        G2Surface { x:262;width:762;height:699;radius:10;color:"#252525" }
+        G2Surface { anchors.fill:parent;radius:10;smoothing:.6;color:"#2c2c2c" }
+        G2Surface { x:262;width:762;height:699;radius:10;smoothing:.6;color:"#252525" }
         SvgIcon { x:17;y:24;width:32;height:32;name:"settings" }
         G2Surface {
             x:62;y:29;width:186;height:24.17;radius:4;color:Qt.rgba(217/255,217/255,217/255,.17)
@@ -172,10 +172,10 @@ Item {
             }
         }
         Key {
-            x:17;y:78;width:231;height:82;radius:10;color:"#6b6b6b";border.width:1;border.color:"#898989"
+            x:17;y:78;width:231;height:82;radius:10;smoothing:.6;color:"#6b6b6b";border.width:1;border.color:"#898989"
             hint:"General";onClicked:settings.choose("general")
             G2Image { x:10;y:9;width:63.95;height:63.95;radius:21;source:settings.portraitSource }
-            Key { x:10;y:9;width:63.95;height:63.95;radius:21;hint:"Choose profile picture";onClicked:settings.requestPortrait("sidebar") }
+            Key { x:10;y:9;width:63.95;height:63.95;radius:21;smoothing:.6;hint:"Choose profile picture";onClicked:settings.requestPortrait("sidebar") }
             Label { x:89.52;y:25.1;width:133;height:22.14;text:settings.displayHost;font.family:Theme.textFont;font.pixelSize:16;font.weight:Font.Bold;color:"#ffffff" }
             Label { x:90.06;y:51.59;width:122.91;height:12.9;text:"Your PC";font.family:Theme.textFont;font.pixelSize:10;color:"#ffffff" }
         }
@@ -190,7 +190,7 @@ Item {
                     model:settings.filteredGroups
                     G2Surface {
                         required property var modelData
-                        width:231;height:modelData.length*42+5.2;radius:10;color:"#6b6b6b";border.width:1;border.color:"#898989"
+                        width:231;height:modelData.length*42+5.2;radius:10;smoothing:.6;color:"#6b6b6b";border.width:1;border.color:"#898989"
                         Column {
                             width:231;spacing:0
                             Repeater {
@@ -201,8 +201,8 @@ Item {
                                     width:231;height:42;radius:10
                                     hint:modelData.name;color:"transparent"
                                     onClicked:settings.choose(modelData.id)
-                                    G2Surface { y:2;width:231;height:43;radius:10;color:"#535353";visible:settings.page===modelData.id }
-                                    G2Surface { x:10;y:10;width:modelData.id==="accessibility"?27.83:35;height:width;radius:8;color:"#2f2f2f";SvgIcon { anchors.centerIn:parent;width:24;height:24;name:modelData.icon } }
+                                    G2Surface { y:2;width:231;height:43;radius:0;color:"#535353";visible:settings.page===modelData.id }
+                                    G2Surface { x:10;y:10;width:modelData.id==="accessibility"?27.83:35;height:width;radius:8;smoothing:.6;color:"#2f2f2f";SvgIcon { anchors.centerIn:parent;width:24;height:24;name:modelData.icon } }
                                     Label { x:50;y:15;width:modelData.id==="airplane"?112:165.93;height:18;text:modelData.name;font.pixelSize:11;color:"#ffffff" }
                                     G2Surface { x:45;y:44.5;width:162;height:1;color:"#ffffff";visible:index<parent.parent.parent.modelData.length-1 }
                                     SettingsToggle { visible:modelData.id==="airplane";x:165;y:12;checked:!Networking.wifiEnabled&&!Desk.adapter?.enabled;hint:"Airplane Mode";onToggled:settings.toggleAirplane() }
@@ -239,7 +239,7 @@ Item {
         Item {
             width:body.width;height:390
             G2Image { x:287;y:0;width:116;height:116;radius:21;source:settings.portraitSource }
-            Key { x:287;y:0;width:116;height:116;radius:21;hint:"Choose profile picture";onClicked:settings.requestPortrait("general") }
+            Key { x:287;y:0;width:116;height:116;radius:21;smoothing:.6;hint:"Choose profile picture";onClicked:settings.requestPortrait("general") }
             Label { x:303;y:130;width:96;height:28;text:settings.displayHost;font.family:Theme.textFont;font.pixelSize:20;font.weight:Font.Bold;color:"#ffffff" }
             Key { x:389.5;y:131.5;width:26;height:26;radius:8;hint:"Rename PC";onClicked:settings.editName();SvgIcon { anchors.centerIn:parent;width:11;height:11;name:"edit" } }
             Key { x:245;y:172;width:199;height:18;hint:"System information";onClicked:settings.choose("about")

@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Bluetooth
+import "Corners.js" as Corners
 
 Item {
     id: sidebar
@@ -63,8 +64,7 @@ Item {
         onPaint: {
             const c=getContext("2d"), w=width-1, h=height-1, r=Math.min(sidebar.itemRadius-.5,w/2,h/2);
             c.reset(); c.clearRect(0,0,width,height); c.translate(.5,.5);
-            c.beginPath(); c.moveTo(r,0); c.lineTo(w-r,0); c.bezierCurveTo(w,0,w,0,w,r);
-            c.bezierCurveTo(w,h,w,h,w-r,h); c.lineTo(r,h); c.bezierCurveTo(0,h,0,h,0,r); c.bezierCurveTo(0,0,0,0,r,0); c.closePath();
+            Corners.trace(c,w,h,r,0);
             c.clip(); c.fillStyle="#cecece"; c.fillRect(0,0,w*fraction,h);
         }
     }

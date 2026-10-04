@@ -26,7 +26,7 @@ G2Surface {
     Behavior on color { ColorAnimation { duration: Theme.fast } }
     Behavior on scale { NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast; easing.type: Easing.OutCubic } }
     G2Surface {
-        anchors.fill:parent; radius:root.radius
+        anchors.fill:parent; radius:root.radius; smoothing:root.smoothing
         color:root.color.r>.5 ? "#111111" : "#ffffff"
         opacity:mouse.pressed ? .16 : mouse.containsMouse ? .09 : 0
         Behavior on opacity { NumberAnimation { duration:Theme.reducedMotion?0:Theme.fast } }

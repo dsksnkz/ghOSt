@@ -1,5 +1,9 @@
 # ghOSt progress
 
+## 2026-10-04 / Figma corner renderer corrected and live
+
+Replaced the nearly-square single-cubic renderer with shared radius/smoothing paths and matching portrait/meter/slider clips. Editable Figma confirms Bluetooth15/11px at0% smoothing and Settings portrait21px/main frame10px at60%. Settings grey/icon materials use10/8px G2; selected navigation strip is square. [Files, screenshots, tests and recovery](changes/2026-10-04-corners.md).45 Python tests, JS geometry, actual pixel assertions and Settings/sidebar/calendar regressions pass. Only ghOSt restarted; native output inspected/logs clean. Binds/autostart/wallpaper preserved. Full prompt remains pending for broader recorded gaps.
+
 ## 2026-10-04 / Requested desktop-visible corrections
 
 Latest direct authorization supersedes staging-only delivery for the requested ghOSt surfaces. Deployed tested rail/sidebar/calendar/Settings corrections to the existing ghOSt profile and restarted only ghOSt. Added left-group divider lines, independent notification server/observation/history/dismissal, and a stale-focus fix for opening Settings. Requested radii, grouped Settings/portrait/PC-name/creator flows, larger statuses, left-to-right entrances and cylindrical workspace wheel are now deployed. [Output, verification, rollback and remaining limits](changes/2026-10-04-desktop.md).

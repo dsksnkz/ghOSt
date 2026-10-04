@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Shapes as Shapes
+import "Corners.js" as Corners
 
 Item {
     id: surface
     property color color: "transparent"
     property real radius: 0
+    property real smoothing: 0
     property Gradient gradient: null
     component BorderStyle: QtObject { property color color: "transparent"; property real width: 0 }
     property BorderStyle border: BorderStyle {}
@@ -18,25 +20,18 @@ Item {
     Component.onCompleted: syncGradient()
     readonly property real inset: Math.max(0,border.width)/2
     readonly property real r: Math.max(0,Math.min(radius-inset,(width-2*inset)/2,(height-2*inset)/2))
-    // Coincident corner controls give zero curvature at both straight joins.
+    // Match Figma's radius AND smoothing, rather than substituting a squircle.
     Shapes.Shape {
-        anchors.fill: parent
         preferredRendererType: Shapes.Shape.CurveRenderer
         Shapes.ShapePath {
             strokeColor: surface.border.color
             strokeWidth: surface.border.width>0 ? surface.border.width : -1
             fillColor: surface.color
             fillGradient: surface.gradient ? shading : null
-            startX: surface.inset+surface.r; startY: surface.inset
-            PathLine { x:surface.width-surface.inset-surface.r; y:surface.inset }
-            PathCubic { x:surface.width-surface.inset; y:surface.inset+surface.r; control1X:surface.width-surface.inset; control1Y:surface.inset; control2X:control1X; control2Y:control1Y }
-            PathLine { x:surface.width-surface.inset; y:surface.height-surface.inset-surface.r }
-            PathCubic { x:surface.width-surface.inset-surface.r; y:surface.height-surface.inset; control1X:surface.width-surface.inset; control1Y:surface.height-surface.inset; control2X:control1X; control2Y:control1Y }
-            PathLine { x:surface.inset+surface.r; y:surface.height-surface.inset }
-            PathCubic { x:surface.inset; y:surface.height-surface.inset-surface.r; control1X:surface.inset; control1Y:surface.height-surface.inset; control2X:control1X; control2Y:control1Y }
-            PathLine { x:surface.inset; y:surface.inset+surface.r }
-            PathCubic { x:surface.inset+surface.r; y:surface.inset; control1X:surface.inset; control1Y:surface.inset; control2X:control1X; control2Y:control1Y }
+            PathSvg { path: Corners.svg(Math.max(0,surface.width-2*surface.inset),Math.max(0,surface.height-2*surface.inset),surface.r,surface.smoothing) }
         }
+        x:surface.inset; y:surface.inset
+        width:surface.width-2*surface.inset; height:surface.height-2*surface.inset
     }
     Shapes.LinearGradient {
         id: shading

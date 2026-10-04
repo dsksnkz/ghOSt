@@ -1,5 +1,9 @@
 # Figma measurements / 2026-10-03
 
+## 2026-10-04 actual corner paths
+
+Editable nodes rechecked: Bluetooth30:62=144×222/r15/smoothing0%; inner30:63=134×213/r11/smoothing0%; portrait36:371=116×116/r21/smoothing60%; main Settings36:269=1024×699/r10/smoothing60%. Navigation selection36:369 is square. Shared geometry now uses actual arc/transition paths, not the nearly-square single cubic. Settings grey/icon materials follow explicit G2 at10/8px; added layers are not all measured Figma counterparts. [Verification](changes/2026-10-04-corners.md).
+
 ## 2026-10-04 corrections and measurements
 
 Latest direct corrections supersede historical values below: all rail fonts Nerd Mono; sidebar controls15 px with11 px WLAN/Bluetooth wells and enlarged136×26 right-anchored status group; calendar bottom controls request15 px (24 px controls clamp to12 px effective); Settings portraits21 px, frames10 px and icon wells8 px, all continuous corners. Retain main7 px frames and733×310 calendar.

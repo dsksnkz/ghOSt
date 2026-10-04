@@ -1,5 +1,9 @@
 prompts outputs here
 
+## 2026-10-04 · Figma corner renderer corrected and live
+
+Corrected actual outlines/clipping across rail/sidebar/calendar/Settings:15/11px cards,21px portraits,10px grey frames and8px icon wells. Editable Figma distinguishes0% card smoothing from60% Settings portrait/main frame; navigation selection is square. [Files, verification and remaining gaps](docs/changes/2026-10-04-corners.md) · [Sidebar](site/assets/sidebar-frame.webp) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).45 Python tests, geometry/pixel checks and runtime regressions pass. Tested/deployed only requested ghOSt profile; shortcuts/autostart/wallpaper/legacy processes preserved. Prompt text unchanged; broader revision remains pending.
+
 ## 2026-10-04 · Desktop-visible corrections
 
 Applied and deployed the requested rail/sidebar/calendar/Settings corrections. Added left rail hairlines and ghOSt notification history/backend; repaired a stale-focus transition that dismissed Settings. Grouped frames, picture chooser, PC-name editor, creator Info,15/11/21/10/8px G2 controls, larger statuses, randomized left-to-right entry and cylindrical workspace wheel are now in the installed ghOSt profile. Shortcuts, wallpaper, autostart and unrelated services preserved.
