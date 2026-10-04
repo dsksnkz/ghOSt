@@ -4,12 +4,25 @@ import QtQuick
 QtObject {
     property bool reducedMotion: false
     readonly property real outerRadius: 7
-    function innerRadius(padding) { return Math.max(0, outerRadius-padding); }
+    // Reference coordinates stay fixed; the complete calendar scales together.
+    readonly property real calendarScale: 1.12
     readonly property string font: "JetBrainsMono Nerd Font Mono"
-    readonly property FontLoader jetRegular: FontLoader { source:"fonts/JetBrainsMono-Regular.ttf" }
-    readonly property FontLoader jetLight: FontLoader { source:"fonts/JetBrainsMono-Light.ttf" }
-    readonly property FontLoader jetMedium: FontLoader { source:"fonts/JetBrainsMono-Medium.ttf" }
-    readonly property FontLoader jetBold: FontLoader { source:"fonts/JetBrainsMono-Bold.ttf" }
+    readonly property FontLoader jetRegular: FontLoader {
+        source: "fonts/JetBrainsMono-Regular.ttf"
+    }
+
+    readonly property FontLoader jetLight: FontLoader {
+        source: "fonts/JetBrainsMono-Light.ttf"
+    }
+
+    readonly property FontLoader jetMedium: FontLoader {
+        source: "fonts/JetBrainsMono-Medium.ttf"
+    }
+
+    readonly property FontLoader jetBold: FontLoader {
+        source: "fonts/JetBrainsMono-Bold.ttf"
+    }
+
     readonly property string textFont: jetRegular.name
     readonly property color base: "#080808"
     readonly property color surface: "#101010"
@@ -25,4 +38,14 @@ QtObject {
     readonly property int fast: 90
     readonly property int motion: 150
     readonly property int panel: 220
+
+    function calendarWidth(screenWidth, screenHeight) {
+        const desired = screenWidth * 733 / 1920 * calendarScale;
+        const heightLimit = Math.max(1, screenHeight - 100) * 733 / 310;
+        return Math.floor(Math.min(desired, screenWidth - 32, heightLimit));
+    }
+
+    function innerRadius(padding) {
+        return Math.max(0, outerRadius - padding);
+    }
 }

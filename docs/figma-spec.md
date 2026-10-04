@@ -1,5 +1,9 @@
 # Figma measurements / 2026-10-03
 
+## 2026-10-04 latest direct spacing overrides
+
+The user's newer screenshots/requests override earlier exact coordinates: centered218px clock block with at least16px time-divider gap; right glyphs22px high, common centerline; Settings navigation52px rows,6px group inset/16px group gaps,14px glyphs in35px wells,18px pencil gap. Whole calendar uses1.12× scale,820×347 at1920×1080; inner composition retains733/310 ratio. Main radius7px and prior measured G2 materials retained. These are explicit-request-derived adjustments, not new measured Figma nodes. [Tests and output](changes/2026-10-04-spacing.md).
+
 ## 2026-10-04 actual corner paths
 
 Editable nodes rechecked: Bluetooth30:62=144×222/r15/smoothing0%; inner30:63=134×213/r11/smoothing0%; portrait36:371=116×116/r21/smoothing60%; main Settings36:269=1024×699/r10/smoothing60%. Navigation selection36:369 is square. Shared geometry now uses actual arc/transition paths, not the nearly-square single cubic. Settings grey/icon materials follow explicit G2 at10/8px; added layers are not all measured Figma counterparts. [Verification](changes/2026-10-04-corners.md).

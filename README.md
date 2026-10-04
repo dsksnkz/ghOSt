@@ -10,6 +10,8 @@ Graphical Hyprland Operating System Toolkit.
 
 ## Current scope
 
+The current rail, sidebar, calendar and Settings runtime source, icons, fonts, helpers and installer are in this repository. [Source layout and development](docs/source.md). Local user preferences, SSIDs, private screenshots and recovery snapshots are not installation source and are deliberately excluded.
+
 Top rail, application launcher, calendar with liquid GPU/RAM/CPU instrumentation, left sidebar, Settings, audio, network, Bluetooth, media, battery and a confirmation-based power panel. Measured Figma spacing, JetBrains Mono/Turret Road typography, monochrome SVG icons and click-triggered motion.
 
 Settings has fourteen pages. PipeWire output/input selection, volume and mute; existing EasyEffects editor access; battery and opt-in local display-on history; sidebar widget visibility; laptop brightness; local wallpaper selection through a running awww daemon; ghOSt notification history; wireless/Bluetooth; reduced motion; storage and system information. Unavailable services are shown explicitly. The embedded equalizer band editor and independent lock remain pending.
@@ -34,7 +36,7 @@ cd ghOSt
 ./install.sh
 ```
 
-Default installation stages a separate copy under ~/.local/share/ghost/staged/ghost-bar. It does not start the shell or change the active rice, wallpaper, keybindings or autostart. Existing staged copies are backed up.
+Default installation stages the complete runtime under ~/.local/share/ghost/staged/ghost-bar, excluding generated Python caches/logs. It does not start the shell or change the active rice, wallpaper, keybindings or autostart. Existing staged copies are backed up. An isolated installation test compares every runtime source/asset byte with its installed copy.
 
 ## Activate deliberately
 
@@ -56,6 +58,7 @@ The legacy restore command is ./install.sh --restore. It verifies tracked integr
 - Sidebar and calendar gear controls open Settings. Search filters its navigation.
 - Power opens a HUD. Sleep, log out, restart and shut down require a second confirmation click. Lock is unavailable until its independent configuration is complete.
 - Escape or click outside closes a native panel.
+- Settings navigation uses52px rows,16px group gaps and14px glyphs inside35px wells. The calendar is12% larger than the reference coordinate plane, uniformly scaled to fit the output.
 - Buttons support Tab focus and Return/Space activation.
 
 ## Verification

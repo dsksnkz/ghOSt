@@ -2,9 +2,16 @@ import QtQuick
 
 Item {
     property color ink: Theme.text
+
     implicitWidth: 24
     implicitHeight: 24
-    FontLoader { id: face; source: "fonts/TurretRoad-Bold.ttf" }
+
+    FontLoader {
+        id: face
+
+        source: "fonts/TurretRoad-Bold.ttf"
+    }
+
     Text {
         anchors.centerIn: parent
         text: "G"

@@ -33,6 +33,15 @@ def digest(path):
 def run(*command):
     return subprocess.run(command, check=False, capture_output=True, text=True)
 
+def copy_profile(destination):
+    """Install the complete public runtime, excluding generated local caches."""
+    shutil.copytree(
+        repo / "config/quickshell/ghost-bar",
+        destination,
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.log"),
+    )
+
 if args.restore:
     if not manifest.exists():
         raise SystemExit("No ghOSt installation snapshot found.")
@@ -60,7 +69,7 @@ if not args.activate:
     if staged.exists():
         backup = state / "backups" / ("stage-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f"))
         shutil.copytree(staged, backup)
-    shutil.copytree(repo / "config/quickshell/ghost-bar", staged, dirs_exist_ok=True)
+    copy_profile(staged)
     print("ghOSt staged at " + str(staged))
     print("Live rice, wallpaper, keybindings and autostart were not changed.")
     print("To install and start ghOSt deliberately: ./install.sh --activate")
@@ -87,7 +96,7 @@ if record is None:
     manifest.write_text(json.dumps(record, indent=2) + "\n")
 
 target.mkdir(parents=True, exist_ok=True)
-shutil.copytree(repo / "config/quickshell/ghost-bar", target, dirs_exist_ok=True)
+copy_profile(target)
 launcher.parent.mkdir(parents=True, exist_ok=True)
 launcher.write_text('#!/usr/bin/env bash\nexec quickshell -d -n -c ghost-bar "$@"\n')
 launcher.chmod(0o755)

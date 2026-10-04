@@ -1,5 +1,9 @@
 # ghOSt progress
 
+## 2026-10-04 / Rail, sidebar, Settings and calendar spacing
+
+Latest eight corrections applied and deployed: roomier clock, aligned22px right glyphs, root Escape dismissal,40% Settings glyphs,52px rows/16px groups,18px name-pencil gap and12% larger820×347 calendar. Runtime QML expanded with Qt6 formatting; complete source/installer documented and fresh isolated install byte-tested. [Output, verification, source and recovery](changes/2026-10-04-spacing.md).46 Python tests, spacing/corner geometry/pixels,14 Settings pages/flows, sidebar/calendar motion and JS regressions pass. Native output/logs inspected; only named ghOSt restarted. Shortcuts/autostart/wallpaper/legacy preserved. Physical pointer/keyboard automation and broader backlog remain honestly pending.
+
 ## 2026-10-04 / Figma corner renderer corrected and live
 
 Replaced the nearly-square single-cubic renderer with shared radius/smoothing paths and matching portrait/meter/slider clips. Editable Figma confirms Bluetooth15/11px at0% smoothing and Settings portrait21px/main frame10px at60%. Settings grey/icon materials use10/8px G2; selected navigation strip is square. [Files, screenshots, tests and recovery](changes/2026-10-04-corners.md).45 Python tests, JS geometry, actual pixel assertions and Settings/sidebar/calendar regressions pass. Only ghOSt restarted; native output inspected/logs clean. Binds/autostart/wallpaper preserved. Full prompt remains pending for broader recorded gaps.

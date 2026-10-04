@@ -1,5 +1,9 @@
 prompts outputs here
 
+## 2026-10-04 · Rail, sidebar, Settings and calendar spacing
+
+Implemented/deployed the latest eight corrections: clock spacing and right-icon alignment; root sidebar Escape;40% Settings glyphs with larger rows/groups; separate pencil gap; complete public runtime/installer/readable QML; larger calendar. [Actual output, tests and recovery](docs/changes/2026-10-04-spacing.md) · [Source](docs/source.md) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).46 Python tests and fixture/native checks pass; no private native capture published. Full prompt remains pending for unrelated documented backlog.
+
 ## 2026-10-04 · Figma corner renderer corrected and live
 
 Corrected actual outlines/clipping across rail/sidebar/calendar/Settings:15/11px cards,21px portraits,10px grey frames and8px icon wells. Editable Figma distinguishes0% card smoothing from60% Settings portrait/main frame; navigation selection is square. [Files, verification and remaining gaps](docs/changes/2026-10-04-corners.md) · [Sidebar](site/assets/sidebar-frame.webp) · [Settings](site/assets/settings-general.webp) · [Calendar](site/assets/calendar-frame.webp) · [Pages](https://dsksnkz.github.io/ghOSt/).45 Python tests, geometry/pixel checks and runtime regressions pass. Tested/deployed only requested ghOSt profile; shortcuts/autostart/wallpaper/legacy processes preserved. Prompt text unchanged; broader revision remains pending.

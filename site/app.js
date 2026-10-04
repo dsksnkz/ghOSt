@@ -1,7 +1,7 @@
 const views = {
   settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
   desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
-  calendar: ["calendar-frame.webp", "Calendar · sample storm and performance readings"],
+  calendar: ["calendar-frame.webp", "Calendar · enlarged frame; sample weather and readings"],
   rail: ["rail-frame.webp", "Rail · cylindrical workspace wheel, fixed indicator and grouped controls"],
   wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
   sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards and notification history; sample data"],

@@ -52,8 +52,8 @@ for page in ('general', 'sound', 'battery', 'widgets', 'brightness', 'wallpaper'
     assert state['preview'] and state['visible'] and state['page'] == page
     assert (state['width'], state['height'], state['categories']) == (1024, 699, 14)
     assert (state['x'], state['y'], state['scale']) == (524, 212, 1)
-    assert state['navHeight'] == 500 and state['profileFont'] == 'JetBrains Mono'
-    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 215.2
+    assert state['navHeight'] == 491 and state['profileFont'] == 'JetBrains Mono'
+    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 272
     assert state['groupCategories'][0] == ['network', 'bluetooth', 'general', 'airplane', 'accessibility']
     assert not state['error']
     time.sleep(.25)
