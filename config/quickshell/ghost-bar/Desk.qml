@@ -53,7 +53,8 @@ Singleton {
     readonly property var now: clock.date
     readonly property int activeWorkspace: Hyprland.focusedWorkspace?.id ?? 1
     property SystemClock clock: SystemClock {
-        precision: SystemClock.Seconds
+        // Every clock readout is HH:mm; avoid rebinding the desktop each second.
+        precision: SystemClock.Minutes
     }
     PwObjectTracker {
         objects: root.sink ? [root.sink] : []

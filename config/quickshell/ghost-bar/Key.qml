@@ -20,6 +20,7 @@ G2Surface {
     implicitHeight: 30
     radius: 5
     activeFocusOnTab: true
+    opacity: enabled ? 1 : 0.42
     border.width: activeFocus ? 1 : 0
     border.color: Theme.text
     Keys.onReturnPressed: clicked()
@@ -74,7 +75,7 @@ G2Surface {
 
     Behavior on color {
         ColorAnimation {
-            duration: Theme.fast
+            duration: Theme.reducedMotion ? 0 : Theme.fast
         }
     }
 

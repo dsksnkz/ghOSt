@@ -26,6 +26,12 @@ The launcher searches installed desktop entries by name, generic name and keywor
 
 CPU is measured from Linux counter deltas. GPU and RAM usage use system telemetry. The CPU diamond switches to average processor clock frequency in MHz. Missing or stale readings show unavailable; sampling stops when the calendar closes. London weather is configured in `config/ghost/weather.json` from the user's chosen location.
 
+Calendar waves now animate on the GPU, with the same rounded silhouette and a
+software fallback. Minute-only clocks, cached geometry and event-driven work-area
+checks reduce background work. [Native output, measurements and recovery](docs/changes/2026-10-04-performance.md).
+Development on the owner's laptop is now desktop-first, without a separate
+visual preview or new website build; other installations remain explicitly opt-in.
+
 ## Stage
 
 An Arch Linux, Hyprland, Quickshell with networking and bluetooth, and jetbrains as main font. NVIDIA utilization optionally uses nvidia-smi; supported DRM devices use gpu_busy_percent when available.

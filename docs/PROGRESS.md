@@ -1,5 +1,19 @@
 # ghOSt progress
 
+## 2026-10-04 / Native performance and UI finish
+
+Latest direct instruction: build visibly on this laptop, not in another visual
+preview/site. Applied native GPU liquid animation with the original silhouette
+and software fallback, cached corner/wave geometry, minute-only clocks and
+event-driven work-area measurement with a slower fallback. Refined narrow-label
+fades, disabled-control contrast and reduced-motion hover feedback without
+changing measured composition/radii/type.50 Python tests plus JS checks pass;
+native renderer phases/logs, Settings/window mapping and output inspected.
+[Files, actual native screenshots, CPU sample limits and recovery](changes/2026-10-04-performance.md).
+Keybindings/autostart/wallpaper and legacy processes preserved. No new preview
+website build; broader prompt remains pending. Source publication is recorded
+in the change record after verification.
+
 ## 2026-10-04 / Rail fullscreen behavior
 
 Per-monitor fullscreen hides the rail until exit or a normal workspace.48 Python tests and actual Qt state-transition/dismissal assertions pass; native mapping/logs checked, user confirmed fullscreen works. Prior six Sidebar/Settings/notification/alignment/calendar fixes deployed; spacing/motion/weather rechecks pass. [Output and recovery](changes/2026-10-04-fullscreen.md). Shortcuts/autostart/game settings unchanged; broader prompt pending.

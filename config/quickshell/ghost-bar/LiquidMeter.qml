@@ -1,4 +1,5 @@
 import "Corners.js" as Corners
+import "WaveGeometry.js" as Waves
 import QtQuick
 
 Item {
@@ -19,6 +20,20 @@ Item {
     // Invert the diamond's cross-sectional area, so 20% fills 20% of its area.
     readonly property real fillHeight: displayedLevel <= 0.5 ? Math.sqrt(displayedLevel / 2) : 1 - Math.sqrt((1 - displayedLevel) / 2)
     readonly property real waterLine: (height - 8) - (height - 16) * fillHeight
+    readonly property var diamondPath: Corners.geometry(87, 87, 15, 0).commands
+    readonly property var wavePoints: Waves.samples(width, 2)
+    // Animate uniforms on accelerated backends, not three raster uploads/frame.
+    // Keep the same Canvas path as a software/error fallback and static mask.
+    readonly property bool useGpu: GraphicsInfo.api !== GraphicsInfo.Software && GraphicsInfo.api !== GraphicsInfo.Unknown && gpuLiquid.status !== ShaderEffect.Error
+    function renderingStatus() {
+        return {
+            backend: useGpu ? "gpu" : "canvas",
+            shaderStatus: gpuLiquid.status,
+            shaderLog: gpuLiquid.log,
+            moving: active && visible && available && !reducedMotion,
+            phase: phase
+        };
+    }
 
     signal clicked
 
@@ -30,8 +45,9 @@ Item {
     Keys.onSpacePressed: clicked()
     Accessible.role: Accessible.Button
     Accessible.name: title + ": " + (available ? Math.round(value) + unit : "Unavailable")
-    onDisplayedLevelChanged: liquid.requestPaint()
-    onAvailableChanged: liquid.requestPaint()
+    onDisplayedLevelChanged: if (!useGpu) liquid.requestPaint()
+    onAvailableChanged: if (!useGpu) liquid.requestPaint()
+    onUseGpuChanged: liquid.requestPaint()
 
     FontLoader {
         id: instrumentFace
@@ -64,7 +80,8 @@ Item {
         interval: 16
         onTriggered: {
             meter.phase = (meter.phase + 0.032) % (Math.PI * 2);
-            liquid.requestPaint();
+            if (!meter.useGpu)
+                liquid.requestPaint();
         }
     }
 
@@ -75,14 +92,14 @@ Item {
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
         onPaint: {
-            const c = getContext("2d"), w = width, h = height, side = 87, r = 15, half = side / 2;
+            const c = getContext("2d"), w = width, h = height, half = 87 / 2;
             c.reset();
             c.clearRect(0, 0, w, h);
             c.save();
             c.translate(w / 2, h / 2);
             c.rotate(Math.PI / 4);
             c.translate(-half, -half);
-            Corners.trace(c, side, side, r, 0);
+            Corners.traceCommands(c, meter.diamondPath);
             c.restore();
             c.fillStyle = hover.hovered ? "#3b3b3b" : "#313131";
             c.fill();
@@ -93,17 +110,13 @@ Item {
             }
             c.save();
             c.clip();
-            if (meter.available && meter.displayedLevel > 0) {
+            if (!meter.useGpu && meter.available && meter.displayedLevel > 0) {
                 const waterY = (h - 8) - (h - 16) * meter.fillHeight;
+                const points = meter.wavePoints;
+                const phase = meter.phase;
+                const amplitude = meter.displayedLevel >= 0.999 ? 0 : 5;
                 for (let wave = 0; wave < 2; wave++) {
-                    c.beginPath();
-                    c.moveTo(0, h);
-                    for (let x = 0; x <= w; x += 2) {
-                        const amplitude = meter.displayedLevel >= 0.999 ? 0 : 5;
-                        c.lineTo(x, waterY + Math.sin(x / w * 6.28 + meter.phase + wave * 1.5) * amplitude);
-                    }
-                    c.lineTo(w, h);
-                    c.closePath();
+                    Waves.trace(c, points, phase + wave * 1.5, waterY, amplitude, w, h);
                     c.fillStyle = wave ? "#f1f1f1" : "#b8b8b8";
                     c.fill();
                 }
@@ -118,6 +131,27 @@ Item {
 
             target: meter
         }
+    }
+
+    ShaderEffectSource {
+        id: silhouette
+        sourceItem: liquid
+        hideSource: meter.useGpu
+        live: true
+        visible: false
+    }
+
+    ShaderEffect {
+        id: gpuLiquid
+        anchors.fill: parent
+        visible: meter.useGpu
+        fragmentShader: "shaders/liquid.frag.qsb"
+        property var source: silhouette
+        property size meterSize: Qt.size(width, height)
+        property real wavePhase: meter.phase
+        property real waterLine: meter.waterLine
+        property real waveAmplitude: meter.displayedLevel >= 0.999 ? 0 : 5
+        property real fillEnabled: meter.available && meter.displayedLevel > 0 ? 1 : 0
     }
 
     Label {

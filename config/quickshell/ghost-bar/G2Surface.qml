@@ -23,8 +23,21 @@ Item {
     Component.onCompleted: syncGradient()
     readonly property real inset: Math.max(0, border.width) / 2
     readonly property real r: Math.max(0, Math.min(radius - inset, (width - 2 * inset) / 2, (height - 2 * inset) / 2))
+    readonly property bool needsContinuousCorners: r > 0 && smoothing > 0
+    // Ordinary circles/squares use Qt's batched rectangle renderer. Only real
+    // continuous corners need an SVG curve mesh; radius/smoothing stay separate.
+    Rectangle {
+        anchors.fill: parent
+        visible: !surface.needsContinuousCorners
+        radius: Math.max(0, surface.radius)
+        color: surface.color
+        gradient: surface.gradient
+        border.width: Math.max(0, surface.border.width)
+        border.color: surface.border.color
+    }
     // Match Figma's radius AND smoothing, rather than substituting a squircle.
     Shapes.Shape {
+        visible: surface.needsContinuousCorners
         preferredRendererType: Shapes.Shape.CurveRenderer
         Shapes.ShapePath {
             strokeColor: surface.border.color
@@ -32,7 +45,7 @@ Item {
             fillColor: surface.color
             fillGradient: surface.gradient ? shading : null
             PathSvg {
-                path: Corners.svg(Math.max(0, surface.width - 2 * surface.inset), Math.max(0, surface.height - 2 * surface.inset), surface.r, surface.smoothing)
+                path: surface.needsContinuousCorners ? Corners.svg(Math.max(0, surface.width - 2 * surface.inset), Math.max(0, surface.height - 2 * surface.inset), surface.r, surface.smoothing) : ""
             }
         }
         x: surface.inset

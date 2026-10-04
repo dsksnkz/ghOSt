@@ -120,6 +120,14 @@ Item {
             height: height
         });
     }
+    function renderingStatus() {
+        return {
+            active: active,
+            reducedMotion: reducedMotion,
+            elapsed: elapsed,
+            meters: [gpuMeter.renderingStatus(), ramMeter.renderingStatus(), cpuMeter.renderingStatus()]
+        };
+    }
     function monthStep(step) {
         month = new Date(month.getFullYear(), month.getMonth() + step, 1);
     }
@@ -325,6 +333,7 @@ Item {
             }
         }
         LiquidMeter {
+            id: gpuMeter
             x: 235
             y: 27
             title: "GPU"
@@ -335,6 +344,7 @@ Item {
             onClicked: cal.notice = "GPU · " + (available ? Math.round(value) + "%" : "Unavailable")
         }
         LiquidMeter {
+            id: ramMeter
             x: 375.01
             y: 27
             title: "RAM"
@@ -345,6 +355,7 @@ Item {
             onClicked: cal.notice = "RAM · " + (available ? Math.round(value) + "%" : "Unavailable")
         }
         LiquidMeter {
+            id: cpuMeter
             x: 305
             y: 97
             valueY: 80

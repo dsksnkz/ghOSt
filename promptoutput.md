@@ -1,5 +1,20 @@
 prompts outputs here
 
+## 2026-10-04 · Native performance and UI finish
+
+GPU liquid waves, unchanged rounded silhouettes/software fallback; minute clocks,
+cached geometry, fewer work-area queries, narrow-label fades and disabled/control
+motion refinements are installed in the existing ghOSt desktop profile.
+[Native calendar](docs/images/2026-10-04-performance/calendar-native.png) ·
+[Rail](docs/images/2026-10-04-performance/rail-native.png) ·
+[Settings controls](docs/images/2026-10-04-performance/settings-controls-native.png) ·
+[Sidebar notification region](docs/images/2026-10-04-performance/sidebar-notifications-native.png) ·
+[Files,50 tests, CPU measurement limits and recovery](docs/changes/2026-10-04-performance.md).
+Latest direct request makes future building desktop-first; no separate visual
+preview/site build after that correction. Source prompt/design hashes remain
+f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d /9cc34c7e555a0cbfbff777d194a13ac3b799e6fe.
+Broader Figma/lock/EQ/terminal/migration requests are not marked complete.
+
 ## 2026-10-04 · Rail fullscreen behavior
 
 Rail hides on its monitor's fullscreen workspace and returns afterward. Tested/deployed; user confirmed fullscreen works.48 Python tests and actual Qt transition/dismissal assertions pass. Previous six corrections remain deployed. [Native output](site/assets/rail-native.png) · [Verification/recovery](docs/changes/2026-10-04-fullscreen.md) · [Pages](https://dsksnkz.github.io/ghOSt/). No shortcut/autostart/game/session changes; broader prompt pending.

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import Quickshell.Wayland
 
 // Reserve the rail's work area independently of its screen-edge overlay.
@@ -22,6 +23,18 @@ PanelWindow {
     mask: Region {}
     WlrLayershell.namespace: "ghost-rail-reservation"
     WlrLayershell.layer: WlrLayer.Top
+    function remeasure() {
+        if (!readWorkarea.running)
+            readWorkarea.running = true;
+    }
+    onRequiredSpaceChanged: settle.restart()
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (["configreloaded", "monitoradded", "monitoraddedv2", "monitorremoved"].includes(event.name))
+                settle.restart();
+        }
+    }
     // A content item ensures a buffer is committed even for an input-empty,
     // completely transparent reservation surface.
     Item {
@@ -46,14 +59,16 @@ PanelWindow {
         }
     }
     Timer {
+        id: settle
         interval: 150
         running: true
-        onTriggered: readWorkarea.running = true
+        onTriggered: reservation.remeasure()
     }
     Timer {
-        interval: 5000
+        // A low-frequency fallback detects unrelated layer-shell reservations.
+        interval: 30000
         repeat: true
         running: true
-        onTriggered: readWorkarea.running = true
+        onTriggered: reservation.remeasure()
     }
 }

@@ -1,5 +1,16 @@
 # Verification
 
+## 2026-10-04 / native performance pass
+
+50 Python tests, exact cached-wave geometry, corner/wheel and15 launcher
+assertions pass. Native GPU shaders compile; all three moving phases and stopped
+closed states are read through the installed shell. Component-only desktop
+captures retain the reference material and composition. Short native CPU samples
+and their limits are in [the change record](changes/2026-10-04-performance.md).
+No separate visual preview/site is built after the user's latest instruction.
+Earlier isolated checks in this same pass preceded that instruction; they are
+not presented as native input or GPU pixel-parity proof.
+
 2026-10-04 desktop-visible pass:45 Python tests including isolated session-bus notification protocol/ownership tests;15 launcher assertions, JS wheel checks,14 QML Settings pages/flows, sidebar radii/fonts/motion and calendar/wheel animation checks pass. Native ghOSt loading,1024×699 Settings mapping and real notification observation were checked; stale Settings-focus transition fixed. Existing service ownership, shortcuts/autostart and wallpaper preserved. [Evidence and limits](changes/2026-10-04-desktop.md). This supersedes earlier staging-only verification for the explicitly authorized ghOSt surfaces, not the broader pending migration.
 
 ## 2026-10-04 · Workspace wheel

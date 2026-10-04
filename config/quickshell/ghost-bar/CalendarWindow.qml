@@ -10,6 +10,9 @@ PanelWindow {
     property var peers: []
     property bool managedFocus: false
     property bool opened: false
+    function renderingStatus() {
+        return calendar.renderingStatus();
+    }
     function sync() {
         opened = Desk.panel === "calendar" && Desk.panelScreen === screen.name;
     }

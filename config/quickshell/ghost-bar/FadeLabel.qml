@@ -25,7 +25,8 @@ Item {
     G2Surface {
         visible: label.implicitWidth > root.width
         anchors.right: parent.right
-        width: 28
+        // Keep the same edge treatment without erasing short/narrow labels.
+        width: Math.min(28, root.width / 4)
         height: parent.height
 
         gradient: Gradient {

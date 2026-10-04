@@ -8,6 +8,7 @@ ShellRoot {
         id: settingsWindow
     }
     Variants {
+        id: outputs
         model: Quickshell.screens
         delegate: Scope {
             id: output
@@ -140,6 +141,13 @@ ShellRoot {
                 battery: Desk.charge,
                 workspace: Desk.activeWorkspace
             });
+        }
+        // Read-only native diagnostics: verification needs no substitute UI.
+        function rendering(): string {
+            return JSON.stringify(Array.from(outputs.instances, output => ({
+                screen: output.modelData.name,
+                calendar: output.calendarSurface.renderingStatus()
+            })));
         }
     }
 }

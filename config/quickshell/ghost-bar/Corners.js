@@ -43,8 +43,13 @@ function svg(width,height,radius,smoothing) {
     return geometry(width,height,radius,smoothing).commands.map(c=>c.join(' ')).join(' ');
 }
 function trace(context,width,height,radius,smoothing) {
+    traceCommands(context, geometry(width,height,radius,smoothing).commands);
+}
+// Animated canvases keep immutable geometry, instead of rebuilding corner
+// equations and temporary arrays on every frame.
+function traceCommands(context,commands) {
     context.beginPath();
-    for(const c of geometry(width,height,radius,smoothing).commands) {
+    for(const c of commands) {
         if(c[0]==='M') context.moveTo(c[1],c[2]);
         else if(c[0]==='L') context.lineTo(c[1],c[2]);
         else if(c[0]==='C') context.bezierCurveTo(c[1],c[2],c[3],c[4],c[5],c[6]);
