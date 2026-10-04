@@ -6,6 +6,8 @@ Latest direct authorization supersedes staging-only delivery for the requested g
 
 45 Python tests,15 launcher assertions, JS wheel checks,14 Settings-page/flow captures and rail/sidebar/calendar motion checks pass. Native ghOSt logs clean; Settings mapped1024×699 and real notification observation works without replacing its owner. Shortcuts/autostart/wallpaper unchanged. Public renders use samples; native captures remain private. Same ACTIVE five-hour weekday heartbeat now carries desktop-visible authorization. Full prompts.md remains pending for broader recorded gaps; no100% parity claim.
 
+Published source `a953a7e`; Pages run37199503178 succeeded. Remote changed screenshots, HTML/script and wallpaper match local exports; Sidebar preview visibly loads. Responsive390px layout has no horizontal overflow.
+
 ## 2026-10-04 / explicitly requested Sunday workspace build
 
 Staged the detailed cylindrical workspace wheel, stable triangle/hit targets, continuous mid-turn retargeting, eligible displayed neighbors and fractional/multiple-notch scrolling. Added actual QML motion/still captures and reduced-motion web preview. [Output and verification](changes/2026-10-04-workspace-wheel.md). 41 Python tests, 15 launcher assertions, JS projection/ring tests, native QML fixture motion/input-model checks and prior Settings/sidebar/calendar regressions pass. Active desktop, shortcuts/autostart and existing processes unchanged; no automatic activation. Published source `0b19c9e`; Pages run37193540728 succeeded and static output bytes match remotely. Full prompt remains pending for left rail alignment/dividers, independent notifications/lock and other gaps.
