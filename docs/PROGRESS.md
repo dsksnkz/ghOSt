@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-04 / Minimal website and descriptions
+
+Latest direct website request: seven component/motion views, short descriptions,
+and a single-page Settings changer instead of a page-card wall. Separated capture,
+motion and rendering code; refactored icon helpers and documented focused-function,
+clear-name, shallow-flow rules.50 Python tests, five website tests and existing
+JS regressions pass; default/mobile layout and browser navigation inspected.
+Native desktop unchanged; broader prompt remains pending.
+[Output, screenshots and recovery](changes/2026-10-04-website.md).
+
 ## 2026-10-04 / Native performance and UI finish
 
 Latest direct instruction: build visibly on this laptop, not in another visual

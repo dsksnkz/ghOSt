@@ -18,7 +18,21 @@ All code needed by the current ghOSt rail/sidebar/calendar/Settings is published
 
 QML source is expanded with the installed Qt6 formatter instead of compressed one-line controls. Geometry changes use named sizing rules; current row/icon/gap/calendarscale values are inspected at runtime by `verify_spacing.py`. Python backends keep validation and standard system calls separate from the visual layer. Source formatting is not a substitute for behavior tests.
 
-## Checks
+## Readability
+
+Three working rules, drawn from the [Linux coding-style guide](https://www.kernel.org/doc/html/latest/process/coding-style.html):
+keep functions focused, name things clearly, and keep control flow shallow.
+These are practical project rules, not a claimed canonical set of “Linus' three laws”.
+Use each language's normal formatting; explain intent rather than restating code.
+Behavior changes require regression tests, not just prettier formatting.
+
+The website separates capture data (`catalogue.mjs`), motion rules (`motion.mjs`)
+and rendering (`app.js`). Settings uses one page at a time, with previous/next
+controls and a native page selector. Old icon downloads remain available directly,
+but are not an additional main website view. Browser animations are labeled
+demonstrations; they do not run or control the desktop.
+
+### Checks
 
 ```sh
 python3 -m unittest discover -s tests -v
@@ -26,6 +40,7 @@ node tests/test_launcher.cjs
 node tests/test_workspace_wheel.cjs
 node tests/test_corners.js
 node tests/test_wave_geometry.cjs
+node --test tests/test_site.mjs
 git diff --check
 ```
 

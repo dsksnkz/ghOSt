@@ -1,5 +1,16 @@
 prompts outputs here
 
+## 2026-10-04 · Website and descriptions
+
+Short function/how descriptions; seven website views; minimal Settings changer
+with fourteen pages; labeled sidebar/calendar motion and readable web helpers.
+[Output and verification](docs/changes/2026-10-04-website.md) ·
+[Settings screenshot](site/assets/website-settings.jpg) ·
+[Mobile screenshot](site/assets/website-settings-mobile.jpg) ·
+[Website](https://dsksnkz.github.io/ghOSt/).
+Source prompt/design hashes verified unchanged; broader desktop work remains pending.
+This explicitly requested website change does not replace desktop-first development.
+
 ## 2026-10-04 · Native performance and UI finish
 
 GPU liquid waves, unchanged rounded silhouettes/software fallback; minute clocks,

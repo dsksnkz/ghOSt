@@ -1,66 +1,151 @@
-const assetVersion = "20261004-fullscreen";
-const views = {
-  settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
-  desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
-  calendar: ["calendar-frame.webp", "Calendar · enlarged frame; sample weather and readings"],
-  rail: ["rail-frame.webp", "Rail · workspace wheel and grouped controls; hides on fullscreen"],
-  wheel: ["workspace-wheel-motion.webp", "Workspace wheel · actual isolated QML motion; sample desktops"],
-  sidebar: ["sidebar-frame.webp", "Sidebar · three-layer cards and notification history; sample data"],
-  notification: ["notification-popup.webp", "Notification popup · actual QML; explicitly labeled sample data"],
-  power: ["power-frame.webp", "Power · a second click confirms disruptive actions"],
-  launcher: ["launcher.png", "Launcher / native application catalogue and persistent pins."],
-  search: ["launcher-search.png", "Search / ranked name, category description and keyword matches."],
-  empty: ["launcher-empty.png", "Search / clear feedback when there are no matching applications."],
-  cpu: ["calendar-performance.png", "CPU / utilization from aggregate counter deltas."],
-  gpu: ["calendar-gpu.png", "GPU / NVIDIA utilization sampled while selected."],
-  clock: ["calendar-clock.png", "Clock / average processor MHz; scale from the hardware maximum."],
-  audio: ["audio-panel.png", "Audio / PipeWire volume and output controls."],
-  icons: ["icons.png", "Icons / the same shapes rendered in white and black."]
-};
-const settingsPages = ["sound", "battery", "widgets", "brightness", "wallpaper", "notifications", "network", "bluetooth", "airplane", "accessibility", "storage", "applications", "about"];
-const settingsFlows = [
-  ["name-editor", "PC name", "PC-name editor · fixture only; no computer renamed"],
-  ["portrait-fixture", "Profile picture", "Profile-picture selection · sample wallpaper crop; originals preserved"],
-  ["search-sound", "Navigation search", "Navigation search · grouped Sound result"]
-];
-const settingsNav = document.querySelector("#settings-nav");
-for (const page of settingsPages) {
-  const label = page === "widgets" ? "Sidebar widgets" : page[0].toUpperCase() + page.slice(1);
-  views["settings-" + page] = ["settings-" + page + ".webp", "Settings / " + label + " · sample data; system actions disabled"];
-  const button = document.createElement("button");
-  button.type = "button";
-  button.dataset.view = "settings-" + page;
-  button.setAttribute("aria-pressed", "false");
-  button.textContent = label;
-  settingsNav.append(button);
+import {assetUrl, motionGroups, settingsPages, settingsView, views} from "./catalogue.mjs";
+import {entranceFrames, groupFrames, groupTiming, revealOrder} from "./motion.mjs";
+
+const stage = document.querySelector("#stage");
+const pagePicker = document.querySelector("#settings-page");
+const motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+let currentView = "calendar";
+let settingsIndex = 0;
+let renderRevision = 0;
+let animations = [];
+let lastOrder = [];
+
+function cancelMotion() {
+  for (const animation of animations) animation.cancel();
+  animations = [];
 }
-for (const [page, label, description] of settingsFlows) {
-  views["settings-" + page] = ["settings-" + page + ".webp", "Settings / " + description];
-  const button = document.createElement("button");
-  button.type = "button";
-  button.dataset.view = "settings-" + page;
-  button.setAttribute("aria-pressed", "false");
-  button.textContent = label;
-  settingsNav.append(button);
-}
-const surface = document.querySelector("#surface");
-let selection = "calendar";
-document.querySelectorAll("[data-view]").forEach(button => {
-  button.addEventListener("click", () => {
-    selection = button.dataset.view;
-    const chosen = selection;
-    let [file, description] = views[chosen];
-    if (chosen === "wheel" && matchMedia("(prefers-reduced-motion: reduce)").matches) file = "workspace-wheel-still.webp";
-    const next = new Image();
-    next.onload = () => {
-      if (selection !== chosen) return;
-      surface.src = next.src;
-      surface.alt = "ghOSt component preview: " + description;
-      document.querySelector("#caption").textContent = description;
-      document.querySelector("#fullsize").href = next.src;
-      document.querySelector("figure").dataset.view = selection;
-    };
-    next.src = "assets/" + file + "?v=" + assetVersion;
-    document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = url;
   });
-});
+}
+
+function cropImage(view, region = view.crop) {
+  const [left, top, width, height] = region;
+  const crop = document.createElement("div");
+  crop.className = "crop";
+  crop.style.setProperty("--aspect", width + " / " + height);
+  crop.style.setProperty("--max-width", view.maxWidth + "px");
+  const image = document.createElement("img");
+  image.src = assetUrl(view.file);
+  image.alt = view.title + " — " + view.kind;
+  image.style.width = (view.size[0] / width * 100) + "%";
+  image.style.left = (-left / width * 100) + "%";
+  image.style.top = (-top / height * 100) + "%";
+  crop.append(image);
+  return crop;
+}
+
+function motionFragment(view, group) {
+  const [left, top, width, height, shape = ""] = group;
+  const fragment = document.createElement("div");
+  fragment.className = "motion-fragment " + shape;
+  fragment.setAttribute("aria-hidden", "true");
+  fragment.style.left = (left / view.crop[2] * 100) + "%";
+  fragment.style.top = (top / view.crop[3] * 100) + "%";
+  fragment.style.width = (width / view.crop[2] * 100) + "%";
+  fragment.style.height = (height / view.crop[3] * 100) + "%";
+  const region = [view.crop[0] + left, view.crop[1] + top, width, height];
+  fragment.append(cropImage(view, region));
+  return fragment;
+}
+
+function motionFrame(view) {
+  const frame = document.createElement("div");
+  frame.className = "motion-frame " + view.motion;
+  frame.style.setProperty("--max-width", view.maxWidth + "px");
+  frame.style.setProperty("--aspect", view.crop[2] + " / " + view.crop[3]);
+  frame.setAttribute("role", "img");
+  frame.setAttribute("aria-label", view.title + ". " + view.description);
+  for (const group of motionGroups[view.motion]) frame.append(motionFragment(view, group));
+  return frame;
+}
+
+function playMotion(frame, view) {
+  if (motionPreference.matches || document.hidden) return;
+  const fragments = [...frame.children];
+  lastOrder = revealOrder(fragments.length, lastOrder);
+  animations.push(frame.animate(entranceFrames(view.motion), {
+    duration: 260, easing: "ease-out", fill: "both",
+  }));
+  for (const [rank, index] of lastOrder.entries()) {
+    animations.push(fragments[index].animate(groupFrames(view.motion), groupTiming(view.motion, rank)));
+  }
+}
+
+function updateControls(view) {
+  document.querySelector("#display-title").textContent = view.title;
+  document.querySelector("#description").textContent = view.description;
+  document.querySelector("#capture-kind").textContent = view.kind;
+  document.querySelector("#full-image").href = assetUrl(view.file);
+  document.querySelector("#settings-controls").hidden = currentView !== "settings";
+  document.querySelector("#replay").hidden = !view.motion;
+  pagePicker.value = String(settingsIndex);
+  document.querySelector("#page-number").textContent =
+    String(settingsIndex + 1).padStart(2, "0") + " / " + settingsPages.length;
+  for (const button of document.querySelectorAll("[data-view]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.view === currentView));
+  }
+}
+
+async function render() {
+  const revision = ++renderRevision;
+  const view = currentView === "settings" ? settingsView(settingsIndex) : views[currentView];
+  cancelMotion();
+  updateControls(view);
+  stage.setAttribute("aria-busy", "true");
+  document.querySelector("#load-error").hidden = true;
+  try {
+    await loadImage(assetUrl(view.file));
+    if (revision !== renderRevision) return;
+    const content = view.motion ? motionFrame(view) : cropImage(view);
+    stage.replaceChildren(content);
+    if (view.motion) playMotion(content, view);
+  } catch {
+    if (revision !== renderRevision) return;
+    stage.replaceChildren();
+    document.querySelector("#load-error").hidden = false;
+  } finally {
+    if (revision === renderRevision) stage.setAttribute("aria-busy", "false");
+  }
+}
+
+function selectPage(index) {
+  settingsIndex = (index + settingsPages.length) % settingsPages.length;
+  currentView = "settings";
+  render();
+}
+
+function populatePages() {
+  for (const [index, [, label]] of settingsPages.entries()) {
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = label;
+    pagePicker.append(option);
+  }
+}
+
+function connectControls() {
+  document.querySelector("#surfaces").addEventListener("click", event => {
+    const button = event.target.closest("[data-view]");
+    if (!button) return;
+    currentView = button.dataset.view;
+    render();
+  });
+  pagePicker.addEventListener("change", () => selectPage(Number(pagePicker.value)));
+  document.querySelector("#previous-page").addEventListener("click", () => selectPage(settingsIndex - 1));
+  document.querySelector("#next-page").addEventListener("click", () => selectPage(settingsIndex + 1));
+  document.querySelector("#replay").addEventListener("click", render);
+  motionPreference.addEventListener("change", cancelMotion);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelMotion();
+  });
+}
+
+populatePages();
+connectControls();
+render();

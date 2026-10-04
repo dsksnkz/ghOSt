@@ -1,49 +1,54 @@
 <!doctype html>
 <html lang="en">
-
-  
   <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080808"><title>ghOSt / Preview</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111111">
+    <meta name="description" content="Rail, calendar, sidebar, settings and launcher for Hyprland.">
+    <title>ghOSt</title>
+    <link rel="stylesheet" href="style.css?v=20261004-mfd">
   </head>
-
-  
   <body>
-  
-<header><a href="./" class="brand"><span class="mark" aria-hidden="true">G</span>ghOSt</a><span class="version">04 OCT 2026</span><a href="icons.html">SVG ICONS ↗</a><a href="https://github.com/dsksnkz/ghOSt">SOURCE ↗</a></header>
-
-  <main>
-  
-<div class="intro"><div><p class="eyebrow">GRAPHICAL HYPRLAND OPERATING SYSTEM TOOLKIT</p><h1>Preview</h1></div><p class="description">Arch Linux · Hyprland · Quickshell<br>Isolated component captures. Sample device names and weather are labeled.</p></div>
-  
-    <nav aria-label="Preview surface">
-    
-<button type="button" data-view="calendar" aria-pressed="true">01 · Calendar</button>
-<button type="button" data-view="desktop" aria-pressed="false">Composition</button>
-<button type="button" data-view="rail" aria-pressed="false">02 · Rail</button>
-<button type="button" data-view="wheel" aria-pressed="false">Workspace wheel</button>
-<button type="button" data-view="sidebar" aria-pressed="false">03 · Sidebar</button>
-<button type="button" data-view="notification" aria-pressed="false">Notification popup</button>
-<button type="button" data-view="settings" aria-pressed="false">Settings</button>
-<button type="button" data-view="power" aria-pressed="false">04 · Power</button>
-<button type="button" data-view="launcher" aria-pressed="false">05 · Launcher</button>
-<button type="button" data-view="search" aria-pressed="false">06 · Search</button>
-<button type="button" data-view="empty" aria-pressed="false">07 · Empty</button>
-<button type="button" data-view="cpu" aria-pressed="false">08 · CPU</button>
-<button type="button" data-view="gpu" aria-pressed="false">09 · GPU</button>
-<button type="button" data-view="clock" aria-pressed="false">10 · Clock</button>
-<button type="button" data-view="audio" aria-pressed="false">11 · Audio</button>
-<button type="button" data-view="icons" aria-pressed="false">12 · Icons</button>
-
-  </nav>
-<details><summary>Settings pages</summary><nav id="settings-nav" aria-label="Settings preview pages"></nav></details>
-
-<figure data-view="calendar"><div class="surface-stage"><img id="surface" src="assets/calendar-frame.webp?v=20261004-notifications" width="1920" height="1080" alt="ghOSt enlarged calendar with sample storm weather and performance values"></div><figcaption><span id="caption" aria-live="polite">Calendar · enlarged frame; sample weather and readings</span><a id="fullsize" href="assets/calendar-frame.webp?v=20261004-notifications" target="_blank" rel="noopener">OPEN FULL IMAGE ↗</a></figcaption></figure>
-<section class="notes"><div><h2>State</h2><p>Verified rail, sidebar, calendar and Settings are deployed by request. Component captures use labeled samples; the native rail crop excludes application content.</p><a href="assets/rail-native.png?v=20261004-fullscreen">NATIVE RAIL ↗</a></div><div><h2>Changes</h2><p>The rail hides during fullscreen and returns afterward. Rounded Settings selection, aligned labels, notification popup, empty notification center, sidebar dismissal and grey calendar outline are deployed. Further Figma matching and independent lock remain pending.</p><a href="https://github.com/dsksnkz/ghOSt/blob/main/docs/changes/2026-10-04-fullscreen.md">CHANGES ↗</a> · <a href="https://github.com/dsksnkz/ghOSt/blob/main/docs/source.md">SOURCE GUIDE ↗</a></div></section>
-
-  </main><footer>ghOSt <span>Graphical Hyprland Operating System Toolkit</span></footer>
-
-<script src="app.js?v=20261004-fullscreen"></script>
-
-  </body></html>
+    <header>
+      <a class="brand" href="./" aria-label="ghOSt home">
+        <img src="assets/icons/white/ghost.svg" width="28" height="28" alt="">ghOSt
+      </a>
+      <a href="https://github.com/dsksnkz/ghOSt">Source ↗</a>
+    </header>
+    <main>
+      <nav id="surfaces" aria-label="Components">
+        <button type="button" data-view="rail" aria-pressed="false">Top rail</button>
+        <button type="button" data-view="calendar" aria-pressed="true">Calendar</button>
+        <button type="button" data-view="sidebar" aria-pressed="false">Sidebar</button>
+        <button type="button" data-view="settings" aria-pressed="false">Settings</button>
+        <button type="button" data-view="launcher" aria-pressed="false">App launcher</button>
+        <button type="button" data-view="sidebar-motion" aria-pressed="false">Sidebar motion</button>
+        <button type="button" data-view="calendar-motion" aria-pressed="false">Calendar motion</button>
+      </nav>
+      <section class="display" aria-label="Component display">
+        <div class="display-header">
+          <h1 id="display-title">Calendar</h1>
+          <span id="capture-kind">Desktop capture</span>
+        </div>
+        <div id="stage" aria-busy="false"></div>
+        <p id="load-error" role="alert" hidden>Image unavailable. Choose another view or reload.</p>
+        <div id="settings-controls" class="mfd-controls" hidden>
+          <button id="previous-page" type="button" aria-label="Previous Settings page">←</button>
+          <label class="page-picker">
+            <span class="sr-only">Settings page</span>
+            <select id="settings-page"></select>
+          </label>
+          <output id="page-number" aria-label="Page number">01 / 14</output>
+          <button id="next-page" type="button" aria-label="Next Settings page">→</button>
+        </div>
+        <div class="display-footer">
+          <p id="description" aria-live="polite">Weather, dates and device usage. System readings drive the meters.</p>
+          <button id="replay" type="button" hidden>Replay</button>
+          <a id="full-image" href="assets/calendar-native.png" target="_blank" rel="noopener">Full image ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer>Arch Linux · Hyprland · Quickshell<span>Captures, not remote controls.</span></footer>
+    <script type="module" src="app.js?v=20261004-mfd"></script>
+  </body>
+</html>

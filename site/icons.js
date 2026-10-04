@@ -1,28 +1,42 @@
 const grid = document.querySelector('#icon-grid');
 const search = document.querySelector('#search');
-let icons = [], light = false;
+let icons = [];
+let light = false;
+
+function downloadLinks(icon) {
+  const links = document.createElement('div');
+  links.className = 'icon-downloads';
+  for (const tone of ['black', 'white']) {
+    const link = document.createElement('a');
+    link.href = `assets/icons/${tone}/${icon.name}.svg`;
+    link.download = `ghost-${icon.name}-${tone}.svg`;
+    link.textContent = tone;
+    link.setAttribute('aria-label', `Download ${icon.name}, ${tone} SVG`);
+    links.append(link);
+  }
+  return links;
+}
+
+function iconCard(icon) {
+  const card = document.createElement('article');
+  card.className = 'icon-card';
+  const image = document.createElement('img');
+  image.src = `assets/icons/${light ? 'black' : 'white'}/${icon.name}.svg`;
+  image.alt = '';
+  image.width = 24;
+  image.height = 24;
+  const title = document.createElement('h2');
+  title.textContent = icon.name;
+  const category = document.createElement('small');
+  category.textContent = icon.category;
+  card.append(image, title, category, downloadLinks(icon));
+  return card;
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const matches = icons.filter(i => `${i.name} ${i.category}`.toLowerCase().includes(query));
-  grid.replaceChildren(...matches.map(icon => {
-    const card = document.createElement('article');
-    card.className = 'icon-card';
-    const img = document.createElement('img');
-    img.src = `assets/icons/${light ? 'black' : 'white'}/${icon.name}.svg`;
-    img.alt = ''; img.width = 24; img.height = 24;
-    const title = document.createElement('h2'); title.textContent = icon.name;
-    const category = document.createElement('small'); category.textContent = icon.category;
-    const links = document.createElement('div'); links.className = 'icon-downloads';
-    for (const tone of ['black', 'white']) {
-      const link = document.createElement('a');
-      link.href = `assets/icons/${tone}/${icon.name}.svg`;
-      link.download = `ghost-${icon.name}-${tone}.svg`;
-      link.textContent = tone;
-      link.setAttribute('aria-label', `Download ${icon.name}, ${tone} SVG`);
-      links.append(link);
-    }
-    card.append(img, title, category, links); return card;
-  }));
+  grid.replaceChildren(...matches.map(iconCard));
   grid.classList.toggle('light', light);
   document.querySelector('#count').textContent = `${matches.length} / ${icons.length} icons`;
   document.querySelector('#empty').hidden = matches.length !== 0;
