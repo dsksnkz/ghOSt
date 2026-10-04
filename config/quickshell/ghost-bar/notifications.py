@@ -164,7 +164,11 @@ class Service:
         # Monitors must never let Gio dispatch an observed method and reply to it.
         # Preserve BecomeMonitor's own reply while initialising, then consume.
         initial_reply = message.get_message_type() in (Gio.DBusMessageType.METHOD_RETURN,Gio.DBusMessageType.ERROR) and message.get_sender()=='org.freedesktop.DBus' and not self.monitoring
-        return None if incoming and not initial_reply else message
+        if incoming and not initial_reply:
+            return None
+        # Both callback input and output transfer ownership. Returning a distinct
+        # copy avoids aliasing the same PyGObject wrapper during monitor setup.
+        return message.copy()
     def remember(self,sender,serial,arguments,destination):
         self.pending[(sender,serial)] = (arguments,time.monotonic())
         self.pending = {key:value for key,value in list(self.pending.items())[-100:] if time.monotonic()-value[1]<15}

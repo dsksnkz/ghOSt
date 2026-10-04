@@ -71,6 +71,16 @@ class NotificationsTest(unittest.TestCase):
         history.add(101,['App',101,'','Replacement','Body',[],{},0],':1.1',True)
         self.assertEqual(len(history.items),100)
         self.assertEqual(history.items[0]['summary'],'Replacement')
+    def test_forwarded_filter_message_has_independent_ownership(self):
+        service = module.Service.__new__(module.Service)
+        service.monitoring = False
+        message = module.Gio.DBusMessage.new_method_call(
+            'org.freedesktop.DBus', '/org/freedesktop/DBus',
+            'org.freedesktop.DBus', 'GetId')
+        forwarded = service.message(None, message, False, None)
+        self.assertIsNot(forwarded, message)
+        self.assertEqual(forwarded.get_member(), message.get_member())
+        self.assertEqual(forwarded.get_message_type(), message.get_message_type())
     def test_server_replacement_expiry_dnd_and_clear(self):
         bridge,state=self.start();self.assertEqual(state['mode'],'server')
         identifier=self.notify()
