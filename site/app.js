@@ -1,3 +1,4 @@
+const assetVersion = "20261004-notifications";
 const views = {
   settings: ["settings-general.webp", "Settings · measured 1024 × 699 frame; sample data"],
   desktop: ["desktop-frame.webp", "Composition · measured Figma layout with sample data"],
@@ -59,7 +60,7 @@ document.querySelectorAll("[data-view]").forEach(button => {
       document.querySelector("#fullsize").href = next.src;
       document.querySelector("figure").dataset.view = selection;
     };
-    next.src = "assets/" + file;
+    next.src = "assets/" + file + "?v=" + assetVersion;
     document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
   });
 });
