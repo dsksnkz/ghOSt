@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Calendar row hover padding
+
+Full-size weather-row Keys retain the full hover/click area. Scaled row contents
+now have6px horizontal inset and centered18px content height, keeping glyphs/text
+inside rather than against the hover edge. Width compensates for70/60% scaling so
+forecast text is not prematurely elided.51 tests pass; native text/layout capture
+checked. Physical hover was not automated. Snapshot:
+`.local/backups/2026-10-07-calendar-hover-p3tfTz/`.
+[Actual calendar](../site/assets/calendar-native.png).
+
 ## 2026-10-07 / Calendar weather synchronization
 
 Current-weather headline and Today row now use the same API observation;

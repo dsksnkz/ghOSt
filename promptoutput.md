@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-07 · Calendar hover rows
+
+Full-row hover/click boxes with inset, vertically centered icons/text; smaller
+forecast rows retain available text width.51 tests pass; native layout checked,
+physical hover not automated. [Actual calendar](site/assets/calendar-native.png).
+Recovery:`.local/backups/2026-10-07-calendar-hover-p3tfTz/`.
+
 ## 2026-10-07 · Calendar weather/corners
 
 Headline and Today use current weather together; older/future daily values remain

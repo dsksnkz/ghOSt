@@ -302,14 +302,17 @@ Item {
                                 cal.forecastSelected = true;
                             }
                             Item {
-                                width: parent.width
-                                height: parent.height
+                                // The unscaled Key owns the full-row hover box;
+                                // keep every scaled glyph comfortably inside it.
+                                x: 6
+                                width: (parent.width - 12) / scale
+                                height: 18
                                 scale: cal.forecastScale(modelData.date)
                                 transformOrigin: Item.TopLeft
                                 y: (parent.height - height * scale) / 2
                                 SvgIcon {
                                     x: 0
-                                    y: 0
+                                    y: (parent.height - height) / 2
                                     width: 17
                                     height: 17
                                     name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition
@@ -317,8 +320,9 @@ Item {
                                 Label {
                                     x: 24
                                     y: 0
-                                    width: 170
-                                    height: 26
+                                    width: parent.width - x
+                                    height: parent.height
+                                    verticalAlignment: Text.AlignVCenter
                                     text: cal.labelDay(modelData.date) + " - " + modelData.condition + " " + Math.round(modelData.temperature) + "°"
                                     font.family: Theme.textFont
                                     font.pixelSize: 13
