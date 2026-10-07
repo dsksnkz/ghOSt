@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-07 / Sidebar top anchor
+
+Replaced the old144px top offset with rail height plus8px. Enlarged410×914
+sidebar now maps at y58, ending at972 on1080px output;15% content scale retained.
+51 tests pass; native placement/logs/capture checked. Snapshot:
+`.local/backups/2026-10-07-sidebar-position-YTODJM/`.
+[Native header](../site/assets/sidebar-status-native.png).
+
 ## 2026-10-07 / Sidebar115% scale
 
 Whole sidebar coordinate plane enlarged15%, retaining proportional contents and

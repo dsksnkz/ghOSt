@@ -1,5 +1,11 @@
 prompts outputs here
 
+## 2026-10-07 · Sidebar placement
+
+Sidebar anchored8px below the rail, not at the old144px offset. Native y58,
+410×914, retaining15% enlargement.51 tests pass; actual mapping/logs checked.
+Recovery:`.local/backups/2026-10-07-sidebar-position-YTODJM/`.
+
 ## 2026-10-07 · Sidebar enlargement
 
 Sidebar and all contents15% larger, proportional and screen-fitted; anchor unchanged.
