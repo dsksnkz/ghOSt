@@ -99,10 +99,18 @@ Item {
             return .82 + .18 * (t - 120) / 60;
         return 1;
     }
-    function labelDay(dateString) {
+    function dayOffset(dateString) {
         const d = new Date(dateString + "T12:00:00");
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
-        const delta = Math.round((d - today) / 86400000);
+        return Math.round((d - today) / 86400000);
+    }
+    function forecastScale(dateString) {
+        const distance = Math.abs(dayOffset(dateString));
+        return distance === 0 ? 1 : distance === 1 ? 0.7 : 0.6;
+    }
+    function labelDay(dateString) {
+        const delta = dayOffset(dateString);
+        const d = new Date(dateString + "T12:00:00");
         return delta === 0 ? "Today" : delta === -1 ? "Yesterday" : delta === 1 ? "Tomorrow" : Qt.formatDateTime(d, "dd MMM");
     }
     function status() {
@@ -221,9 +229,9 @@ Item {
             width: 194
             height: 208
             opacity: cal.groupOpacity(0)
-            readonly property var selectedForecast: cal.forecastSelected ? cal.weather.days?.[cal.forecastIndex] : null
-            readonly property string condition: selectedForecast?.condition || cal.weather.condition
-            readonly property var temperature: selectedForecast?.temperature ?? cal.weather.temperature
+            // Scrolling forecasts never changes the current-weather headline.
+            readonly property string condition: cal.weather.condition
+            readonly property var temperature: cal.weather.temperature
             WeatherGlyph {
                 id: weatherArt
                 x: 0
@@ -293,23 +301,30 @@ Item {
                                 cal.forecastIndex = index;
                                 cal.forecastSelected = true;
                             }
-                            SvgIcon {
-                                x: 0
-                                y: 0
-                                width: 17
-                                height: 17
-                                name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition
-                            }
-                            Label {
-                                x: 24
-                                y: 0
-                                width: 170
-                                height: 26
-                                text: cal.labelDay(modelData.date) + " - " + modelData.condition + " " + Math.round(modelData.temperature) + "°"
-                                font.family: Theme.textFont
-                                font.pixelSize: index === cal.forecastIndex ? 13 : 11
-                                font.weight: Font.Light
-                                color: "#ffffff"
+                            Item {
+                                width: parent.width
+                                height: parent.height
+                                scale: cal.forecastScale(modelData.date)
+                                transformOrigin: Item.TopLeft
+                                y: (parent.height - height * scale) / 2
+                                SvgIcon {
+                                    x: 0
+                                    y: 0
+                                    width: 17
+                                    height: 17
+                                    name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition
+                                }
+                                Label {
+                                    x: 24
+                                    y: 0
+                                    width: 170
+                                    height: 26
+                                    text: cal.labelDay(modelData.date) + " - " + modelData.condition + " " + Math.round(modelData.temperature) + "°"
+                                    font.family: Theme.textFont
+                                    font.pixelSize: 13
+                                    font.weight: Font.Light
+                                    color: "#ffffff"
+                                }
                             }
                         }
                     }
@@ -470,7 +485,7 @@ Item {
                 width: 24
                 height: 24
                 color: "#d9d9d9"
-                radius: 15
+                radius: 7
                 hint: "Applications"
                 onClicked: cal.navigateRequested("launcher")
                 SvgIcon {
@@ -487,7 +502,7 @@ Item {
                 width: 36
                 height: 36
                 color: "#d9d9d9"
-                radius: 15
+                radius: 7
                 hint: "Settings"
                 onClicked: cal.navigateRequested("settings")
                 SvgIcon {
@@ -504,7 +519,7 @@ Item {
                 width: 24
                 height: 24
                 color: "#d9d9d9"
-                radius: 15
+                radius: 7
                 hint: "Power"
                 onClicked: cal.navigateRequested("session")
                 SvgIcon {

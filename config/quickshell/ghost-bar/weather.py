@@ -32,9 +32,15 @@ def normalize(data):
     if not finite(temperature):
         raise ValueError('Invalid temperature')
     days = []
+    current_date = current.get('time', '').split('T')[0]
     for date, code, value in zip(daily['time'], daily['weather_code'], daily['temperature_2m_max']):
         if finite(value):
-            days.append({'date': date, 'condition': condition(code), 'temperature': value})
+            # Today describes now, like the headline, not the daily maximum
+            # or dominant weather code. Other days retain their daily readings.
+            is_today = date == current_date
+            days.append({'date': date,
+                         'condition': condition(current['weather_code'] if is_today else code),
+                         'temperature': temperature if is_today else value})
     return {'condition': condition(current['weather_code']), 'temperature': temperature, 'days': days[:5]}
 
 

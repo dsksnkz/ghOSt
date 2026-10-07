@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261007-outer-gaps";
+export const assetVersion = "20261007-weather";
 export const views = {
   rail: {
     title: "Top rail",

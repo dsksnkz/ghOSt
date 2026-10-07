@@ -1,5 +1,14 @@
 prompts outputs here
 
+## 2026-10-07 · Calendar weather/corners
+
+Headline and Today use current weather together; older/future daily values remain
+real. Forecast rows:Today100%,Yesterday/Tomorrow70%,two-day distance60%.
+Three bottom controls now have7px corners.51 tests pass; active London weather,
+native renderer/logs and [actual output](site/assets/calendar-native.png) verified.
+Files:CalendarPanel.qml,weather.py,tests/test_weather.py,site catalogue/capture.
+Recovery:`.local/backups/2026-10-07-calendar-iSxpER/`; unrelated settings preserved.
+
 ## 2026-10-07 · Outer margins / status icons
 
 Rail outer gaps halved; inside spacing restored. Sidebar status icons/readout30%

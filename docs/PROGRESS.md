@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-07 / Calendar weather synchronization
+
+Current-weather headline and Today row now use the same API observation;
+historical/future rows retain daily readings. Forecast scrolling no longer changes
+the current headline. Entire forecast rows scale100/70/60% by calendar-day distance
+from today, independent of selection. Bottom action corners are7px rather than15px;
+main frame/meters unchanged.51 tests pass, including a current-vs-daily mismatch
+regression; live London data, native motion/logs and component capture checked.
+Snapshot:`.local/backups/2026-10-07-calendar-iSxpER/` includes source/live originals.
+[Actual calendar](../site/assets/calendar-native.png).
+
 ## 2026-10-07 / Outer gaps and sidebar status only
 
 Latest correction: halve gaps between screen edges and rail, not internal gaps.

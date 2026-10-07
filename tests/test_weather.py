@@ -10,6 +10,15 @@ spec.loader.exec_module(weather)
 
 
 class Weather(unittest.TestCase):
+    def test_today_matches_current_while_other_days_keep_daily_readings(self):
+        data = {'current': {'time': '2026-10-07T20:00', 'temperature_2m': 12, 'weather_code': 0},
+                'daily': {'time': ['2026-10-06', '2026-10-07', '2026-10-08'],
+                          'weather_code': [3, 63, 63], 'temperature_2m_max': [21, 18, 15]}}
+        result = weather.normalize(data)
+        self.assertEqual(result['days'][1], {'date': '2026-10-07', 'condition': 'clear', 'temperature': 12})
+        self.assertEqual(result['days'][0]['temperature'], 21)
+        self.assertEqual(result['days'][2]['condition'], 'rain')
+
     def test_codes(self):
         for code, expected in [(0, 'clear'), (3, 'cloud'), (63, 'rain'), (75, 'snow'), (95, 'storm'), (123, 'unknown')]:
             self.assertEqual(weather.condition(code), expected)
