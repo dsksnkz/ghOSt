@@ -4,7 +4,7 @@ import QtQuick
 QtObject {
     property bool reducedMotion: false
     readonly property real outerRadius: 7
-    // Scale the entire rail, including typography, glyphs and spacing.
+    // Compact height and uniformly scale contents; preserve the frame's width.
     readonly property real railVerticalScale: 0.9
     readonly property real railHeight: 64 * railVerticalScale
     // Reference coordinates stay fixed; the complete calendar scales together.

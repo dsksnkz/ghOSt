@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Full-width rail correction
+
+Latest clarification supersedes the uniform whole-frame shrink below. Main rail
+width/margins restored; contents scale uniformly0.9 in both axes inside the
+10%-flatter frame. Left/center/right groups stay anchored; dividers scale with
+contents. Network/Bluetooth/battery glyphs and battery text use a common vertical
+center.50 tests pass; native hot-reload/logs and full-width capture checked.
+Snapshot:`.local/backups/2026-10-07-rail-width-HmeTXH/`; no shortcut/autostart changes.
+[Actual rail](../site/assets/rail-native.png).
+
 ## 2026-10-07 / Uniform rail scale correction
 
 Latest clarification: the whole rail must scale down, not just its padding.

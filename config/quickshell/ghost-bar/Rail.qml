@@ -31,22 +31,21 @@ Item {
         return JSON.stringify(workspaceWheel.status());
     }
     implicitHeight: Theme.railHeight
-    readonly property real designScale: width / 1920 * Theme.railVerticalScale
+    readonly property real designScale: width / 1920
     function open(name, item) {
         const center = item.mapToItem(bar, item.width / 2, 0).x;
         Desk.toggle(name, screenName, Math.max(6, Math.min(width - 398, center - 196)), center);
     }
     Item {
-        x: (bar.width - width * scale) / 2
         width: 1920
-        height: 64
+        height: Theme.railHeight
         scale: bar.designScale
         transformOrigin: Item.TopLeft
         Material {
             x: 19
-            y: 16
+            y: 16 * Theme.railVerticalScale
             width: 1882
-            height: 46
+            height: 46 * Theme.railVerticalScale
             radius: Theme.outerRadius
             gradient: null
             color: "#191919"
@@ -60,10 +59,13 @@ Item {
                 border.width: 1
             }
             Item {
-                // All contents share the rail's uniform scale and optical alignment.
-                width: parent.width
+                id: controls
+                // Keep the rail full-width; shrink contents uniformly and anchor groups.
+                readonly property real extraWidth: width - 1882
+                width: parent.width / Theme.railVerticalScale
                 height: 46
-                y: (parent.height - height) / 2
+                scale: Theme.railVerticalScale
+                transformOrigin: Item.TopLeft
                 Key {
                     x: 19
                     y: 7
@@ -102,14 +104,14 @@ Item {
                     color: "#3a3a3a"
                 }
                 G2Surface {
-                    x: 1598
+                    x: 1598 + controls.extraWidth
                     y: 5
                     width: 1
                     height: 36
                     color: "#3a3a3a"
                 }
                 G2Surface {
-                    x: 1821
+                    x: 1821 + controls.extraWidth
                     y: 5
                     width: 1
                     height: 36
@@ -149,7 +151,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 853
+                    x: 853 + controls.extraWidth / 2
                     y: 5
                     width: 218
                     height: 36
@@ -212,7 +214,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 1473
+                    x: 1473 + controls.extraWidth
                     y: 7
                     width: 100
                     height: 32
@@ -246,7 +248,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 1621
+                    x: 1621 + controls.extraWidth
                     y: 7
                     width: 41
                     height: 32
@@ -255,7 +257,7 @@ Item {
                     SvgIcon {
                         id: networkIcon
                         x: 9.5
-                        y: 5
+                        anchors.verticalCenter: parent.verticalCenter
                         width: 22
                         height: 22
                         name: bar.fixtureMode ? "wifi" : Desk.wired ? "ethernet" : "wifi"
@@ -263,7 +265,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 1673
+                    x: 1673 + controls.extraWidth
                     y: 7
                     width: 41
                     height: 32
@@ -272,7 +274,7 @@ Item {
                     SvgIcon {
                         id: bluetoothIcon
                         x: 9.5
-                        y: 5
+                        anchors.verticalCenter: parent.verticalCenter
                         width: 22
                         height: 22
                         name: "bluetooth"
@@ -280,7 +282,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 1726
+                    x: 1726 + controls.extraWidth
                     y: 7
                     width: 71
                     height: 32
@@ -289,7 +291,7 @@ Item {
                     InkLabel {
                         id: batteryText
                         x: 0
-                        y: 0
+                        anchors.verticalCenter: parent.verticalCenter
                         width: 38
                         height: 32
                         text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
@@ -300,7 +302,7 @@ Item {
                     SvgIcon {
                         id: batteryIcon
                         x: 41
-                        y: 5
+                        anchors.verticalCenter: parent.verticalCenter
                         width: 30
                         height: 22
                         name: "battery"
@@ -308,7 +310,7 @@ Item {
                     }
                 }
                 Key {
-                    x: 1837
+                    x: 1837 + controls.extraWidth
                     y: 7
                     width: 39
                     height: 32

@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-07 · Full-width correction
+
+Restored full rail width. Contents/fonts/icons/dividers shrink proportionally
+in both axes, with left/center/right anchoring and common right-status vertical
+centers.50 tests pass; active output/logs checked. [Screenshot](site/assets/rail-native.png).
+Supersedes the previous whole-frame width shrink. Backup:
+`.local/backups/2026-10-07-rail-width-HmeTXH/`.
+
 ## 2026-10-07 · Uniform rail correction
 
 Entire rail now scales to90%, including fonts/icons/control spacing; centered
