@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Sidebar115% scale
+
+Whole sidebar coordinate plane enlarged15%, retaining proportional contents and
+its original screen anchor. Uniformly fits smaller displays rather than stretching.
+Native window410×914 at1920×1080; right-status70% relative size remains intact.
+51 tests pass; native window/logs checked. Only named ghOSt restarted when hot-reload
+IPC stopped accepting queries; legacy process, shortcuts, autostart and wallpaper
+unchanged. Snapshot:`.local/backups/2026-10-07-sidebar-scale-w048g7/`.
+[Privacy-safe native header](../site/assets/sidebar-status-native.png).
+
 ## 2026-10-07 / Calendar row hover padding
 
 Full-size weather-row Keys retain the full hover/click area. Scaled row contents

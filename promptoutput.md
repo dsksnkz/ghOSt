@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-07 · Sidebar enlargement
+
+Sidebar and all contents15% larger, proportional and screen-fitted; anchor unchanged.
+Native410×914 window checked;51 tests pass. Only ghOSt restarted for IPC recovery.
+[Actual header](site/assets/sidebar-status-native.png); full captures with private
+network names are not published. Recovery:`.local/backups/2026-10-07-sidebar-scale-w048g7/`.
+
 ## 2026-10-07 · Calendar hover rows
 
 Full-row hover/click boxes with inset, vertically centered icons/text; smaller
