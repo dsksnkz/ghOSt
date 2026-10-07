@@ -2,7 +2,7 @@ prompts outputs here
 
 ## 2026-10-07 · Outer margins / status icons
 
-Rail outer gaps halved; inside spacing restored. Sidebar status icons/readout50%
+Rail outer gaps halved; inside spacing restored. Sidebar status icons/readout30%
 smaller, right anchored; all three header buttons unchanged.50 tests pass;
 native output/logs checked. [Rail](site/assets/rail-native.png) ·
 [Sidebar status](site/assets/sidebar-status-native.png).

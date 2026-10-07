@@ -4,7 +4,8 @@
 
 Latest correction: halve gaps between screen edges and rail, not internal gaps.
 Original internal spacing restored; side margins19→9.5px, top gap14.4→7.2px,
-50px reserved height. Sidebar's right-anchored status group scales50%; settings,
+50px reserved height. Latest correction: sidebar's right-anchored status group
+is30% smaller (70% scale), not50%; settings,
 notification and power buttons retain their original size.50 tests pass; native
 reload/logs and privacy-safe captures checked. Recovery: rail-gaps and
 sidebar-header backups under `.local/backups/2026-10-07-*`.
