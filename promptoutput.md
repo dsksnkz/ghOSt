@@ -8,6 +8,9 @@ and existing JS checks pass; helper installed, native weather agreement inspecte
 [Actual output and verification](docs/changes/2026-10-07-weather-cache.md).
 No visual design, website or unrelated system changes; broader prompt pending.
 
+Published `fc2c13a`; fresh committed-archive 61 tests and remote helper/image hashes
+verified. Calendar restored to its initial closed state after inspection.
+
 ## 2026-10-07 · ghOSt advertisement
 
 [26-second film](assets/ghOSt-advertisement.mp4): native desktop-wheel and sidebar

@@ -48,3 +48,9 @@ can remain unused; no original config/location file was changed or removed.
 
 Source, tests and the privacy-safe native screenshot are included in this
 verified release; publication is checked separately after committing.
+
+Published source release `fc2c13a` to GitHub `main`. A fresh archive of that commit
+passes all 61 Python tests, including installer/distribution checks. Remote Git
+blob hashes match the installed helper and privacy-safe native screenshot.
+The calendar was opened for native inspection and returned to its initial closed
+state afterward; active rail and legacy processes remain untouched.

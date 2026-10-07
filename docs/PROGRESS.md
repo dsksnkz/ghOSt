@@ -10,6 +10,9 @@ checks pass; native current/Today agreement and cache reuse inspected.
 [Native output, timing limits and recovery](changes/2026-10-07-weather-cache.md).
 No preview-site redesign; broader feature/reference backlog remains pending.
 
+Published `fc2c13a`; fresh committed-archive 61 tests pass and remote helper/image
+blob hashes match. Calendar inspection complete, initial closed state restored.
+
 ## 2026-10-07 / Product animation
 
 Created the requested short, full advertisement: workspace wheel, scroll-volume
