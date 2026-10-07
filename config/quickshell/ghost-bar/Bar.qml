@@ -8,7 +8,7 @@ PanelWindow {
 
     readonly property var monitor: Hyprland.monitorFor(screen)
     visible: !fullscreenState.active
-    implicitHeight: 64 * screen.width / 1920
+    implicitHeight: Math.ceil(Theme.railHeight * screen.width / 1920)
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     WlrLayershell.namespace: "ghost-bar"

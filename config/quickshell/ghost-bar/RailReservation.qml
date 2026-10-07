@@ -16,7 +16,7 @@ PanelWindow {
         right: true
     }
     implicitHeight: 1
-    readonly property int requiredSpace: Math.ceil(64 * screen.width / 1920)
+    readonly property int requiredSpace: Math.ceil(Theme.railHeight * screen.width / 1920)
     property int otherSpace: requiredSpace
     exclusiveZone: Math.max(0, requiredSpace - otherSpace)
     color: "transparent"

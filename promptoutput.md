@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-07 · Compact rail
+
+10% less vertical space; unchanged type/icons/horizontal alignment. Active desktop
+hot-reload and58px work-area reservation verified;50 backend/five website tests pass.
+Files:Theme.qml,Rail.qml,Bar.qml,RailReservation.qml and the website rail asset/catalogue.
+[Actual output](site/assets/rail-native.png) · [Website](https://dsksnkz.github.io/ghOSt/).
+Recovery:`.local/backups/2026-10-07-rail-DjS5si/live/`; unrelated files preserved.
+
 ## 2026-10-04 · Website and descriptions
 
 Short function/how descriptions; seven website views; minimal Settings changer

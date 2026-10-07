@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Compact rail
+
+Reduced vertical rail geometry10%:46→41.4px surface,16→14.4px top gap,
+64→57.6px overall design height (58px reserved at1920px). Glyphs, fonts,
+horizontal positions and7px corners unchanged. Tested and hot-reloaded only
+ghOSt;50 backend and five website tests pass. Native rail captured and Pages
+asset updated. No shortcut/autostart/wallpaper/legacy changes.
+Snapshot:`.local/backups/2026-10-07-rail-DjS5si/` includes source/live originals.
+[Actual rail](../site/assets/rail-native.png). Full prompt remains pending.
+
 ## 2026-10-04 / Minimal website and descriptions
 
 Latest direct website request: seven component/motion views, short descriptions,
