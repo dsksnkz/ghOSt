@@ -12,11 +12,10 @@ PanelWindow {
     property bool opened: false
     property real reveal: opened ? 1 : 0
     readonly property real screenScale: screen.width / 1920
-    readonly property int topOffset: Math.ceil((Theme.railHeight + 8) * screenScale)
-    // Anchor below the rail, then fit the enlarged coordinate plane uniformly.
+    // Center vertically on the display while preserving uniform enlargement.
     readonly property real designScale: Math.min(screenScale * 1.15,
         (screen.width - 32) / 356,
-        Math.max(1, screen.height - topOffset - 14) / 794)
+        Math.max(1, screen.height - 28) / 794)
 
     function sync() {
         opened = Desk.sidebarOpen && Desk.panelScreen === screen.name;
@@ -24,7 +23,7 @@ PanelWindow {
 
     Component.onCompleted: sync()
     margins.left: 0
-    margins.top: topOffset
+    margins.top: Math.max(0, Math.floor((screen.height - implicitHeight) / 2))
     implicitWidth: Math.ceil(356 * designScale)
     implicitHeight: Math.ceil(794 * designScale)
     color: "transparent"

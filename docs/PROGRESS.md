@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-07 / Sidebar vertical center
+
+Latest correction supersedes the rail-adjacent anchor: vertically center the
+whole sidebar on the display, retaining left-edge alignment and15% scale.
+Native410×914 at y83 on1080px output gives83px above and below.51 tests pass;
+actual placement/logs/capture checked. Snapshot:
+`.local/backups/2026-10-07-sidebar-center-aCVKcw/`.
+
 ## 2026-10-07 / Sidebar top anchor
 
 Replaced the old144px top offset with rail height plus8px. Enlarged410×914

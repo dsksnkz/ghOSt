@@ -1,5 +1,11 @@
 prompts outputs here
 
+## 2026-10-07 · Centered sidebar
+
+Sidebar vertically centered, still left-aligned and15% enlarged. Verified y83,
+height914 on1080px display (83px above/below);51 tests pass, native logs clean.
+Recovery:`.local/backups/2026-10-07-sidebar-center-aCVKcw/`.
+
 ## 2026-10-07 · Sidebar placement
 
 Sidebar anchored8px below the rail, not at the old144px offset. Native y58,
