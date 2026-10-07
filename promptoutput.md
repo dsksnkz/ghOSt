@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-07 · Uniform rail correction
+
+Entire rail now scales to90%, including fonts/icons/control spacing; centered
+on screen,58px reserved height. Supersedes the padding-only implementation.
+50 tests pass; active native output/logs checked. [Screenshot](site/assets/rail-native.png).
+Source/live originals:`.local/backups/2026-10-07-rail-scale-icNARB/`.
+
 ## 2026-10-07 · Compact rail
 
 10% less vertical space; unchanged type/icons/horizontal alignment. Active desktop

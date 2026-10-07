@@ -31,21 +31,22 @@ Item {
         return JSON.stringify(workspaceWheel.status());
     }
     implicitHeight: Theme.railHeight
-    readonly property real designScale: width / 1920
+    readonly property real designScale: width / 1920 * Theme.railVerticalScale
     function open(name, item) {
         const center = item.mapToItem(bar, item.width / 2, 0).x;
         Desk.toggle(name, screenName, Math.max(6, Math.min(width - 398, center - 196)), center);
     }
     Item {
+        x: (bar.width - width * scale) / 2
         width: 1920
-        height: Theme.railHeight
+        height: 64
         scale: bar.designScale
         transformOrigin: Item.TopLeft
         Material {
             x: 19
-            y: 16 * Theme.railVerticalScale
+            y: 16
             width: 1882
-            height: 46 * Theme.railVerticalScale
+            height: 46
             radius: Theme.outerRadius
             gradient: null
             color: "#191919"
@@ -59,7 +60,7 @@ Item {
                 border.width: 1
             }
             Item {
-                // Retain the original horizontal geometry and optical alignment.
+                // All contents share the rail's uniform scale and optical alignment.
                 width: parent.width
                 height: 46
                 y: (parent.height - height) / 2

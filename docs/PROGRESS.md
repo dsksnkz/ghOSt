@@ -1,5 +1,14 @@
 # ghOSt progress
 
+## 2026-10-07 / Uniform rail scale correction
+
+Latest clarification: the whole rail must scale down, not just its padding.
+Applied0.9 uniform scaling to the original coordinate plane, centered on screen;
+fonts, icons, controls and gaps now shrink together. Overall reserved height
+remains58px.50 tests pass; native hot-reload/logs/capture checked.
+Snapshot:`.local/backups/2026-10-07-rail-scale-icNARB/`. Previous compact-padding
+description below is historical and superseded. [Actual rail](../site/assets/rail-native.png).
+
 ## 2026-10-07 / Compact rail
 
 Reduced vertical rail geometry10%:46→41.4px surface,16→14.4px top gap,
