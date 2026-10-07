@@ -1,5 +1,34 @@
 # ghOSt progress
 
+## 2026-10-07 / Product animation
+
+Created the requested short, full advertisement: workspace wheel, scroll-volume
+changes, calendar reveal/weather/telemetry/CPU-clock/month controls, grouped
+sidebar motion, and Settings General/Battery/Storage/System Info. Actual current
+QML components supply the interfaces; demonstration data excludes private chats,
+network names and the user's earlier OBS recording. Original projected geometry,
+folded planes, moving orbit/grid composition and synthesized mechanical sound
+support the monochrome motion-reference direction without copying its footage
+or music.
+
+[Film](../assets/ghOSt-advertisement.mp4) ·
+[Poster](../assets/ghOSt-advertisement-poster.jpg) ·
+[Reproducible source](../scripts/ad/README.md).
+
+Verified: 396 exported native animation frames plus four Settings pages;
+projection geometry and continuous scene timeline; full encoded-video decode;
+780 frames, 1920×1080 at 30fps, 26 seconds, H.264/AAC. Encoded contact sheet and
+individual scene compositions inspected. This is a produced component-demo film,
+not an unattended live desktop interaction test. No live audio, workspaces,
+configuration or session action changed; only an owned offscreen renderer ran.
+Project prompt/design Git blobs were checked against current GitHub main before
+production and match the existing recorded hashes. This film does not declare
+the broader outstanding Figma/native-feature work complete.
+
+Film and reproducible source are included in this release; no website layout
+was changed. Originals and ignored render cache retained; documentation pre-edit copies are in
+`.local/ad-production-hq/docs-before/`.
+
 ## 2026-10-07 / Sidebar vertical center
 
 Latest correction supersedes the rail-adjacent anchor: vertically center the

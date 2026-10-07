@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-07 · ghOSt advertisement
+
+[26-second film](assets/ghOSt-advertisement.mp4): native desktop-wheel and sidebar
+animation, rail volume scrolling, calendar/weather/metrics/month controls, and
+Settings General, Battery, Storage and System Info. Monochrome projected planes,
+orbital geometry and original sound.1080p/30fps; sample data, no private recording
+or reference music reused. All 396 native sequence frames verified, encoded 780
+frames decoded successfully, all scene compositions reviewed. Live desktop and
+audio unchanged. [Source and reproduction](scripts/ad/README.md).
+
 ## 2026-10-07 · Centered sidebar
 
 Sidebar vertically centered, still left-aligned and15% enlarged. Verified y83,
