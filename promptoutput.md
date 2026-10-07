@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-07 · Calendar weather loading
+
+Calendar reopen reuses a private recent observation; 15-minute expiry, location
+changes and local midnight refresh it. No stale-after-expiry fallback. 61 tests
+and existing JS checks pass; helper installed, native weather agreement inspected.
+[Actual output and verification](docs/changes/2026-10-07-weather-cache.md).
+No visual design, website or unrelated system changes; broader prompt pending.
+
 ## 2026-10-07 · ghOSt advertisement
 
 [26-second film](assets/ghOSt-advertisement.mp4): native desktop-wheel and sidebar

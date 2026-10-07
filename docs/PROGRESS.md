@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Calendar weather loading
+
+Private 15-minute weather cache removes repeat network waits on calendar reopen;
+location, timezone-midnight, rollback and expiry invalidate it. No expired-data
+fallback or fabricated readings. Tested/deployed the helper only, without a shell
+restart or UI/shortcut/wallpaper/autostart change. 61 Python tests and existing JS
+checks pass; native current/Today agreement and cache reuse inspected.
+[Native output, timing limits and recovery](changes/2026-10-07-weather-cache.md).
+No preview-site redesign; broader feature/reference backlog remains pending.
+
 ## 2026-10-07 / Product animation
 
 Created the requested short, full advertisement: workspace wheel, scroll-volume
