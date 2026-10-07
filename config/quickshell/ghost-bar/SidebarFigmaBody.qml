@@ -182,6 +182,8 @@ Item {
         }
         Item {
             id: statusGroup
+            scale: 0.5
+            transformOrigin: Item.TopRight
             anchors.right: parent.right
             anchors.rightMargin: 21
             y: 13

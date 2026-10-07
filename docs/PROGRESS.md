@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-07 / Outer gaps and sidebar status only
+
+Latest correction: halve gaps between screen edges and rail, not internal gaps.
+Original internal spacing restored; side margins19→9.5px, top gap14.4→7.2px,
+50px reserved height. Sidebar's right-anchored status group scales50%; settings,
+notification and power buttons retain their original size.50 tests pass; native
+reload/logs and privacy-safe captures checked. Recovery: rail-gaps and
+sidebar-header backups under `.local/backups/2026-10-07-*`.
+[Rail](../site/assets/rail-native.png) · [Sidebar header](../site/assets/sidebar-status-native.png).
+
 ## 2026-10-07 / Full-width rail correction
 
 Latest clarification supersedes the uniform whole-frame shrink below. Main rail

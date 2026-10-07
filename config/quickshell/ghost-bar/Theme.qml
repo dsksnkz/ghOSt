@@ -6,7 +6,8 @@ QtObject {
     readonly property real outerRadius: 7
     // Compact height and uniformly scale contents; preserve the frame's width.
     readonly property real railVerticalScale: 0.9
-    readonly property real railHeight: 64 * railVerticalScale
+    readonly property real railOuterGapScale: 0.5
+    readonly property real railHeight: (46 + 18 * railOuterGapScale) * railVerticalScale
     // Reference coordinates stay fixed; the complete calendar scales together.
     readonly property real calendarScale: 1.12
     readonly property string font: "JetBrainsMono Nerd Font Mono"

@@ -42,9 +42,9 @@ Item {
         scale: bar.designScale
         transformOrigin: Item.TopLeft
         Material {
-            x: 19
-            y: 16 * Theme.railVerticalScale
-            width: 1882
+            x: 19 * Theme.railOuterGapScale
+            y: 16 * Theme.railVerticalScale * Theme.railOuterGapScale
+            width: 1920 - 38 * Theme.railOuterGapScale
             height: 46 * Theme.railVerticalScale
             radius: Theme.outerRadius
             gradient: null

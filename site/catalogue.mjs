@@ -1,10 +1,10 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261007-rail";
+export const assetVersion = "20261007-outer-gaps";
 export const views = {
   rail: {
     title: "Top rail",
     description: "Workspaces and device controls. Scroll switches desktops; clicks open panels.",
-    file: "rail-native.png", size: [1920, 60], crop: [0, 0, 1920, 60],
+    file: "rail-native.png", size: [1920, 52], crop: [0, 0, 1920, 52],
     maxWidth: 1200, kind: "Desktop capture",
   },
   calendar: {
