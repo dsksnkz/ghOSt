@@ -11,8 +11,10 @@ covered in the [change record](docs/changes/2026-10-08-interactions.md).
 62 Python tests, actual Qt event/geometry checks, windowless production
 compile/router/polling/scan tests and existing JS checks pass. Native deployment
 and privacy-safe crops verified; no hardware/media setter executed in tests.
-Physical touch and compositor pointer paths remain unautomated. Fresh archive
-verification/publication pending; the broader design prompt is not completed.
+Physical touch and compositor pointer paths remain unautomated. Published
+`41d2f3a`; fresh archive passes all listed checks and remote runtime/sounds/Lua
+controls/native crops match their blob hashes. A silent Qt click probe verifies
+base SFX plus derived action dispatch. The broader design prompt is not completed.
 
 ## 2026-10-08 · Settings page requests — release pending
 

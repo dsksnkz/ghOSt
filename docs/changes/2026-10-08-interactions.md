@@ -56,7 +56,8 @@ this release; its pending safe-capture checkpoint is resolved.
 
 62 Python tests pass, including complete isolated installation and sound format,
 duration/amplitude/distinctness. Actual Qt event tests cover Escape, outside
-pointer dismissal, fullscreen restoration, nav wheel propagation, intermediate
+pointer dismissal, fixed click-sound/action dispatch, fullscreen restoration,
+nav wheel propagation, intermediate
 and settled selector positions, weather headline agreement and music geometry.
 Production surface compilation creates no windows or backend actions. Settings
 router (10 transitions), polling (14 pages and real five-second timer), network
@@ -122,6 +123,9 @@ Restore only those paths after reconciling later user edits; restoring
 surfaces. Reload Hyprland only after restoring its keybind file. No broad process
 stop, hardware change or session restart is necessary.
 
-Authorized publication and fresh committed-archive verification are pending
-until the release entry below records their success. Independent lock, embedded
-equalizer, exact-reference backlog and the user's Nautilus choice remain separate.
+Published runtime/crops in `41d2f3a`. A fresh committed archive passed all 62
+Python tests, Qt input/compile/router/polling/network checks and JS checks listed
+above. Remote runtime, sounds, optional Lua controls and native crop blob hashes
+match the commit. An additional silent Qt click probe confirms both the base SFX
+handler and derived button action run once. Independent lock, embedded equalizer,
+exact-reference backlog and the user's Nautilus choice remain separate.

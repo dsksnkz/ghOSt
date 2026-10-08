@@ -17,6 +17,26 @@ ShellRoot {
             height: 900
             property int outsideEvents: 0
             property int escapeEvents: 0
+            property int soundRequests: 0
+            property int actionRequests: 0
+            Key {
+                id: clickProbe
+                x: 700
+                y: 400
+                width: 80
+                text: "Test"
+                // Observe both base and derived signal handlers without audio.
+                function clickSound() {
+                    test.soundRequests++;
+                }
+                onClicked: test.actionRequests++
+            }
+            function test_click_sound_and_action() {
+                mouseClick(clickProbe, 30, 15);
+                compare(soundRequests, 1);
+                compare(actionRequests, 1);
+                console.info("PASS: click dispatches both fixed SFX and derived action");
+            }
             QtObject {
                 id: workspace
                 property bool hasFullscreen: false

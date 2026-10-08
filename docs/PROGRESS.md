@@ -18,9 +18,11 @@ production compile/router/polling/network tests and existing JS checks pass.
 Native surface bounds, SoundEffect Ready states, service ownership and private
 WLAN clarity inspected. Physical touch/media setters and compositor input paths
 were not automated. [Files, crops, installation, migration and recovery](changes/2026-10-08-interactions.md).
-Publication and fresh committed-archive verification pending; broader design
-backlog remains unfinished. The older routing release-pending entry below is
-superseded by this combined pass.
+Published `41d2f3a`. Fresh committed-archive verification passes every listed
+suite; remote runtime/sounds/Lua controls/native crops match Git blob hashes.
+An additional silent Qt click probe verifies SFX and derived actions each run
+once. Broader design backlog remains unfinished. The older routing
+release-pending entry below is superseded by this combined pass.
 
 ## 2026-10-08 / Settings page requests — release pending
 

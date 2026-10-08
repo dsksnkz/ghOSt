@@ -16,6 +16,7 @@ for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
                   "PASS: per-output fullscreen visibility and restoration",
                   "PASS: Settings wheel propagation and Bezier selection movement",
                   "PASS: selected weather headline and temperature agree",
-                  "PASS: expanded/compact music geometry and time formatting"):
+                  "PASS: expanded/compact music geometry and time formatting",
+                  "PASS: click dispatches both fixed SFX and derived action"):
     assert assertion in output, output
 print("PASS: Qt dismissal, fullscreen, Settings scroll/selection, weather and music layout")
