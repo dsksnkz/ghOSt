@@ -7,6 +7,7 @@ import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import Quickshell.Services.Mpris
+import "NetworkScanPolicy.js" as ScanPolicy
 
 Singleton {
     id: root
@@ -23,6 +24,7 @@ Singleton {
     property bool sidebarOpen: false
     property bool settingsRequested: false
     property string settingsPage: "general"
+    property bool networkSettingsVisible: false
     function toggleSidebar(screenName) {
         panelScreen = screenName;
         settingsRequested = false;
@@ -44,6 +46,14 @@ Singleton {
     readonly property int charge: hasBattery ? Math.round(battery.percentage * 100) : 0
     readonly property var adapter: Bluetooth.defaultAdapter
     readonly property var wifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
+    readonly property bool networkScanRequested: ScanPolicy.shouldScan({
+        wifiAvailable: wifi !== null,
+        wifiEnabled: Networking.wifiEnabled,
+        panel: panel,
+        sidebarOpen: sidebarOpen,
+        sidebarNetworkEnabled: Settings.widget("network"),
+        networkSettingsVisible: networkSettingsVisible
+    })
     readonly property var wired: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected) ?? null
     readonly property var network: wifi?.networks.values.find(n => n.connected) ?? null
     readonly property string networkName: wired ? "Ethernet" : network ? network.name : Networking.wifiEnabled ? "Not connected" : "Wi-Fi off"
@@ -92,6 +102,22 @@ Singleton {
     function setPerformanceMetric(value) {
         performanceMetric = value;
     }
-    onPanelChanged: if (wifi)
-        wifi.scannerEnabled = panel === "network"
+    // A one-time panel-change assignment missed Sidebar and Settings entirely.
+    // Bind demand to all visible network browsers and release it when hidden.
+    Binding {
+        target: root.wifi
+        property: "scannerEnabled"
+        value: root.networkScanRequested
+        when: root.wifi !== null
+    }
+    function networkScanStatus() {
+        return {
+            available: wifi !== null,
+            wifiEnabled: Networking.wifiEnabled,
+            requested: networkScanRequested,
+            scannerEnabled: wifi?.scannerEnabled ?? false,
+            networkSettingsVisible: networkSettingsVisible,
+            sidebarOpen: sidebarOpen
+        };
+    }
 }

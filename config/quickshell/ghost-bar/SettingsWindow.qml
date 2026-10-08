@@ -32,6 +32,11 @@ FloatingWindow {
     implicitHeight: 699
     minimumSize: Qt.size(720, 490)
     color: "transparent"
+    Binding {
+        target: Desk
+        property: "networkSettingsVisible"
+        value: window.visible && content.page === "network"
+    }
     Component.onCompleted: Settings.active = visible
     onVisibleChanged: {
         Settings.active = visible;

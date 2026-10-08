@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-08 · Sidebar and Settings Wi-Fi discovery
+
+Network discovery requests now follow visible Sidebar and Settings network lists,
+not just the old popup. Hidden browsers stop ghOSt's scan demand. 128 policy cases,
+12 windowless Qt transitions, 61 Python tests and existing JS checks pass; actual
+native scanner states checked. Deployed to active ghOSt, preserving connections,
+shortcuts and legacy processes. No layout or radio/profile changes.
+[Actual output and recovery](docs/changes/2026-10-08-network-scan.md).
+Publication pending; broader prompt remains unfinished.
+
 ## 2026-10-07 · Calendar weather loading
 
 Calendar reopen reuses a private recent observation; 15-minute expiry, location

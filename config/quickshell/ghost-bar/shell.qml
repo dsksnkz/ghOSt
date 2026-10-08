@@ -128,6 +128,10 @@ ShellRoot {
                 error: Notifications.error
             });
         }
+        // No SSIDs, credentials or connection actions in scanner diagnostics.
+        function networkScan(): string {
+            return JSON.stringify(Desk.networkScanStatus());
+        }
         function dismissNotification(key: string): void {
             Notifications.dismiss(key);
         }

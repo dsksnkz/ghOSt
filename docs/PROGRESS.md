@@ -1,5 +1,21 @@
 # ghOSt progress
 
+## 2026-10-08 / Sidebar and Settings Wi-Fi discovery
+
+Repaired scan demand: the old network-popup-only assignment missed Sidebar and
+Settings. Available, enabled Wi-Fi now scans while a network browser is visible;
+General, Calendar and closed surfaces release ghOSt's demand. Sidebar widget
+visibility and the actual Settings page control this, including device changes.
+No connection, radio toggle or visual geometry changed.
+
+128 policy combinations, 12 windowless Qt binding transitions, 61 Python tests
+and existing JS checks pass. Native Sidebar, Wireless Network, General, old
+network popup and Calendar states verified. Tested files deployed into the active
+ghOSt profile; only the named ghOSt instance restarted for new IPC registration.
+Legacy process, connections, shortcuts and 50px reservation preserved.
+[Native output, verification and recovery](changes/2026-10-08-network-scan.md).
+Publication is pending this pass; broader feature/reference backlog remains pending.
+
 ## 2026-10-07 / Calendar weather loading
 
 Private 15-minute weather cache removes repeat network waits on calendar reopen;
