@@ -1,5 +1,20 @@
 # ghOSt progress
 
+## 2026-10-08 / Settings background work
+
+Settings now uses its actual page to schedule backend reads: Battery, Brightness
+and Storage keep 5-second updates; other pages use 60 seconds. Startup, opening,
+page changes and explicit actions retain fresh reads. Closed Settings does not
+poll. Live audio/network/Bluetooth/notification service bindings and opt-in
+minute usage sampling are unchanged. No UI geometry changed.
+
+Actual windowless Settings timer/process tests cover all 14 page intervals,
+startup/open/page refresh, hidden release and fixture suppression. 61 Python
+tests and existing JS checks pass. Native General/Storage/closed query counters,
+window placement and logs checked; files hot-reloaded without restarting either
+shell. [Native output, limitations and recovery](changes/2026-10-08-settings-polling.md).
+Publication pending; broader feature/reference backlog remains pending.
+
 ## 2026-10-08 / Sidebar and Settings Wi-Fi discovery
 
 Repaired scan demand: the old network-popup-only assignment missed Sidebar and

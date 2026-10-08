@@ -5,6 +5,9 @@ FloatingWindow {
     id: window
 
     function inspect(action) {
+        if (action === "polling")
+            return JSON.stringify(Settings.pollingStatus());
+
         if (action === "portrait-general")
             content.requestPortrait("general");
 
@@ -32,6 +35,11 @@ FloatingWindow {
     implicitHeight: 699
     minimumSize: Qt.size(720, 490)
     color: "transparent"
+    Binding {
+        target: Settings
+        property: "page"
+        value: content.page
+    }
     Binding {
         target: Desk
         property: "networkSettingsVisible"

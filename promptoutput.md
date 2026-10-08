@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-08 · Settings background work
+
+Less backend polling on static/service-driven Settings pages; Battery, Brightness
+and Storage retain 5-second updates. Opening and page changes refresh immediately,
+closed Settings stops periodic reads. Actual windowless Qt tests, 61 Python tests
+and existing JS checks pass. Native counters/output verified; deployed by hot
+reload, no process restart or layout change.
+[Verification and recovery](docs/changes/2026-10-08-settings-polling.md).
+Publication pending; broader prompt remains unfinished.
+
 ## 2026-10-08 · Sidebar and Settings Wi-Fi discovery
 
 Network discovery requests now follow visible Sidebar and Settings network lists,

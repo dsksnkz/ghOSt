@@ -6,6 +6,11 @@ import Quickshell.Io
 Singleton {
     id: settings
     property bool active: false
+    property string page: "general"
+    // Battery, disk space and external brightness changes need frequent reads.
+    // Other pages use live service bindings or change only on explicit actions.
+    readonly property int refreshInterval: ["battery", "storage", "brightness"].includes(page) ? 5000 : 60000
+    property int queryCount: 0
     readonly property bool fixture: Quickshell.env("GHOST_SETTINGS_FIXTURE") === "1"
     property var state: ({
             preferences: {
@@ -20,8 +25,20 @@ Singleton {
         return state.preferences?.widgets?.[name] !== false;
     }
     function refresh() {
-        if (!fixture && !query.running && !change.running)
+        if (!fixture && !query.running && !change.running) {
+            queryCount++;
             query.running = true;
+        }
+    }
+    function pollingStatus() {
+        return {
+            active: active,
+            page: page,
+            interval: refreshInterval,
+            timerRunning: refreshTimer.running,
+            queries: queryCount,
+            queryRunning: query.running
+        };
     }
     function receive(text) {
         try {
@@ -52,6 +69,8 @@ Singleton {
     }
     onActiveChanged: if (active)
         refresh()
+    onPageChanged: if (active)
+        refresh()
     Component.onCompleted: refresh()
     Process {
         id: query
@@ -74,7 +93,8 @@ Singleton {
         }
     }
     Timer {
-        interval: 5000
+        id: refreshTimer
+        interval: settings.refreshInterval
         repeat: true
         running: settings.active && !settings.fixture
         onTriggered: settings.refresh()
