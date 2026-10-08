@@ -26,7 +26,15 @@ PanelWindow {
         right: true
     }
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+        onPressed: if (Desk.sidebarOpen || Desk.panel === "calendar")
+            Desk.close()
+    }
+
     Rail {
+        active: bar.visible
         anchors.fill: parent
         monitor: bar.monitor
         trayWindow: bar

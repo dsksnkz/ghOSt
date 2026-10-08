@@ -397,47 +397,11 @@ Item {
     }
     Component {
         id: mediaPage
-        Column {
-            spacing: 17
-            Label {
-                width: parent.width
-                text: Desk.player?.trackTitle || "Nothing playing"
-                font.pixelSize: 19
-                wrapMode: Text.WordWrap
-            }
-            Label {
-                width: parent.width
-                text: Desk.player?.trackArtist || "Media appears here when playback starts."
-                color: Theme.muted
-                wrapMode: Text.WordWrap
-            }
-            Row {
-                spacing: 8
-                Action {
-                    width: (body.width - 16) / 3
-                    text: " previous"
-                    enabled: Desk.player?.canGoPrevious ?? false
-                    opacity: enabled ? 1 : 0.35
-                    onClicked: Desk.player.previous()
-                }
-                Action {
-                    width: (body.width - 16) / 3
-                    text: Desk.playing ? "pause" : "play"
-                    enabled: Desk.player?.canTogglePlaying ?? false
-                    opacity: enabled ? 1 : 0.35
-                    onClicked: Desk.player.togglePlaying()
-                }
-                Action {
-                    width: (body.width - 16) / 3
-                    text: "next "
-                    enabled: Desk.player?.canGoNext ?? false
-                    opacity: enabled ? 1 : 0.35
-                    onClicked: Desk.player.next()
-                }
-            }
-            Caption {
-                text: Desk.player?.identity || "MPRIS"
-            }
+        MusicBar {
+            active: content.popup.opened
+            compact: false
+            width: body.width
+            property string soundGroup: "rail"
         }
     }
     Component {

@@ -4,6 +4,8 @@ import Quickshell.Hyprland
 
 Item {
     id: bar
+    property bool active: true
+    property string soundGroup: "rail"
     property var monitor: null
     property var trayWindow: null
     property string screenName: ""
@@ -117,38 +119,13 @@ Item {
                     height: 36
                     color: "#3a3a3a"
                 }
-                Key {
+                MusicBar {
+                    active: bar.active
                     x: 314
                     y: 7
                     width: 260
                     height: 32
-                    hint: "Media controls"
-                    onClicked: bar.open("media", this)
-                    onSecondaryClicked: if (Desk.player?.canTogglePlaying)
-                        Desk.player.togglePlaying()
-                    SvgIcon {
-                        x: 14
-                        y: 6
-                        width: 14
-                        height: 14
-                        name: !bar.fixtureMode && Desk.playing ? "pause" : "play"
-                        opacity: !bar.fixtureMode && Desk.playing ? 1 : .4
-                    }
-                    Label {
-                        x: 42
-                        y: 7
-                        width: 210
-                        text: bar.fixtureMode ? "NO PLAYBACK" : Desk.player?.trackTitle || "NO PLAYBACK"
-                        font.pixelSize: 10
-                        color: !bar.fixtureMode && Desk.player ? Theme.text : Theme.faint
-                    }
-                    G2Surface {
-                        x: 14
-                        y: 27
-                        width: 247
-                        height: 1
-                        color: "#323232"
-                    }
+                    onExpanded: bar.open("media", this)
                 }
                 Key {
                     x: 853 + controls.extraWidth / 2
@@ -221,6 +198,7 @@ Item {
                     hint: "Sound"
                     onClicked: bar.open("audio", this)
                     onSecondaryClicked: Desk.mute()
+                    wheelEnabled: true
                     onScrolled: delta => Desk.setVolume((Desk.volume + (delta > 0 ? 2 : -2)) / 100)
                     SvgIcon {
                         id: soundIcon

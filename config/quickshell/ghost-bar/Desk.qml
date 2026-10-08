@@ -24,9 +24,11 @@ Singleton {
     property bool sidebarOpen: false
     property bool settingsRequested: false
     property string settingsPage: "general"
+    signal settingsNavigationRequested
     property bool networkSettingsVisible: false
     function toggleSidebar(screenName) {
         panelScreen = screenName;
+        panel = "";
         settingsRequested = false;
         sidebarOpen = !sidebarOpen;
     }
@@ -36,6 +38,7 @@ Singleton {
         sidebarOpen = false;
         settingsPage = page;
         settingsRequested = true;
+        settingsNavigationRequested();
     }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink?.audio ?? null
@@ -78,6 +81,7 @@ Singleton {
         }
         panelScreen = screenName;
         panelX = x;
+        sidebarOpen = false;
         panelOrigin = center === undefined ? 196 : Math.max(18, Math.min(374, center - x));
         notice = "";
         panel = name;

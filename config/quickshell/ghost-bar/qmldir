@@ -1,4 +1,9 @@
 singleton Theme 1.0 Theme.qml
+singleton UiSounds 1.0 UiSounds.qml
+MusicBar 1.0 MusicBar.qml
+singleton OsdState 1.0 OsdState.qml
+Osd 1.0 Osd.qml
+EdgeHandle 1.0 EdgeHandle.qml
 singleton Desk 1.0 Desk.qml
 singleton Settings 1.0 Settings.qml
 singleton Notifications 1.0 Notifications.qml
@@ -10,6 +15,7 @@ DismissArea 1.0 DismissArea.qml
 InkLabel 1.0 InkLabel.qml
 SettingsPanel 1.0 SettingsPanel.qml
 SettingsWindow 1.0 SettingsWindow.qml
+SettingsNavigation 1.0 SettingsNavigation.qml
 SettingsToggle 1.0 SettingsToggle.qml
 SettingsSlider 1.0 SettingsSlider.qml
 Bar 1.0 Bar.qml

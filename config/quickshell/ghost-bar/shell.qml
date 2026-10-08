@@ -4,6 +4,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 
 ShellRoot {
+    Component.onCompleted: UiSounds.status()
     SettingsWindow {
         id: settingsWindow
     }
@@ -17,7 +18,9 @@ ShellRoot {
             readonly property var calendarSurface: calendarWindow
             readonly property var panelSurface: panelWindow
             property int focusRevision: 0
-            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && !Desk.sidebarOpen && Desk.panel !== ""
+            // Media transport needs no compositor keyboard grab. Its outside
+            // dismissal surface also permits opening while the pointer is away.
+            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && !Desk.sidebarOpen && Desk.panel !== "" && Desk.panel !== "media"
             function refreshFocus() {
                 focusRevision++;
                 if (wantsFocus)
@@ -49,6 +52,12 @@ ShellRoot {
                 screen: output.modelData
             }
             RailReservation {
+                screen: output.modelData
+            }
+            Osd {
+                screen: output.modelData
+            }
+            EdgeHandle {
                 screen: output.modelData
             }
             NotificationToast {
@@ -116,6 +125,13 @@ ShellRoot {
             if (screen)
                 Desk.openSettings(screen.name, page || "general");
         }
+        function osd(kind: string): void {
+            OsdState.request(kind);
+        }
+        function forecast(step: int): string {
+            const output = outputs.instances.find(output => output.calendarSurface.opened);
+            return output ? output.calendarSurface.forecastStep(step) : "{}";
+        }
         function settingsFlow(action: string): string {
             return settingsWindow.inspect(action);
         }
@@ -149,9 +165,9 @@ ShellRoot {
         // Read-only native diagnostics: verification needs no substitute UI.
         function rendering(): string {
             return JSON.stringify(Array.from(outputs.instances, output => ({
-                screen: output.modelData.name,
-                calendar: output.calendarSurface.renderingStatus()
-            })));
+                        screen: output.modelData.name,
+                        calendar: output.calendarSurface.renderingStatus()
+                    })));
         }
     }
 }

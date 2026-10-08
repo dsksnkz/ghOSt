@@ -13,6 +13,15 @@ PanelWindow {
     function renderingStatus() {
         return calendar.renderingStatus();
     }
+    function forecastStep(step) {
+        if (opened)
+            calendar.selectForecast(calendar.forecastIndex + step);
+        return JSON.stringify({
+            condition: calendar.headlineCondition,
+            temperature: calendar.headlineTemperature,
+            index: calendar.forecastIndex
+        });
+    }
     function sync() {
         opened = Desk.panel === "calendar" && Desk.panelScreen === screen.name;
     }

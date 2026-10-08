@@ -13,6 +13,9 @@ result = subprocess.run(["quickshell", "-p", str(entry)], env=environment,
                         capture_output=True, text=True, timeout=15, check=True)
 output = result.stdout + result.stderr
 for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
-                  "PASS: per-output fullscreen visibility and restoration"):
+                  "PASS: per-output fullscreen visibility and restoration",
+                  "PASS: Settings wheel propagation and Bezier selection movement",
+                  "PASS: selected weather headline and temperature agree",
+                  "PASS: expanded/compact music geometry and time formatting"):
     assert assertion in output, output
-print("PASS: isolated Qt dismissal events and fullscreen visibility/restoration")
+print("PASS: Qt dismissal, fullscreen, Settings scroll/selection, weather and music layout")

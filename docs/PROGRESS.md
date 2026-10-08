@@ -1,5 +1,47 @@
 # ghOSt progress
 
+## 2026-10-08 / Native interaction pass
+
+Implemented the latest eleven desktop requests: animated MPRIS controls, crisp
+WLAN text/icons, independent touch-capable left OSD and edge handle, forecast
+switcher, moving Settings selector and working nav scrolling, Super+I, three
+fixed gentle click sounds, outside dismissal and a larger date calendar.
+Nautilus is deliberately untouched pending the requested follow-up question.
+The previously pending Settings routing work is included; fresh safe native
+captures are now available. Tested changes are deployed by hot reload, with
+both shell PIDs retained. Only the explicitly requested legacy OSD/edge behavior
+and matching media/brightness bindings were replaced. Wallpaper/autostart and
+unrelated services stay intact.
+
+62 Python tests, actual Qt input/selector/weather/music checks, windowless
+production compile/router/polling/network tests and existing JS checks pass.
+Native surface bounds, SoundEffect Ready states, service ownership and private
+WLAN clarity inspected. Physical touch/media setters and compositor input paths
+were not automated. [Files, crops, installation, migration and recovery](changes/2026-10-08-interactions.md).
+Publication and fresh committed-archive verification pending; broader design
+backlog remains unfinished. The older routing release-pending entry below is
+superseded by this combined pass.
+
+## 2026-10-08 / Settings page requests — release pending
+
+Fixed a reproduced native routing bug: requesting Storage while Settings was
+already open on General kept General visible. Every open request now signals a
+small nonvisual router; repeated requests work even if the requested page string
+is unchanged. Deferred requests coalesce to the latest page, and closing before
+the callback prevents hidden navigation/focus work. Geometry is unchanged.
+
+10 production-router Qt transitions, 61 Python tests, Settings timer/fixture
+tests and existing JS regressions pass. All 14 actual native pages plus repeat
+requests, scanner demand and polling intervals verified. Tested source deployed
+by hot reload; both shell PIDs, shortcuts, connections and work area preserved.
+[Verification, snapshot and release checkpoint](changes/2026-10-08-settings-routing.md).
+
+Publication is not complete. The final capture encountered foreground gameplay;
+that frame is private and excluded. Do not interrupt the game for another capture.
+Next safe pass: capture the unchanged native Settings material when gameplay is
+not foreground, then fresh committed-archive checks and authorized publication.
+Preserve this dirty, already-live work; no prompt marked complete.
+
 ## 2026-10-08 / Settings background work
 
 Settings now uses its actual page to schedule backend reads: Battery, Brightness

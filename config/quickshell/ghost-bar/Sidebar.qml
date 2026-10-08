@@ -43,8 +43,6 @@ PanelWindow {
         else if (!sidebar.managedFocus)
             grab.active = false;
 
-        if (Desk.wifi)
-            Desk.wifi.scannerEnabled = opened || Desk.panel === "network";
     }
 
     Connections {

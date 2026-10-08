@@ -11,11 +11,25 @@ G2Surface {
     property real padding: 12
     property int fontSize: 11
     property alias hovered: mouse.containsMouse
+    property bool wheelEnabled: false
+    property string soundGroup: ""
 
     signal clicked
     signal secondaryClicked
     signal scrolled(real delta)
 
+    function clickSound() {
+        let item = root;
+        while (item) {
+            if (item.soundGroup) {
+                UiSounds.play(item.soundGroup);
+                return;
+            }
+            item = item.parent;
+        }
+    }
+
+    onClicked: clickSound()
     implicitWidth: label.implicitWidth + padding * 2
     implicitHeight: 30
     radius: 5
@@ -69,6 +83,10 @@ G2Surface {
             return event.button === Qt.LeftButton ? root.clicked() : root.secondaryClicked();
         }
         onWheel: event => {
+            if (!root.wheelEnabled) {
+                event.accepted = false;
+                return;
+            }
             return root.scrolled(event.angleDelta.y);
         }
     }

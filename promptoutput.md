@@ -1,5 +1,30 @@
 prompts outputs here
 
+## 2026-10-08 · Native interaction pass
+
+Eleven requested desktop changes are implemented and live. Nautilus remains
+untouched, as requested. The direct prompt is preserved in
+[requests](docs/requests/2026-10-08-interactions.md). New music controls, crisp
+WLAN list, independent left OSD/edge, weather switcher, Settings motion/scrolling,
+Super+I, gentle per-surface clicks, outside dismissal and enlarged date grid are
+covered in the [change record](docs/changes/2026-10-08-interactions.md).
+62 Python tests, actual Qt event/geometry checks, windowless production
+compile/router/polling/scan tests and existing JS checks pass. Native deployment
+and privacy-safe crops verified; no hardware/media setter executed in tests.
+Physical touch and compositor pointer paths remain unautomated. Fresh archive
+verification/publication pending; the broader design prompt is not completed.
+
+## 2026-10-08 · Settings page requests — release pending
+
+Requests now navigate an already-open Settings window, including repeated page
+requests. Rapid requests coalesce; closed windows ignore deferred work. 10 actual
+Qt router transitions, 61 Python tests, timer tests and JS regressions pass;
+all 14 native page routes/scanner/polling states checked. Deployed by hot reload.
+[Evidence and recovery](docs/changes/2026-10-08-settings-routing.md).
+Final screenshot/publication pending: foreground gameplay interrupted capture,
+so no further desktop inspection is performed while the game is active. Private
+gameplay frame excluded. Broader prompt and this release remain unfinished.
+
 ## 2026-10-08 · Settings background work
 
 Less backend polling on static/service-driven Settings pages; Battery, Brightness

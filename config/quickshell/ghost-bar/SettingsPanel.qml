@@ -8,6 +8,7 @@ import Quickshell.Services.Pipewire
 
 Item {
     id: settings
+    property string soundGroup: "settings"
     readonly property real navigationRowHeight: 52
     readonly property real navigationInset: 6
     readonly property real navigationGroupGap: 16
@@ -141,6 +142,28 @@ Item {
     readonly property var filteredCategories: categories.filter(c => !query || c.name.toLowerCase().includes(query.toLowerCase()))
     readonly property var categoryGroups: [["network", "bluetooth", "general", "airplane", "accessibility"], ["sound", "battery", "brightness"], ["widgets", "wallpaper", "notifications"], ["storage", "applications", "about"]]
     readonly property var filteredGroups: categoryGroups.map(group => group.map(id => filteredCategories.find(c => c.id === id)).filter(c => !!c)).filter(group => group.length)
+    readonly property var navLayout: navigationLayout()
+    function navigationLayout() {
+        const groups = [], rows = [];
+        let y = 0;
+        for (const group of filteredGroups) {
+            const height = navigationGroupHeight(group.length);
+            groups.push({
+                y,
+                height
+            });
+            group.forEach((category, index) => rows.push(Object.assign({}, category, {
+                    y: y + navigationInset + index * navigationRowHeight,
+                    divider: index < group.length - 1
+                })));
+            y += height + navigationGroupGap;
+        }
+        return {
+            groups,
+            rows,
+            height: Math.max(0, y - navigationGroupGap)
+        };
+    }
     signal closeRequested
     function choose(id) {
         if (!categories.some(c => c.id === id))
@@ -243,6 +266,10 @@ Item {
             height: scene.height,
             scale: scene.scale,
             navHeight: navFlick.height,
+            navScroll: navFlick.contentY,
+            navContentHeight: navFlick.contentHeight,
+            selectionY: navigationSelection.y,
+            selectionTarget: settings.navLayout.rows.find(row => row.id === settings.page)?.y ?? 0,
             groupHeights: filteredGroups.map(g => navigationGroupHeight(g.length)),
             groupCategories: filteredGroups.map(g => g.map(c => c.id)),
             profileFont: Theme.textFont,
@@ -549,93 +576,98 @@ Item {
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            layer.enabled: true
+            layer.enabled: false
             Controls.ScrollBar.vertical: Controls.ScrollBar {
                 policy: Controls.ScrollBar.AsNeeded
             }
-            Column {
+            Item {
                 id: nav
                 width: 231
-                spacing: settings.navigationGroupGap
+                height: settings.navLayout.height
                 Repeater {
-                    model: settings.filteredGroups
+                    model: settings.navLayout.groups
                     G2Surface {
                         required property var modelData
+                        y: modelData.y
                         width: 231
-                        height: settings.navigationGroupHeight(modelData.length)
+                        height: modelData.height
                         radius: 10
                         smoothing: .6
                         color: "#6b6b6b"
                         border.width: 1
                         border.color: "#898989"
-                        Column {
-                            y: settings.navigationInset
-                            width: 231
-                            spacing: 0
-                            Repeater {
-                                model: parent.parent.modelData
-                                Key {
-                                    required property var modelData
-                                    required property int index
-                                    width: 231
-                                    height: settings.navigationRowHeight
-                                    radius: 10
-                                    hint: modelData.name
-                                    color: "transparent"
-                                    onClicked: settings.choose(modelData.id)
-                                    G2Surface {
-                                        x: 6
-                                        width: 219
-                                        height: parent.height
-                                        radius: 10
-                                        smoothing: .6
-                                        color: "#535353"
-                                        visible: settings.page === modelData.id
-                                    }
-                                    G2Surface {
-                                        objectName: "settings-navigation-icon"
-                                        x: 12
-                                        y: (parent.height - height) / 2
-                                        width: 35
-                                        height: 35
-                                        radius: 8
-                                        smoothing: .6
-                                        color: "#2f2f2f"
-                                        SvgIcon {
-                                            objectName: "settings-navigation-glyph"
-                                            anchors.centerIn: parent
-                                            width: parent.width * settings.iconRatio
-                                            height: width
-                                            name: modelData.icon
-                                        }
-                                    }
-                                    Label {
-                                        x: 59
-                                        y: (parent.height - height) / 2
-                                        width: modelData.id === "airplane" ? 100 : 160
-                                        height: 18
-                                        text: modelData.name
-                                        font.pixelSize: 11
-                                        color: "#ffffff"
-                                    }
-                                    G2Surface {
-                                        x: 59
-                                        y: parent.height - .5
-                                        width: 160
-                                        height: 1
-                                        color: "#ffffff"
-                                        visible: index < parent.parent.parent.modelData.length - 1
-                                    }
-                                    SettingsToggle {
-                                        visible: modelData.id === "airplane"
-                                        x: 165
-                                        y: (parent.height - height) / 2
-                                        checked: !Networking.wifiEnabled && !Desk.adapter?.enabled
-                                        hint: "Airplane Mode"
-                                        onToggled: settings.toggleAirplane()
-                                    }
-                                }
+                    }
+                }
+                G2Surface {
+                    id: navigationSelection
+                    x: 6
+                    y: settings.navLayout.rows.find(row => row.id === settings.page)?.y ?? 0
+                    visible: settings.navLayout.rows.some(row => row.id === settings.page)
+                    width: 219
+                    height: settings.navigationRowHeight
+                    radius: 10
+                    smoothing: .6
+                    color: "#535353"
+                    Behavior on y {
+                        NumberAnimation {
+                            duration: Theme.reducedMotion ? 0 : 280
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: [0.22, 1, 0.36, 1, 1, 1]
+                        }
+                    }
+                }
+                Repeater {
+                    model: settings.navLayout.rows
+                    Key {
+                        required property var modelData
+                        y: modelData.y
+                        width: 231
+                        height: settings.navigationRowHeight
+                        radius: 10
+                        hint: modelData.name
+                        color: "transparent"
+                        onClicked: settings.choose(modelData.id)
+                        G2Surface {
+                            objectName: "settings-navigation-icon"
+                            x: 12
+                            y: (parent.height - height) / 2
+                            width: 35
+                            height: 35
+                            radius: 8
+                            smoothing: .6
+                            color: "#2f2f2f"
+                            SvgIcon {
+                                objectName: "settings-navigation-glyph"
+                                anchors.centerIn: parent
+                                width: parent.width * settings.iconRatio
+                                height: width
+                                name: modelData.icon
                             }
+                        }
+                        Label {
+                            x: 59
+                            y: (parent.height - height) / 2
+                            width: modelData.id === "airplane" ? 100 : 160
+                            height: 18
+                            text: modelData.name
+                            font.pixelSize: 11
+                            color: "#ffffff"
+                        }
+                        G2Surface {
+                            x: 59
+                            y: parent.height - .5
+                            width: 160
+                            height: 1
+                            color: "#ffffff"
+                            visible: modelData.divider
+                        }
+                        SettingsToggle {
+                            visible: modelData.id === "airplane"
+                            x: 165
+                            y: (parent.height - height) / 2
+                            checked: !Networking.wifiEnabled && !Desk.adapter?.enabled
+                            hint: "Airplane Mode"
+                            onToggled: settings.toggleAirplane()
                         }
                     }
                 }

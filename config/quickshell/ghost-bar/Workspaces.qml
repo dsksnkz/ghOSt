@@ -154,7 +154,11 @@ Item {
             height: 46
             color: "transparent"
             hint: "Workspace " + workspace
-            onClicked: wheel.select(workspace)
+            onClicked: {
+                Desk.close();
+                wheel.select(workspace);
+            }
+            wheelEnabled: true
             onScrolled: delta => wheel.scroll(delta)
         }
     }

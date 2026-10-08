@@ -13,6 +13,8 @@ Controls.Slider {
     implicitHeight: 32
     padding: 0
     Accessible.name: label
+    onPressedChanged: if (pressed)
+        UiSounds.play("settings")
 
     background: Item {
         y: 12

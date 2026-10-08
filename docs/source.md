@@ -10,6 +10,10 @@ All code needed by the current ghOSt rail/sidebar/calendar/Settings is published
 - `CalendarWindow.qml`, `CalendarPanel.qml`, `LiquidMeter.qml`, `WeatherGlyph.qml`: complete calendar, instrumentation and motion.
 - `shaders/liquid.frag`, `shaders/liquid.frag.qsb`, `WaveGeometry.js`: GPU liquid animation with the original static Canvas silhouette and a cached software fallback.
 - `SettingsWindow.qml`, `SettingsPanel.qml`, `Settings.qml`, `settings_backend.py`: native Settings, navigation, validated actions and persistence.
+- `SettingsNavigation.qml`: coalesced, repeated page requests for the native Settings window.
+- `MusicBar.qml`: MPRIS transport/progress and bounded playback-indicator animation.
+- `Osd.qml`, `OsdState.qml`, `EdgeHandle.qml`: independent left-side controls and edge handle.
+- `UiSounds.qml`, `sounds/`, `scripts/render_ui_sounds.py`: three deterministic original click pops.
 - `Notifications.qml`, `notifications.py`: standard-protocol notifications with occupied-owner preservation.
 - `Theme.qml`, `G2Surface.qml`, `G2Image.qml`, `Corners.js`: shared geometry/material/font rules.
 - `install.sh`, `scripts/install.py`: explicit stage/activation and original-preserving recovery.
@@ -47,6 +51,10 @@ git diff --check
 `test_distribution.py` performs a fresh installation in temporary XDG directories and byte-compares all source/assets without starting ghOSt or editing live config. `python3 scripts/verify_input.py` uses the installed QtTest module inside a separate offscreen Quickshell entry to send actual Qt Escape/pointer events to the same sidebar/dismissal widgets. This is a widget event test, not a claim of physical compositor input automation. Run native/fixture checks from the change record, never session/power actions to test.
 
 Requirements: Arch/Hyprland, Quickshell with networking/Bluetooth/PipeWire services, Python3/GObject-Gio and JetBrainsMono Nerd Font Mono. Plain JetBrains Mono/Turret Road fonts are included. GPU instrumentation uses available system telemetry. Optional tools/services expose honest unavailable states. Weather reads the user's explicit `$XDG_CONFIG_HOME/ghost/weather.json`; installation does not infer a location or overwrite preferences. The existing approved London configuration is unchanged on the owner's laptop.
+Qt Multimedia supplies click playback; `brightnessctl` accesses a writable
+standard backlight if available. Optional Lua control mappings are in
+`config/hypr/ghost-controls.lua`; replacing old bindings is deliberate, not an
+automatic install step. See the [interaction migration record](changes/2026-10-08-interactions.md).
 
 Fresh installation defaults to an isolated stage. `./install.sh --activate` deliberately installs/starts ghOSt and adds only its own integration. It does not silently disable another bar or replace existing shortcuts. The complete independent lock/EQ/terminal/migration backlog remains documented; shipping the current source does not claim those functions finished.
 

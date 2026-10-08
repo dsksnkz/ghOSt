@@ -56,6 +56,13 @@ Item {
     property bool clockMetric: false
     property int forecastIndex: 2
     property bool forecastSelected: false
+    function selectForecast(index) {
+        forecastIndex = Math.max(0, Math.min((weather.days?.length || 1) - 1, index));
+        forecastSelected = true;
+    }
+    readonly property var selectedForecast: forecastSelected ? weather.days?.[forecastIndex] : null
+    readonly property string headlineCondition: selectedForecast?.condition ?? weather.condition
+    readonly property var headlineTemperature: selectedForecast?.temperature ?? weather.temperature
     signal navigateRequested(string page)
     onWeatherChanged: if (!previewMode)
         Desk.weatherSummary = weather
@@ -229,9 +236,8 @@ Item {
             width: 194
             height: 208
             opacity: cal.groupOpacity(0)
-            // Scrolling forecasts never changes the current-weather headline.
-            readonly property string condition: cal.weather.condition
-            readonly property var temperature: cal.weather.temperature
+            readonly property string condition: cal.headlineCondition
+            readonly property var temperature: cal.headlineTemperature
             WeatherGlyph {
                 id: weatherArt
                 x: 0
@@ -278,8 +284,18 @@ Item {
                 width: 194
                 height: 130
                 clip: true
+                Label {
+                    x: 0
+                    y: 52
+                    width: 12
+                    height: 26
+                    text: ">"
+                    font.pixelSize: 16
+                    verticalAlignment: Text.AlignVCenter
+                }
                 Column {
-                    width: parent.width
+                    x: 15
+                    width: parent.width - 15
                     y: (2 - cal.forecastIndex) * 26
                     Behavior on y {
                         NumberAnimation {
@@ -292,15 +308,12 @@ Item {
                         Key {
                             required property var modelData
                             required property int index
-                            width: 194
+                            width: 179
                             height: 26
                             color: "transparent"
                             opacity: index === cal.forecastIndex ? 1 : Math.abs(index - cal.forecastIndex) > 1 ? .45 : .75
                             hint: cal.labelDay(modelData.date) + " forecast"
-                            onClicked: {
-                                cal.forecastIndex = index;
-                                cal.forecastSelected = true;
-                            }
+                            onClicked: cal.selectForecast(index)
                             Item {
                                 // The unscaled Key owns the full-row hover box;
                                 // keep every scaled glyph comfortably inside it.
@@ -337,8 +350,7 @@ Item {
                     anchors.fill: parent
                     acceptedButtons: Qt.NoButton
                     onWheel: event => {
-                        cal.forecastIndex = Math.max(0, Math.min((cal.weather.days?.length || 1) - 1, cal.forecastIndex + (event.angleDelta.y > 0 ? -1 : 1)));
-                        cal.forecastSelected = true;
+                        cal.selectForecast(cal.forecastIndex + (event.angleDelta.y > 0 ? -1 : 1));
                     }
                 }
                 Label {
@@ -388,10 +400,12 @@ Item {
             onClicked: cal.clockMetric = !cal.clockMetric
         }
         Item {
-            x: 498
-            y: 73
+            x: 486
+            y: 60
             width: 231
             height: 173
+            scale: 1.06
+            transformOrigin: Item.TopLeft
             opacity: cal.groupOpacity(4)
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_PageUp) {
@@ -418,7 +432,7 @@ Item {
                     width: 165
                     height: 18
                     text: Qt.formatDateTime(cal.month, "MMMM yyyy")
-                    font.pixelSize: 7
+                    font.pixelSize: 9
                     color: Theme.muted
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -447,7 +461,7 @@ Item {
                         height: 16
                         horizontalAlignment: Text.AlignHCenter
                         color: Theme.muted
-                        font.pixelSize: 6
+                        font.pixelSize: 8
                     }
                 }
                 Repeater {
@@ -459,7 +473,7 @@ Item {
                         height: 18
                         radius: 2
                         text: day.getDate()
-                        fontSize: 7
+                        fontSize: 9
                         selected: day.toDateString() === cal.selectedDate.toDateString()
                         ink: selected ? Theme.base : day.getMonth() === cal.month.getMonth() ? Theme.text : Theme.faint
                         hint: Qt.formatDateTime(day, "dddd dd MMMM yyyy")
@@ -472,7 +486,7 @@ Item {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 text: Qt.formatDateTime(cal.selectedDate, "dddd, dd MMMM").toUpperCase()
-                font.pixelSize: 5
+                font.pixelSize: 7
                 color: Theme.muted
                 font.letterSpacing: .5
             }

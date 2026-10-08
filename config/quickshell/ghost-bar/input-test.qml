@@ -47,6 +47,72 @@ ShellRoot {
                 height: 200
                 onDismissed: test.outsideEvents++
             }
+            SettingsPanel {
+                id: settingsPanel
+                visible: false
+                width: 1024
+                height: 699
+                previewMode: true
+            }
+            CalendarPanel {
+                id: weatherSwitcher
+                visible: false
+                previewMode: true
+                width: 733
+            }
+            MusicBar {
+                id: musicControls
+                visible: false
+                compact: false
+                width: 348
+            }
+            function test_music_layout() {
+                compare(musicControls.implicitHeight, 210);
+                compare(musicControls.timecode(125), "2:05");
+                compare(musicControls.timecode(-1), "0:00");
+                musicControls.compact = true;
+                compare(musicControls.implicitHeight, 32);
+                musicControls.compact = false;
+                console.info("PASS: expanded/compact music geometry and time formatting");
+            }
+            function test_settings_scroll_and_selection() {
+                sidebar.visible = false;
+                settingsPanel.visible = true;
+                settingsPanel.choose("general");
+                wait(350);
+                const before = JSON.parse(settingsPanel.status());
+                mouseWheel(settingsPanel, 120, 400, 0, -240);
+                wait(100);
+                verify(JSON.parse(settingsPanel.status()).navScroll > before.navScroll);
+                settingsPanel.choose("storage");
+                wait(35);
+                const moving = JSON.parse(settingsPanel.status());
+                verify(Math.abs(moving.selectionY - moving.selectionTarget) > .5);
+                wait(350);
+                const settled = JSON.parse(settingsPanel.status());
+                compare(settled.selectionY, settled.selectionTarget);
+                settingsPanel.visible = false;
+                sidebar.visible = true;
+                console.info("PASS: Settings wheel propagation and Bezier selection movement");
+            }
+            function test_weather_switcher() {
+                sidebar.visible = false;
+                weatherSwitcher.visible = true;
+                weatherSwitcher.forecastIndex = 2;
+                weatherSwitcher.forecastSelected = false;
+                wait(20);
+                mouseWheel(weatherSwitcher, 100, 170, 0, -120);
+                wait(20);
+                compare(weatherSwitcher.headlineCondition, "clear");
+                compare(weatherSwitcher.headlineTemperature, 20);
+                mouseWheel(weatherSwitcher, 100, 170, 0, 120);
+                wait(20);
+                compare(weatherSwitcher.headlineCondition, "storm");
+                compare(weatherSwitcher.headlineTemperature, 15);
+                weatherSwitcher.visible = false;
+                sidebar.visible = true;
+                console.info("PASS: selected weather headline and temperature agree");
+            }
             function test_escape_from_root() {
                 wait(20);
                 sidebar.forceActiveFocus();

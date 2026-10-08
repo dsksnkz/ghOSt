@@ -5,6 +5,8 @@ FloatingWindow {
     id: window
 
     function inspect(action) {
+        if (action === "sounds")
+            return JSON.stringify(UiSounds.status());
         if (action === "polling")
             return JSON.stringify(Settings.pollingStatus());
 
@@ -46,15 +48,14 @@ FloatingWindow {
         value: window.visible && content.page === "network"
     }
     Component.onCompleted: Settings.active = visible
-    onVisibleChanged: {
-        Settings.active = visible;
-        if (visible)
-            Qt.callLater(() => {
-                content.choose(Desk.settingsPage);
-                content.forceActiveFocus();
-            });
-    }
+    onVisibleChanged: Settings.active = visible
     onClosed: Desk.settingsRequested = false
+
+    SettingsNavigation {
+        controller: Desk
+        pageContent: content
+        active: window.visible
+    }
 
     SettingsPanel {
         id: content

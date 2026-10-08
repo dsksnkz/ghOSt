@@ -22,6 +22,10 @@ not remote desktop controls. [61 monochrome SVG icons](docs/icons.md) are reusab
 
 Requires Arch Linux, Hyprland, Quickshell with networking/Bluetooth/PipeWire,
 Python 3 with GObject/Gio, and JetBrains Mono Nerd Font Mono.
+Click sounds use Qt Multimedia (`qt6-multimedia`); hardware brightness uses
+`brightnessctl` where a writable backlight exists. Optional media-key and
+Super+I mappings are in [ghost-controls.lua](config/hypr/ghost-controls.lua).
+Replace existing matching bindings deliberately; the installer does not add them.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git

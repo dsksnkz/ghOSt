@@ -8,6 +8,7 @@ import "Corners.js" as Corners
 
 Item {
     id: sidebar
+    property string soundGroup: "sidebar"
     property var screen
     property bool previewMode: false
     property bool previewLongNames: false
@@ -367,7 +368,7 @@ Item {
                 y: 47
                 width: parent.width - 14
                 height: parent.height - 53
-                layer.enabled: true
+                layer.enabled: false
                 contentHeight: wifiList.height
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
@@ -412,13 +413,12 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: 17
                                 height: 17
-                                name: "check"
-                                visible: modelData.connected
+                                name: modelData.connected ? "check" : "wifi"
                             }
                             FadeLabel {
-                                x: 44
+                                x: 34
                                 y: 6
-                                width: 86
+                                width: parent.width - x - 5
                                 height: 17
                                 text: modelData.name
                                 font.pixelSize: 11
@@ -494,7 +494,7 @@ Item {
                 y: 47
                 width: parent.width - 14
                 height: parent.height - 53
-                layer.enabled: true
+                layer.enabled: false
                 contentHeight: btList.height
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
@@ -572,6 +572,8 @@ Item {
             onMoved: if (!sidebar.previewMode)
                 Desk.setVolume(value)
             Accessible.name: "Output volume"
+            onPressedChanged: if (pressed)
+                UiSounds.play("sidebar")
             background: G2Surface {
                 x: volume.leftPadding
                 y: 0
@@ -608,11 +610,13 @@ Item {
             from: 0
             to: 100
             value: sidebar.previewMode ? 75 : sidebar.brightnessPercent ?? 0
-            enabled: sidebar.previewMode || sidebar.screen?.name?.startsWith("eDP-") && sidebar.brightnessPercent !== null
+            enabled: sidebar.previewMode || (!!sidebar.screen?.name?.startsWith("eDP-") && sidebar.brightnessPercent !== null)
             opacity: sidebar.itemProgress(4) * (enabled ? 1 : .4)
             onMoved: if (!sidebar.previewMode)
                 Quickshell.execDetached(["brightnessctl", "set", Math.round(value) + "%"])
             Accessible.name: "Display brightness"
+            onPressedChanged: if (pressed)
+                UiSounds.play("sidebar")
             background: G2Surface {
                 x: brightness.leftPadding
                 y: 0
