@@ -57,7 +57,13 @@ visual redesign or parity claim made. Current remote/local source blobs match:
 `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe`, and `mainDesigns/1`
 `8b137891791fe96927ad78e64b0aad7bded08bdc`. No preview-site layout changed.
 Broader reference, embedded equalizer, independent lock and migration work remain
-pending. Publication and committed-release verification are recorded separately.
+pending.
+
+Published source release `5de3fd4` to GitHub `main`. Its fresh committed archive
+passes all 61 Python tests, the actual Settings timer/process test (including
+fixture suppression), and existing JS regressions. Remote Git blobs match the
+new Settings singleton and privacy-safe native Storage screenshot. Native panels
+remain closed and neither shell was restarted.
 
 ## Recovery
 

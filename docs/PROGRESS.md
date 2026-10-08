@@ -13,7 +13,9 @@ startup/open/page refresh, hidden release and fixture suppression. 61 Python
 tests and existing JS checks pass. Native General/Storage/closed query counters,
 window placement and logs checked; files hot-reloaded without restarting either
 shell. [Native output, limitations and recovery](changes/2026-10-08-settings-polling.md).
-Publication pending; broader feature/reference backlog remains pending.
+Published `5de3fd4`; fresh archive passes the timer tests, 61 Python tests and
+existing JS regressions. Remote Settings/image blob hashes match. Broader
+feature/reference backlog remains pending.
 
 ## 2026-10-08 / Sidebar and Settings Wi-Fi discovery
 
