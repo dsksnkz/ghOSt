@@ -52,8 +52,12 @@ and local prompt/design Git blobs match:
 - `mainDesigns/1`: `8b137891791fe96927ad78e64b0aad7bded08bdc`
 
 The broader Figma/reference, embedded equalizer, independent lock and migration
-backlog remains pending. Source, tests and this privacy-safe native capture are
-ready for publication; release checks are recorded after committing.
+backlog remains pending.
+
+Published source release `7bee15a` to GitHub `main`. A fresh archive passes all
+61 Python tests, 128 policy cases, 12 windowless Qt transitions and the existing
+JS regressions. Remote Git blob hashes match the new policy and privacy-safe
+native screenshot. Live ghOSt remains loaded with all inspected surfaces closed.
 
 ## Recovery
 

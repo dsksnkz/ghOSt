@@ -14,7 +14,8 @@ network popup and Calendar states verified. Tested files deployed into the activ
 ghOSt profile; only the named ghOSt instance restarted for new IPC registration.
 Legacy process, connections, shortcuts and 50px reservation preserved.
 [Native output, verification and recovery](changes/2026-10-08-network-scan.md).
-Publication is pending this pass; broader feature/reference backlog remains pending.
+Published `7bee15a`; fresh committed-archive tests pass and remote policy/image
+blob hashes match. Broader feature/reference backlog remains pending.
 
 ## 2026-10-07 / Calendar weather loading
 
