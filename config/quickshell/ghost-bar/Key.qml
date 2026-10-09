@@ -11,6 +11,7 @@ G2Surface {
     property real padding: 12
     property int fontSize: 11
     property alias hovered: mouse.containsMouse
+    property bool hoverFeedback: true
     property bool wheelEnabled: false
     property string soundGroup: ""
 
@@ -49,13 +50,15 @@ G2Surface {
     Accessible.onPressAction: clicked()
 
     G2Surface {
+        objectName: "key-hover-feedback"
         anchors.fill: parent
         radius: root.radius
         smoothing: root.smoothing
         color: root.color.r > 0.5 ? "#111111" : "#ffffff"
-        opacity: mouse.pressed ? 0.16 : mouse.containsMouse ? 0.09 : 0
+        opacity: mouse.pressed ? 0.16 : mouse.containsMouse && root.hoverFeedback ? 0.09 : 0
 
         Behavior on opacity {
+            enabled: root.hoverFeedback
             NumberAnimation {
                 duration: Theme.reducedMotion ? 0 : Theme.fast
             }

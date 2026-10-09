@@ -157,6 +157,9 @@ ShellRoot {
         function settingsFlow(action: string): string {
             return settingsWindow.inspect(action);
         }
+        function captureSettings(path: string): bool {
+            return settingsWindow.captureGeneral(path);
+        }
         function notifications(): string {
             return JSON.stringify({
                 ready: Notifications.ready,

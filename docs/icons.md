@@ -1,13 +1,18 @@
 # Icons
 
-62 separate icons, each available as a transparent black or white SVG. Common settings, input, connectivity, hardware, session, weather and actions share a 24 × 24 viewBox and 1.5px rounded stroke. The pencil added for PC-name editing is also a standalone asset. The Turret Road G is a filled font outline, not the retired ghost mascot.
+64 separate icons, each available as a transparent black or white SVG. Common settings, input, connectivity, hardware, session, weather and actions share a 24 × 24 viewBox and 2px rounded stroke. Straight joins are filleted and rectangular outlines have rounded inner corners as well as outer corners. The Turret Road G remains a filled, now softly rounded font outline, not the retired ghost mascot.
 
 `folder-rounded` uses curved outer corners and explicitly rounded inner cutouts
 in both the tab and the front compartment. It is one design in two inverse monochrome exports; the original
-`folder` remains unchanged. [Preview](../assets/folder-rounded-preview.svg).
+`folder` now uses that same corrected geometry. [Folder](../assets/folder-rounded-preview.svg) · [Full set](../assets/icons-rounded-sheet.svg).
 
 The shaded layered experiment was removed at the user's request. No Nautilus
 theme is applied.
+
+`Icon.qml`, `SvgIcon.qml`, the brand, weather glyph and stationary workspace
+indicator all share the generated assets. The added `lightning` keeps its
+independent opacity animation; `workspace-indicator` keeps the fixed triangle
+position. Third-party application/system themes are not changed.
 
 [Browse and download](https://dsksnkz.github.io/ghOSt/icons.html).
 

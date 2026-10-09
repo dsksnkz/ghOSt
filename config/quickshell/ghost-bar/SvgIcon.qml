@@ -6,6 +6,7 @@ Item {
 
     property string name: "settings"
     property bool black: false
+    property int fillMode: Image.PreserveAspectFit
     readonly property int status: artwork.status
 
     implicitWidth: 24
@@ -18,7 +19,7 @@ Item {
         source: "icons/" + (icon.black ? "black/" : "white/") + icon.name + ".svg"
         sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
         sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
-        fillMode: Image.PreserveAspectFit
+        fillMode: icon.fillMode
         smooth: true
     }
 }

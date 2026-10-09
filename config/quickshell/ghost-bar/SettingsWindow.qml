@@ -3,8 +3,31 @@ import Quickshell
 
 FloatingWindow {
     id: window
+    property string captureResult: ""
+
+    // Capture the actual visible native General page, not another desktop app.
+    // Refuse network/history pages so verification cannot export private lists.
+    function captureGeneral(path) {
+        if (!visible || content.page !== "general") {
+            captureResult = "refused: General not visible";
+            return false;
+        }
+        captureResult = "pending";
+        const requested = content.grabToImage(result => {
+            if (!visible || content.page !== "general") {
+                captureResult = "cancelled: page changed";
+                return;
+            }
+            captureResult = result.saveToFile(path) ? "saved" : "failed";
+        });
+        if (!requested)
+            captureResult = "failed: renderer unavailable";
+        return requested;
+    }
 
     function inspect(action) {
+        if (action === "capture")
+            return captureResult;
         if (action === "sounds")
             return JSON.stringify(UiSounds.status());
         if (action === "polling")

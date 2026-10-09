@@ -52,8 +52,11 @@ for page in ('general', 'sound', 'battery', 'widgets', 'brightness', 'wallpaper'
     assert state['preview'] and state['visible'] and state['page'] == page
     assert (state['width'], state['height'], state['categories']) == (1024, 699, 14)
     assert (state['x'], state['y'], state['scale']) == (524, 212, 1)
-    assert state['navHeight'] == 491 and state['profileFont'] == 'JetBrains Mono'
-    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 272
+    assert state['navHeight'] == 538 and state['navTop'] == 137
+    assert (state['searchTop'], state['searchWidth']) == (84, 227)
+    assert (state['portraitTop'], state['portraitSize'], state['portraitRadius']) == (18, 48, 11)
+    assert state['profileFont'] == 'JetBrains Mono'
+    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 234
     assert state['groupCategories'][0] == ['network', 'bluetooth', 'general', 'airplane', 'accessibility']
     assert not state['error']
     time.sleep(.25)
@@ -74,7 +77,7 @@ assert unquote(state['portraitSource']) == unquote(fixture_picture.as_uri())
 time.sleep(.35)
 capture('settings-portrait-fixture')
 with Image.open(output / 'settings-general.png') as before, Image.open(output / 'settings-portrait-fixture.png') as after:
-    for box in ((551,299,615,363), (1109,265,1225,381)):
+    for box in ((541,230,589,278), (1109,265,1225,381)):
         assert before.crop(box).tobytes() != after.crop(box).tobytes(), 'Portrait did not update'
 call('settings', 'reset', '')
 state = json.loads(call('settings', 'name-open', ''))

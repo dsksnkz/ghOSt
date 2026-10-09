@@ -1,5 +1,21 @@
 # ghOSt progress
 
+## 2026-10-09 / Rounded icon family and Settings header
+
+All64 owned glyphs now use the corrected rounded inner/outer style, including
+the legacy-compatible Icon entry point, brand, weather and stationary indicator.
+Settings matches the new header reference: original48px portrait/radius11,
+full-width search, gear, higher selections; latest follow-ups remove dividers,
+add16px top spacing and6px row gaps, and disable selected-row hover feedback.
+Right-page content/functions remain. Tested and hot-reloaded visibly on the
+laptop; both shell PIDs preserved.64 Python tests, Qt input/compile/router/polling/
+scan checks and JS suites pass. Native Settings/Calendar/rail output inspected.
+[Files, evidence, remaining limits and recovery](changes/2026-10-09-icons-settings.md).
+Publication pending; broader prompt is not marked complete.
+
+Taste skill separately installed globally at the user's direct request. No
+project dependency or theme was installed; supplied design authority remains.
+
 ## 2026-10-09 / Folder redo: inner radii
 
 Removed the rejected layered SVG/PNG and its dedicated tests; the deleted design

@@ -162,24 +162,16 @@ Item {
             onScrolled: delta => wheel.scroll(delta)
         }
     }
-    Canvas {
+    Icon {
         id: indicator
         x: 36 + (23 - width) / 2
         y: 29
         width: 14
         height: 6
         z: 5
-        onPaint: {
-            const c = getContext("2d");
-            c.reset();
-            c.beginPath();
-            c.moveTo(0, 6);
-            c.lineTo(7, 0);
-            c.lineTo(14, 6);
-            c.closePath();
-            c.fillStyle = "#aeaeae";
-            c.fill();
-        }
+        name: "workspace-indicator"
+        fillMode: Image.Stretch
+        ink: "#aeaeae"
     }
     function status() {
         const rendered = [];

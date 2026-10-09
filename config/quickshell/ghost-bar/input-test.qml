@@ -115,6 +115,67 @@ ShellRoot {
                 sidebar.visible = true;
                 console.info("PASS: Settings wheel propagation and Bezier selection movement");
             }
+            function test_settings_reference_header() {
+                sidebar.visible = false;
+                settingsPanel.visible = true;
+                settingsPanel.choose("general");
+                wait(350);
+                const original = JSON.parse(settingsPanel.status());
+                compare(original.navTop, 137);
+                compare(original.searchTop, 84);
+                compare(original.searchWidth, 227);
+                compare(original.portraitTop, 18);
+                compare(original.portraitSize, 48);
+                compare(original.portraitRadius, 11);
+                const spacing = settingsPanel.spacingStatus();
+                compare(spacing.rowHeight, 42);
+                compare(spacing.rowGap, 6);
+                compare(spacing.icons.length, 14);
+                for (const icon of spacing.icons)
+                    verify(Math.abs(icon.glyph / icon.well - .6) < .001);
+                const selected = findChild(settingsPanel, "settings-navigation-general");
+                const unselected = findChild(settingsPanel, "settings-navigation-network");
+                verify(selected !== null && unselected !== null);
+                mouseMove(selected, 120, 21);
+                wait(200);
+                verify(selected.hovered);
+                compare(findChild(selected, "key-hover-feedback").opacity, 0);
+                mouseMove(unselected, 120, 21);
+                wait(200);
+                verify(unselected.hovered);
+                compare(findChild(unselected, "key-hover-feedback").opacity, .09);
+                settingsPanel.choose("about");
+                wait(350);
+                const bottom = JSON.parse(settingsPanel.status());
+                verify(bottom.navScroll > 0);
+                compare(bottom.portraitTop, original.portraitTop);
+                compare(bottom.searchTop, original.searchTop);
+                mouseClick(settingsPanel, 41, 42);
+                verify(JSON.parse(settingsPanel.status()).portraitChooserRequested);
+                settingsPanel.cancelPortrait();
+                mouseClick(settingsPanel, 206, 42);
+                compare(settingsPanel.page, "general");
+                const search = findChild(settingsPanel, "settings-search");
+                verify(search !== null);
+                mouseClick(search, 30, 8);
+                keyClick(Qt.Key_S);
+                keyClick(Qt.Key_O);
+                keyClick(Qt.Key_U);
+                keyClick(Qt.Key_N);
+                keyClick(Qt.Key_D);
+                compare(settingsPanel.filteredCategories.length, 1);
+                compare(settingsPanel.filteredCategories[0].id, "sound");
+                settingsPanel.query = "";
+                for (const category of settingsPanel.categories) {
+                    settingsPanel.choose(category.id);
+                    wait(10);
+                    compare(settingsPanel.page, category.id);
+                }
+                settingsPanel.choose("general");
+                settingsPanel.visible = false;
+                sidebar.visible = true;
+                console.info("PASS: Settings fixed header, search, portrait, gear and all 14 pages");
+            }
             function test_weather_switcher() {
                 sidebar.visible = false;
                 weatherSwitcher.visible = true;

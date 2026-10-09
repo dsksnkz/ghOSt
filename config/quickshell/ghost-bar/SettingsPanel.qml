@@ -9,12 +9,15 @@ import Quickshell.Services.Pipewire
 Item {
     id: settings
     property string soundGroup: "settings"
-    readonly property real navigationRowHeight: 52
-    readonly property real navigationInset: 6
+    readonly property real navigationRowHeight: 42
+    readonly property real navigationRowGap: 6
+    readonly property real navigationStride: navigationRowHeight + navigationRowGap
+    readonly property real navigationInset: 0
     readonly property real navigationGroupGap: 16
-    readonly property real iconRatio: 0.4
+    // The new screenshot supersedes the old 40% glyph sizing.
+    readonly property real iconRatio: 0.6
     function navigationGroupHeight(count) {
-        return count * navigationRowHeight + 2 * navigationInset;
+        return count * navigationRowHeight + Math.max(0, count - 1) * navigationRowGap + 2 * navigationInset;
     }
     property bool previewMode: false
     property string page: "general"
@@ -153,8 +156,7 @@ Item {
                 height
             });
             group.forEach((category, index) => rows.push(Object.assign({}, category, {
-                    y: y + navigationInset + index * navigationRowHeight,
-                    divider: index < group.length - 1
+                    y: y + navigationInset + index * navigationStride
                 })));
             y += height + navigationGroupGap;
         }
@@ -175,7 +177,7 @@ Item {
         for (const group of filteredGroups) {
             const index = group.findIndex(c => c.id === id);
             if (index >= 0) {
-                y += index * navigationRowHeight;
+                y += index * navigationStride;
                 if (categoryGroups[0].includes(id))
                     navFlick.contentY = 0;
                 else if (y < navFlick.contentY)
@@ -266,6 +268,12 @@ Item {
             height: scene.height,
             scale: scene.scale,
             navHeight: navFlick.height,
+            navTop: navFlick.y,
+            searchTop: searchHousing.y,
+            searchWidth: searchHousing.width,
+            portraitTop: sidebarPortrait.parent.y,
+            portraitSize: sidebarPortrait.width,
+            portraitRadius: sidebarPortrait.radius,
             navScroll: navFlick.contentY,
             navContentHeight: navFlick.contentHeight,
             selectionY: navigationSelection.y,
@@ -303,6 +311,7 @@ Item {
         visit(nav);
         return {
             rowHeight: navigationRowHeight,
+            rowGap: navigationRowGap,
             groupGap: navigationGroupGap,
             icons,
             bodySpacing: body.spacing,
@@ -478,32 +487,28 @@ Item {
             smoothing: .6
             color: "#252525"
         }
-        SvgIcon {
-            x: 17
-            y: 24
-            width: 32
-            height: 32
-            name: "settings"
-        }
         G2Surface {
-            x: 62
-            y: 29
-            width: 186
+            id: searchHousing
+            x: 17
+            y: 84
+            width: 227
             height: 24.17
             radius: 4
             color: Qt.rgba(217 / 255, 217 / 255, 217 / 255, .17)
-            SvgIcon {
-                x: 7
-                y: 3
-                width: 16
-                height: 16
-                name: "search"
+            Label {
+                x: 14
+                y: 4
+                text: "Search here"
+                visible: search.text.length === 0
+                color: "#858585"
+                font.pixelSize: 12
             }
             TextInput {
                 id: search
-                x: 26
+                objectName: "settings-search"
+                x: 14
                 y: 4
-                width: 152
+                width: 199
                 height: 17
                 color: "#ffffff"
                 font.family: Theme.font
@@ -515,40 +520,30 @@ Item {
                 Accessible.name: "Find Settings"
             }
         }
-        Key {
+        Item {
             x: 17
-            y: 78
-            width: 231
-            height: 82
-            radius: 10
-            smoothing: .6
-            color: "#6b6b6b"
-            border.width: 1
-            border.color: "#898989"
-            hint: "General"
-            onClicked: settings.choose("general")
+            y: 18
+            width: 227
+            height: 48
             G2Image {
-                x: 10
-                y: 9
-                width: 63.95
-                height: 63.95
-                radius: 21
+                id: sidebarPortrait
+                width: 48
+                height: 48
+                radius: 11
                 source: settings.portraitSource
             }
             Key {
-                x: 10
-                y: 9
-                width: 63.95
-                height: 63.95
-                radius: 21
+                width: 48
+                height: 48
+                radius: 11
                 smoothing: .6
                 hint: "Choose profile picture"
                 onClicked: settings.requestPortrait("sidebar")
             }
             Label {
-                x: 89.52
-                y: 25.1
-                width: 133
+                x: 65
+                y: 4
+                width: 104
                 height: 22.14
                 text: settings.displayHost
                 font.family: Theme.textFont
@@ -557,22 +552,37 @@ Item {
                 color: "#ffffff"
             }
             Label {
-                x: 90.06
-                y: 51.59
-                width: 122.91
+                x: 65
+                y: 32
+                width: 104
                 height: 12.9
                 text: "Your PC"
                 font.family: Theme.textFont
                 font.pixelSize: 10
                 color: "#ffffff"
             }
+            Key {
+                x: 173
+                y: 8
+                width: 32
+                height: 32
+                radius: 8
+                hint: "General"
+                onClicked: settings.choose("general")
+                SvgIcon {
+                    anchors.centerIn: parent
+                    width: 28
+                    height: 28
+                    name: "settings"
+                }
+            }
         }
         Flickable {
             id: navFlick
             x: 17
-            y: 184
+            y: 137
             width: 231
-            height: 491
+            height: 538
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
@@ -584,26 +594,13 @@ Item {
                 id: nav
                 width: 231
                 height: settings.navLayout.height
-                Repeater {
-                    model: settings.navLayout.groups
-                    G2Surface {
-                        required property var modelData
-                        y: modelData.y
-                        width: 231
-                        height: modelData.height
-                        radius: 10
-                        smoothing: .6
-                        color: "#6b6b6b"
-                        border.width: 1
-                        border.color: "#898989"
-                    }
-                }
+                // Logical groups keep their spacing without housings or lines.
                 G2Surface {
                     id: navigationSelection
-                    x: 6
+                    x: 15
                     y: settings.navLayout.rows.find(row => row.id === settings.page)?.y ?? 0
                     visible: settings.navLayout.rows.some(row => row.id === settings.page)
-                    width: 219
+                    width: 211
                     height: settings.navigationRowHeight
                     radius: 10
                     smoothing: .6
@@ -620,6 +617,8 @@ Item {
                     model: settings.navLayout.rows
                     Key {
                         required property var modelData
+                        objectName: "settings-navigation-" + modelData.id
+                        hoverFeedback: modelData.id !== settings.page
                         y: modelData.y
                         width: 231
                         height: settings.navigationRowHeight
@@ -629,10 +628,10 @@ Item {
                         onClicked: settings.choose(modelData.id)
                         G2Surface {
                             objectName: "settings-navigation-icon"
-                            x: 12
+                            x: modelData.id === settings.page ? 23 : 10
                             y: (parent.height - height) / 2
-                            width: 35
-                            height: 35
+                            width: 28
+                            height: 28
                             radius: 8
                             smoothing: .6
                             color: "#2f2f2f"
@@ -645,21 +644,13 @@ Item {
                             }
                         }
                         Label {
-                            x: 59
+                            x: modelData.id === settings.page ? 63 : 50
                             y: (parent.height - height) / 2
-                            width: modelData.id === "airplane" ? 100 : 160
+                            width: modelData.id === "airplane" ? 112 : 162
                             height: 18
                             text: modelData.name
                             font.pixelSize: 11
                             color: "#ffffff"
-                        }
-                        G2Surface {
-                            x: 59
-                            y: parent.height - .5
-                            width: 160
-                            height: 1
-                            color: "#ffffff"
-                            visible: modelData.divider
                         }
                         SettingsToggle {
                             visible: modelData.id === "airplane"

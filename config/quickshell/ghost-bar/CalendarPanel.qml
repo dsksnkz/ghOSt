@@ -284,14 +284,12 @@ Item {
                 width: 194
                 height: 130
                 clip: true
-                Label {
+                SvgIcon {
                     x: 0
-                    y: 52
+                    y: 56
                     width: 12
-                    height: 26
-                    text: ">"
-                    font.pixelSize: 16
-                    verticalAlignment: Text.AlignVCenter
+                    height: 18
+                    name: "forward"
                 }
                 Column {
                     x: 15

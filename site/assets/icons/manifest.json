@@ -156,6 +156,10 @@
     "category": "Actions"
   },
   {
+    "name": "workspace-indicator",
+    "category": "Actions"
+  },
+  {
     "name": "down",
     "category": "Actions"
   },
@@ -233,6 +237,10 @@
   },
   {
     "name": "storm",
+    "category": "Weather"
+  },
+  {
+    "name": "lightning",
     "category": "Weather"
   },
   {

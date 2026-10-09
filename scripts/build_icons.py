@@ -5,20 +5,85 @@ from html import escape
 import argparse
 import json
 import math
+from fontTools.pens.recordingPen import RecordingPen
+from fontTools.pens.svgPathPen import SVGPathPen
+from fontTools.svgLib.path import parse_path
 
 ROOT = Path(__file__).resolve().parents[1]
 DESTINATIONS = (ROOT / "config/quickshell/ghost-bar/icons", ROOT / "site/assets/icons")
 
 
+def rounded_path(data, radius=1.6):
+    """Fillet straight joins, including inside corners of closed outlines.
+
+    Curves retain their supplied geometry. Short edges limit the fillet so
+    small symbols never collapse. SVGPathPen serializes curves and expanded arcs.
+    """
+    recording = RecordingPen()
+    parse_path(data, recording)
+    pen = SVGPathPen(None)
+    contour = []
+    for command, points in recording.value:
+        if command == "moveTo":
+            contour = [(command, points)]
+        elif command in ("closePath", "endPath"):
+            draw_rounded_contour(pen, contour, command == "closePath", radius)
+        else:
+            contour.append((command, points))
+    return pen.getCommands()
+
+
+def draw_rounded_contour(pen, commands, closed, radius):
+    start = commands[0][1][0]
+    segments = commands[1:]
+    if not segments:
+        pen.moveTo(start)
+        pen.endPath()
+        return
+    if closed and segments[-1][1][-1] != start:
+        segments.append(("lineTo", (start,)))
+    vertices = [start] + [points[-1] for _, points in segments]
+    count = len(vertices) - int(closed)
+    corners = {}
+    for index in range(count):
+        if not closed and index in (0, count - 1):
+            continue
+        incoming = segments[(index - 1) % len(segments)][0]
+        outgoing = segments[index % len(segments)][0]
+        if incoming != "lineTo" or outgoing != "lineTo":
+            continue
+        vertex = vertices[index]
+        before, after = vertices[(index - 1) % count], vertices[(index + 1) % count]
+        a = (before[0] - vertex[0], before[1] - vertex[1])
+        b = (after[0] - vertex[0], after[1] - vertex[1])
+        lengths = math.hypot(*a), math.hypot(*b)
+        if min(lengths) < .001 or abs(a[0] * b[1] - a[1] * b[0]) < .001:
+            continue
+        trim = min(radius, lengths[0] * .3, lengths[1] * .3)
+        corners[index] = tuple((vertex[0] + delta[0] / length * trim,
+                                vertex[1] + delta[1] / length * trim)
+                               for delta, length in zip((a, b), lengths))
+    pen.moveTo(corners.get(0, (start, start))[1])
+    for index, (command, points) in enumerate(segments):
+        endpoint = (index + 1) % count if closed else index + 1
+        if endpoint in corners:
+            before, after = corners[endpoint]
+            pen.lineTo(before)
+            pen.qCurveTo(vertices[endpoint], after)
+        else:
+            getattr(pen, command)(*points)
+    pen.closePath() if closed else pen.endPath()
+
+
 def path(d):
-    return f'<path d="{d}"/>'
+    return f'<path d="{rounded_path(d)}"/>'
 
 
 def circle(x, y, r):
     return f'<circle cx="{x}" cy="{y}" r="{r}"/>'
 
 
-def rect(x, y, w, h, radius=1):
+def rect(x, y, w, h, radius=2.6):
     return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{radius}"/>'
 
 
@@ -29,7 +94,7 @@ def gear():
         angle = i * math.pi / 16
         points.append(f'{12 + math.cos(angle) * radius:.4f} {12 + math.sin(angle) * radius:.4f}')
     outline = 'M' + 'L'.join(points) + 'Z M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8Z'
-    return f'<path d="{outline}" fill="currentColor" stroke="none" fill-rule="evenodd"/>'
+    return f'<path d="{rounded_path(outline, .65)}" fill="currentColor" stroke="none" fill-rule="evenodd"/>'
 
 
 # No external icon set, font symbols or raster embeds. Brand outline is the
@@ -82,10 +147,11 @@ ICONS = {
     "back": ("Actions", path("m14 5-7 7 7 7")),
     "forward": ("Actions", path("m10 5 7 7-7 7")),
     "up": ("Actions", path("m5 14 7-7 7 7")),
+    "workspace-indicator": ("Actions", f'<path d="{rounded_path("M2 22 12 2 22 22Z", 1.2)}" fill="currentColor" stroke="none"/>'),
     "down": ("Actions", path("m5 10 7 7 7-7")),
     "menu": ("Actions", path("M4 6h16M4 12h16M4 18h16")),
     "pin": ("Actions", path("M8 3h8M9 3v6l-3 5h12l-3-5V3M12 14v8")),
-    "folder": ("Personal", path("M3 5h7l3 3h8v12H3Z")),
+    "folder": ("Personal", rounded_folder()),
     "folder-rounded": ("Personal", rounded_folder()),
     "terminal": ("Personal", rect(2, 4, 20, 16) + path("m6 9 3 3-3 3m7 1h5")),
     "browser": ("Personal", circle(12, 12, 9) + '<ellipse cx="12" cy="12" rx="4" ry="9"/>' + path("M3 12h18")),
@@ -102,6 +168,7 @@ ICONS = {
     "cloud": ("Weather", path("M7 18h11c5 0 5-8 0-8C17 3 7 3 6 10c-5 0-5 8 1 8Z")),
     "rain": ("Weather", path("M6 14C2 14 2 8 6 8c1-6 10-6 11 0 6-1 6 6 2 6M7 17l-1 4m6-4-1 4m6-4-1 4")),
     "storm": ("Weather", path("M6 15C1 15 1 8 6 8c1-6 10-6 11 0 6-1 6 7 2 7M13 10l-5 7h7l-4 5")),
+    "lightning": ("Weather", path("M14 3 5 14h8l-3 7 9-11h-8Z")),
     "snow": ("Weather", path("M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M3 10l4-1-1-4M21 14l-4 1 1 4M3 14l4 1-1 4M21 10l-4-1 1-4")),
     "dot": ("Actions", circle(12, 12, 2)),
 }
@@ -122,7 +189,8 @@ def brand():
     glyph.draw(pen)
     tx = 12 - (x0 + x1) * scale / 2
     ty = 12 + (y0 + y1) * scale / 2
-    return f'<path transform="matrix({scale} 0 0 {-scale} {tx} {ty})" d="{pen.getCommands()}" fill="currentColor" stroke="none"/>'
+    outline = rounded_path(pen.getCommands(), .5 / scale)
+    return f'<path transform="matrix({scale} 0 0 {-scale} {tx} {ty})" d="{outline}" fill="currentColor" stroke="none"/>'
 
 
 def definitions():
@@ -131,13 +199,26 @@ def definitions():
 
 def svg(name, geometry, color):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" '
-            f'fill="none" color="{color}" stroke="currentColor" stroke-width="1.5" '
+            f'fill="none" color="{color}" stroke="currentColor" stroke-width="2" '
             f'stroke-linecap="round" stroke-linejoin="round"><title>{escape(name)}</title>{geometry}</svg>\n')
 
 
 def build(check=False):
     icons = definitions()
     files = {}
+    # A reproducible full-set inspection sheet, not a second icon source.
+    tiles = []
+    for index, (name, (_, geometry)) in enumerate(icons.items()):
+        x, y = (index % 9) * 120, (index // 9) * 98
+        tiles.append(f'<g transform="translate({x + 36} {y + 10}) scale(2)" '
+                     f'fill="none" stroke="currentColor" stroke-width="2" '
+                     f'stroke-linecap="round" stroke-linejoin="round">{geometry}</g>'
+                     f'<text x="{x + 60}" y="{y + 80}" text-anchor="middle" '
+                     f'fill="#bbb" font-family="monospace" font-size="11">{name}</text>')
+    files[ROOT / "assets/icons-rounded-sheet.svg"] = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="784" '
+        'viewBox="0 0 1080 784" color="#fff"><rect width="1080" height="784" fill="#252525"/>'
+        + ''.join(tiles) + '</svg>\n')
     files[ROOT / "assets/folder-rounded-preview.svg"] = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">\n'
         '  <rect width="160" height="180" fill="#fff"/>\n'

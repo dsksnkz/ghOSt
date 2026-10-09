@@ -14,6 +14,16 @@ MANIFEST = json.loads((ASSETS / "manifest.json").read_text())
 
 
 class IconTests(unittest.TestCase):
+    def test_shared_style_reaches_compatibility_icons(self):
+        compat = (ASSETS.parent / "Icon.qml").read_text()
+        self.assertIn("SvgIcon {", compat)
+        self.assertNotIn("Canvas {", compat)
+        self.assertNotIn("switch (", compat)
+        self.assertEqual((ASSETS / "black/folder.svg").read_text().split("</title>")[1],
+                         (ASSETS / "black/folder-rounded.svg").read_text().split("</title>")[1])
+        for name in ("ethernet", "volume", "storage", "security", "play", "pin", "lightning"):
+            self.assertIn("Q", (ASSETS / "black" / (name + ".svg")).read_text(), name)
+
     def test_rounded_folder_has_rounded_inside_corners(self):
         data = subprocess.check_output([
             "rsvg-convert", "-w", "240", "-h", "240",
@@ -41,7 +51,7 @@ class IconTests(unittest.TestCase):
                     file = ASSETS / tone / (icon["name"] + ".svg")
                     root = ET.fromstring(file.read_bytes())
                     self.assertEqual(root.attrib["viewBox"], "0 0 24 24")
-                    self.assertEqual(root.attrib["stroke-width"], "1.5")
+                    self.assertEqual(root.attrib["stroke-width"], "2")
                     self.assertEqual(root.attrib["fill"], "none")
                     for element in root.iter():
                         self.assertIn(element.tag.split("}")[-1], allowed)

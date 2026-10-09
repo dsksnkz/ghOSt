@@ -19,47 +19,23 @@ Item {
     implicitHeight: 112
 
     // Cached geometry: lightning animates opacity, rain animates transforms.
-    Canvas {
+    SvgIcon {
         width: 108
-        height: 112
+        height: 90
+        name: "cloud"
         visible: weather.wet || weather.condition === "cloud"
-        onPaint: {
-            const c = getContext("2d");
-            c.reset();
-            c.strokeStyle = "#f4f4f4";
-            c.lineWidth = 2.5;
-            c.lineCap = "round";
-            c.lineJoin = "round";
-            c.beginPath();
-            c.moveTo(24, 74);
-            c.bezierCurveTo(-4, 59, 5, 12, 38, 10);
-            c.bezierCurveTo(58, 9, 72, 21, 76, 39);
-            c.bezierCurveTo(111, 36, 116, 72, 91, 79);
-            c.stroke();
-        }
     }
 
-    Canvas {
+    SvgIcon {
         id: bolt
 
-        width: 108
-        height: 112
+        x: 31
+        y: 57
+        width: 51
+        height: 55
+        name: "lightning"
         visible: weather.condition === "storm"
         opacity: 0.6
-        onPaint: {
-            const c = getContext("2d");
-            c.reset();
-            c.strokeStyle = "#ffffff";
-            c.lineWidth = 3;
-            c.lineCap = "round";
-            c.lineJoin = "round";
-            c.beginPath();
-            c.moveTo(60, 58);
-            c.lineTo(43, 83);
-            c.lineTo(68, 83);
-            c.lineTo(51, 109);
-            c.stroke();
-        }
 
         SequentialAnimation on opacity {
             running: weather.moving && weather.condition === "storm"
