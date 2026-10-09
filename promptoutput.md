@@ -8,8 +8,9 @@ Implemented/deployed15 real mono Cava bands behind compact music,9→13px title,
 6px title inset, existing controls/progress and expanded panel preserved.
 Qt input/compile and raw Cava frame checks pass; live process/native output
 inspected. Private media title excluded from the published native crop.
-[Record](docs/changes/2026-10-09-music-background.md). Publication pending final
-commit/push verification; no broader prompt completion claim.
+[Record](docs/changes/2026-10-09-music-background.md). Published `9abd448`;
+remote main and runtime QML blobs verified. This request is delivered; no broader
+prompt completion claim.
 
 ## 2026-10-09 / Click-sound volume and choices
 

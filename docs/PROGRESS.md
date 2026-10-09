@@ -8,8 +8,9 @@ text/geometry and expanded media panel remain. Dedicated30fps mono raw stream,
 bounded frame parsing, fullscreen/pause/reduced-motion stop and fixture isolation.
 Qt input/compile checks pass; live Cava observed, native crop excludes the user's
 title and source/live files verified. [Details and recovery](changes/2026-10-09-music-background.md).
-Publication pending final commit/push verification; broader migration remains
-pending independently.
+Published `9abd448`; remote main and both runtime QML blob hashes verified.
+The unrelated upstream weather-location clearing commit was retained. This
+music request is delivered; broader migration remains pending independently.
 
 ## 2026-10-09 / Serpantinum removal: migration pending
 

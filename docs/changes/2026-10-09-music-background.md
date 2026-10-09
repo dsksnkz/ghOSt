@@ -36,3 +36,7 @@ of all fifteen full heights or a fabricated audio fixture.
 Snapshot: `.local/backups/2026-10-09-music-background-CGb9ud/` contains affected
 project and original live runtime files. No system audio level, shortcuts,
 wallpaper, other shell or user Cava configuration was changed.
+
+Published implementation: `9abd4482956dcc43a6d19f6a5510ec0a82f28405`.
+Remote main and MusicBar/AudioSpectrum Git blobs matched after pushing; the
+unrelated upstream weather-location clearing change was integrated unchanged.
