@@ -8,7 +8,9 @@ and system settings are unaffected. Persistent private copies/preferences,
 cancelled selection and invalid files handled.71 tests plus Qt/JS checks pass;
 active native output/Ready states verified and Sound opened for direct inspection.
 [Record and actual screenshot](docs/changes/2026-10-09-sfx-settings.md).
-Publication and fresh archive verification pending; broader prompt unfinished.
+Published `9490dea`; remote revision/seven runtime/test/native-image blobs
+verified. Fresh archive passes71 tests, silent Qt input/compile and generator.
+This request is delivered; broader prompt remains unfinished.
 
 ## 2026-10-09 / Settings and Settings sidebar
 

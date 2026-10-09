@@ -44,8 +44,9 @@ network/website JS suites pass. No new website was built.
 
 Only UiSounds.qml, SettingsPanel.qml and settings_backend.py were hot-reloaded
 into the active ghOSt profile. Installed files match source; ghOSt PID222465 and
-legacy PID1824 remain. Native effects report Ready, correct default sources and
-18% gain. No media-volume, brightness, connection, wallpaper, shortcut, autostart,
+legacy PID1824 remain. Native effects report Ready and18% gain; a preset change
+selected by the user was reflected by the native UI/runtime. No media-volume,
+brightness, connection, wallpaper, shortcut, autostart,
 gameplay or hardware change was performed. No custom file or sound was chosen
 unattended, and test playback is always suppressed.
 
@@ -74,4 +75,6 @@ Three unrelated untracked files are untouched.
 Real gain/source bindings and native UI were checked; subjective loudness and
 live custom-file selection were not exercised unattended. PCM validation/copy
 and persistence are verified against private temporary files. Broader prompts.md
-work remains unfinished. Publication and committed-archive verification pending.
+work remains unfinished. Published `9490dea`; remote revision and seven
+runtime/test/native-image blob hashes match. A fresh committed archive passes
+all71 Python tests, actual silent Qt input, production compile and generator checks.

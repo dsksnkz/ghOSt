@@ -9,7 +9,9 @@ preferences and bounded PCM validation preserve originals and unrelated settings
 Tested/deployed by hot reload, both shell PIDs retained; Settings opened on Sound
 at the user's explicit request.71 tests, Qt and JS suites pass; native output and
 Ready states inspected. [Details, native image and recovery](changes/2026-10-09-sfx-settings.md).
-Publication/fresh archive pending. No prompt marked complete yet.
+Published `9490dea`; remote revision/seven runtime, test and native-image blobs
+verified. Fresh committed archive passes71 tests, silent Qt input/compile and
+generator checks. This request is delivered; broader prompt remains unfinished.
 
 ## 2026-10-09 / Settings with Taste Skill
 
