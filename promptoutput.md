@@ -5,7 +5,8 @@ prompts outputs here
 Added one rounded folder design in black/white transparent SVG variants, keeping
 the original icon unchanged. Preview: `assets/folder-rounded-preview.svg`.
 No Nautilus theme or desktop configuration was applied. All 62 Python tests and
-generator freshness checks pass; raster preview inspected. Publication pending.
+generator freshness checks pass; raster preview inspected. Published `ecf2799`,
+with remote revision and all four SVG copies verified against their blob hashes.
 
 ## 2026-10-09 · OSD and actual outside dismissal
 
