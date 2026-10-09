@@ -475,3 +475,14 @@ Offscreen bounds, intermediate tilt, fixed layout, input/idle/mock-auth tests
 and production compile pass. Software screenshot recorded; native visual
 confirmation pending. No desktop-visible test window, real lock or PAM invoked.
 Snapshot `.local/backups/2026-10-09-lock-tilt30/`; LockScene installed only.
+# 2026-10-09 / Calendar background and weather stroke weight
+
+Request: "remove the gradient of the calendar bar and set the weather icons to less weight icon".
+
+Flat #151515 calendar background replaces gradient. Weather headline/list use
+weather-only 1.25px strokes (previously 2px), same exact SVG geometry; animated
+rain uses 1.2px drops. Other icon styles and calendar behavior unchanged.
+Compile, input/weather and 16 weather tests pass; added icon geometry/parity
+assertion. Offscreen component screenshot inspected; no visible testing window
+or system action. Live files installed with reversible snapshot at
+`.local/backups/2026-10-09-calendar-flat/`; clean screenshot recorded.

@@ -1,5 +1,21 @@
 # ghOSt progress
 
+## 2026-10-09 / Flat calendar and lighter weather glyphs
+
+Removed the CalendarWindow frame gradient; retained flat #151515 fill, grey
+border and 7px outer corners. Added weather-only variants of the existing six
+SVG shapes with 1.25px rather than 2px strokes; headline and forecast use these,
+animated rain drops reduced from 1.8px to 1.2px. No brightness/settings/shared
+icon geometry changed. Weather data, switching, motion and calendar layout
+remain intact. Compile, Qt input/weather transitions, 16 weather tests and icon
+variant/parity checks pass. Isolated offscreen actual-component render inspected
+and saved to `docs/images/2026-10-09-calendar-flat/calendar.png`; sample data is
+not a current-weather assertion. Live calendar files and six assets installed,
+only the named ghOSt instance restarted (the previous instance did not log a
+reload), unrelated processes/shortcuts untouched.
+Snapshot `.local/backups/2026-10-09-calendar-flat/`.
+
+
 ## 2026-10-09 / 30-degree cursor tilt and stable blur cancellation
 
 Cursor-driven slat tilt is now capped at ±30 degrees. It smoothly blends with

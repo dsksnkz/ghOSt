@@ -402,7 +402,7 @@ Item {
                                     y: (parent.height - height) / 2
                                     width: 17
                                     height: 17
-                                    name: modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition
+                                    name: "weather-" + (modelData.condition === "clear" ? "brightness" : modelData.condition === "unknown" ? "cloud" : modelData.condition)
                                 }
                                 Label {
                                     x: 24

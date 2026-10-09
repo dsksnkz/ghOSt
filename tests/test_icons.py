@@ -14,6 +14,13 @@ MANIFEST = json.loads((ASSETS / "manifest.json").read_text())
 
 
 class IconTests(unittest.TestCase):
+    def test_weather_variants_are_lighter_without_changing_geometry(self):
+        for name in ("cloud", "brightness", "rain", "snow", "lightning", "storm"):
+            original = (ASSETS / "white" / (name + ".svg")).read_text()
+            light = (ASSETS / "white" / ("weather-" + name + ".svg")).read_text()
+            self.assertEqual(light, original.replace('stroke-width="2"', 'stroke-width="1.25"'))
+            self.assertEqual(light, (ROOT / "site/assets/icons/white" / ("weather-" + name + ".svg")).read_text())
+
     def test_shared_style_reaches_compatibility_icons(self):
         compat = (ASSETS.parent / "Icon.qml").read_text()
         self.assertIn("SvgIcon {", compat)

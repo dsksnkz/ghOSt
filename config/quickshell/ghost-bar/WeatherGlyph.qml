@@ -22,7 +22,7 @@ Item {
     SvgIcon {
         width: 108
         height: 90
-        name: "cloud"
+        name: "weather-cloud"
         visible: weather.wet || weather.condition === "cloud"
     }
 
@@ -33,7 +33,7 @@ Item {
         y: 57
         width: 51
         height: 55
-        name: "lightning"
+        name: "weather-lightning"
         visible: weather.condition === "storm"
         opacity: 0.6
 
@@ -68,9 +68,9 @@ Item {
 
             x: 25 + index * 11 - travel * 5
             y: 77 + travel * 27
-            width: 1.8
+            width: 1.2
             height: 7
-            radius: 0.9
+            radius: 0.6
             rotation: 18
             color: Theme.text
             opacity: weather.reducedMotion ? 0.7 : Math.sin(travel * Math.PI) * 0.85
@@ -81,7 +81,7 @@ Item {
         anchors.centerIn: parent
         width: 94
         height: 94
-        name: weather.condition === "clear" ? "brightness" : "snow"
+        name: weather.condition === "clear" ? "weather-brightness" : "weather-snow"
         visible: weather.condition === "clear" || weather.condition === "snow"
 
         SequentialAnimation on rotation {
