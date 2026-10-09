@@ -67,4 +67,7 @@ Exact project/live originals are in
 `.local/backups/2026-10-09-icons-settings-vOt2Co/`; additional checkpoints retain
 the versions before line removal, top gap and row gap. Restore only affected
 paths after reconciling later edits. No unrelated dirty files are included.
-Publication pending. Broader prompts.md remains unfinished.
+Published `dc20fdd`. Remote main, every shell/site icon blob, changed Settings/
+compatibility renderer and all six native images match local Git objects. A fresh
+committed archive passes all64 Python tests, generator freshness and Qt input/
+production-compilation checks. Broader prompts.md remains unfinished.

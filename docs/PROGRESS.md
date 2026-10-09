@@ -11,7 +11,9 @@ Right-page content/functions remain. Tested and hot-reloaded visibly on the
 laptop; both shell PIDs preserved.64 Python tests, Qt input/compile/router/polling/
 scan checks and JS suites pass. Native Settings/Calendar/rail output inspected.
 [Files, evidence, remaining limits and recovery](changes/2026-10-09-icons-settings.md).
-Publication pending; broader prompt is not marked complete.
+Published `dc20fdd`; remote revision, all shell/site icon blobs and six native
+images verified. Fresh archive passes64 tests, generator and Qt input/compile.
+Broader prompt is not marked complete.
 
 Taste skill separately installed globally at the user's direct request. No
 project dependency or theme was installed; supplied design authority remains.

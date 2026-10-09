@@ -8,8 +8,10 @@ add16px search-to-list space and6px inter-row gaps, and suppress selected hover.
 All14 pages, header actions/search, scroll and Bézier selector remain functional.
 Tested/live on the laptop, preserving both shell processes and unrelated configs.
 64 Python tests plus Qt and JS checks pass; native Settings/Calendar/rail images
-are in the [change record](docs/changes/2026-10-09-icons-settings.md). Publication
-pending; broader prompt remains unfinished. Safe native Sidebar header included;
+are in the [change record](docs/changes/2026-10-09-icons-settings.md). Published
+`dc20fdd`; all icon/native image blobs and remote revision verified. Fresh archive
+passes64 tests, generator and Qt input/compile; broader prompt remains unfinished.
+Safe native Sidebar header included;
 private list/chat captures are excluded.
 
 ## 2026-10-09 · Redo the inside folder corners
