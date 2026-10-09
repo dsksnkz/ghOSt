@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-09 / Venetian lock screen
+
+Independent Quickshell Wayland session-lock entry now has descending shaded
+blinds with Bézier timing, first-key transition to blurred blinds/sharp digital
+clock and masked password, and post-PAM-success slat rotation over the actual
+desktop. Uses existing `/etc/pam.d/hyprlock`; no PAM/authentication files changed.
+Installed and bound to Super+L/power-key Lock; wlogout's Lock action and ghOSt's
+confirmed Lock menu route use the same entry. Actual session not locked in tests.
+Qt visual/input/mocked-PAM policy checks, production compile, existing input suite,
+Lua syntax and source/live comparisons pass. Safe test-rendered screenshots
+published; real PAM, secure compositor handoff, multi-monitor/hotplug and physical
+unlock round trip remain unverified. [Details, frames and recovery](changes/2026-10-09-venetian-lock.md).
+
 ## 2026-10-09 / Weather switch blur and left alignment
 
 Forecast wheel/click selection now blurs/fades the complete weather headline

@@ -442,7 +442,7 @@ Item {
                     {
                         label: "Lock",
                         icon: "lock",
-                        command: []
+                        command: ["quickshell", "--no-duplicate", "--path", Quickshell.shellPath("lock/shell.qml")]
                     },
                     {
                         label: "Sleep",

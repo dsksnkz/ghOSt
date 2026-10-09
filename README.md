@@ -29,6 +29,11 @@ samples are saved. Without Cava the background stays quiet.
 Optional media-key and Super+I mappings are in [ghost-controls.lua](config/hypr/ghost-controls.lua).
 Replace existing matching bindings deliberately; the installer does not add them.
 
+The lock screen has descending blinds, a clock/password transition, and rotating
+slats after authentication. It uses Quickshell Wayland session lock and the
+existing `/etc/pam.d/hyprlock` service. Optional bindings are in
+[ghost-lock.lua](config/hypr/ghost-lock.lua); the installer does not lock your session.
+
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
 cd ghOSt
@@ -45,7 +50,8 @@ may require reconciliation. Backups live in `~/.local/state/ghost/backups`.
 
 ## Limits and checks
 
-Independent lock and an embedded equalizer remain pending. Notifications preserve
+An embedded equalizer remains pending. The new lock's real PAM/compositor round trip
+requires normal user verification; automated checks never lock the desktop. Notifications preserve
 an existing server; observation-mode DND cannot silence that server's banners.
 Unavailable readings and services are shown honestly. Private preferences,
 notification history and recovery snapshots are not published.

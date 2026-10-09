@@ -1,5 +1,19 @@
 prompts outputs here
 
+## 2026-10-09 / Venetian blinds lock
+
+Request: descending venetian blinds with Bézier speed; typing blurs the blinds
+away and brings in a digital clock/password input; success rotates the slats
+to reveal the desktop, then removes them rather than lifting the blinds.
+Implemented independent session-lock/PAM entry, visual scene, authentication
+controller and authenticated exit overlay. Installed and connected to existing
+lock routes. Existing PAM service reused unchanged; no actual lock invoked.
+Animation/input/mock-auth tests, production compile, existing Qt suite, Lua and
+live file parity pass. Screenshots are explicitly safe Qt test renders.
+Real authentication/secure unlock/multi-output handoff require normal user
+verification; this part is not claimed fully verified or broad prompt-complete.
+[Files and frames](docs/changes/2026-10-09-venetian-lock.md).
+
 ## 2026-10-09 / Forecast switch transition
 
 Request: "every scroll or change in the calendar bar, the top actual weather
