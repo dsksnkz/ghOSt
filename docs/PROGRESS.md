@@ -16,8 +16,10 @@ card/track per the follow-up; actual native output inspected. 62 Python
 tests, Qt input and surface compilation pass. Both shell PIDs, shortcuts,
 wallpaper, autostart and notification ownership preserved.
 [Cause, native proof, images, migration and recovery](changes/2026-10-09-osd-dismissal.md).
-Publication pending; the standing user instruction is to publish every completed
-verified change. Broader design backlog remains pending; Nautilus is untouched.
+Published `aea9b3e`; fresh committed-archive checks pass, remote changed runtime
+and native-image blobs match, and installed files match source. The standing
+user instruction is to publish every completed verified change. Broader design
+backlog remains pending; Nautilus is untouched.
 
 ## 2026-10-08 / Native interaction pass
 

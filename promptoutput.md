@@ -10,7 +10,8 @@ both shell PIDs remain. The ghOSt vertical slider has no horizontal cap;
 follow-up tighter horizontal padding and darker card/track are included.
 62 tests and production compile/input checks pass; safe native crops inspected.
 [Evidence and recovery](docs/changes/2026-10-09-osd-dismissal.md).
-Publication pending; every completed verified ghOSt change is to be published.
+Published `aea9b3e`; fresh archive checks and remote/runtime/image hash verification
+pass. Every completed verified ghOSt change is to be published.
 Nautilus and the broader backlog remain untouched/pending.
 
 ## 2026-10-08 · Native interaction pass

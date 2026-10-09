@@ -93,6 +93,8 @@ installed files and affected legacy root/manager originals are in
 `.local/backups/2026-10-09-osd-nVhhIx/`. Restore only the affected paths after
 reconciling later edits, then reload their configuration. No broad reset is needed.
 
-Publication is pending until the release record states the pushed revision and
-remote verification. The user's standing instruction is to publish every
-completed, verified ghOSt change. Private files and unrelated edits remain excluded.
+Published `aea9b3e`. A fresh committed archive passes all 62 Python tests, Qt
+input checks and windowless surface compilation. Remote revision and changed
+runtime/native-image blob hashes match; installed runtime files match the source.
+The user's standing instruction is to publish every completed, verified ghOSt
+change. Private files and unrelated edits remain excluded.
