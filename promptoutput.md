@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-09 · Rounded folder icon
+
+Added one rounded folder design in black/white transparent SVG variants, keeping
+the original icon unchanged. Preview: `assets/folder-rounded-preview.svg`.
+No Nautilus theme or desktop configuration was applied. All 62 Python tests and
+generator freshness checks pass; raster preview inspected. Publication pending.
+
 ## 2026-10-09 · OSD and actual outside dismissal
 
 Fixed the real compositor path, not just the Qt callback: Sidebar now uses

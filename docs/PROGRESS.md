@@ -1,5 +1,14 @@
 # ghOSt progress
 
+## 2026-10-09 / Rounded folder asset
+
+Created `folder-rounded`: one original outline with softer body/tab corners and
+a front fold, exported as transparent black and white SVGs in the existing icon
+system. Original folder icon and Nautilus remain unchanged. All 62 Python tests
+and generator freshness checks pass, including transparent black/white raster
+parity at 24/48px. Enlarged preview inspected. Publication pending; this is an
+asset, not a theme activation.
+
 ## 2026-10-09 / OSD and real outside-click fixes
 
 Sidebar's exclusive layer mode redirected outside clicks back to it on this

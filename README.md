@@ -16,7 +16,7 @@ A monochrome desktop shell for Arch Linux and Hyprland, built with Quickshell.
 - **Motion:** grouped sidebar entrance and randomized calendar reveal, with reduced-motion support.
 
 The website shows component captures and labeled browser motion demonstrations,
-not remote desktop controls. [61 monochrome SVG icons](docs/icons.md) are reusable separately.
+not remote desktop controls. [62 monochrome SVG icons](docs/icons.md) are reusable separately.
 
 ## Install
 

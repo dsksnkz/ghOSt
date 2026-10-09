@@ -78,6 +78,7 @@ ICONS = {
     "menu": ("Actions", path("M4 6h16M4 12h16M4 18h16")),
     "pin": ("Actions", path("M8 3h8M9 3v6l-3 5h12l-3-5V3M12 14v8")),
     "folder": ("Personal", path("M3 5h7l3 3h8v12H3Z")),
+    "folder-rounded": ("Personal", path("M5.5 5.5h3.7q.8 0 1.4.6l1.5 1.5q.4.4 1.1.4h5.3Q21 8 21 10.5v7Q21 20 18.5 20h-13Q3 20 3 17.5V8Q3 5.5 5.5 5.5ZM3 10.5h18")),
     "terminal": ("Personal", rect(2, 4, 20, 16) + path("m6 9 3 3-3 3m7 1h5")),
     "browser": ("Personal", circle(12, 12, 9) + '<ellipse cx="12" cy="12" rx="4" ry="9"/>' + path("M3 12h18")),
     "cpu": ("Hardware", rect(6, 6, 12, 12) + rect(9, 9, 6, 6) + path("M8 2v4m4-4v4m4-4v4M8 18v4m4-4v4m4-4v4M2 8h4m-4 4h4m-4 4h4m12-8h4m-4 4h4m-4 4h4")),
