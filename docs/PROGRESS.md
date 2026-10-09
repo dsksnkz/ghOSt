@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-09 / Layered folder refinement
+
+The user's follow-up explicitly asks for depth and shading, superseding pure
+black/white for this asset. Created `assets/folder-layered.svg` and a transparent
+512px PNG: dark rear/tab, recessed inner lip, light tapered front, lower edge
+thickness, subtle highlights and contact shadow. Existing flat pack remains
+unchanged; no desktop/Nautilus theme activated. Raster bounds, neutrality,
+transparency, gradient variation and brighter middle/darker top verified at
+32/256px; enlarged output visually inspected. All 64 Python tests and flat-pack
+generator checks pass. Publication pending.
+
 ## 2026-10-09 / Rounded folder asset
 
 Created `folder-rounded`: one original outline with softer body/tab corners and

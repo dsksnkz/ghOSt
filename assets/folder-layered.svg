@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>ghOSt rounded layered folder</title>
+  <defs>
+    <linearGradient id="rear" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#626262"/>
+      <stop offset="0.45" stop-color="#414141"/>
+      <stop offset="1" stop-color="#232323"/>
+    </linearGradient>
+    <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cacaca"/>
+      <stop offset="1" stop-color="#8b8b8b"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#ededed"/>
+      <stop offset="0.45" stop-color="#c7c7c7"/>
+      <stop offset="1" stop-color="#939393"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.08"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="145%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+  <!-- The lower silhouette supplies a soft contact shadow, not a backdrop. -->
+  <path d="M44 115h168q23 0 21 23l-6 63q-2 31-33 31H53q-30 0-33-31l-7-61q-3-25 31-25Z" fill="#000000" opacity="0.24" filter="url(#shadow)"/>
+  <!-- Dark rear shell and rounded raised tab. -->
+  <path d="M52 52h42c7 0 10 2 15 7l16 16c3 3 5 4 10 4h61c18 0 30 12 30 30v87c0 19-13 32-32 32H52c-18 0-30-13-30-32V84c0-19 12-32 30-32Z" fill="url(#rear)" stroke="#292929" stroke-width="1.5"/>
+  <path d="M34 83c0-12 7-20 19-20h40c5 0 8 1 11 4l17 17c4 4 8 5 14 5h61" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- A recessed middle lip makes the separate material layers visible. -->
+  <rect x="41" y="93" width="174" height="59" rx="10" fill="url(#inner)" stroke="#dadada" stroke-width="1"/>
+  <path d="M44 104h168" stroke="#ffffff" stroke-opacity="0.38" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Dark thickness below the gently tapered front face. -->
+  <path d="M39 113h178c12 0 18 8 17 20l-7 73c-2 20-14 30-33 30H52c-19 0-31-10-33-30l-6-69c-2-15 8-24 26-24Z" fill="#606060"/>
+  <path d="M39 107h178c12 0 18 8 17 20l-7 73c-2 20-14 30-33 30H52c-19 0-31-10-33-30l-6-69c-2-15 8-24 26-24Z" fill="url(#front)" stroke="url(#rim)" stroke-width="1.5"/>
+  <path d="M39 111h175c9 0 13 4 14 11" fill="none" stroke="#ffffff" stroke-opacity="0.48" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M53 222h138c13 0 23-6 27-17" fill="none" stroke="#5b5b5b" stroke-opacity="0.18" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

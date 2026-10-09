@@ -6,6 +6,12 @@
 fold line. It is one design in two inverse monochrome exports; the original
 `folder` remains unchanged. [Preview](../assets/folder-rounded-preview.svg).
 
+The follow-up [layered folder](../assets/folder-layered.svg) is a standalone
+shaded SVG: darker rear/tab, recessed middle lip, lighter tapered front, edge
+highlights and a soft contact shadow. It intentionally uses neutral-grey
+gradients rather than the flat pack's pure-tone stroke convention.
+[512px transparent PNG](../assets/folder-layered.png). No Nautilus theme is applied.
+
 [Browse and download](https://dsksnkz.github.io/ghOSt/icons.html).
 
 ## Files
