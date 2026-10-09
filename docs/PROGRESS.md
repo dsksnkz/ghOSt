@@ -1,5 +1,23 @@
 # ghOSt progress
 
+## 2026-10-09 / Realistic Venetian blinds
+
+Replaced flat stripes with shared curved thin-sheet 3D slats: crowned faces,
+rounded end profiles, closed edges, brushed metallic paint, directional lighting,
+cast shadows, front/back suspension cords and ladder rungs, head and bottom rails.
+The original descent, credential blur and authenticated rotating exit remain.
+Detailed gradient/texture/cord fallback supports the software Qt renderer.
+Installed the six affected lock files into the existing ghOSt profile, with no
+running lock instance and no session-lock, PAM or power action invoked.
+Snapshot: `.local/backups/2026-10-09-realistic-blinds-SaUciM/`.
+Software input/mock-auth tests and production compile pass. A short native
+Wayland test window (not a session lock) verified the real OpenGL 3D renderer,
+opening propagation, masked input and mocked authentication outcomes; inspected
+closed, credential and rotating actual-render images are under
+`docs/images/2026-10-09-realistic-blinds/`. Offscreen Qt falls back to software;
+it cannot validate 3D output. Real PAM/unlock handoff remains user-test pending.
+
+
 ## 2026-10-09 / Super+L standalone import fix
 
 User launch logs showed the nested lock entry failing before locking:

@@ -421,3 +421,17 @@ now capture without editing (no installed swappy). No session or capture action
 tested. Wlogout only opens a session menu; its existing lock command is hyprlock.
 Actual locker choice/configuration and remaining shortcut migration must be
 resolved before removing Serpantinum. Not marked complete or published.
+# 2026-10-09 / Realistic Venetian blinds
+
+Request: "it dosent look like blinds, it looks like straight bars. make it as realistic as possible. maximum details".
+
+Implemented curved 3D thin-sheet slats, rounded ends, painted/brushed material,
+lighting and cast shadows, paired ladder cords/rungs and head/bottom rails.
+Shared procedural geometry avoids rebuilding meshes for every animation frame.
+Preserved descent, typing blur, secure authentication policy and rotating exit.
+Added a detailed software-renderer fallback. Installed only affected lock files
+after safe tests; no actual lock or authentication invoked. Source/live paths
+snapshotted in `.local/backups/2026-10-09-realistic-blinds-SaUciM/`.
+Software and native Wayland/OpenGL visual/input/mock-auth checks and production
+compile pass. Actual renders: `docs/images/2026-10-09-realistic-blinds/`.
+Real authenticated unlock/handoff remains unverified; no parity claim.

@@ -35,6 +35,8 @@ ShellRoot {
                 wait(850);
                 compare(scene.drop, 1);
                 capture("blinds");
+                if (Quickshell.env("GHOST_LOCK_EXPECT_3D"))
+                    tryCompare(blinds, "uses3D", true, 2000);
                 scene.forceActiveFocus();
                 keyClick(Qt.Key_A);
                 compare(scene.credentialsVisible, true);
@@ -80,8 +82,11 @@ ShellRoot {
 
                 scene.visible = false;
                 blinds.visible = true;
+                wait(100);
                 blinds.opening = 0.5;
-                wait(30);
+                wait(250);
+                compare(blinds.renderedOpening, 0.5);
+                waitForRendering(blinds);
                 compare(blinds.y, 0);
                 verify(blinds.count > 1);
                 saved = false;
@@ -120,7 +125,7 @@ ShellRoot {
                 onWakeRequested: credentialsVisible = true
                 onSubmitted: test.submissions++
             }
-            Blinds { id: blinds; visible: false; width: parent.width; height: parent.height }
+            Blinds { id: blinds; force3D: !!Quickshell.env("GHOST_LOCK_EXPECT_3D"); visible: false; width: parent.width; height: parent.height }
         }
     }
 }

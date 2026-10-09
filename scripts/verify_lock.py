@@ -7,9 +7,10 @@ import shutil
 import tempfile
 
 root = Path(__file__).resolve().parents[1]
-environment = dict(os.environ, QT_QPA_PLATFORM="offscreen")
-environment.pop("WAYLAND_DISPLAY", None)
-environment.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
+environment = dict(os.environ, QT_QPA_PLATFORM=os.environ.get("GHOST_LOCK_TEST_PLATFORM", "offscreen"))
+if environment["QT_QPA_PLATFORM"] == "offscreen":
+    environment.pop("WAYLAND_DISPLAY", None)
+    environment.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
 with tempfile.TemporaryDirectory(prefix="ghost-lock-test-") as directory:
     runtime = Path(directory) / "runtime"
     shutil.copytree(root / "config/quickshell/ghost-bar", runtime)

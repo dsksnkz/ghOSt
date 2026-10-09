@@ -1,4 +1,7 @@
 Blinds 1.0 Blinds.qml
+BlindsFallback 1.0 BlindsFallback.qml
+Blinds3D 1.0 Blinds3D.qml
+SlatMesh 1.0 SlatMesh.qml
 LockScene 1.0 LockScene.qml
 LockAuth 1.0 LockAuth.qml
 ExitOverlay 1.0 ExitOverlay.qml

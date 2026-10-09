@@ -4,48 +4,29 @@ Item {
     id: blinds
     property real drop: 1
     property real opening: 0
-    readonly property int count: Math.max(1, Math.ceil(height / 54))
-    readonly property real slatHeight: height / count
+    property bool force3D: false
+    readonly property int count: Math.max(1, Math.ceil((height - 52) / 36))
+    readonly property bool hardware: GraphicsInfo.api !== GraphicsInfo.Software
+    readonly property bool uses3D: physical.status === Loader.Ready
+    readonly property real renderedOpening: physical.item ? physical.item.opening : fallback.opening
     y: (drop - 1) * height
 
-    Repeater {
-        model: blinds.count
-        Rectangle {
-            required property int index
-            readonly property real turn: Math.max(0, Math.min(1, (blinds.opening - index / blinds.count * 0.15) / 0.85))
-            x: -2
-            y: index * blinds.slatHeight
-            width: blinds.width + 4
-            height: blinds.slatHeight + 1
-            opacity: 1 - Math.max(0, (turn - 0.8) / 0.2)
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: "#454545"
-                }
-                GradientStop {
-                    position: 0.12
-                    color: "#393939"
-                }
-                GradientStop {
-                    position: 0.7
-                    color: "#292929"
-                }
-                GradientStop {
-                    position: 1
-                    color: "#151515"
-                }
-            }
-            transform: Rotation {
-                origin.x: width / 2
-                origin.y: height / 2
-                axis {
-                    x: 1
-                    y: 0
-                    z: 0
-                }
-                angle: 90 * turn
-            }
-        }
+    Loader {
+        id: physical
+        anchors.fill: parent
+        active: blinds.hardware || blinds.force3D
+        source: "Blinds3D.qml"
+    }
+    Binding {
+        target: physical.item
+        property: "opening"
+        value: blinds.opening
+        when: physical.status === Loader.Ready
+    }
+    BlindsFallback {
+        id: fallback
+        anchors.fill: parent
+        visible: !blinds.uses3D
+        opening: blinds.opening
     }
 }
