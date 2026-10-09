@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-09 / Settings with Taste Skill
+
+Refined Settings and its own sidebar using Taste's audit/spacing/hierarchy/
+contrast principles, adapted to native QML. Larger functional search, fixed
+icon/text alignment, more row space, live General summaries, grouped sound and
+other controls, legible read-only facts and passive storage meter. All14 pages,
+original portraits, name flow, creator names, scroll and reduced-motion selector
+remain. Tested and hot-reloaded on the laptop; both shell PIDs retained.64 tests,
+Qt input/compile/router/polling/scan and JS checks pass. Six native screenshots
+exclude private lists and battery history/time. [Evidence and recovery](changes/2026-10-09-settings-taste.md).
+Publication/fresh committed-archive check pending; broader prompt not completed.
+
 ## 2026-10-09 / Rounded icon family and Settings header
 
 All64 owned glyphs now use the corrected rounded inner/outer style, including

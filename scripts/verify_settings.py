@@ -52,11 +52,11 @@ for page in ('general', 'sound', 'battery', 'widgets', 'brightness', 'wallpaper'
     assert state['preview'] and state['visible'] and state['page'] == page
     assert (state['width'], state['height'], state['categories']) == (1024, 699, 14)
     assert (state['x'], state['y'], state['scale']) == (524, 212, 1)
-    assert state['navHeight'] == 538 and state['navTop'] == 137
+    assert state['navHeight'] == 530 and state['navTop'] == 145
     assert (state['searchTop'], state['searchWidth']) == (84, 227)
     assert (state['portraitTop'], state['portraitSize'], state['portraitRadius']) == (18, 48, 11)
     assert state['profileFont'] == 'JetBrains Mono'
-    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 234
+    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 252
     assert state['groupCategories'][0] == ['network', 'bluetooth', 'general', 'airplane', 'accessibility']
     assert not state['error']
     time.sleep(.25)

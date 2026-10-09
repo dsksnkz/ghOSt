@@ -9,8 +9,15 @@ import Quickshell.Services.Pipewire
 Item {
     id: settings
     property string soundGroup: "settings"
-    readonly property real navigationRowHeight: 42
-    readonly property real navigationRowGap: 6
+    // Settings-only tokens. Keep the supplied sidebar and native frame geometry.
+    readonly property color primaryInk: "#f1f1f1"
+    readonly property color secondaryInk: "#b8b8b8"
+    readonly property color controlSurface: "#2f2f2f"
+    readonly property color controlBorder: "#444444"
+    readonly property int controlHeight: 56
+    readonly property string creatorAttribution: "ghOSt - ChatGPT and dsksnkz"
+    readonly property real navigationRowHeight: 44
+    readonly property real navigationRowGap: 8
     readonly property real navigationStride: navigationRowHeight + navigationRowGap
     readonly property real navigationInset: 0
     readonly property real navigationGroupGap: 16
@@ -267,6 +274,10 @@ Item {
             width: scene.width,
             height: scene.height,
             scale: scene.scale,
+            pageWidth: pageFlick.width,
+            pageHeight: pageFlick.height,
+            pageContentHeight: pageFlick.contentHeight,
+            pageScroll: pageFlick.contentY,
             navHeight: navFlick.height,
             navTop: navFlick.y,
             searchTop: searchHousing.y,
@@ -318,6 +329,13 @@ Item {
             nameGap: 18
         };
     }
+    function publicCaptureItem() {
+        // Battery history and display-on time are private. Export charge only.
+        if (page !== "battery")
+            return settings;
+        const summary = pageLoader.item?.children.find(item => item.objectName === "settings-battery-summary");
+        return summary?.children.find(item => item.objectName === "settings-battery-charge") ?? null;
+    }
     Connections {
         target: Settings
         function onStateChanged() {
@@ -337,85 +355,168 @@ Item {
     Keys.onEscapePressed: closeRequested()
 
     component Section: Column {
-        spacing: 16
+        spacing: 12
         property string title: ""
-        width: body.width
+        width: parent.width
         Label {
             text: parent.title
-            font.pixelSize: 11
-            color: "#b8b8b8"
+            font.pixelSize: 13
+            color: settings.secondaryInk
             font.weight: Font.Medium
             visible: text !== ""
         }
     }
     component Card: G2Surface {
-        width: body.width
+        width: parent.width
         radius: 10
         smoothing: .6
-        color: "#2f2f2f"
+        color: settings.controlSurface
         border.width: 1
-        border.color: "#3b3b3b"
+        border.color: settings.controlBorder
+    }
+    component ControlGroup: Card {
+        objectName: "settings-control-group"
+        default property alias controls: groupBody.data
+        property int padding: 20
+        implicitHeight: groupBody.height + padding * 2
+        height: implicitHeight
+        Column {
+            id: groupBody
+            x: parent.padding
+            y: parent.padding
+            width: parent.width - parent.padding * 2
+            spacing: 12
+        }
+    }
+    component Summary: Key {
+        objectName: "settings-summary"
+        property string icon: "info"
+        property string name: ""
+        property string value: ""
+        property string detail: ""
+        property bool actionable: true
+        width: (body.width - 16) / 2
+        height: 128
+        radius: 10
+        smoothing: .6
+        color: settings.controlSurface
+        border.width: 1
+        border.color: activeFocus ? settings.primaryInk : settings.controlBorder
+        hint: name
+        enabled: actionable
+        opacity: 1
+        SvgIcon { x: 20; y: 20; width: 18; height: 18; name: parent.icon }
+        Label {
+            x: 50; y: 20; width: parent.width - 90; height: 20
+            text: parent.name; font.pixelSize: 12; color: settings.secondaryInk
+        }
+        SvgIcon {
+            anchors.right: parent.right; anchors.rightMargin: 20
+            y: 22; width: 14; height: 14; name: "forward"
+            visible: parent.actionable; opacity: .7
+        }
+        Label {
+            x: 20; y: 52; width: parent.width - 40; height: 36
+            text: parent.value; font.pixelSize: 26; font.weight: Font.Medium
+            color: settings.primaryInk
+        }
+        Label {
+            x: 20; y: 99; width: parent.width - 40; height: 18
+            text: parent.detail; font.pixelSize: 11; color: settings.secondaryInk
+        }
     }
     component DeviceRow: Key {
+        objectName: "settings-device-row"
         property string icon: ""
         property string name: ""
         property string value: ""
-        width: body.width
-        height: 48
-        radius: 8
+        property bool actionable: true
+        readonly property real valueWidth: value ? Math.min(260, Math.max(60, valueLabel.implicitWidth)) : 0
+        width: parent.width
+        height: settings.controlHeight
+        radius: 10
+        smoothing: .6
+        color: settings.controlSurface
+        // Read-only measurements remain legible, unlike unavailable actions.
+        opacity: actionable ? (enabled ? 1 : .42) : 1
+        activeFocusOnTab: actionable && enabled
         hint: name
-        SvgIcon {
+        G2Surface {
             x: 16
-            y: 15
-            width: 18
-            height: 18
-            name: parent.icon
+            y: (parent.height - height) / 2
+            width: 32
+            height: 32
+            radius: 8
+            color: "#252525"
+            SvgIcon {
+                anchors.centerIn: parent
+                width: 18
+                height: 18
+                name: parent.parent.icon
+            }
         }
         FadeLabel {
-            x: 48
-            y: 16
-            width: parent.width - 284
-            height: 18
+            x: 64
+            y: (parent.height - height) / 2
+            width: parent.width - parent.valueWidth - 128
+            height: 22
             text: parent.name
-            font.pixelSize: 11
-            background: "#252525"
+            font.pixelSize: 13
+            background: settings.controlSurface
         }
         Label {
+            id: valueLabel
             anchors.right: parent.right
-            anchors.rightMargin: 16
-            y: 16
-            width: 230
+            anchors.rightMargin: parent.actionable ? 44 : 20
+            y: (parent.height - height) / 2
+            height: 22
+            width: parent.valueWidth
             horizontalAlignment: Text.AlignRight
             text: parent.value
-            font.pixelSize: 10
-            color: "#b8b8b8"
+            font.pixelSize: 12
+            color: settings.secondaryInk
+        }
+        SvgIcon {
+            anchors.right: parent.right
+            anchors.rightMargin: 18
+            y: (parent.height - height) / 2
+            width: 14
+            height: 14
+            name: "forward"
+            visible: parent.actionable && parent.enabled
+            opacity: .7
         }
     }
-    component ToggleRow: Item {
+    component ToggleRow: G2Surface {
+        objectName: "settings-toggle-row"
         property string name: ""
         property string icon: "settings"
         property bool checked: false
         signal toggled(bool value)
-        width: body.width
-        height: 48
+        width: parent.width
+        height: settings.controlHeight
+        radius: 10
+        smoothing: .6
+        color: settings.controlSurface
         SvgIcon {
             x: 16
-            y: 15
+            y: (parent.height - height) / 2
             width: 18
             height: 18
             name: parent.icon
         }
         Label {
             x: 48
-            y: 16
+            y: (parent.height - height) / 2
+            height: 22
             width: parent.width - 140
             text: parent.name
-            font.pixelSize: 11
+            font.pixelSize: 13
         }
         SettingsToggle {
             anchors.right: parent.right
             anchors.rightMargin: 16
-            y: 14
+            y: (parent.height - height) / 2
             checked: parent.checked
             enabled: parent.enabled && !Settings.busy
             hint: parent.name
@@ -423,18 +524,19 @@ Item {
         }
     }
     component Note: Label {
-        width: body.width
+        width: parent.width
         wrapMode: Text.WordWrap
         elide: Text.ElideNone
         color: "#b8b8b8"
-        font.pixelSize: 11
+        font.pixelSize: 12
+        lineHeight: 1.35
     }
     component SoundControl: Column {
         property string name: ""
         property string icon: "volume"
         property real amount: 0
         signal moved(real value)
-        width: body.width
+        width: parent.width
         spacing: 14
         Row {
             width: parent.width
@@ -447,7 +549,7 @@ Item {
             Label {
                 width: parent.width - 88
                 text: parent.parent.name
-                font.pixelSize: 12
+                font.pixelSize: 13
             }
             Label {
                 text: Math.round(parent.parent.amount) + "%"
@@ -492,32 +594,60 @@ Item {
             x: 17
             y: 84
             width: 227
-            height: 24.17
-            radius: 4
-            color: Qt.rgba(217 / 255, 217 / 255, 217 / 255, .17)
+            height: 32
+            radius: 8
+            smoothing: .6
+            color: "#3b3b3b"
+            border.width: search.activeFocus ? 1 : 0
+            border.color: settings.secondaryInk
+            SvgIcon {
+                x: 12
+                y: 8
+                width: 16
+                height: 16
+                name: "search"
+                opacity: .75
+            }
             Label {
-                x: 14
-                y: 4
-                text: "Search here"
+                x: 38
+                y: 7
+                text: "Search settings"
                 visible: search.text.length === 0
-                color: "#858585"
+                color: "#b8b8b8"
                 font.pixelSize: 12
             }
             TextInput {
                 id: search
                 objectName: "settings-search"
-                x: 14
-                y: 4
-                width: 199
-                height: 17
+                x: 38
+                y: 7
+                width: 151
+                height: 18
                 color: "#ffffff"
                 font.family: Theme.font
-                font.pixelSize: 11
+                font.pixelSize: 12
                 text: settings.query
                 onTextChanged: settings.query = text
                 selectByMouse: true
                 clip: true
                 Accessible.name: "Find Settings"
+            }
+            Key {
+                objectName: "settings-search-clear"
+                x: 199
+                y: 6
+                width: 20
+                height: 20
+                radius: 6
+                visible: search.text.length > 0
+                hint: "Clear search"
+                onClicked: settings.query = ""
+                SvgIcon {
+                    anchors.centerIn: parent
+                    width: 12
+                    height: 12
+                    name: "close"
+                }
             }
         }
         Item {
@@ -559,7 +689,7 @@ Item {
                 text: "Your PC"
                 font.family: Theme.textFont
                 font.pixelSize: 10
-                color: "#ffffff"
+                color: settings.secondaryInk
             }
             Key {
                 x: 173
@@ -580,9 +710,9 @@ Item {
         Flickable {
             id: navFlick
             x: 17
-            y: 137
+            y: 145
             width: 231
-            height: 538
+            height: 530
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
@@ -597,14 +727,14 @@ Item {
                 // Logical groups keep their spacing without housings or lines.
                 G2Surface {
                     id: navigationSelection
-                    x: 15
+                    x: 0
                     y: settings.navLayout.rows.find(row => row.id === settings.page)?.y ?? 0
                     visible: settings.navLayout.rows.some(row => row.id === settings.page)
-                    width: 211
+                    width: 227
                     height: settings.navigationRowHeight
                     radius: 10
                     smoothing: .6
-                    color: "#535353"
+                    color: "#454545"
                     Behavior on y {
                         NumberAnimation {
                             duration: Theme.reducedMotion ? 0 : 280
@@ -628,13 +758,13 @@ Item {
                         onClicked: settings.choose(modelData.id)
                         G2Surface {
                             objectName: "settings-navigation-icon"
-                            x: modelData.id === settings.page ? 23 : 10
+                            x: 12
                             y: (parent.height - height) / 2
                             width: 28
                             height: 28
                             radius: 8
                             smoothing: .6
-                            color: "#2f2f2f"
+                            color: modelData.id === settings.page ? "#252525" : "#2f2f2f"
                             SvgIcon {
                                 objectName: "settings-navigation-glyph"
                                 anchors.centerIn: parent
@@ -644,13 +774,14 @@ Item {
                             }
                         }
                         Label {
-                            x: modelData.id === settings.page ? 63 : 50
+                            x: 52
                             y: (parent.height - height) / 2
                             width: modelData.id === "airplane" ? 112 : 162
                             height: 18
                             text: modelData.name
-                            font.pixelSize: 11
-                            color: "#ffffff"
+                            font.pixelSize: 12
+                            font.weight: modelData.id === settings.page ? Font.Medium : Font.Normal
+                            color: modelData.id === settings.page ? settings.primaryInk : "#d1d1d1"
                         }
                         SettingsToggle {
                             visible: modelData.id === "airplane"
@@ -692,17 +823,30 @@ Item {
                     id: entrance
                     target: body
                     property: "opacity"
-                    from: .5
+                    from: .78
                     to: 1
                     duration: Theme.reducedMotion ? 0 : 140
                 }
-                Label {
+                Item {
                     visible: settings.page !== "general"
-                    text: settings.categories.find(c => c.id === settings.page)?.name || ""
-                    font.pixelSize: 20
-                    font.weight: Font.Medium
+                    width: parent.width
+                    height: 32
+                    SvgIcon {
+                        x: 0; y: 6; width: 20; height: 20
+                        name: settings.categories.find(c => c.id === settings.page)?.icon || "info"
+                    }
+                    Label {
+                        x: 36; width: parent.width - 36; height: 32
+                        verticalAlignment: Text.AlignVCenter
+                        text: settings.categories.find(c => c.id === settings.page)?.name || ""
+                        font.pixelSize: 22
+                        font.weight: Font.Medium
+                        color: settings.primaryInk
+                    }
                 }
                 Loader {
+                    id: pageLoader
+                    objectName: "settings-page-loader"
                     width: body.width
                     sourceComponent: ({
                             general: generalPage,
@@ -737,7 +881,7 @@ Item {
         id: generalPage
         Item {
             width: body.width
-            height: 390
+            height: 518
             G2Image {
                 x: 287
                 y: 0
@@ -785,9 +929,9 @@ Item {
                 }
             }
             Key {
-                x: 245
+                x: (parent.width - width) / 2
                 y: 172
-                width: 199
+                width: 245
                 height: 18
                 hint: "System information"
                 onClicked: settings.choose("about")
@@ -801,12 +945,51 @@ Item {
                 Label {
                     x: 27
                     y: 1
-                    width: 172
+                    width: parent.width - 27
                     height: 15
-                    text: "ghOSt - by you and Dsksnkz"
+                    text: settings.creatorAttribution
                     font.family: Theme.textFont
                     font.pixelSize: 11
                     color: "#ffffff"
+                }
+            }
+            Row {
+                y: 230
+                width: parent.width
+                spacing: 16
+                Summary {
+                    objectName: "settings-overview-battery"
+                    icon: "battery"
+                    name: "Battery"
+                    value: settings.details.battery ? settings.details.battery.percent + "%" : "AC power"
+                    detail: settings.details.battery?.status || "No battery detected"
+                    onClicked: settings.choose("battery")
+                }
+                Summary {
+                    objectName: "settings-overview-storage"
+                    icon: "storage"
+                    name: "Storage"
+                    value: settings.gigabytes(settings.details.storage?.free)
+                    detail: settings.details.storage ? "Free of " + settings.gigabytes(settings.details.storage.total) : "Storage unavailable"
+                    onClicked: settings.choose("storage")
+                }
+            }
+            Column {
+                y: 382
+                width: parent.width
+                spacing: 12
+                DeviceRow {
+                    objectName: "settings-overview-sound"
+                    icon: "volume"
+                    name: "Sound"
+                    value: settings.previewMode ? Math.round(settings.fixtureVolume) + "%" : Desk.audio ? (Desk.muted ? "Muted" : Math.round(Desk.volume) + "%") : "Unavailable"
+                    onClicked: settings.choose("sound")
+                }
+                DeviceRow {
+                    icon: "accessibility"
+                    name: "Reduced motion"
+                    value: Theme.reducedMotion ? "On" : "Off"
+                    onClicked: settings.choose("accessibility")
                 }
             }
         }
@@ -816,7 +999,8 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            SoundControl {
+            ControlGroup {
+              SoundControl {
                 name: "Output volume"
                 amount: settings.previewMode ? settings.fixtureVolume : Desk.volume
                 enabled: settings.previewMode || !!Desk.audio
@@ -826,14 +1010,15 @@ Item {
                     else
                         Desk.setVolume(value / 100);
                 }
-            }
-            ToggleRow {
+              }
+              ToggleRow {
                 name: "Mute output"
                 icon: "mute"
                 checked: !settings.previewMode && Desk.muted
                 enabled: settings.previewMode || !!Desk.audio
                 onToggled: if (!settings.previewMode)
                     Desk.mute()
+              }
             }
             Section {
                 title: "Output device"
@@ -858,7 +1043,8 @@ Item {
                     text: "No output devices"
                 }
             }
-            SoundControl {
+            ControlGroup {
+              SoundControl {
                 name: "Microphone level"
                 icon: "microphone"
                 amount: settings.previewMode ? settings.fixtureInput : Math.round((settings.source?.audio?.volume ?? 0) * 100)
@@ -869,8 +1055,8 @@ Item {
                     else if (settings.source?.audio)
                         settings.source.audio.volume = value / 100;
                 }
-            }
-            ToggleRow {
+              }
+              ToggleRow {
                 name: "Mute microphone"
                 icon: "microphone"
                 checked: !settings.previewMode && !!settings.source?.audio?.muted
@@ -879,6 +1065,7 @@ Item {
                     if (!settings.previewMode && settings.source?.audio)
                         settings.source.audio.muted = value;
                 }
+              }
             }
             Section {
                 title: "Input device"
@@ -918,36 +1105,34 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            Label {
-                text: settings.details.battery ? settings.details.battery.percent + "%" : "AC power"
-                font.pixelSize: 42
-            }
-            Note {
-                text: settings.details.battery?.status || "No battery detected"
-            }
-            ToggleRow {
-                name: "Record battery and display-on time"
-                icon: "clock"
-                checked: !!settings.details.preferences?.usageTracking
-                onToggled: value => settings.preference("usageTracking", value)
-            }
-            Note {
-                text: "Local history only. Counts display-on time while ghOSt is running."
-            }
-            Card {
-                height: 96
-                Label {
-                    x: 20
-                    y: 18
-                    text: "Today"
-                    color: "#b8b8b8"
+            Row {
+                objectName: "settings-battery-summary"
+                width: parent.width
+                spacing: 16
+                Summary {
+                    objectName: "settings-battery-charge"
+                    icon: "battery"
+                    name: "Charge"
+                    value: settings.details.battery ? settings.details.battery.percent + "%" : "AC power"
+                    detail: settings.details.battery?.status || "No battery detected"
+                    actionable: false
                 }
-                Label {
-                    x: 20
-                    y: 43
-                    text: Math.floor((settings.details.usage?.seconds ?? 0) / 3600) + "h " + Math.floor((settings.details.usage?.seconds ?? 0) % 3600 / 60) + "m"
-                    font.pixelSize: 26
+                Summary {
+                    icon: "clock"
+                    name: "Display-on time today"
+                    value: settings.details.preferences?.usageTracking ? Math.floor((settings.details.usage?.seconds ?? 0) / 3600) + "h " + Math.floor((settings.details.usage?.seconds ?? 0) % 3600 / 60) + "m" : "Not recording"
+                    detail: "While ghOSt is running"
+                    actionable: false
                 }
+            }
+            ControlGroup {
+                ToggleRow {
+                    name: "Record battery and display-on time"
+                    icon: "clock"
+                    checked: !!settings.details.preferences?.usageTracking
+                    onToggled: value => settings.preference("usageTracking", value)
+                }
+                Note { text: "History stays on this computer." }
             }
             Section {
                 title: "Battery history"
@@ -958,6 +1143,7 @@ Item {
                         icon: "battery"
                         name: Qt.formatDateTime(new Date(modelData.time * 1000), "HH:mm")
                         value: modelData.percent + "% · " + modelData.status
+                        actionable: false
                         enabled: false
                     }
                 }
@@ -970,10 +1156,11 @@ Item {
     }
     Component {
         id: widgetsPage
-        Card {
-            height: 240
+        ControlGroup {
+            padding: 8
             Column {
                 width: parent.width
+                spacing: 6
                 Repeater {
                     model: [
                         {
@@ -1018,7 +1205,8 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            SoundControl {
+            ControlGroup {
+              SoundControl {
                 name: "Laptop display"
                 icon: "brightness"
                 amount: settings.details.brightness?.percent ?? 0
@@ -1027,6 +1215,7 @@ Item {
                     settings.pendingBrightness = Math.max(1, value);
                     brightnessCommit.restart();
                 }
+              }
             }
             Note {
                 text: settings.details.brightness ? "External displays require a supported display control backend." : "No controllable laptop backlight detected"
@@ -1144,7 +1333,7 @@ Item {
                 elide: Text.ElideNone
                 font.pixelSize: 10
                 color: "#b8b8b8"
-                text: settings.nameSubmitted && Settings.error ? Settings.error : "1–63 lowercase letters, numbers or hyphens. No edge hyphens."
+                text: settings.nameSubmitted && Settings.error ? Settings.error : "1-63 lowercase letters, numbers or hyphens. No edge hyphens."
             }
             Key {
                 x: 180
@@ -1338,18 +1527,37 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            Label {
-                text: settings.gigabytes(settings.details.storage?.used)
-                font.pixelSize: 32
-            }
-            Note {
-                text: "Used of " + settings.gigabytes(settings.details.storage?.total)
-            }
-            SettingsSlider {
+            Row {
                 width: parent.width
-                enabled: false
-                value: 100 * (settings.details.storage?.used ?? 0) / (settings.details.storage?.total || 1)
-                label: "Used storage"
+                spacing: 16
+                Summary {
+                    icon: "storage"; name: "Used"
+                    value: settings.gigabytes(settings.details.storage?.used)
+                    detail: settings.details.storage ? "Of " + settings.gigabytes(settings.details.storage.total) : "Storage unavailable"
+                    actionable: false
+                }
+                Summary {
+                    icon: "folder"; name: "Free"
+                    value: settings.gigabytes(settings.details.storage?.free)
+                    detail: "Home filesystem"
+                    actionable: false
+                }
+            }
+            // A passive measurement, not a disabled slider suggesting a setter.
+            ControlGroup {
+                Label { text: "Used storage"; color: settings.secondaryInk; font.pixelSize: 12 }
+                G2Surface {
+                    objectName: "settings-storage-meter"
+                    width: parent.width; height: 8; radius: 4; color: "#414141"
+                    Accessible.role: Accessible.ProgressBar
+                    Accessible.name: "Used storage"
+                    Accessible.description: settings.details.storage ? Math.round(100 * settings.details.storage.used / settings.details.storage.total) + "%" : "Unavailable"
+                    G2Surface {
+                        objectName: "settings-storage-fill"
+                        width: parent.width * Math.max(0, Math.min(1, (settings.details.storage?.used ?? 0) / (settings.details.storage?.total || 1)))
+                        height: parent.height; radius: 4; color: "#d9d9d9"
+                    }
+                }
             }
             DeviceRow {
                 icon: "folder"
@@ -1381,10 +1589,11 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            Card {
-                height: 144
+            ControlGroup {
+                padding: 8
                 Column {
                     width: parent.width
+                    spacing: 6
                     DeviceRow {
                         icon: "info"
                         name: "Computer"
@@ -1395,18 +1604,20 @@ Item {
                         icon: "terminal"
                         name: "Kernel"
                         value: settings.details.kernel || "Unavailable"
+                        actionable: false
                         enabled: false
                     }
                     DeviceRow {
                         icon: "settings"
                         name: "Desktop"
                         value: "Hyprland / ghOSt"
+                        actionable: false
                         enabled: false
                     }
                 }
             }
             Label {
-                text: "ghOSt - by you and Dsksnkz"
+                text: settings.creatorAttribution
                 font.family: Theme.textFont
                 font.pixelSize: 11
                 color: "#ffffff"

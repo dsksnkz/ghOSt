@@ -3,33 +3,40 @@ import Quickshell
 
 FloatingWindow {
     id: window
+
     property string captureResult: ""
 
-    // Capture the actual visible native General page, not another desktop app.
-    // Refuse network/history pages so verification cannot export private lists.
+    // Capture actual native content only on pages without private lists/paths.
+    // The method name stays stable for the existing captureSettings IPC.
     function captureGeneral(path) {
-        if (!visible || content.page !== "general") {
-            captureResult = "refused: General not visible";
+        const safePages = ["general", "sound", "battery", "storage", "widgets", "about", "brightness", "accessibility", "airplane", "applications"];
+        const page = content.page;
+        const item = content.publicCaptureItem();
+        if (!visible || !safePages.includes(page) || !item) {
+            captureResult = "refused: private or hidden page";
             return false;
         }
         captureResult = "pending";
-        const requested = content.grabToImage(result => {
-            if (!visible || content.page !== "general") {
+        const requested = item.grabToImage((result) => {
+            if (!visible || content.page !== page) {
                 captureResult = "cancelled: page changed";
-                return;
+                return ;
             }
             captureResult = result.saveToFile(path) ? "saved" : "failed";
         });
         if (!requested)
             captureResult = "failed: renderer unavailable";
+
         return requested;
     }
 
     function inspect(action) {
         if (action === "capture")
             return captureResult;
+
         if (action === "sounds")
             return JSON.stringify(UiSounds.status());
+
         if (action === "polling")
             return JSON.stringify(Settings.pollingStatus());
 
@@ -60,19 +67,21 @@ FloatingWindow {
     implicitHeight: 699
     minimumSize: Qt.size(720, 490)
     color: "transparent"
+    Component.onCompleted: Settings.active = visible
+    onVisibleChanged: Settings.active = visible
+    onClosed: Desk.settingsRequested = false
+
     Binding {
         target: Settings
         property: "page"
         value: content.page
     }
+
     Binding {
         target: Desk
         property: "networkSettingsVisible"
         value: window.visible && content.page === "network"
     }
-    Component.onCompleted: Settings.active = visible
-    onVisibleChanged: Settings.active = visible
-    onClosed: Desk.settingsRequested = false
 
     SettingsNavigation {
         controller: Desk
@@ -86,4 +95,5 @@ FloatingWindow {
         anchors.fill: parent
         onCloseRequested: Desk.settingsRequested = false
     }
+
 }

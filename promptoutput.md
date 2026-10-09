@@ -1,5 +1,16 @@
 prompts outputs here
 
+## 2026-10-09 / Settings and Settings sidebar
+
+Taste Skill's applicable audit, spacing, hierarchy and contrast guidance adapted
+to native ghOSt, preserving owned icons and existing functions. Both panes
+refined: larger searchable sidebar, stable selections, live General summaries,
+grouped controls and readable values. Original portraits/name flow, creator
+attribution, all14 pages and scroll/motion remain. Tested/live on the laptop;
+64 Python tests, Qt and JS checks pass. Six privacy-safe actual-output captures
+and [full record](docs/changes/2026-10-09-settings-taste.md). Publication and fresh
+archive verification pending; broader prompt remains unfinished.
+
 ## 2026-10-09 · All icons and Settings redesign
 
 All64 ghOSt icons share rounded inner/outer corners and2px outlines. New Settings

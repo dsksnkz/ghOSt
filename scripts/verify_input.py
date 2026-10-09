@@ -16,6 +16,7 @@ for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
                   "PASS: per-output fullscreen visibility and restoration",
                   "PASS: Settings wheel propagation and Bezier selection movement",
                   "PASS: Settings fixed header, search, portrait, gear and all 14 pages",
+                  "PASS: Settings live summaries, passive storage, all-page bounds and content scrolling",
                   "PASS: selected weather headline and temperature agree",
                   "PASS: expanded/compact music geometry and time formatting",
                   "PASS: click dispatches both fixed SFX and derived action"):
