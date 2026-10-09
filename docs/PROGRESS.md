@@ -1,5 +1,12 @@
 # ghOSt progress
 
+## 2026-10-09 / Remove left rail dividers
+
+Removed the two separators between menu, desktop switcher and music at the
+user's direct request. Existing spacing, rail outline and right-side dividers
+remain. Production compile and diff checks pass, native hot reload succeeds,
+installed Rail matches source. [Native crop and recovery](changes/2026-10-09-left-dividers.md).
+
 ## 2026-10-09 / Rail music background
 
 Fifteen real Cava bars span the compact music background behind the larger13px

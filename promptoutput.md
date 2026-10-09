@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-09 / Left rail dividers
+
+Request: "remove the horizontal lines between the three bars on top left,
+desktop swither and music". Removed the two inter-group separator surfaces,
+preserving component positions and right-side separators. Compiled, deployed
+and inspected actual native output; source/live match.
+[Evidence](docs/changes/2026-10-09-left-dividers.md).
+
 ## 2026-10-09 / Rail music:15 background bars and larger title
 
 Direct request: move Cava from the left to the background of the whole music
