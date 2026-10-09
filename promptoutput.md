@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-09 / Super+L launch repair
+
+User reports "super l dosent do shit". Actual launch logs show the lock scene
+cannot import G2Surface when its entry is inside the nested lock directory.
+Moved the entry to `ghost-bar/lock.qml`, preserving shared components inside
+Quickshell's scanned root; explicit ghost-lock ShellId remains separate from
+the bar. Updated Super+L, power-key Lock, wlogout and ghOSt Lock menu routes.
+Correct-root compile and visual/input/mock-auth checks pass; live files and Lua
+verified. Real compositor lock/unlock remains user-verification pending.
+
 ## 2026-10-09 / Venetian blinds lock
 
 Request: descending venetian blinds with Bézier speed; typing blurs the blinds

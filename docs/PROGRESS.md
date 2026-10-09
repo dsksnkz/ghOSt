@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-09 / Super+L standalone import fix
+
+User launch logs showed the nested lock entry failing before locking:
+`G2Surface is not a type`. Earlier compile tests used the bar root and missed
+the standalone nested-root import boundary. Moved the production entry to
+`ghost-bar/lock.qml` so owned shared components remain inside the config root,
+and assigned explicit `ghost-lock` ShellId. All local/public launch routes updated.
+Correct-root compile, visual/input/mock-auth checks, Lua and live parity pass;
+compositor reloaded without errors. Real lock/unlock still not invoked in tests.
+Original frames remain applicable; no visual change.
+
 ## 2026-10-09 / Venetian lock screen
 
 Independent Quickshell Wayland session-lock entry now has descending shaded

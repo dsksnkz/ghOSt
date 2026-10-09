@@ -12,7 +12,7 @@ The user's requested sequence is implemented in an independent lock entry:
   `PamResult.Success` authorizes exit. Secrets have no logs, disk storage,
   command-line arguments or IPC endpoints; cleared references are not a claim
   of cryptographic memory erasure.
-- `lock/shell.qml`: one secure `WlSessionLockSurface` per output, existing
+- `lock.qml`: one secure `WlSessionLockSurface` per output, existing
   `/etc/pam.d/hyprlock` authentication, no unlock IPC or fixture bypass.
 - `lock/ExitOverlay.qml`: after successful authentication, maps transparent
   overlays with closed blinds, then releases the session lock and rotates the
@@ -60,3 +60,15 @@ Recovery snapshot: `.local/backups/2026-10-09-venetian-lock-RydxHg/` includes
 original live keybinds/autostart/wlogout layout/PanelContent and affected project
 documents. The newly added live lock directory can be kept while restoring those
 exact original routes. Serpantinum removal remains a separate unfinished task.
+
+## Standalone launch repair
+
+The user's first real launch exposed `G2Surface is not a type`: nested
+`lock/shell.qml` made the shared surface an import outside Quickshell's config
+root. The earlier compile harness used the bar root, so it missed this boundary.
+The entry now lives at `ghost-bar/lock.qml`, imports the visual components from
+`lock/`, and sets an explicit `ghost-lock` ShellId. All launch routes match this
+entry. Visuals are unchanged, so the existing test-rendered frames still apply.
+Correct-root production compile and mocked input/auth tests pass; real session
+locking is still not automatically tested. The old installed nested entry was
+moved to local trash after its replacement and original snapshot were saved.

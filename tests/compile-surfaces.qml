@@ -5,7 +5,7 @@ ShellRoot {
     Component.onCompleted: Qt.callLater(validate)
     function validate() {
         const files = ["SettingsPanel.qml", "SidebarFigmaBody.qml", "CalendarPanel.qml",
-            "MusicBar.qml", "UiSounds.qml", "OsdState.qml", "Osd.qml", "EdgeHandle.qml", "shell.qml", "lock/shell.qml"];
+            "MusicBar.qml", "UiSounds.qml", "OsdState.qml", "Osd.qml", "EdgeHandle.qml", "shell.qml", "lock.qml"];
         for (const file of files) {
             const component = Qt.createComponent(Qt.resolvedUrl(file));
             if (component.status !== Component.Ready) {
