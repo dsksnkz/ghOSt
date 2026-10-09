@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-09 / Remove top rail calendar icon
+
+Removed the calendar glyph beside the rail clock at the user's direct request.
+Clock/date/weather positions and the clickable calendar target remain. Removed
+the obsolete icon-center diagnostic/assertion. Production compile and diff
+checks pass, native hot reload succeeds and source/live Rail match.
+[Native output and recovery](changes/2026-10-09-rail-calendar-icon.md).
+
 ## 2026-10-09 / Remove left rail dividers
 
 Removed the two separators between menu, desktop switcher and music at the

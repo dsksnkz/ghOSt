@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-09 / Remove rail calendar icon
+
+Request: "remove calendar icon on top rail". Removed the glyph while preserving
+clock/date/weather layout and click-to-open calendar behavior. Compile passed,
+deployed and native output inspected; source/live files match.
+[Evidence](docs/changes/2026-10-09-rail-calendar-icon.md).
+
 ## 2026-10-09 / Left rail dividers
 
 Request: "remove the horizontal lines between the three bars on top left,

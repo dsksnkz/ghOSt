@@ -119,14 +119,6 @@ Item {
                     height: 36
                     hint: "Calendar"
                     onClicked: bar.open("calendar", this)
-                    SvgIcon {
-                        id: calendarIcon
-                        x: 0
-                        y: 8
-                        width: 19
-                        height: 20
-                        name: "calendar"
-                    }
                     InkLabel {
                         id: railTime
                         x: 27
@@ -310,7 +302,6 @@ Item {
         return {
             clockGap: clockDivider.x - railTime.x - railTime.contentWidth,
             clockInkCenter: railTime.mapToItem(bar, 0, railTime.inkCenterY).y,
-            calendarIconCenter: calendarIcon.mapToItem(bar, 0, calendarIcon.height / 2).y,
             batteryInkCenter: batteryText.mapToItem(bar, 0, batteryText.inkCenterY).y,
             batteryIconCenter: batteryIcon.mapToItem(bar, 0, batteryIcon.height / 2).y,
             rightIcons: icons.map(icon => ({
