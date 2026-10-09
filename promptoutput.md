@@ -1,5 +1,14 @@
 prompts outputs here
 
+## 2026-10-09 · Redo the inside folder corners
+
+Deleted the rejected layered experiment (recoverable from Git/snapshot) and
+replaced the earlier rounded outline with explicit rounded inner tab/body
+cutouts. Black/white variants and preview share one generator geometry. No
+Nautilus changes. All 63 Python tests, generator freshness and diff checks pass;
+rendered inner corners visually inspected. Publication pending; older variants below are
+historical, not the current design.
+
 ## 2026-10-09 · Shaded, layered folder
 
 Added the requested 3D-like grey shading with a dark rear/tab and lighter middle

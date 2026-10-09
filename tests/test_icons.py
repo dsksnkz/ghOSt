@@ -14,6 +14,17 @@ MANIFEST = json.loads((ASSETS / "manifest.json").read_text())
 
 
 class IconTests(unittest.TestCase):
+    def test_rounded_folder_has_rounded_inside_corners(self):
+        data = subprocess.check_output([
+            "rsvg-convert", "-w", "240", "-h", "240",
+            str(ASSETS / "black/folder-rounded.svg")])
+        alpha = Image.open(io.BytesIO(data)).convert("RGBA").getchannel("A")
+        # Curved cavity corners retain material where a square cutout wouldn't.
+        for point in ((48, 132), (192, 132), (48, 192), (192, 192), (46, 114)):
+            self.assertGreater(alpha.getpixel(point), 220, point)
+        for point in ((120, 155), (80, 100)):
+            self.assertEqual(alpha.getpixel(point), 0, point)
+
     def test_expected_coverage(self):
         names = {i["name"] for i in MANIFEST}
         required = set("settings wifi ethernet network bluetooth display brightness volume microphone notifications appearance wallpaper keyboard mouse touchpad accessibility language calendar clock battery power storage app accounts privacy security lock updates info search cpu gpu memory ghost".split())

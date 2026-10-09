@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-09 / Folder redo: inner radii
+
+Removed the rejected layered SVG/PNG and its dedicated tests; the deleted design
+is recoverable in Git history and `.local/backups/2026-10-09-folder-redo-IOeZVO/`.
+Rebuilt `folder-rounded` as an even-odd filled silhouette with separately rounded
+tab/body cavities, eliminating the sharp inner joins of the previous stroked
+version. Preview now derives from the same canonical geometry, not a duplicate.
+Original `folder` and Nautilus remain untouched. All 63 Python tests, generator
+freshness and diff checks pass; rendered preview visually inspected, including
+rounded negative-space corners. Publication pending.
+This supersedes the earlier layered and rounded-asset entries below.
+
 ## 2026-10-09 / Layered folder refinement
 
 The user's follow-up explicitly asks for depth and shading, superseding pure
