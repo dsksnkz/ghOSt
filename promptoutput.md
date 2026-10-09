@@ -486,3 +486,18 @@ Compile, input/weather and 16 weather tests pass; added icon geometry/parity
 assertion. Offscreen component screenshot inspected; no visible testing window
 or system action. Live files installed with reversible snapshot at
 `.local/backups/2026-10-09-calendar-flat/`; clean screenshot recorded.
+# 2026-10-10 / Serpantinum removal
+
+Request: "uninstall every serpantinum thing, including this top bar wtf is it doing there behind my ghost bar".
+
+Removed legacy autostart and command dependencies, preserved shortcut
+combinations with native workspace actions and ghOSt counterparts. H/A now
+Info/Widgets because old guide/autohide have no exact counterpart. Source,
+configuration, state, runtime/caches and unused nested legacy-dependent shell
+moved to private recoverable backup. No legacy processes or layers remain;
+ghOSt is the sole shell and owns the now-vacant notification service legitimately.
+Root command symlinks remain inert/dangling: administrator password required
+for unlinking, so full uninstall is not marked complete. Lua/config/compile/IPC
+and layer/reference checks pass. Rail crop published without private titles.
+Backup `.local/backups/2026-10-10-serpantinum-removal/`; no auth/session tests.
+

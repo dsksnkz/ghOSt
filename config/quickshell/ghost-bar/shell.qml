@@ -124,6 +124,9 @@ ShellRoot {
     }
     IpcHandler {
         target: "bar"
+        function reload(): void {
+            Quickshell.reload(false);
+        }
         function toggle(name: string): void {
             const screen = Quickshell.screens[0];
             if (screen)

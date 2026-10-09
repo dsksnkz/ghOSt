@@ -1,5 +1,35 @@
 # ghOSt progress
 
+## 2026-10-10 / Serpantinum uninstall — active removal complete, root links pending
+
+Direct user request explicitly authorizes removing the legacy shell/processes.
+Removed its autostart command and all active legacy shortcuts; ghOSt survives
+unchanged as the sole QuickShell instance. Layer inventory now contains only
+ghOSt surfaces; the duplicate top rail is absent. The previously observed
+legacy PIDs had already exited before targeted termination (no process matched
+the original PIDs); repeated process/layer checks confirm none remain.
+Moved installed source, settings, state, runtime and three cache directories,
+plus unused nested old shell under the live ghOSt directory, into recoverable
+`.local/backups/2026-10-10-serpantinum-removal/`. Private backup is not published.
+No pacman package exists. Root-owned `/usr/local/bin/serpantinum` and
+`/usr/local/bin/serpantinumd` are now dangling/inert symlinks; removing these
+requires administrator authentication (`sudo -n` unavailable). Full uninstall
+is pending that final administrative step, not claimed complete.
+
+Existing combinations retained: M reloads ghOSt, Space launcher, R system Info,
+B Wallpaper, N Network. H now Info and A Widgets: these are not exact replacements
+for the old guide/autohide pages. Number/Shift+number use native Hyprland workspace
+focus/move; scroll, lock, screenshot and clipboard bindings remain intact.
+Published optional `config/hypr/ghost-migration.lua` and independent reload IPC.
+Lua syntax, compositor configerrors (empty), compile, IPC reload, notification
+server takeover of the vacant name, live-source parity and legacy reference
+search pass. No lock/power/workspace/screenshot shortcut action invoked.
+Privacy-safe actual rail crop in `docs/images/2026-10-10-serpantinum-removal/`.
+Wallpaper/theme and unrelated services untouched; notifications report ready
+server mode. Administrator cleanup: `sudo unlink /usr/local/bin/serpantinum`
+and `sudo unlink /usr/local/bin/serpantinumd`, after confirming each is a symlink.
+
+
 ## 2026-10-09 / Flat calendar and lighter weather glyphs
 
 Removed the CalendarWindow frame gradient; retained flat #151515 fill, grey
