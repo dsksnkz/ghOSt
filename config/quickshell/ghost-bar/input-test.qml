@@ -262,6 +262,38 @@ ShellRoot {
                 console.info("PASS: selected weather headline and temperature agree");
             }
 
+            function test_weather_blur_transition() {
+                weatherSwitcher.active = true;
+                weatherSwitcher.reducedMotion = false;
+                weatherSwitcher.forecastSelected = false;
+                weatherSwitcher.syncWeatherHeadline();
+                const headline = findChild(weatherSwitcher, "weather-headline");
+                const forecast = findChild(weatherSwitcher, "weather-forecast-list");
+                compare(headline.x, forecast.x);
+                weatherSwitcher.selectForecast(1);
+                wait(55);
+                verify(weatherSwitcher.weatherBlur > 0);
+                compare(weatherSwitcher.displayedCondition, "storm");
+                wait(90);
+                compare(weatherSwitcher.displayedCondition, "rain");
+                compare(weatherSwitcher.displayedTemperature, 16);
+                weatherSwitcher.selectForecast(3);
+                wait(20);
+                weatherSwitcher.selectForecast(4);
+                wait(340);
+                compare(weatherSwitcher.displayedCondition, "clear");
+                compare(weatherSwitcher.displayedTemperature, 15);
+                compare(weatherSwitcher.weatherBlur, 0);
+                weatherSwitcher.reducedMotion = true;
+                weatherSwitcher.selectForecast(2);
+                wait(20);
+                compare(weatherSwitcher.displayedCondition, "storm");
+                compare(weatherSwitcher.weatherBlur, 0);
+                weatherSwitcher.active = false;
+                weatherSwitcher.reducedMotion = Theme.reducedMotion;
+                console.info("PASS: weather blur midpoint, rapid scroll settlement, aligned list and reduced motion");
+            }
+
             function test_escape_from_root() {
                 wait(20);
                 sidebar.forceActiveFocus();

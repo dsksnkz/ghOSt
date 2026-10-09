@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
@@ -56,13 +57,40 @@ Item {
     property bool clockMetric: false
     property int forecastIndex: 2
     property bool forecastSelected: false
+    property real weatherBlur: 0
+    property bool weatherReady: false
+    property bool weatherTransitionQueued: false
+    property string displayedCondition: headlineCondition
+    property var displayedTemperature: headlineTemperature
+    function syncWeatherHeadline() {
+        displayedCondition = headlineCondition;
+        displayedTemperature = headlineTemperature;
+    }
+    function queueWeatherTransition() {
+        if (!weatherReady || weatherTransitionQueued)
+            return;
+        weatherTransitionQueued = true;
+        Qt.callLater(() => {
+            weatherTransitionQueued = false;
+            if (!active || reducedMotion) {
+                weatherTransition.stop();
+                weatherBlur = 0;
+                syncWeatherHeadline();
+            } else {
+                weatherTransition.restart();
+            }
+        });
+    }
     function selectForecast(index) {
         forecastIndex = Math.max(0, Math.min((weather.days?.length || 1) - 1, index));
         forecastSelected = true;
+        queueWeatherTransition();
     }
     readonly property var selectedForecast: forecastSelected ? weather.days?.[forecastIndex] : null
     readonly property string headlineCondition: selectedForecast?.condition ?? weather.condition
     readonly property var headlineTemperature: selectedForecast?.temperature ?? weather.temperature
+    onHeadlineConditionChanged: queueWeatherTransition()
+    onHeadlineTemperatureChanged: queueWeatherTransition()
     signal navigateRequested(string page)
     onWeatherChanged: if (!previewMode)
         Desk.weatherSummary = weather
@@ -91,6 +119,9 @@ Item {
     onReducedMotionChanged: if (reducedMotion) {
         entrance.stop();
         elapsed = 1500;
+        weatherTransition.stop();
+        weatherBlur = 0;
+        syncWeatherHeadline();
     }
     function groupOpacity(index) {
         if (reducedMotion || elapsed >= 1500)
@@ -140,7 +171,11 @@ Item {
             active: active,
             reducedMotion: reducedMotion,
             elapsed: elapsed,
-            meters: [gpuMeter.renderingStatus(), ramMeter.renderingStatus(), cpuMeter.renderingStatus()]
+            meters: [gpuMeter.renderingStatus(), ramMeter.renderingStatus(), cpuMeter.renderingStatus()],
+            weatherBlur: weatherBlur,
+            weatherTransition: weatherTransition.running,
+            displayedCondition: displayedCondition,
+            displayedTemperature: displayedTemperature
         };
     }
     function monthStep(step) {
@@ -155,6 +190,9 @@ Item {
             }
         } else {
             entrance.stop();
+            weatherTransition.stop();
+            weatherBlur = 0;
+            syncWeatherHeadline();
             telemetry.running = false;
             weatherProcess.running = false;
             stale.stop();
@@ -164,11 +202,35 @@ Item {
                 readings = {};
         }
     }
-    Component.onCompleted: if (active) {
-        beginReveal();
-        if (!fixtureMode) {
-            telemetry.running = true;
-            weatherProcess.running = true;
+    Component.onCompleted: {
+        weatherReady = true;
+        syncWeatherHeadline();
+        if (active) {
+            beginReveal();
+            if (!fixtureMode) {
+                telemetry.running = true;
+                weatherProcess.running = true;
+            }
+        }
+    }
+    SequentialAnimation {
+        id: weatherTransition
+        NumberAnimation {
+            target: cal
+            property: "weatherBlur"
+            to: 1
+            duration: 110
+            easing.type: Easing.InOutCubic
+        }
+        ScriptAction {
+            script: cal.syncWeatherHeadline()
+        }
+        NumberAnimation {
+            target: cal
+            property: "weatherBlur"
+            to: 0
+            duration: 190
+            easing.type: Easing.OutCubic
         }
     }
     NumberAnimation {
@@ -236,64 +298,78 @@ Item {
             width: 194
             height: 208
             opacity: cal.groupOpacity(0)
-            readonly property string condition: cal.headlineCondition
-            readonly property var temperature: cal.headlineTemperature
-            WeatherGlyph {
-                id: weatherArt
-                x: 0
-                y: 0
-                scale: 63 / 108
-                transformOrigin: Item.TopLeft
-                condition: weatherSection.condition
-                active: cal.active
-                reducedMotion: cal.reducedMotion
+            readonly property string condition: cal.displayedCondition
+            readonly property var temperature: cal.displayedTemperature
+            Item {
+                id: weatherHeadline
+                objectName: "weather-headline"
+                width: 194
+                height: 67
+                opacity: 1 - 0.7 * cal.weatherBlur
+                layer.enabled: cal.weatherBlur > 0
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blurMax: 24
+                    blur: cal.weatherBlur
+                }
+                WeatherGlyph {
+                    id: weatherArt
+                    x: 0
+                    y: 0
+                    scale: 63 / 108
+                    transformOrigin: Item.TopLeft
+                    condition: weatherSection.condition
+                    active: cal.active
+                    reducedMotion: cal.reducedMotion
+                }
+                Label {
+                    x: 77
+                    y: 0
+                    width: 117
+                    height: 26
+                    text: weatherSection.condition === "unknown" ? "WEATHER" : weatherSection.condition.toUpperCase()
+                    font.family: Theme.textFont
+                    font.pixelSize: 20
+                    font.weight: Font.Light
+                    color: "#ffffff"
+                }
+                G2Surface {
+                    x: 77
+                    y: 32
+                    width: 60
+                    height: 1
+                    color: "#ffffff"
+                }
+                Label {
+                    x: 81
+                    y: 41
+                    width: 48
+                    height: 26
+                    text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature) + "°" : "—"
+                    font.family: Theme.textFont
+                    font.pixelSize: 20
+                    font.weight: Font.Light
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
-            Label {
-                x: 77
-                y: 0
-                width: 117
-                height: 26
-                text: weatherSection.condition === "unknown" ? "WEATHER" : weatherSection.condition.toUpperCase()
-                font.family: Theme.textFont
-                font.pixelSize: 20
-                font.weight: Font.Light
-                color: "#ffffff"
-            }
-            G2Surface {
-                x: 77
-                y: 32
-                width: 60
-                height: 1
-                color: "#ffffff"
-            }
-            Label {
-                x: 81
-                y: 41
-                width: 48
-                height: 26
-                text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature) + "°" : "—"
-                font.family: Theme.textFont
-                font.pixelSize: 20
-                font.weight: Font.Light
-                color: "#ffffff"
-                horizontalAlignment: Text.AlignHCenter
+            SvgIcon {
+                x: -16
+                y: 139
+                width: 12
+                height: 18
+                name: "forward"
             }
             Item {
+                objectName: "weather-forecast-list"
                 x: 0
                 y: 83
                 width: 194
                 height: 130
                 clip: true
-                SvgIcon {
-                    x: 0
-                    y: 56
-                    width: 12
-                    height: 18
-                    name: "forward"
-                }
                 Column {
-                    x: 15
-                    width: parent.width - 15
+                    x: 0
+                    width: parent.width
                     y: (2 - cal.forecastIndex) * 26
                     Behavior on y {
                         NumberAnimation {
@@ -306,7 +382,7 @@ Item {
                         Key {
                             required property var modelData
                             required property int index
-                            width: 179
+                            width: 194
                             height: 26
                             color: "transparent"
                             opacity: index === cal.forecastIndex ? 1 : Math.abs(index - cal.forecastIndex) > 1 ? .45 : .75
@@ -315,8 +391,8 @@ Item {
                             Item {
                                 // The unscaled Key owns the full-row hover box;
                                 // keep every scaled glyph comfortably inside it.
-                                x: 6
-                                width: (parent.width - 12) / scale
+                                x: 0
+                                width: parent.width / scale
                                 height: 18
                                 scale: cal.forecastScale(modelData.date)
                                 transformOrigin: Item.TopLeft

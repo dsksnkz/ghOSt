@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-09 / Weather switch blur and left alignment
+
+Forecast wheel/click selection now blurs/fades the complete weather headline
+out, switches condition/temperature at the blur peak, then sharpens it. Latest
+selection wins during rapid scrolling; reduced motion updates instantly and
+closed panels stop the effect. Forecast glyph/row containers share the headline's
+left edge; the hollow arrow remains just outside. Actual Qt input/transition
+tests and compile pass; native blur0.726 and settled output captured without
+private desktop content. Deployed source/live match and reload loaded cleanly.
+[Screenshots, behavior and recovery](changes/2026-10-09-weather-transition.md).
+
 ## 2026-10-09 / Remove top rail calendar icon
 
 Removed the calendar glyph beside the rail clock at the user's direct request.

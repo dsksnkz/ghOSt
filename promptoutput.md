@@ -1,5 +1,17 @@
 prompts outputs here
 
+## 2026-10-09 / Forecast switch transition
+
+Request: "every scroll or change in the calendar bar, the top actual weather
+should blur out then back, to show that it changed. also the scroll menu's left
+needs to be aligned with the weather's left".
+Forecast wheel/clicks and headline data changes blur/fade the entire weather
+headline for300ms, switching data at110ms. Rapid input keeps the latest selection;
+reduced motion is immediate. Forecast and headline left edges aligned, hollow
+arrow outside the rows. Qt transition/input/compile checks pass; real desktop
+blur and sharp states verified and captured. Tested version deployed.
+[Output](docs/changes/2026-10-09-weather-transition.md).
+
 ## 2026-10-09 / Remove rail calendar icon
 
 Request: "remove calendar icon on top rail". Removed the glyph while preserving

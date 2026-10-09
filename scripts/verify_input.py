@@ -19,6 +19,7 @@ for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
                   "PASS: Settings live summaries, passive storage, all-page bounds and content scrolling",
                   "PASS: interface sound volume, actual preset keys, chooser, mute and silent gain/source policy",
                   "PASS: selected weather headline and temperature agree",
+                  "PASS: weather blur midpoint, rapid scroll settlement, aligned list and reduced motion",
                   "PASS: expanded/compact music geometry and time formatting",
                   "PASS: click dispatches both fixed SFX and derived action"):
     assert assertion in output, output
