@@ -35,6 +35,8 @@ ShellRoot {
                 wait(850);
                 compare(scene.drop, 1);
                 capture("blinds");
+                mouseClick(scene, 10, 10);
+                compare(scene.credentialsVisible, false);
                 if (Quickshell.env("GHOST_LOCK_EXPECT_3D"))
                     tryCompare(blinds, "uses3D", true, 2000);
                 scene.forceActiveFocus();
@@ -51,6 +53,23 @@ ShellRoot {
                 compare(submissions, 1);
                 compare(field.text, "");
                 capture("clock-password");
+                mouseClick(scene, 10, 10);
+                compare(scene.credentialsVisible, false);
+                compare(field.text, "");
+                keyClick(Qt.Key_B);
+                compare(scene.credentialsVisible, true);
+                const idle = findChild(scene, "lock-idle");
+                compare(idle.interval, 10000);
+                idle.interval = 120;
+                scene.busy = true;
+                wait(180);
+                compare(scene.credentialsVisible, true);
+                scene.busy = false;
+                wait(180);
+                compare(scene.credentialsVisible, false);
+                compare(field.text, "");
+                idle.interval = 10000;
+                wait(450);
 
                 backend.allowStart = false;
                 verify(!auth.submit("fixture"));
@@ -123,6 +142,8 @@ ShellRoot {
                 anchors.fill: parent
                 now: new Date(2026, 9, 9, 21, 30)
                 onWakeRequested: credentialsVisible = true
+                onSleepRequested: credentialsVisible = false
+                onActivity: restartIdle()
                 onSubmitted: test.submissions++
             }
             Blinds { id: blinds; force3D: !!Quickshell.env("GHOST_LOCK_EXPECT_3D"); visible: false; width: parent.width; height: parent.height }

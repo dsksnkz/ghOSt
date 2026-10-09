@@ -1,5 +1,26 @@
 # ghOSt progress
 
+## 2026-10-09 / Lock dismissal, idle reset and rendering cost
+
+Background clicks no longer wake credentials or introduce blur. When awake,
+outside clicks or Escape clear the field and restore sharp blinds. A 10-second
+inactivity timer does the same; typing/tapping the password resets it, shared
+activity resets timers across outputs, and pending authentication pauses it.
+Session-lock and PAM success gating are unchanged. Reduced rendering cost:
+half-width/height blur target (quarter pixels), shared slat material, medium
+MSAA/shadow map instead of high/very-high, and disabled SSAO. Sharp slats remain
+full resolution with curved geometry, texture, cords and cast shadows retained.
+No measured native FPS claim: all tests were offscreen as explicitly requested.
+Software visual/input/mock-auth and production compile checks pass; verified
+outside click, first-key wake, clearing, idle interval/reset and busy pause.
+Offscreen RHI loads types but yields blank 3D captures on this platform, so those
+are not accepted as visual evidence. A proposed cached-frame optimization was
+removed before deployment. Published captures are labelled software fallback.
+Snapshot: `.local/backups/2026-10-09-lock-idle/`. No real lock, PAM or visible
+test window launched; no running lock instance when installing affected files.
+Native perceived lag and authenticated unlock still need user verification.
+
+
 ## 2026-10-09 / Realistic Venetian blinds
 
 Replaced flat stripes with shared curved thin-sheet 3D slats: crowned faces,

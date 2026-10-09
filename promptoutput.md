@@ -435,3 +435,17 @@ snapshotted in `.local/backups/2026-10-09-realistic-blinds-SaUciM/`.
 Software and native Wayland/OpenGL visual/input/mock-auth checks and production
 compile pass. Actual renders: `docs/images/2026-10-09-realistic-blinds/`.
 Real authenticated unlock/handoff remains unverified; no parity claim.
+# 2026-10-09 / Lock idle reset and performance
+
+Request: "make it so if clicked outside, it dosent blur and if waited 10 seconds it cancels blur aswell, and fix lag issue, without letting me see while ur testing".
+
+Outside clicks now leave closed blinds sharp, or dismiss an awake password/blur
+view; Escape also dismisses. Idle for 10 seconds restores the blinds and clears
+input. Activity resets timers across outputs; busy authentication pauses reset.
+Reduced blur target to quarter pixels, shared slat material, reduced MSAA/shadow
+quality and removed SSAO while preserving curved geometry and cast shadows.
+Only offscreen testing performed, no visible test window or session lock. Tests
+verify input/reset/clearing/busy policy and production types compile. Software
+fallback images are recorded; offscreen 3D blank output is not visual evidence.
+Native FPS/lag and actual unlock remain user-verification pending. Snapshot:
+`.local/backups/2026-10-09-lock-idle/`. Installed affected ghOSt lock paths only.

@@ -12,6 +12,7 @@ ShellRoot {
     property bool reducedMotion: false
     property var preparedScreens: []
     property var finishedScreens: []
+    signal activity
 
     // PAM is the only source of authorization; no unlock IPC or visual test mode.
     function releaseWhenPrepared() {
@@ -52,6 +53,7 @@ ShellRoot {
         WlSessionLockSurface {
             color: "#171717"
             LockScene {
+                id: lockScene
                 anchors.fill: parent
                 reducedMotion: root.reducedMotion
                 credentialsVisible: root.credentialsVisible
@@ -59,6 +61,12 @@ ShellRoot {
                 error: auth.error
                 now: clock.date
                 onWakeRequested: root.credentialsVisible = true
+                onSleepRequested: root.credentialsVisible = false
+                onActivity: root.activity()
+                Connections {
+                    target: root
+                    function onActivity() { lockScene.restartIdle(); }
+                }
                 onSubmitted: response => auth.submit(response)
             }
         }

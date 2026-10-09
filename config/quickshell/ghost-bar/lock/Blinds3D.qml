@@ -10,8 +10,8 @@ View3D {
     environment: SceneEnvironment {
         backgroundMode: SceneEnvironment.Transparent
         antialiasingMode: SceneEnvironment.MSAA
-        antialiasingQuality: SceneEnvironment.High
-        aoStrength: 0.3
+        antialiasingQuality: SceneEnvironment.Medium
+        aoStrength: 0
         aoDistance: 10
         aoSoftness: 50
     }
@@ -21,7 +21,7 @@ View3D {
         brightness: 1.25
         ambientColor: "#454545"
         castsShadow: true
-        shadowMapQuality: Light.ShadowMapQualityVeryHigh
+        shadowMapQuality: Light.ShadowMapQualityMedium
         shadowMapFar: 2500
         shadowBias: 0.05
         shadowFactor: 75
@@ -35,6 +35,12 @@ View3D {
     SlatMesh { id: bladeMesh; bladeWidth: view.width - 36; bladeHeight: view.pitch + 4 }
     PrincipledMaterial { id: railFinish; baseColor: "#454545"; metalness: 0.45; roughness: 0.28 }
     PrincipledMaterial { id: cordFinish; baseColor: "#292929"; roughness: 0.95 }
+    CustomMaterial {
+        id: slatFinish
+        property real bladeSeed: 0
+        fragmentShader: "slat-metal.frag"
+        cullMode: Material.NoCulling
+    }
     Repeater3D {
         model: view.count
         Model {
@@ -45,11 +51,7 @@ View3D {
             eulerRotation: Qt.vector3d(8 + 82 * turn, 0, 0)
             opacity: 1 - Math.max(0, (turn - 0.92) / 0.08)
             geometry: bladeMesh
-            materials: CustomMaterial {
-                property real bladeSeed: index * 3.71
-                fragmentShader: "slat-metal.frag"
-                cullMode: Material.NoCulling
-            }
+            materials: slatFinish
         }
     }
     // Paired front/back ladder cords and short rungs support each blade.

@@ -15,13 +15,36 @@ FocusScope {
     property real reveal: credentialsVisible ? 1 : 0
     readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
     signal wakeRequested
+    signal sleepRequested
+    signal activity
     signal submitted(string response)
 
     function wake(text) {
         wakeRequested();
+        activity();
         password.forceActiveFocus();
         if (text)
             password.insert(password.cursorPosition, text);
+    }
+    function rest() {
+        password.clear();
+        password.focus = false;
+        scene.forceActiveFocus();
+        sleepRequested();
+    }
+    function restartIdle() {
+        if (credentialsVisible && !busy)
+            idle.restart();
+        else
+            idle.stop();
+    }
+    onCredentialsVisibleChanged: restartIdle()
+    onBusyChanged: restartIdle()
+    Timer {
+        id: idle
+        objectName: "lock-idle"
+        interval: 10000
+        onTriggered: scene.rest()
     }
     function submit() {
         if (busy || password.text.length === 0)
@@ -58,9 +81,12 @@ FocusScope {
     Item {
         anchors.fill: parent
         layer.enabled: scene.reveal > 0
+        // Blur needs fewer pixels than the sharp slat view. Keep the sharp
+        // renderer full-resolution and halve only the blur render target.
+        layer.textureSize: Qt.size(Math.ceil(width / 2), Math.ceil(height / 2))
         layer.effect: MultiEffect {
             blurEnabled: true
-            blurMax: 32
+            blurMax: 16
             blur: scene.reveal * 0.8
         }
         Blinds {
@@ -71,10 +97,15 @@ FocusScope {
     }
     MouseArea {
         anchors.fill: parent
-        enabled: !scene.credentialsVisible
-        onClicked: scene.wake("")
+        onClicked: scene.rest()
     }
     Keys.onPressed: event => {
+        if (event.key === Qt.Key_Escape) {
+            scene.rest();
+            event.accepted = true;
+            return;
+        }
+        scene.activity();
         if (!scene.credentialsVisible) {
             if (event.text.length > 0 || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 scene.wake(event.text);
@@ -129,6 +160,17 @@ FocusScope {
                 border.color: password.activeFocus ? "#9c9c9c" : "#555555"
             }
             onAccepted: scene.submit()
+            onTextEdited: scene.activity()
+            TapHandler {
+                onPressedChanged: if (pressed) scene.activity()
+            }
+            Keys.onPressed: event => {
+                scene.activity();
+                if (event.key === Qt.Key_Escape) {
+                    scene.rest();
+                    event.accepted = true;
+                }
+            }
         }
         Text {
             width: parent.width
