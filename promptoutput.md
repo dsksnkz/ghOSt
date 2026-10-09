@@ -6,7 +6,8 @@ Added the requested 3D-like grey shading with a dark rear/tab and lighter middle
 front, rounded layers, rim lighting and a soft shadow. Standalone transparent
 SVG/512px PNG are in `assets/folder-layered.*`; flat variants remain intact.
 Small/large raster checks pass and output inspected. No Nautilus activation.
-All 64 Python tests and flat-pack generator checks pass. Publication pending.
+All 64 Python tests and flat-pack generator checks pass. Published `6017a49`;
+remote revision and SVG/PNG blob hashes verified.
 
 ## 2026-10-09 · Rounded folder icon
 

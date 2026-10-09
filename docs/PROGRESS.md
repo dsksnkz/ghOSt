@@ -9,7 +9,8 @@ thickness, subtle highlights and contact shadow. Existing flat pack remains
 unchanged; no desktop/Nautilus theme activated. Raster bounds, neutrality,
 transparency, gradient variation and brighter middle/darker top verified at
 32/256px; enlarged output visually inspected. All 64 Python tests and flat-pack
-generator checks pass. Publication pending.
+generator checks pass. Published `6017a49`; remote revision and SVG/PNG blob
+hashes verified. No theme activation.
 
 ## 2026-10-09 / Rounded folder asset
 
