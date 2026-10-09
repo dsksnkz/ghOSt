@@ -462,3 +462,16 @@ mock-auth; production types compile. GPU frosted blur/native 3D appearance not
 visually tested because the user prohibits visible testing; software captures
 are explicitly labelled. No lock, PAM or desktop-visible test window invoked.
 Backup `.local/backups/2026-10-09-lock-glass/`; four ghOSt lock files deployed.
+# 2026-10-09 / Cursor tilt cap and blur cancellation geometry
+
+Request: "cap angle at 30, and the scale bugs abit when canceling blur".
+
+Cursor tilt increased to ±30 degrees and smoothly attenuated with reveal.
+Password field stays in layout until the column fade completes, without early
+height/centering changes; hidden credentials cannot receive input. Backdrop
+render target stays full-sized across blur toggles rather than resizing the
+orthographic viewport. Retained prior shared materials/shadow optimizations.
+Offscreen bounds, intermediate tilt, fixed layout, input/idle/mock-auth tests
+and production compile pass. Software screenshot recorded; native visual
+confirmation pending. No desktop-visible test window, real lock or PAM invoked.
+Snapshot `.local/backups/2026-10-09-lock-tilt30/`; LockScene installed only.

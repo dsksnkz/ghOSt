@@ -1,5 +1,22 @@
 # ghOSt progress
 
+## 2026-10-09 / 30-degree cursor tilt and stable blur cancellation
+
+Cursor-driven slat tilt is now capped at ±30 degrees. It smoothly blends with
+credential reveal instead of switching from zero to the cursor angle at the
+last frame. Kept the password field in the credential layout throughout fade-out
+(disabled immediately), avoiding the centered column/clock height and position
+jump. Backdrop blur now uses full-size render targets so toggling the layer does
+not change the 3D viewport/projection. This supersedes the earlier quarter-pixel
+backdrop optimization; shared materials and reduced shadow/MSAA cost remain.
+Offscreen tests cover ±30 limits, intermediate tilt blending, unchanged column
+position/height during cancellation, input clearing, idle and mock auth; compile
+passes. Software cancellation capture in `docs/images/2026-10-09-lock-tilt30/`.
+No visible testing or lock/PAM invocation. Native scale appearance still requires
+user confirmation. Snapshot `.local/backups/2026-10-09-lock-tilt30/`; only the
+affected ghOSt LockScene deployed after checking no active lock instance.
+
+
 ## 2026-10-09 / Frosted lock field and subtle cursor tilt
 
 Password field now has a transparent G2 border with a cropped, masked blur of

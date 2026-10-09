@@ -14,7 +14,7 @@ FocusScope {
     property real drop: 0
     property real reveal: credentialsVisible ? 1 : 0
     property real pointerTilt: 0
-    readonly property real cursorTilt: reducedMotion || reveal > 0 ? 0 : pointerTilt
+    readonly property real cursorTilt: reducedMotion ? 0 : pointerTilt * (1 - reveal)
     readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
     signal wakeRequested
     signal sleepRequested
@@ -22,8 +22,8 @@ FocusScope {
     signal submitted(string response)
 
     function trackCursor(x, y) {
-        // Small mechanical slat tilt, never enough to open the screen.
-        pointerTilt = Math.max(-3, Math.min(3, (y / Math.max(1, height) * 2 - 1) * 2.5 + (x / Math.max(1, width) * 2 - 1) * 0.5));
+        // Cursor tilt stays separate from the authenticated opening animation.
+        pointerTilt = Math.max(-30, Math.min(30, (y / Math.max(1, height) * 2 - 1) * 25 + (x / Math.max(1, width) * 2 - 1) * 5));
     }
     Behavior on pointerTilt {
         NumberAnimation { duration: scene.reducedMotion ? 0 : 100; easing.type: Easing.OutCubic }
@@ -92,9 +92,9 @@ FocusScope {
         id: backdrop
         anchors.fill: parent
         layer.enabled: scene.reveal > 0
-        // Blur needs fewer pixels than the sharp slat view. Keep the sharp
-        // renderer full-resolution and halve only the blur render target.
-        layer.textureSize: Qt.size(Math.ceil(width / 2), Math.ceil(height / 2))
+        // Keep the 3D viewport unchanged when the blur layer is toggled.
+        // A half-size layer changes orthographic projection on some backends.
+        layer.textureSize: Qt.size(Math.ceil(width), Math.ceil(height))
         layer.effect: MultiEffect {
             blurEnabled: true
             blurMax: 16
@@ -130,10 +130,12 @@ FocusScope {
     }
     Column {
         id: credentials
+        objectName: "lock-credentials"
         width: Math.min(340, scene.width - 48)
         anchors.centerIn: parent
         spacing: 28
         opacity: scene.reveal
+        visible: scene.credentialsVisible || scene.reveal > 0
         layer.enabled: scene.reveal < 1 && scene.reveal > 0
         layer.effect: MultiEffect {
             blurEnabled: true
@@ -154,8 +156,10 @@ FocusScope {
             objectName: "lock-password"
             width: parent.width
             height: 52
-            visible: scene.credentialsVisible
-            enabled: !scene.busy
+            // Keep layout geometry until the entire column finishes fading.
+            // Hiding this field on dismissal made the centered clock jump.
+            visible: true
+            enabled: scene.credentialsVisible && !scene.busy
             echoMode: TextInput.Password
             inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
             placeholderText: "Password"
