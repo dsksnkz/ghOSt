@@ -103,5 +103,9 @@ Real system setters, dialogs and physical touch were not activated by this pass.
 Navigation/geometry tests use fixtures; published captures are actual native
 output. No gameplay, drivers or hardware settings were changed.
 
-Publication checkpoint: implementation, tests and native captures complete;
-authorized publication and fresh committed-archive check still pending.
+Published source/native evidence: `3be085f5c048b5cd73695f93584fe3dd79a93097`.
+Remote main and twelve runtime/test/native-image blob hashes verified. A fresh
+archive of that committed revision passes all64 Python tests, generator check,
+Qt input, compilation, routing, polling and network-scan verification. That
+archive's Qt checks use software rendering without opening another desktop UI;
+the published images above are the actual active native GPU-rendered surface.

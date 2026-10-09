@@ -10,7 +10,9 @@ original portraits, name flow, creator names, scroll and reduced-motion selector
 remain. Tested and hot-reloaded on the laptop; both shell PIDs retained.64 tests,
 Qt input/compile/router/polling/scan and JS checks pass. Six native screenshots
 exclude private lists and battery history/time. [Evidence and recovery](changes/2026-10-09-settings-taste.md).
-Publication/fresh committed-archive check pending; broader prompt not completed.
+Published `3be085f`; remote revision and twelve runtime/test/native-image blobs
+verified. Fresh committed archive passes64 tests, generator and Qt suites.
+Broader prompt remains unfinished.
 
 ## 2026-10-09 / Rounded icon family and Settings header
 
