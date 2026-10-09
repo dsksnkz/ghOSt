@@ -31,6 +31,10 @@ Item {
     property string query: ""
     property real fixtureVolume: 62
     property real fixtureInput: 74
+    property var fixtureSounds: ({enabled: true, volume: 18, presets: {rail: "rail", sidebar: "sidebar", settings: "settings"}, files: {}})
+    readonly property var soundPreferences: previewMode ? fixtureSounds : UiSounds.preferences
+    property real pendingSoundVolume: -1
+    property string soundFileGroup: ""
     property var airplaneSnapshot: null
     property real pendingBrightness: 0
     property string fixtureHost: "Unit-01"
@@ -244,6 +248,30 @@ Item {
         if (!previewMode)
             Settings.preference(name, value);
     }
+    function soundPreference(key, value) {
+        if (!previewMode) {
+            preference("sounds." + key, value);
+            return;
+        }
+        const updated = JSON.parse(JSON.stringify(fixtureSounds));
+        if (key === "volume" || key === "enabled")
+            updated[key] = value;
+        else
+            updated.presets[key] = value;
+        fixtureSounds = updated;
+        pendingSoundVolume = -1;
+    }
+    function chooseSoundFile(group) {
+        soundFileGroup = group;
+        if (!previewMode)
+            soundDialog.open();
+    }
+    function selectSound(group, preset) {
+        if (preset === "custom" && !soundPreferences.files?.[group])
+            chooseSoundFile(group);
+        else
+            soundPreference(group, preset);
+    }
     function gigabytes(value) {
         return typeof value === "number" ? (value / 1e9).toFixed(1) + " GB" : "Unavailable";
     }
@@ -341,6 +369,24 @@ Item {
         function onStateChanged() {
             if (nameSubmitted && nameDialog.visible && Settings.state.host === settings.nameDraft)
                 nameDialog.close();
+            if (pendingSoundVolume === UiSounds.level)
+                pendingSoundVolume = -1;
+        }
+        function onErrorChanged() {
+            if (Settings.error)
+                settings.pendingSoundVolume = -1;
+        }
+    }
+    Timer {
+        id: soundVolumeCommit
+        interval: 180
+        onTriggered: {
+            if (Settings.busy) {
+                restart();
+                return;
+            }
+            if (settings.pendingSoundVolume >= 0)
+                settings.soundPreference("volume", settings.pendingSoundVolume);
         }
     }
     Timer {
@@ -559,11 +605,126 @@ Item {
             }
         }
         SettingsSlider {
+            objectName: "settings-level-slider"
             width: parent.width
             value: parent.amount
             label: parent.name
             enabled: parent.enabled
             onMoved: parent.moved(value)
+        }
+    }
+    component SoundChoice: Item {
+        property string group: ""
+        property string name: ""
+        width: parent.width
+        height: 48
+        Label {
+            y: 14
+            width: parent.width - 402
+            height: 22
+            text: parent.name
+            font.pixelSize: 13
+        }
+        Controls.ComboBox {
+            id: choice
+            objectName: "settings-sound-preset-" + parent.group
+            anchors.right: parent.right
+            anchors.rightMargin: 96
+            y: 6
+            width: 290
+            height: 36
+            model: UiSounds.choices
+            textRole: "name"
+            valueRole: "id"
+            enabled: settings.previewMode || !Settings.busy
+            currentIndex: UiSounds.choices.findIndex(item => item.id === settings.soundPreferences.presets[parent.group])
+            Accessible.name: parent.name + " click sound"
+            onActivated: index => {
+                UiSounds.play("settings");
+                settings.selectSound(parent.group, UiSounds.choices[index].id);
+                // Keep the label bound to the accepted state, including cancel.
+                currentIndex = Qt.binding(() => UiSounds.choices.findIndex(item => item.id === settings.soundPreferences.presets[parent.group]));
+            }
+            contentItem: Label {
+                leftPadding: 12
+                rightPadding: 32
+                verticalAlignment: Text.AlignVCenter
+                text: choice.displayText
+                font.pixelSize: 12
+                color: settings.primaryInk
+            }
+            indicator: SvgIcon {
+                x: choice.width - 24
+                y: 11
+                width: 14
+                height: 14
+                name: "forward"
+                rotation: 90
+            }
+            background: G2Surface {
+                radius: 8
+                color: "#252525"
+                border.width: 1
+                border.color: choice.activeFocus || choice.hovered ? settings.secondaryInk : settings.controlBorder
+            }
+            delegate: Controls.ItemDelegate {
+                required property var modelData
+                required property int index
+                width: choice.width - 12
+                height: 36
+                highlighted: choice.highlightedIndex === index
+                contentItem: Label {
+                    text: modelData.name
+                    font.pixelSize: 12
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: G2Surface {
+                    radius: 8
+                    color: parent.highlighted ? "#454545" : "transparent"
+                }
+            }
+            popup: Controls.Popup {
+                y: choice.height + 6
+                width: choice.width
+                padding: 6
+                background: G2Surface {
+                    radius: 10
+                    color: settings.controlSurface
+                    border.width: 1
+                    border.color: settings.controlBorder
+                }
+                contentItem: ListView {
+                    implicitHeight: contentHeight
+                    model: choice.popup.visible ? choice.delegateModel : null
+                    currentIndex: choice.highlightedIndex
+                    clip: true
+                }
+            }
+        }
+        Key {
+            anchors.right: parent.right
+            anchors.rightMargin: 48
+            y: 6
+            width: 36
+            height: 36
+            radius: 8
+            hint: "Choose " + parent.name + " WAV"
+            enabled: settings.previewMode || !Settings.busy
+            onClicked: settings.chooseSoundFile(parent.group)
+            SvgIcon { anchors.centerIn: parent; width: 18; height: 18; name: "folder" }
+        }
+        Key {
+            objectName: "settings-sound-play-" + parent.group
+            anchors.right: parent.right
+            y: 6
+            width: 36
+            height: 36
+            radius: 8
+            hint: "Play " + parent.name + " sound"
+            enabled: settings.previewMode ? settings.soundPreferences.enabled && settings.soundPreferences.volume > 0 && settings.soundPreferences.presets[parent.group] !== "none" : UiSounds.allowed(parent.group) && UiSounds.ready(parent.group)
+            function clickSound() {} // Preview exactly the chosen sound, not two.
+            onClicked: UiSounds.play(parent.group)
+            SvgIcon { anchors.centerIn: parent; width: 18; height: 18; name: "play" }
         }
     }
 
@@ -866,7 +1027,7 @@ Item {
                         })[settings.page]
                 }
                 Note {
-                    visible: !settings.previewMode && Settings.error !== ""
+                    visible: !settings.previewMode && settings.page !== "sound" && Settings.error !== ""
                     text: Settings.error
                 }
                 Note {
@@ -999,6 +1160,45 @@ Item {
         Column {
             width: body.width
             spacing: 24
+            Section {
+                title: "Interface sounds"
+                ControlGroup {
+                    objectName: "settings-interface-sounds"
+                    SoundControl {
+                        objectName: "settings-sfx-volume"
+                        name: "Click sound volume"
+                        amount: settings.pendingSoundVolume >= 0 ? settings.pendingSoundVolume : settings.soundPreferences.volume
+                        onMoved: value => {
+                            settings.pendingSoundVolume = Math.round(value);
+                            soundVolumeCommit.restart();
+                        }
+                    }
+                    ToggleRow {
+                        objectName: "settings-sfx-enabled"
+                        name: "Click sounds"
+                        icon: "volume"
+                        checked: settings.soundPreferences.enabled
+                        onToggled: value => settings.soundPreference("enabled", value)
+                    }
+                    Repeater {
+                        model: [{group: "rail", name: "Top rail"}, {group: "sidebar", name: "Sidebar"}, {group: "settings", name: "Settings"}]
+                        SoundChoice {
+                            required property var modelData
+                            group: modelData.group
+                            name: modelData.name
+                        }
+                    }
+                    Note {
+                        visible: !settings.previewMode && ["rail", "sidebar", "settings"].some(group => UiSounds.warning(group))
+                        text: ["rail", "sidebar", "settings"].map(group => UiSounds.warning(group)).find(message => !!message) || ""
+                    }
+                    Note { text: "Custom: PCM WAV, 8/16-bit mono/stereo, up to 2 seconds." }
+                    Note {
+                        visible: !settings.previewMode && Settings.error !== ""
+                        text: Settings.error
+                    }
+                }
+            }
             ControlGroup {
               SoundControl {
                 name: "Output volume"
@@ -1255,6 +1455,12 @@ Item {
                 text: settings.details.preferences?.wallpaper || "Choose an image to apply through awww"
             }
         }
+    }
+    FileDialog {
+        id: soundDialog
+        title: "Choose click sound"
+        nameFilters: ["PCM WAV (*.wav)"]
+        onAccepted: settings.apply("sound-file", settings.soundFileGroup + "=" + selectedFile.toString())
     }
     FileDialog {
         id: wallpaperDialog

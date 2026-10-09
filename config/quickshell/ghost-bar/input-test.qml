@@ -6,7 +6,7 @@ import Quickshell
 ShellRoot {
     FloatingWindow {
         visible: true
-        implicitWidth: 900
+        implicitWidth: 1024
         implicitHeight: 900
 
         TestCase {
@@ -176,6 +176,56 @@ ShellRoot {
                 sidebar.visible = true;
                 console.info("PASS: Settings live summaries, passive storage, all-page bounds and content scrolling");
             }
+            function test_interface_sounds() {
+                sidebar.visible = false;
+                settingsPanel.visible = true;
+                settingsPanel.choose("sound");
+                wait(200);
+                const control = findChild(settingsPanel, "settings-sfx-volume");
+                const slider = findChild(control, "settings-level-slider");
+                verify(slider !== null);
+                mouseClick(slider, slider.width * .55, 16);
+                wait(250);
+                verify(settingsPanel.fixtureSounds.volume > 18);
+                compare(settingsPanel.fixtureVolume, 62); // Media volume untouched.
+                const selector = findChild(settingsPanel, "settings-sound-preset-rail");
+                selector.forceActiveFocus();
+                keyClick(Qt.Key_Down);
+                wait(20);
+                compare(settingsPanel.fixtureSounds.presets.rail, "sidebar");
+                settingsPanel.selectSound("sidebar", "none");
+                compare(findChild(settingsPanel, "settings-sound-play-sidebar").enabled, false);
+                settingsPanel.selectSound("rail", "custom");
+                compare(settingsPanel.soundFileGroup, "rail");
+                compare(settingsPanel.fixtureSounds.presets.rail, "sidebar");
+                const toggle = findChild(settingsPanel, "settings-sfx-enabled");
+                mouseClick(toggle, toggle.width - 38, 28);
+                compare(settingsPanel.fixtureSounds.enabled, false);
+                compare(findChild(settingsPanel, "settings-sound-play-settings").enabled, false);
+                // Exercise production gain/source/mute policy without audio or disk writes.
+                const previous = Settings.state;
+                Settings.state = {preferences: {sounds: {enabled: true, volume: 65, presets: {rail: "settings", sidebar: "none", settings: "rail"}, files: {}}}};
+                compare(UiSounds.rail.volume, .65);
+                verify(UiSounds.rail.source.toString().endsWith("sounds/settings.wav"));
+                verify(UiSounds.allowed("rail"));
+                compare(UiSounds.allowed("sidebar"), false);
+                compare(UiSounds.allowed("unknown"), false);
+                verify(UiSounds.silent && UiSounds.rail.muted);
+                const lastClick = UiSounds.lastClick;
+                compare(UiSounds.play("rail"), false);
+                compare(UiSounds.lastClick, lastClick);
+                Settings.state = {preferences: {sounds: {enabled: true, volume: 0, presets: {rail: "rail"}, files: {}}}};
+                compare(UiSounds.allowed("rail"), false);
+                Settings.state = {preferences: {sounds: {enabled: false, volume: 18, presets: {rail: "rail"}, files: {}}}};
+                compare(UiSounds.allowed("rail"), false);
+                Settings.state = {preferences: {sounds: {enabled: true, volume: 18, presets: {rail: "custom"}, files: {}}}};
+                compare(UiSounds.allowed("rail"), false);
+                Settings.state = previous;
+                settingsPanel.fixtureSounds = JSON.parse(JSON.stringify(UiSounds.defaults));
+                settingsPanel.visible = false;
+                sidebar.visible = true;
+                console.info("PASS: interface sound volume, actual preset keys, chooser, mute and silent gain/source policy");
+            }
 
             function test_weather_switcher() {
                 sidebar.visible = false;
@@ -237,7 +287,7 @@ ShellRoot {
             name: "SidebarInput"
             when: true
             visible: true
-            width: 900
+            width: 1024
             height: 900
 
             Key {

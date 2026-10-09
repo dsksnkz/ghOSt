@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-09 / Click-sound volume and choices
+
+Added volume/mute, independent rail/sidebar/Settings choices, local custom WAV
+import and preview buttons at the top of Sound. Defaults preserved; media volume
+and system settings are unaffected. Persistent private copies/preferences,
+cancelled selection and invalid files handled.71 tests plus Qt/JS checks pass;
+active native output/Ready states verified and Sound opened for direct inspection.
+[Record and actual screenshot](docs/changes/2026-10-09-sfx-settings.md).
+Publication and fresh archive verification pending; broader prompt unfinished.
+
 ## 2026-10-09 / Settings and Settings sidebar
 
 Taste Skill's applicable audit, spacing, hierarchy and contrast guidance adapted

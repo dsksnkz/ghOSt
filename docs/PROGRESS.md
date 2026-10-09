@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-09 / Click-sound settings
+
+Sound now starts with click-sound volume/mute, separate rail/sidebar/Settings
+choices, private WAV import and single-sound preview keys. Defaults preserve the
+original three cues/18% gain; media volume is independent. Typed private
+preferences and bounded PCM validation preserve originals and unrelated settings.
+Tested/deployed by hot reload, both shell PIDs retained; Settings opened on Sound
+at the user's explicit request.71 tests, Qt and JS suites pass; native output and
+Ready states inspected. [Details, native image and recovery](changes/2026-10-09-sfx-settings.md).
+Publication/fresh archive pending. No prompt marked complete yet.
+
 ## 2026-10-09 / Settings with Taste Skill
 
 Refined Settings and its own sidebar using Taste's audit/spacing/hierarchy/

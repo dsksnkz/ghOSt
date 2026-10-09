@@ -1,10 +1,12 @@
 import importlib.util
 import base64
 import json
+import io
 import os
 from pathlib import Path
 import tempfile
 import unittest
+import wave
 from unittest.mock import patch
 
 root=Path(__file__).parents[1]/'config/quickshell/ghost-bar'
@@ -29,6 +31,80 @@ class Settings(unittest.TestCase):
         self.assertFalse(backend.preferences()['usageTracking'])
         self.assertEqual(backend.usage()['seconds'],0)
         self.assertFalse(backend.paths()[1].exists())
+    def test_click_sounds_keep_original_defaults(self):
+        sounds = backend.preferences()['sounds']
+        self.assertTrue(sounds['enabled'])
+        self.assertEqual(sounds['volume'], 18)
+        self.assertEqual(sounds['presets'], {group: group for group in backend.SOUND_GROUPS})
+        self.assertEqual(sounds['files'], {})
+        self.assertFalse(backend.paths()[0].exists())
+    def test_sound_preferences_are_independent_and_local(self):
+        with patch.object(backend, 'run') as run:
+            backend.setting('widgets.network', 'false')
+            backend.setting('sounds.volume', '37')
+            backend.setting('sounds.rail', 'sidebar')
+            backend.setting('sounds.sidebar', 'none')
+            backend.setting('sounds.enabled', 'false')
+            run.assert_not_called()
+        state = backend.preferences()
+        self.assertFalse(state['widgets']['network'])
+        self.assertEqual(state['sounds']['volume'], 37)
+        self.assertEqual(state['sounds']['presets'], {'rail':'sidebar','sidebar':'none','settings':'settings'})
+        self.assertFalse(state['sounds']['enabled'])
+        self.assertEqual(backend.paths()[0].stat().st_mode & 0o777, 0o600)
+    def test_invalid_sound_preferences_do_not_write(self):
+        for key, value in [('sounds.volume', x) for x in ('-1','101','nan','inf','loud')] + [('sounds.rail','missing'),('sounds.rail','custom'),('sounds.other','rail'),('sounds.enabled','yes')]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                backend.setting(key, value)
+        self.assertFalse(backend.paths()[0].exists())
+    def test_corrupt_sound_preferences_fall_back(self):
+        for sounds in ([], {'volume':float('nan')}, {'volume':True}, {'enabled':1}, {'presets':[],'files':3}):
+            backend.save(backend.paths()[0], {'sounds':sounds})
+            self.assertEqual(backend.preferences()['sounds'], backend.DEFAULTS['sounds'])
+    def make_wav(self, frames=2400, width=2, channels=1, rate=48000):
+        buffer = io.BytesIO()
+        with wave.open(buffer, 'wb') as audio:
+            audio.setparams((channels, width, rate, frames, 'NONE', ''))
+            audio.writeframes(b'\0' * frames * channels * width)
+        path = Path(self.directory.name) / 'my click sound.wav'
+        path.write_bytes(buffer.getvalue())
+        return path
+    def test_custom_sound_copies_original_without_system_action(self):
+        path = self.make_wav()
+        original = path.read_bytes()
+        backend.setting('sounds.volume', '0')
+        with patch.object(backend, 'run') as run:
+            backend.action('sound-file', 'rail=' + path.as_uri())
+            run.assert_not_called()
+        sounds = backend.preferences()['sounds']
+        copied = Path(backend.unquote(backend.urlparse(sounds['files']['rail']).path))
+        self.assertNotEqual(copied, path)
+        self.assertEqual(copied.read_bytes(), original)
+        self.assertEqual(path.read_bytes(), original)
+        self.assertEqual(copied.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(sounds['volume'], 0)
+        self.assertEqual(sounds['presets']['rail'], 'custom')
+        backend.setting('sounds.rail', 'settings')
+        backend.setting('sounds.rail', 'custom')
+        backend.action('sound-file', 'sidebar=' + path.as_uri())
+        self.assertEqual(len(list(copied.parent.glob('*.wav'))), 1)
+    def test_invalid_custom_sound_preserves_preferences(self):
+        backend.setting('sounds.volume', '22')
+        before = backend.paths()[0].read_bytes()
+        for value in ('https://example.com/click.wav', 'file://remote/click.wav'):
+            with self.assertRaises(ValueError):backend.sound_file('rail', value)
+        for parameters in ({'frames':96001}, {'width':3}, {'channels':3}, {'frames':0}):
+            path = self.make_wav(**parameters)
+            with self.assertRaises(ValueError):backend.sound_file('rail', path.as_uri())
+        path = self.make_wav()
+        path.write_bytes(path.read_bytes()[:-10])
+        with self.assertRaises(ValueError):backend.sound_file('rail', path.as_uri())
+        with self.assertRaises(ValueError):backend.sound_file('unknown', path.as_uri())
+        self.assertEqual(backend.paths()[0].read_bytes(), before)
+    def test_custom_sound_preferences_reject_remote_and_unowned_paths(self):
+        for value in ('https://example.com/click.wav','file:///tmp/click.wav','file://remote/click.wav'):
+            backend.save(backend.paths()[0], {'sounds':{'files':{'rail':value}}})
+            self.assertEqual(backend.preferences()['sounds']['files'], {})
     def test_preferences_are_independent_and_persistent(self):
         backend.setting('widgets.network','false')
         backend.setting('reducedMotion','true')

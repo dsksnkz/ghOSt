@@ -4,6 +4,7 @@ import argparse
 from datetime import datetime
 import fcntl
 import hashlib
+import io
 import json
 import math
 import os
@@ -13,9 +14,15 @@ import re
 import shutil
 import subprocess
 import time
+import wave
 from urllib.parse import unquote, urlparse
 
-DEFAULTS = {'reducedMotion': False, 'usageTracking': False, 'widgets': {
+SOUND_GROUPS = ('rail', 'sidebar', 'settings')
+SOUND_PRESETS = (*SOUND_GROUPS, 'none', 'custom')
+DEFAULTS = {'reducedMotion': False, 'usageTracking': False,
+    'sounds': {'enabled': True, 'volume': 18,
+               'presets': {group: group for group in SOUND_GROUPS}, 'files': {}},
+    'widgets': {
     'network': True, 'bluetooth': True, 'volume': True,
     'brightness': True, 'notifications': True}}
 
@@ -57,19 +64,92 @@ def preferences():
     for key in ('wallpaper', 'profilePicture'):
         if isinstance(data.get(key), str):
             result[key] = data[key]
+    sounds = data.get('sounds', {})
+    if isinstance(sounds, dict):
+        if type(sounds.get('enabled')) is bool:
+            result['sounds']['enabled'] = sounds['enabled']
+        volume = sounds.get('volume')
+        if type(volume) in (int, float) and math.isfinite(volume) and 0 <= volume <= 100:
+            result['sounds']['volume'] = round(volume)
+        for group in SOUND_GROUPS:
+            preset = sounds.get('presets', {}).get(group) if isinstance(sounds.get('presets'), dict) else None
+            if preset in SOUND_PRESETS:
+                result['sounds']['presets'][group] = preset
+            value = sounds.get('files', {}).get(group) if isinstance(sounds.get('files'), dict) else None
+            # Only our immutable private copies are eligible, never remote audio.
+            if isinstance(value, str):
+                url = urlparse(value)
+                path = Path(unquote(url.path))
+                if (url.scheme == 'file' and not url.netloc
+                        and path.parent == paths()[0].parent / 'ui-sounds'
+                        and re.fullmatch(r'[a-f0-9]{64}\.wav', path.name)):
+                    result['sounds']['files'][group] = value
     return result
 
 def setting(key, value):
-    if value not in ('true', 'false'):
-        raise ValueError('Expected true or false')
     data = preferences()
-    if key in ('reducedMotion', 'usageTracking'):
-        data[key] = value == 'true'
-    elif key.startswith('widgets.') and key[8:] in DEFAULTS['widgets']:
-        data['widgets'][key[8:]] = value == 'true'
+    if key == 'sounds.volume':
+        number = float(value)
+        if not math.isfinite(number) or not 0 <= number <= 100:
+            raise ValueError('Click sound volume must be 0-100%')
+        data['sounds']['volume'] = round(number)
+    elif key.startswith('sounds.') and key[7:] in SOUND_GROUPS:
+        group = key[7:]
+        if value not in SOUND_PRESETS:
+            raise ValueError('Unknown click sound')
+        if value == 'custom' and group not in data['sounds']['files']:
+            raise ValueError('Choose a WAV file first')
+        data['sounds']['presets'][group] = value
+    elif key in ('reducedMotion', 'usageTracking', 'sounds.enabled') or (key.startswith('widgets.') and key[8:] in DEFAULTS['widgets']):
+        if value not in ('true', 'false'):
+            raise ValueError('Expected true or false')
+        if key == 'sounds.enabled':
+            data['sounds']['enabled'] = value == 'true'
+        elif key.startswith('widgets.'):
+            data['widgets'][key[8:]] = value == 'true'
+        else:
+            data[key] = value == 'true'
     else:
         raise ValueError('Unknown setting')
     save(paths()[0], data)
+
+def sound_file(group, value):
+    """Validate a short PCM WAV and preserve its original in a private copy."""
+    if group not in SOUND_GROUPS:
+        raise ValueError('Unknown sound surface')
+    url = urlparse(value)
+    if url.scheme not in ('', 'file') or url.netloc not in ('', 'localhost'):
+        raise ValueError('Select a local WAV file')
+    path = Path(unquote(url.path)).expanduser().resolve()
+    if not path.is_file() or path.suffix.lower() != '.wav':
+        raise ValueError('Select a WAV file')
+    with path.open('rb') as source:
+        data = source.read(2 * 1024 * 1024 + 1)
+    if len(data) > 2 * 1024 * 1024:
+        raise ValueError('Choose a WAV smaller than 2 MB')
+    try:
+        with wave.open(io.BytesIO(data)) as audio:
+            channels, width, rate, frames, compression, _ = audio.getparams()
+            if (channels not in (1, 2) or width not in (1, 2)
+                    or not 8000 <= rate <= 96000 or not 0 < frames <= 2 * rate
+                    or compression != 'NONE'):
+                raise ValueError('Use a PCM WAV, 8/16-bit mono/stereo, up to 2 seconds')
+            if len(audio.readframes(frames)) != frames * channels * width:
+                raise ValueError('The WAV file is incomplete')
+    except (wave.Error, EOFError) as error:
+        raise ValueError('Use an uncompressed PCM WAV file') from error
+    directory = paths()[0].parent / 'ui-sounds'
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / (hashlib.sha256(data).hexdigest() + '.wav')
+    if not destination.exists():
+        temporary = destination.with_suffix('.tmp')
+        temporary.write_bytes(data)
+        temporary.chmod(0o600)
+        temporary.replace(destination)
+    preferences_data = preferences()
+    preferences_data['sounds']['files'][group] = destination.as_uri()
+    preferences_data['sounds']['presets'][group] = 'custom'
+    save(paths()[0], preferences_data)
 
 def battery():
     for device in Path('/sys/class/power_supply').glob('*'):
@@ -189,6 +269,9 @@ def action(name, value):
         save(paths()[0], data)
     elif name == 'profile-picture':
         profile_picture(value)
+    elif name == 'sound-file':
+        group, filename = value.split('=', 1)
+        sound_file(group, filename)
     elif name == 'hostname':
         hostname(value)
     elif name in ('dnd','notifications'):
