@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell.Services.Mpris
 
-// Motion is a playback indicator, not a fabricated audio spectrum.
+// Compact rail uses real audio behind the title and transport controls.
 Item {
     id: music
     property bool compact: true
@@ -11,6 +11,36 @@ Item {
     readonly property bool playing: Desk.playing
     property real phase: 0
     implicitHeight: compact ? 32 : 210
+    AudioSpectrum {
+        id: spectrum
+        objectName: "music-spectrum"
+        active: music.compact && music.active && music.playing && !Theme.reducedMotion
+    }
+    Item {
+        id: background
+        objectName: "music-spectrum-background"
+        anchors.fill: parent
+        visible: music.compact
+        clip: true
+        Repeater {
+            model: spectrum.barCount
+            G2Surface {
+                required property int index
+                objectName: "music-spectrum-bar-" + index
+                readonly property real slotWidth: background.width / spectrum.barCount
+                x: index * slotWidth + 1
+                y: background.height - height
+                width: Math.max(0, slotWidth - 2)
+                height: Math.max(2, background.height * spectrum.levels[index])
+                radius: 2
+                color: "#515151"
+                opacity: music.playing ? 0.65 : 0.25
+                Behavior on height {
+                    NumberAnimation { duration: Theme.reducedMotion ? 0 : 65 }
+                }
+            }
+        }
+    }
     function timecode(seconds) {
         return Math.floor(Math.max(0, seconds) / 60) + ":" + String(Math.floor(Math.max(0, seconds) % 60)).padStart(2, "0");
     }
@@ -19,9 +49,10 @@ Item {
         to: Math.PI * 2
         duration: 1800
         loops: Animation.Infinite
-        running: music.active && music.playing && !Theme.reducedMotion
+        running: !music.compact && music.active && music.playing && !Theme.reducedMotion
     }
     Row {
+        visible: !music.compact
         x: 0
         y: music.compact ? 6 : 24
         spacing: 2
@@ -38,14 +69,15 @@ Item {
         }
     }
     Item {
-        x: 34
-        width: parent.width - 114
+        x: music.compact ? 6 : 34
+        width: parent.width - (music.compact ? 86 : 114)
         height: music.compact ? 29 : 66
         Label {
+            objectName: "music-title"
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
             text: music.player?.trackTitle || "No playback"
-            font.pixelSize: music.compact ? 9 : 18
+            font.pixelSize: music.compact ? 13 : 18
             color: music.player ? Theme.text : Theme.muted
         }
         Key {

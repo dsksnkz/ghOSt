@@ -1,6 +1,7 @@
 singleton Theme 1.0 Theme.qml
 singleton UiSounds 1.0 UiSounds.qml
 MusicBar 1.0 MusicBar.qml
+AudioSpectrum 1.0 AudioSpectrum.qml
 singleton OsdState 1.0 OsdState.qml
 Osd 1.0 Osd.qml
 EdgeHandle 1.0 EdgeHandle.qml

@@ -1,5 +1,33 @@
 # ghOSt progress
 
+## 2026-10-09 / Rail music background
+
+Fifteen real Cava bars span the compact music background behind the larger13px
+title and existing transport keys. No separate left spectrum column; other rail
+text/geometry and expanded media panel remain. Dedicated30fps mono raw stream,
+bounded frame parsing, fullscreen/pause/reduced-motion stop and fixture isolation.
+Qt input/compile checks pass; live Cava observed, native crop excludes the user's
+title and source/live files verified. [Details and recovery](changes/2026-10-09-music-background.md).
+Publication pending final commit/push verification; broader migration remains
+pending independently.
+
+## 2026-10-09 / Serpantinum removal: migration pending
+
+User requests removal and replacement with wlogout, Hyprshot and Clipse.
+Live region/full-output screenshot shortcuts now use installed Hyprshot;
+Super+V opens installed Clipse in Kitty, with its text/image watchers started
+and persisted in autostart. No clipboard history was cleared or published.
+Lua syntax checks and compositor reload pass, config errors empty, original
+shortcut combinations remain registered. No screenshot/lock/session action
+executed in tests. Hyprshot has no built-in editor and swappy is not installed:
+old edit variants currently capture the same region/output without an editor.
+Snapshot: `.local/backups/2026-10-09-shell-migration-4s9J3a/`.
+Removal is not complete or published: wlogout is a session menu whose existing
+Lock action calls hyprlock; no independent hyprlock configuration was found in
+standard local paths. Confirm actual locking behavior before replacing the
+lock handler or deleting the still-needed legacy instance. Other legacy
+shortcut handlers and autostart remain pending migration.
+
 ## 2026-10-09 / Click-sound settings
 
 Sound now starts with click-sound volume/mute, separate rail/sidebar/Settings

@@ -30,7 +30,23 @@ ShellRoot {
                 compare(musicControls.timecode(-1), "0:00");
                 musicControls.compact = true;
                 compare(musicControls.implicitHeight, 32);
+                const spectrum = findChild(musicControls, "music-spectrum");
+                const background = findChild(musicControls, "music-spectrum-background");
+                compare(spectrum.barCount, 15);
+                compare(background.width, musicControls.width);
+                compare(background.height, musicControls.height);
+                compare(findChild(musicControls, "music-title").font.pixelSize, 13);
+                verify(spectrum.acceptFrame(Array(15).fill("500").join(";") + ";"));
+                compare(spectrum.levels[0], 0.5);
+                verify(!spectrum.acceptFrame("1;2;3;"));
+                verify(!spectrum.acceptFrame(Array(15).fill("1001").join(";")));
+                verify(!spectrum.acceptFrame(Array(15).fill("NaN").join(";")));
+                compare(spectrum.levels[0], 0.5);
+                compare(spectrum.running, false);
+                for (let i = 0; i < 15; ++i)
+                    verify(findChild(musicControls, "music-spectrum-bar-" + i) !== null);
                 musicControls.compact = false;
+                compare(findChild(musicControls, "music-title").font.pixelSize, 18);
                 console.info("PASS: expanded/compact music geometry and time formatting");
             }
 

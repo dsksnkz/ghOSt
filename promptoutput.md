@@ -1,5 +1,16 @@
 prompts outputs here
 
+## 2026-10-09 / Rail music:15 background bars and larger title
+
+Direct request: move Cava from the left to the background of the whole music
+element, use15 bars and increase only music text in the top rail.
+Implemented/deployed15 real mono Cava bands behind compact music,9→13px title,
+6px title inset, existing controls/progress and expanded panel preserved.
+Qt input/compile and raw Cava frame checks pass; live process/native output
+inspected. Private media title excluded from the published native crop.
+[Record](docs/changes/2026-10-09-music-background.md). Publication pending final
+commit/push verification; no broader prompt completion claim.
+
 ## 2026-10-09 / Click-sound volume and choices
 
 Added volume/mute, independent rail/sidebar/Settings choices, local custom WAV
@@ -348,3 +359,13 @@ Added fourteen-page Settings; continuous G2 corners; wider calendar; grouped sid
 [Settings](site/assets/settings-general.webp) · [Sound](site/assets/settings-sound.webp) · [Battery](site/assets/settings-battery.webp) · [Calendar](site/assets/calendar-frame.webp) · [Sidebar](site/assets/sidebar-frame.webp) · [Composition](site/assets/desktop-frame.webp) · [All Pages previews](https://dsksnkz.github.io/ghOSt/) · [Verification and remaining items](docs/changes/2026-10-03-settings-polish.md).
 
 36 Python tests, 15 launcher assertions, isolated Settings/sidebar/calendar checks and native load/layer/log checks pass. Published release `6c500a7`; Pages workflow `37155289952` succeeded and the live Settings image loaded. Source prompt blob `f1c5f9ed4c10315c5f99f4ee83fcf28e9a8abb8d`; mainDesigns blob `9cc34c7e555a0cbfbff777d194a13ac3b799e6fe`. Prompt still pending: exact portrait/unmeasured layers, embedded EQ, independent lock/notifications and broader migration. No fabricated history or disruptive test actions.
+# 2026-10-09 / Serpantinum replacement — pending
+
+Direct request: "yes, lock with wlogout, screenshots with hyprshot, and clipse".
+Live Hyprshot region/output and Super+V Clipse bindings installed, backed up,
+Lua-checked and reloaded without compositor errors. Clipse text/image watchers
+running; no private history published. Existing screenshot edit combinations
+now capture without editing (no installed swappy). No session or capture action
+tested. Wlogout only opens a session menu; its existing lock command is hyprlock.
+Actual locker choice/configuration and remaining shortcut migration must be
+resolved before removing Serpantinum. Not marked complete or published.
