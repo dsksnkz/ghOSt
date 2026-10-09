@@ -4,6 +4,7 @@ import QtQuick3D
 View3D {
     id: view
     property real opening: 0
+    property real cursorTilt: 0
     readonly property int count: Math.max(1, Math.ceil((height - 52) / 36))
     readonly property real pitch: (height - 52) / count
     readonly property real frameOpacity: 1 - Math.max(0, (opening - 0.6) / 0.4)
@@ -48,7 +49,7 @@ View3D {
             readonly property real turn: Math.max(0, Math.min(1, (view.opening - index / view.count * 0.15) / 0.85))
             y: view.height / 2 - 28 - (index + 0.5) * view.pitch
             z: 8
-            eulerRotation: Qt.vector3d(8 + 82 * turn, 0, 0)
+            eulerRotation: Qt.vector3d(8 + 82 * turn + view.cursorTilt * (1 - turn), 0, 0)
             opacity: 1 - Math.max(0, (turn - 0.92) / 0.08)
             geometry: bladeMesh
             materials: slatFinish

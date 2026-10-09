@@ -35,6 +35,13 @@ ShellRoot {
                 wait(850);
                 compare(scene.drop, 1);
                 capture("blinds");
+                scene.trackCursor(scene.width, scene.height);
+                wait(130);
+                compare(scene.cursorTilt, 3);
+                scene.trackCursor(0, 0);
+                wait(130);
+                compare(scene.cursorTilt, -3);
+                scene.pointerTilt = 0;
                 mouseClick(scene, 10, 10);
                 compare(scene.credentialsVisible, false);
                 if (Quickshell.env("GHOST_LOCK_EXPECT_3D"))
@@ -49,6 +56,10 @@ ShellRoot {
                 verify(field.visible);
                 compare(field.width, 340);
                 compare(field.height, 52);
+                compare(scene.cursorTilt, 0);
+                const border = findChild(scene, "lock-password-border");
+                compare(border.color, "#00000000");
+                compare(border.border.width, 1);
                 keyClick(Qt.Key_Return);
                 compare(submissions, 1);
                 compare(field.text, "");

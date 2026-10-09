@@ -1,5 +1,23 @@
 # ghOSt progress
 
+## 2026-10-09 / Frosted lock field and subtle cursor tilt
+
+Password field now has a transparent G2 border with a cropped, masked blur of
+the blinds inside, without the previous opaque grey fill. Backdrop sampling
+excludes the credential column (no recursive password/clock capture). Only a
+170×26 texture is sampled for the 340×52 field. Blinds respond smoothly to cursor
+position with a bounded ±3-degree slat tilt, in both 3D and software fallback;
+tilt disables during credential blur and reduced motion and fades out during
+authenticated opening. Background clicks and idle clearing remain unchanged.
+Offscreen input/mock-auth tests, bounds/transparent-fill assertions and production
+compile pass. Software fallback screenshots are in `docs/images/2026-10-09-lock-glass/`;
+software rendering cannot validate GPU frosted blur or real 3D appearance. Those
+remain native/user-verification gaps, not claimed visually verified. No visible
+test window, actual lock, PAM or session action was invoked. Snapshot:
+`.local/backups/2026-10-09-lock-glass/`. Installed four affected lock files after
+confirming no running lock instance; unchanged shortcuts/authentication files.
+
+
 ## 2026-10-09 / Lock dismissal, idle reset and rendering cost
 
 Background clicks no longer wake credentials or introduce blur. When awake,

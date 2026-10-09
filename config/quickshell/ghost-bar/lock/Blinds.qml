@@ -4,6 +4,7 @@ Item {
     id: blinds
     property real drop: 1
     property real opening: 0
+    property real cursorTilt: 0
     property bool force3D: false
     readonly property int count: Math.max(1, Math.ceil((height - 52) / 36))
     readonly property bool hardware: GraphicsInfo.api !== GraphicsInfo.Software
@@ -23,10 +24,17 @@ Item {
         value: blinds.opening
         when: physical.status === Loader.Ready
     }
+    Binding {
+        target: physical.item
+        property: "cursorTilt"
+        value: blinds.cursorTilt
+        when: physical.status === Loader.Ready
+    }
     BlindsFallback {
         id: fallback
         anchors.fill: parent
         visible: !blinds.uses3D
         opening: blinds.opening
+        cursorTilt: blinds.cursorTilt
     }
 }

@@ -3,6 +3,7 @@ import QtQuick
 Item {
     id: view
     property real opening: 0
+    property real cursorTilt: 0
     readonly property int count: Math.max(1, Math.ceil((height - 52) / 36))
     readonly property real pitch: (height - 52) / count
     readonly property real frameOpacity: 1 - Math.max(0, (opening - 0.6) / 0.4)
@@ -45,7 +46,7 @@ Item {
             transform: Rotation {
                 origin.x: blade.width / 2; origin.y: blade.height / 2
                 axis { x: 1; y: 0; z: 0 }
-                angle: 82 * blade.turn
+                angle: 82 * blade.turn + view.cursorTilt * (1 - blade.turn)
             }
         }
     }

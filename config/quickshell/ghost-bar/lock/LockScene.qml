@@ -13,11 +13,21 @@ FocusScope {
     property date now: new Date()
     property real drop: 0
     property real reveal: credentialsVisible ? 1 : 0
+    property real pointerTilt: 0
+    readonly property real cursorTilt: reducedMotion || reveal > 0 ? 0 : pointerTilt
     readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
     signal wakeRequested
     signal sleepRequested
     signal activity
     signal submitted(string response)
+
+    function trackCursor(x, y) {
+        // Small mechanical slat tilt, never enough to open the screen.
+        pointerTilt = Math.max(-3, Math.min(3, (y / Math.max(1, height) * 2 - 1) * 2.5 + (x / Math.max(1, width) * 2 - 1) * 0.5));
+    }
+    Behavior on pointerTilt {
+        NumberAnimation { duration: scene.reducedMotion ? 0 : 100; easing.type: Easing.OutCubic }
+    }
 
     function wake(text) {
         wakeRequested();
@@ -79,6 +89,7 @@ FocusScope {
         color: "#171717"
     }
     Item {
+        id: backdrop
         anchors.fill: parent
         layer.enabled: scene.reveal > 0
         // Blur needs fewer pixels than the sharp slat view. Keep the sharp
@@ -93,10 +104,14 @@ FocusScope {
             width: parent.width
             height: parent.height
             drop: scene.drop
+            cursorTilt: scene.cursorTilt
         }
     }
     MouseArea {
         anchors.fill: parent
+        hoverEnabled: true
+        onPositionChanged: scene.trackCursor(mouseX, mouseY)
+        onExited: scene.pointerTilt = 0
         onClicked: scene.rest()
     }
     Keys.onPressed: event => {
@@ -152,12 +167,47 @@ FocusScope {
             rightPadding: 18
             selectByMouse: false
             persistentSelection: false
-            background: G2Surface {
-                radius: 15
-                smoothing: 0.6
-                color: "#242424"
-                border.width: 1
-                border.color: password.activeFocus ? "#9c9c9c" : "#555555"
+            background: Item {
+                id: glass
+                objectName: "lock-password-glass"
+                // Sample only the blinds, never the password or clock, so the
+                // frosted interior cannot recursively capture credentials.
+                ShaderEffectSource {
+                    id: glassSample
+                    sourceItem: backdrop
+                    sourceRect: Qt.rect(credentials.x + password.x, credentials.y + password.y, glass.width, glass.height)
+                    textureSize: Qt.size(Math.ceil(glass.width / 2), Math.ceil(glass.height / 2))
+                    live: scene.credentialsVisible
+                    visible: false
+                }
+                G2Surface {
+                    id: glassMask
+                    anchors.fill: parent
+                    radius: 15
+                    smoothing: 0.6
+                    color: "white"
+                    visible: false
+                    layer.enabled: true
+                }
+                MultiEffect {
+                    anchors.fill: parent
+                    source: glassSample
+                    blurEnabled: true
+                    blurMax: 16
+                    blur: 1
+                    autoPaddingEnabled: false
+                    maskEnabled: true
+                    maskSource: glassMask
+                }
+                G2Surface {
+                    objectName: "lock-password-border"
+                    anchors.fill: parent
+                    radius: 15
+                    smoothing: 0.6
+                    color: "transparent"
+                    border.width: 1
+                    border.color: password.activeFocus ? "#9c9c9c" : "#555555"
+                }
             }
             onAccepted: scene.submit()
             onTextEdited: scene.activity()

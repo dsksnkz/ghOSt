@@ -449,3 +449,16 @@ verify input/reset/clearing/busy policy and production types compile. Software
 fallback images are recorded; offscreen 3D blank output is not visual evidence.
 Native FPS/lag and actual unlock remain user-verification pending. Snapshot:
 `.local/backups/2026-10-09-lock-idle/`. Installed affected ghOSt lock paths only.
+# 2026-10-09 / Password glass and cursor-controlled blinds
+
+Request: "make the password bar just an border with inside as blur, and the blinds is rotateable with cursor, not much though".
+
+Removed opaque field fill; retained G2 border around a small cropped/blurred
+backdrop sample, masked to the field corners. Cursor position drives smooth
+±3-degree slat rotation, disabled during credential blur/reduced motion and
+attenuated during exit. Secure lock/authentication policy and idle reset retained.
+Offscreen tests verify bounds, transparent fill, first-key input, reset and
+mock-auth; production types compile. GPU frosted blur/native 3D appearance not
+visually tested because the user prohibits visible testing; software captures
+are explicitly labelled. No lock, PAM or desktop-visible test window invoked.
+Backup `.local/backups/2026-10-09-lock-glass/`; four ghOSt lock files deployed.
