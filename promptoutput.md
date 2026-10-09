@@ -6,7 +6,8 @@ Deleted the rejected layered experiment (recoverable from Git/snapshot) and
 replaced the earlier rounded outline with explicit rounded inner tab/body
 cutouts. Black/white variants and preview share one generator geometry. No
 Nautilus changes. All 63 Python tests, generator freshness and diff checks pass;
-rendered inner corners visually inspected. Publication pending; older variants below are
+rendered inner corners visually inspected. Published `ffabbe7`; remote revision,
+six asset blob hashes and removal of layered assets verified. Older variants below are
 historical, not the current design.
 
 ## 2026-10-09 · Shaded, layered folder

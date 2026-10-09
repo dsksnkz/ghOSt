@@ -9,7 +9,8 @@ tab/body cavities, eliminating the sharp inner joins of the previous stroked
 version. Preview now derives from the same canonical geometry, not a duplicate.
 Original `folder` and Nautilus remain untouched. All 63 Python tests, generator
 freshness and diff checks pass; rendered preview visually inspected, including
-rounded negative-space corners. Publication pending.
+rounded negative-space corners. Published `ffabbe7`; remote main and all six
+asset blob hashes verified, with layered assets absent from the remote tree.
 This supersedes the earlier layered and rounded-asset entries below.
 
 ## 2026-10-09 / Layered folder refinement
