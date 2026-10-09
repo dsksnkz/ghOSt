@@ -1,5 +1,24 @@
 # ghOSt progress
 
+## 2026-10-09 / OSD and real outside-click fixes
+
+Sidebar's exclusive layer mode redirected outside clicks back to it on this
+Hyprland version. Changed to OnDemand plus managed focus. Actual native left,
+right, middle and Escape tests pass, including inside-click preservation and
+no click-through; Calendar/Media outside presses also pass. Native diagnostics
+have safe automatic cleanup and a five-second guard expiry.
+
+Removed the old OSD instance from its local manager and forced a verified legacy
+hot reload without restarting its process. The previous hidden-source edit had
+not reached the running legacy configuration. Removed the horizontal cap from
+ghOSt's volume/brightness slider, tightened side padding and darkened the OSD
+card/track per the follow-up; actual native output inspected. 62 Python
+tests, Qt input and surface compilation pass. Both shell PIDs, shortcuts,
+wallpaper, autostart and notification ownership preserved.
+[Cause, native proof, images, migration and recovery](changes/2026-10-09-osd-dismissal.md).
+Publication pending; the standing user instruction is to publish every completed
+verified change. Broader design backlog remains pending; Nautilus is untouched.
+
 ## 2026-10-08 / Native interaction pass
 
 Implemented the latest eleven desktop requests: animated MPRIS controls, crisp

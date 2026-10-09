@@ -14,6 +14,17 @@ PanelWindow {
     required property var notificationWindow
 
     readonly property bool mediaOpened: panelWindow.opened && panelWindow.page === "media"
+    property int presses: 0
+    function status() {
+        return {
+            visible,
+            width,
+            height,
+            inputWidth: input.width,
+            inputHeight: input.height,
+            presses
+        };
+    }
     visible: sidebarWindow.opened || calendarWindow.opened || mediaOpened
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
@@ -29,8 +40,12 @@ PanelWindow {
     }
 
     DismissArea {
+        id: input
         anchors.fill: parent
-        onDismissed: Desk.close()
+        onDismissed: {
+            dismissal.presses++;
+            Desk.close();
+        }
     }
 
     mask: Region {

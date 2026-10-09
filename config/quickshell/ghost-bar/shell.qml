@@ -5,6 +5,17 @@ import Quickshell.Hyprland
 
 ShellRoot {
     Component.onCompleted: UiSounds.status()
+    // Native development must not leave Quickshell's generic reload panel over
+    // the desktop. Errors remain in the runtime log; these are not OSD messages.
+    Connections {
+        target: Quickshell
+        function onReloadCompleted() {
+            Quickshell.inhibitReloadPopup();
+        }
+        function onReloadFailed(errorString) {
+            Quickshell.inhibitReloadPopup();
+        }
+    }
     SettingsWindow {
         id: settingsWindow
     }
@@ -17,10 +28,13 @@ ShellRoot {
             readonly property var sidebarSurface: sidebarWindow
             readonly property var calendarSurface: calendarWindow
             readonly property var panelSurface: panelWindow
+            readonly property var dismissalSurface: dismissalWindow
             property int focusRevision: 0
-            // Media transport needs no compositor keyboard grab. Its outside
-            // dismissal surface also permits opening while the pointer is away.
-            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && !Desk.sidebarOpen && Desk.panel !== "" && Desk.panel !== "media"
+            property int focusDismissals: 0
+            // Sidebar uses OnDemand layer focus: include it in this group so
+            // Escape remains usable without trapping outside pointer events.
+            // Media transport does not need a compositor keyboard grab.
+            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && (Desk.sidebarOpen || (Desk.panel !== "" && Desk.panel !== "media"))
             function refreshFocus() {
                 focusRevision++;
                 if (wantsFocus)
@@ -77,6 +91,7 @@ ShellRoot {
                 managedFocus: true
             }
             SidebarDismissal {
+                id: dismissalWindow
                 screen: output.modelData
                 sidebarWindow: output.sidebarSurface
                 calendarWindow: output.calendarSurface
@@ -98,8 +113,10 @@ ShellRoot {
                     if (focusDelay.running)
                         return;
                     Qt.callLater(() => {
-                        if (revision === output.focusRevision && output.wantsFocus && !focusDelay.running && !Desk.settingsRequested)
+                        if (revision === output.focusRevision && output.wantsFocus && !focusDelay.running && !Desk.settingsRequested) {
+                            output.focusDismissals++;
                             Desk.close();
+                        }
                     });
                 }
             }
@@ -131,6 +148,11 @@ ShellRoot {
         function forecast(step: int): string {
             const output = outputs.instances.find(output => output.calendarSurface.opened);
             return output ? output.calendarSurface.forecastStep(step) : "{}";
+        }
+        function dismissal(): string {
+            return JSON.stringify(Array.from(outputs.instances, output => Object.assign(output.dismissalSurface.status(), {
+                    focusDismissals: output.focusDismissals
+                })));
         }
         function settingsFlow(action: string): string {
             return settingsWindow.inspect(action);

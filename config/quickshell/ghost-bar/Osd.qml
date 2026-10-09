@@ -24,7 +24,7 @@ PanelWindow {
     property real reveal: opened ? 1 : 0
 
     visible: opened || reveal > 0.001
-    implicitWidth: 112
+    implicitWidth: 80
     implicitHeight: 310
     margins.top: Math.round((screen.height - implicitHeight) / 2)
     color: "transparent"
@@ -43,18 +43,18 @@ PanelWindow {
 
         x: -30 + 44 * window.reveal
         y: 8
-        width: 76
+        width: 44
         height: 294
         radius: 15
         smoothing: 0.6
-        color: "#242424"
-        border.color: "#666666"
+        color: "#151515"
+        border.color: "#393939"
         border.width: 1
         scale: 0.4 + 0.6 * window.reveal
         opacity: window.reveal
 
         SvgIcon {
-            x: 26
+            x: 10
             y: 16
             width: 24
             height: 24
@@ -64,9 +64,9 @@ PanelWindow {
         Controls.Slider {
             id: slider
 
-            x: 15
+            x: 0
             y: 55
-            width: 46
+            width: 44
             height: 184
             orientation: Qt.Vertical
             from: 0
@@ -81,36 +81,34 @@ PanelWindow {
             onPressedChanged: OsdState.interacting = pressed
 
             background: G2Surface {
-                x: 12
+                x: 14
                 y: 0
-                width: 22
+                width: 16
                 height: slider.height
                 radius: 9
-                color: "#404040"
+                color: "#2c2c2c"
 
                 G2Surface {
                     anchors.bottom: parent.bottom
                     width: parent.width
                     height: parent.height * slider.position
                     radius: 9
-                    color: "#d9d9d9"
+                    color: "#c6c6c6"
                 }
             }
 
-            handle: G2Surface {
-                x: 8
-                y: slider.visualPosition * (slider.height - height)
-                width: 30
-                height: 7
-                radius: 3
-                color: "#ffffff"
+            // The filled track is the indicator; no floating horizontal cap.
+            // Keep an empty handle item so Qt retains normal touch/drag input.
+            handle: Item {
+                width: 0
+                height: 0
             }
         }
 
         Label {
-            x: 4
+            x: 0
             y: 255
-            width: 68
+            width: 44
             horizontalAlignment: Text.AlignHCenter
             text: OsdState.available ? Math.round(OsdState.amount) + "%" : "—"
             font.pixelSize: 14

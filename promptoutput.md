@@ -1,5 +1,18 @@
 prompts outputs here
 
+## 2026-10-09 · OSD and actual outside dismissal
+
+Fixed the real compositor path, not just the Qt callback: Sidebar now uses
+OnDemand focus, and native left/right/middle outside clicks plus immediate
+Escape pass without underlying click-through. Calendar/Media pass too. Removed
+the legacy OSD instance and verified its configuration finally hot-reloaded;
+both shell PIDs remain. The ghOSt vertical slider has no horizontal cap;
+follow-up tighter horizontal padding and darker card/track are included.
+62 tests and production compile/input checks pass; safe native crops inspected.
+[Evidence and recovery](docs/changes/2026-10-09-osd-dismissal.md).
+Publication pending; every completed verified ghOSt change is to be published.
+Nautilus and the broader backlog remain untouched/pending.
+
 ## 2026-10-08 · Native interaction pass
 
 Eleven requested desktop changes are implemented and live. Nautilus remains

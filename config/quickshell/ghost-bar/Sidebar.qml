@@ -13,9 +13,7 @@ PanelWindow {
     property real reveal: opened ? 1 : 0
     readonly property real screenScale: screen.width / 1920
     // Center vertically on the display while preserving uniform enlargement.
-    readonly property real designScale: Math.min(screenScale * 1.15,
-        (screen.width - 32) / 356,
-        Math.max(1, screen.height - 28) / 794)
+    readonly property real designScale: Math.min(screenScale * 1.15, (screen.width - 32) / 356, Math.max(1, screen.height - 28) / 794)
 
     function sync() {
         opened = Desk.sidebarOpen && Desk.panelScreen === screen.name;
@@ -31,8 +29,9 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-sidebar"
     WlrLayershell.layer: WlrLayer.Overlay
-    // Opening from a keyboard-less rail must focus the sidebar immediately.
-    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Exclusive layer focus also redirects OUTSIDE pointer events on Hyprland.
+    // The shell's managed focus grab preserves keyboard focus without that trap.
+    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     onOpenedChanged: {
         if (opened)
             Qt.callLater(() => {
@@ -42,7 +41,6 @@ PanelWindow {
             });
         else if (!sidebar.managedFocus)
             grab.active = false;
-
     }
 
     Connections {
