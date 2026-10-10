@@ -17,7 +17,15 @@ Item {
         const entry = Search.commandEntry(query);
         return entry ? [entry] : [];
     }
-    implicitHeight: 380
+    implicitHeight: 352
+    function navigateKey(event) {
+        if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
+            move(event.key === Qt.Key_Down ? 1 : -1);
+            event.accepted = true;
+        }
+    }
+    Keys.priority: Keys.BeforeItem
+    Keys.onPressed: event => navigateKey(event)
 
     function focusSearch() { search.forceActiveFocus(); }
     function beginSession() {
@@ -58,35 +66,35 @@ Item {
     }
     G2Surface {
         width: parent.width
-        height: 60
-        radius: 22
+        height: 48
+        radius: 18
         smoothing: 0.6
         color: "#252525"
         Icon {
-            x: 24
+            x: 20
             anchors.verticalCenter: parent.verticalCenter
-            width: 28; height: 28
+            width: 23; height: 23
             name: "search"
             ink: "#858585"
         }
         Controls.TextField {
             id: search
-            x: 80
-            width: parent.width - 100
+            x: 64
+            width: parent.width - 80
             height: parent.height
             padding: 0
             color: Theme.text
             placeholderText: "Search"
             placeholderTextColor: "#858585"
             font.family: Theme.textFont
-            font.pixelSize: 22
+            font.pixelSize: 18
             selectByMouse: true
             selectionColor: Theme.text
             selectedTextColor: Theme.base
             background: Item {}
             Accessible.name: "Search applications or > followed by a background command"
-            Keys.onDownPressed: launcher.move(1)
-            Keys.onUpPressed: launcher.move(-1)
+            Keys.priority: Keys.BeforeItem
+            Keys.onPressed: event => launcher.navigateKey(event)
             Keys.onReturnPressed: launcher.launch(launcher.results[list.currentIndex])
             Keys.onEnterPressed: launcher.launch(launcher.results[list.currentIndex])
         }
@@ -94,11 +102,13 @@ Item {
     ListView {
         id: list
         objectName: "launcher-list"
-        y: 78
+        y: 64
         width: parent.width
-        height: parent.height - y
+        // Whole rows only: preserve a bottom breathing margin rather than
+        // showing a cropped fifth icon beneath the four visible results.
+        height: Math.max(60, Math.floor((parent.height - y - 16 + spacing) / (60 + spacing)) * (60 + spacing) - spacing)
         clip: true
-        spacing: 10
+        spacing: 8
         model: launcher.results
         currentIndex: 0
         boundsBehavior: Flickable.StopAtBounds
@@ -108,12 +118,12 @@ Item {
             objectName: "launcher-selection"
             y: list.currentItem ? list.currentItem.y : 0
             width: list.width
-            height: 80
-            radius: 22
+            height: 60
+            radius: 18
             smoothing: 0.6
             color: "transparent"
             border.width: 1
-            border.color: "#363636"
+            border.color: "#555555"
             Behavior on y {
                 NumberAnimation {
                     duration: Theme.reducedMotion ? 0 : 220
@@ -128,15 +138,15 @@ Item {
             required property int index
             readonly property bool chosen: ListView.isCurrentItem
             width: list.width
-            height: 80
+            height: 60
             Key {
                 id: rowKey
                 width: parent.width
                 height: parent.height
-                radius: 22
+                radius: 18
                 smoothing: 0.6
                 color: "transparent"
-                hoverFeedback: !row.chosen
+                hoverFeedback: false
                 hint: row.modelData.name
                 onClicked: {
                     list.currentIndex = row.index;
@@ -144,30 +154,30 @@ Item {
                 }
                 Image {
                     id: appIcon
-                    x: 24
+                    x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 50; height: 50
+                    width: 40; height: 40
                     source: row.modelData.icon ? Quickshell.iconPath(row.modelData.icon, true) : ""
-                    sourceSize: Qt.size(50 * Screen.devicePixelRatio, 50 * Screen.devicePixelRatio)
+                    sourceSize: Qt.size(40 * Screen.devicePixelRatio, 40 * Screen.devicePixelRatio)
                     visible: status === Image.Ready
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                 }
                 Icon {
-                    x: 24
+                    x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 50; height: 50
+                    width: 40; height: 40
                     visible: appIcon.status !== Image.Ready
                     name: Search.iconFor(row.modelData)
                     ink: Theme.text
                 }
                 Label {
-                    x: 110
+                    x: 88
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - x - 54
                     text: row.modelData.name
                     font.family: Theme.textFont
-                    font.pixelSize: 22
+                    font.pixelSize: 18
                     color: Theme.text
                     elide: Text.ElideRight
                 }

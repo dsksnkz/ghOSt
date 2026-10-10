@@ -5,8 +5,8 @@ import Quickshell
 ShellRoot {
     FloatingWindow {
         visible: true
-        implicitWidth: 600
-        implicitHeight: 412
+        implicitWidth: 480
+        implicitHeight: 384
         color: "#191919"
         TestCase {
             id: test
@@ -55,13 +55,25 @@ ShellRoot {
                 const list = findChild(launcher, "launcher-list");
                 const outline = findChild(launcher, "launcher-selection");
                 verify(launcher.results.length > 1);
-                launcher.move(1);
+                launcher.focusSearch();
+                keyClick(Qt.Key_Down);
+                compare(list.currentIndex, 1);
                 wait(70);
                 if (!Theme.reducedMotion)
-                    verify(outline.y > 0 && outline.y < 90);
+                    verify(outline.y > 0 && outline.y < 68);
                 wait(240);
-                compare(outline.y, 90);
-                launcher.move(-1);
+                compare(outline.y, 68);
+                compare(outline.color, "#00000000");
+                compare(outline.border.width, 1);
+                compare(list.height, 4 * 60 + 3 * 8);
+                verify(launcher.height - list.y - list.height >= 16);
+                if (directory) {
+                    saved = false;
+                    test.grabToImage(result => saved = result.saveToFile(directory + "/four-apps.png"));
+                    tryCompare(test, "saved", true, 1500);
+                }
+                keyClick(Qt.Key_Up);
+                compare(list.currentIndex, 0);
                 wait(250);
                 compare(outline.y, 0);
                 launcher.query = "Spotify";

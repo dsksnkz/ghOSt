@@ -528,3 +528,15 @@ and harmless command text, published with source. Four live files deployed and
 ghOSt reloaded, with reversible exact-path snapshots. Native command launch
 remains user-verification pending. Earlier Kitty-command behavior superseded.
 
+# 2026-10-10 / Smaller launcher and arrow-key selection
+
+Request: "too big, scale it down so it can fit 1 more app while still having some space, scale down the  total size.  make it possible for up down arrow keys to control selection, and the selection isnt grey fill, its only a grey stroke. arrow keys selection is animated, smooth animation".
+
+Launcher reduced to 480×384, four complete rows with bottom breathing room,
+smaller icons/labels/search and no partially clipped fifth item. Explicit arrow
+event handling drives smooth Bézier outline movement. Transparent selected row,
+1px grey stroke, no hover fill. Offscreen real key-event/animation/geometry tests,
+existing input/compile and Node checks pass; actual render recorded. Installed
+two affected live files and reloaded ghOSt; backup retained. No test app/command
+executed. Background command mode and fresh-open reset preserved.
+

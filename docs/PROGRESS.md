@@ -1,5 +1,22 @@
 # ghOSt progress
 
+## 2026-10-10 / Compact four-row launcher and keyboard outline
+
+Reduced total launcher from 600×412 to 480×384; search 48px, icons 40px,
+labels 18px, rows 60px with 8px spacing. Four complete rows fit instead of three,
+with at least 16px bottom breathing room; whole-row sizing prevents a clipped
+fifth icon. Selection is transparent with a 1px grey stroke, 220ms Bézier
+translation and no row hover fill. Explicit BeforeItem arrow handling in the
+search plus launcher-level fallback keeps Up/Down controlling selection without
+moving focus out of the input. Enter/background commands and fresh-open reset
+are unchanged. Real Qt key-event tests verify selection index, intermediate
+animation position, both directions, transparent fill, four-row capacity and
+bottom space; Node/input/compile checks pass. Offscreen actual render inspected
+in `docs/images/2026-10-10-launcher-compact/`. Two live files installed, named
+ghOSt reload invoked; `.local/backups/2026-10-10-launcher-compact/` preserves
+affected project/live paths. No applications/commands executed in verification.
+
+
 ## 2026-10-10 / Launcher reference layout and background commands
 
 Latest screenshot supersedes the previous compact launcher. Centered 600×412
