@@ -560,3 +560,13 @@ Down and reverse Up settlement; existing input/compile/Node checks pass.
 Actual component screenshot recorded. One live file installed and ghOSt
 reloaded, preserving size, stroke style, commands and fresh-open reset.
 
+# 2026-10-10 / Escape closes launcher
+
+Request: "if pressed escape it turns off, dont lemme see when ur testing".
+
+Added explicit BeforeItem Escape handling, command/query clearing and close
+signal wired to the live panel. Offscreen Qt key event verifies closure request
+and no execution; compile/existing input checks pass. No visible testing or
+actual command launched. No appearance change; prior screenshots still apply.
+Two live files installed and named ghOSt reloaded; exact backups retained.
+

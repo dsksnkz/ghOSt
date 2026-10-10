@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-10 / Explicit launcher Escape dismissal
+
+Escape is consumed before TextField handling and emits launcher closeRequested,
+connected to Desk.close in production (preview popup close in isolated tests).
+Stops keyboard scroll and clears query/last request without running any command.
+Offscreen real Escape from populated command input verifies one close request,
+cleared input and no execution; launcher/input and compile checks pass. No
+desktop-visible test window or app launch. No visual geometry change; existing
+launcher-scroll screenshots remain applicable. Two live files deployed with
+named ghOSt reload. Snapshot `.local/backups/2026-10-10-launcher-escape/`.
+
+
 ## 2026-10-10 / Smooth launcher viewport scrolling
 
 Removed immediate positionViewAtIndex calls from arrow selection: viewport

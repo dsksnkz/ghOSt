@@ -229,6 +229,12 @@ Item {
         id: launcherPage
         Launcher {
             previewMode: content.previewMode
+            onCloseRequested: {
+                if (content.previewMode)
+                    popup.opened = false;
+                else
+                    Desk.close();
+            }
         }
     }
     Component {

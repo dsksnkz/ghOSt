@@ -13,6 +13,7 @@ ShellRoot {
             visible: true
             anchors.fill: parent
             property bool saved: false
+            property int closes: 0
             G2Surface {
                 anchors.fill: parent
                 color: "#191919"
@@ -26,6 +27,7 @@ ShellRoot {
                 anchors.fill: parent
                 anchors.margins: 16
                 previewMode: true
+                onCloseRequested: test.closes++
             }
             function test_commands() {
                 wait(100);
@@ -115,6 +117,13 @@ ShellRoot {
                     tryCompare(test, "saved", true, 1500);
                 }
                 console.info("PASS: fresh-open query reset and animated selection outline in both directions");
+                launcher.query = "> echo never executed";
+                launcher.focusSearch();
+                keyClick(Qt.Key_Escape);
+                compare(test.closes, 1);
+                compare(launcher.query, "");
+                compare(launcher.lastRequest, "");
+                console.info("PASS: Escape from command input requests closure and clears input without execution");
                 console.info("PASS: launcher terminal row, explicit Enter, no command execution, no command pinning and app-search restoration");
             }
         }

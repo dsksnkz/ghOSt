@@ -18,8 +18,15 @@ Item {
         return entry ? [entry] : [];
     }
     implicitHeight: 296
+    signal closeRequested
     function navigateKey(event) {
-        if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
+        if (event.key === Qt.Key_Escape) {
+            keyboardScroll.stop();
+            query = "";
+            lastRequest = "";
+            closeRequested();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
             move(event.key === Qt.Key_Down ? 1 : -1);
             event.accepted = true;
         }
