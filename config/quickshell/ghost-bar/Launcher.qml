@@ -29,15 +29,31 @@ Item {
 
     function focusSearch() { search.forceActiveFocus(); }
     function beginSession() {
+        keyboardScroll.stop();
         query = "";
         lastRequest = "";
         list.currentIndex = results.length ? 0 : -1;
+        list.contentY = list.originY;
         focusSearch();
     }
     function move(delta) {
         if (!results.length) return;
         list.currentIndex = Math.max(0, Math.min(results.length - 1, list.currentIndex + delta));
-        list.positionViewAtIndex(list.currentIndex, ListView.Contain);
+        const top = list.originY + list.currentIndex * (48 + list.spacing);
+        const bottom = top + 48;
+        let target = list.contentY;
+        if (top < target) target = top;
+        else if (bottom > target + list.height) target = bottom - list.height;
+        target = Math.max(list.originY, Math.min(list.originY + Math.max(0, list.contentHeight - list.height), target));
+        // Retarget from the current frame when keys repeat; never snap the
+        // viewport with positionViewAtIndex while the outline is animating.
+        keyboardScroll.stop();
+        if (Theme.reducedMotion)
+            list.contentY = target;
+        else {
+            keyboardScroll.to = target;
+            keyboardScroll.start();
+        }
     }
     function pin(entry) {
         if (!entry || entry.terminalCommand) return;
@@ -57,7 +73,19 @@ Item {
         return JSON.stringify({query, count: results.length,
             selected: results[list.currentIndex]?.id || "", pins, lastRequest});
     }
-    onResultsChanged: list.currentIndex = results.length ? 0 : -1
+    onResultsChanged: {
+        keyboardScroll.stop();
+        list.currentIndex = results.length ? 0 : -1;
+        list.contentY = list.originY;
+    }
+    NumberAnimation {
+        id: keyboardScroll
+        target: list
+        property: "contentY"
+        duration: 220
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: [0.2, 0.75, 0.25, 1, 1, 1]
+    }
     Component.onCompleted: Qt.callLater(focusSearch)
     Settings {
         id: preferences
@@ -112,11 +140,12 @@ Item {
         model: launcher.results
         currentIndex: 0
         boundsBehavior: Flickable.StopAtBounds
+        onMovementStarted: keyboardScroll.stop()
         keyNavigationEnabled: false
         highlightFollowsCurrentItem: false
         highlight: G2Surface {
             objectName: "launcher-selection"
-            y: list.currentItem ? list.currentItem.y : 0
+            y: list.originY + Math.max(0, list.currentIndex) * (48 + list.spacing)
             width: list.width
             height: 48
             radius: 16

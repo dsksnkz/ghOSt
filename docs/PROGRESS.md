@@ -1,5 +1,21 @@
 # ghOSt progress
 
+## 2026-10-10 / Smooth launcher viewport scrolling
+
+Removed immediate positionViewAtIndex calls from arrow selection: viewport
+contentY now animates over 220ms using the outline's same Bézier curve. Selection
+outline uses stable index/row coordinates rather than virtualized item geometry.
+Only the minimum scroll to fully contain the selected row is requested; rapid
+keys retarget from the current frame, pointer scrolling interrupts the keyboard
+animation, reduced motion remains instant, and fresh query/open resets scroll.
+Real offscreen key-event tests verify a nonzero intermediate scroll (no snap),
+outline/viewport synchronization at the fifth row, rapid Down and reverse Up
+settlement. Existing reset/commands/ranking/input/compile checks pass. Actual
+scrolled component render recorded in `docs/images/2026-10-10-launcher-scroll/`.
+Single live Launcher file deployed and named ghOSt reloaded; snapshot:
+`.local/backups/2026-10-10-launcher-scroll/`. No app/command executed in tests.
+
+
 ## 2026-10-10 / Wider, flatter launcher
 
 Latest clarification: wider and flatter, not narrower. Launcher now 560×328

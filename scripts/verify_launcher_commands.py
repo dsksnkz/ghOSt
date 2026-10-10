@@ -21,5 +21,6 @@ output = result.stdout + result.stderr
 assert result.returncode == 0, output
 assert "PASS: launcher terminal row, explicit Enter, no command execution, no command pinning and app-search restoration" in output, output
 assert "PASS: fresh-open query reset and animated selection outline in both directions" in output, output
+assert "PASS: keyboard viewport scroll is interpolated, synchronized and retargets rapid keys" in output, output
 assert not any(error in output for error in ("FAIL!", "ReferenceError", "TypeError", "Binding loop")), output
 print("PASS: launcher command UI, Enter dispatch and preview execution guard")

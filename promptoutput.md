@@ -548,3 +548,15 @@ labels, four whole rows, bottom breathing room and animated stroke selection.
 Offscreen keyboard/animation/geometry and compile pass; actual render inspected.
 Two live files installed and named ghOSt reloaded with exact-path backups.
 
+# 2026-10-10 / Smooth scrolling to lower launcher results
+
+Request: "when it moves down to the down element, the scroll animation is not smooth".
+
+Replaced immediate viewport positioning with coordinated 220ms Bézier scrolling
+and outline movement. Stable index geometry avoids virtual-item jumps; repeated
+keys retarget smoothly and direct pointer movement cancels keyboard animation.
+Offscreen real keys verify intermediate scroll, synchronized outline, rapid
+Down and reverse Up settlement; existing input/compile/Node checks pass.
+Actual component screenshot recorded. One live file installed and ghOSt
+reloaded, preserving size, stroke style, commands and fresh-open reset.
+

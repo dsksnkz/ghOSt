@@ -76,6 +76,37 @@ ShellRoot {
                 compare(list.currentIndex, 0);
                 wait(250);
                 compare(outline.y, 0);
+                verify(launcher.results.length > 6);
+                for (let i = 0; i < 3; i++) keyClick(Qt.Key_Down);
+                wait(250);
+                compare(list.currentIndex, 3);
+                compare(list.contentY, 0);
+                keyClick(Qt.Key_Down);
+                compare(list.currentIndex, 4);
+                compare(list.contentY, 0);
+                wait(70);
+                if (!Theme.reducedMotion) {
+                    verify(list.contentY > 0 && list.contentY < 56);
+                    compare(Math.round(outline.y - list.contentY), 168);
+                }
+                wait(250);
+                compare(list.contentY, 56);
+                keyClick(Qt.Key_Down);
+                wait(40);
+                keyClick(Qt.Key_Down);
+                wait(260);
+                compare(list.currentIndex, 6);
+                compare(list.contentY, 168);
+                for (let i = 0; i < 4; i++) keyClick(Qt.Key_Up);
+                wait(260);
+                compare(list.currentIndex, 2);
+                compare(list.contentY, 112);
+                console.info("PASS: keyboard viewport scroll is interpolated, synchronized and retargets rapid keys");
+                if (directory) {
+                    saved = false;
+                    test.grabToImage(result => saved = result.saveToFile(directory + "/scrolled-selection.png"));
+                    tryCompare(test, "saved", true, 1500);
+                }
                 launcher.query = "Spotify";
                 wait(250);
                 if (directory) {
