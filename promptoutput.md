@@ -501,3 +501,15 @@ for unlinking, so full uninstall is not marked complete. Lua/config/compile/IPC
 and layer/reference checks pass. Rail crop published without private titles.
 Backup `.local/backups/2026-10-10-serpantinum-removal/`; no auth/session tests.
 
+# 2026-10-10 / Launcher terminal commands
+
+Request: "make it possible in app launcher to put in terminal  commands".
+
+Added explicit `>` command mode alongside unchanged application search. A
+Run in terminal row executes only on Enter/click, through Kitty with Bash and
+held output; quotes/pipes passed intact in a single argument. Empty commands
+cannot run, command rows cannot be pinned, command strings are not persisted.
+Node and Qt offscreen guard/dispatch tests pass along with existing input and
+compile checks; no actual command executed in testing. Sample-only screenshot
+published. Source/live files snapshotted, installed and named ghOSt reloaded.
+

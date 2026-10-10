@@ -10,7 +10,13 @@ Item {
     property alias query: search.text
     property string lastRequest: ""
     readonly property var pins: Search.readPins(preferences.pinnedIds)
-    readonly property var results: Search.ranked(DesktopEntries.applications.values, query, pins)
+    readonly property bool commandMode: Search.commandMode(query)
+    readonly property var results: {
+        if (!commandMode)
+            return Search.ranked(DesktopEntries.applications.values, query, pins);
+        const entry = Search.commandEntry(query);
+        return entry ? [entry] : [];
+    }
     implicitHeight: 428
     function focusSearch() {
         search.forceActiveFocus();
@@ -22,7 +28,7 @@ Item {
         list.positionViewAtIndex(list.currentIndex, ListView.Contain);
     }
     function pin(entry) {
-        if (!entry)
+        if (!entry || entry.terminalCommand)
             return;
         preferences.pinnedIds = JSON.stringify(pins.includes(entry.id) ? pins.filter(id => id !== entry.id) : [...pins, entry.id]);
     }
@@ -32,7 +38,10 @@ Item {
         lastRequest = entry.id;
         if (previewMode)
             return;
-        entry.execute();
+        if (entry.terminalCommand)
+            Desk.launch(Search.commandArgs(entry.terminalCommand));
+        else
+            entry.execute();
         Desk.close();
     }
     function status() {
@@ -72,7 +81,7 @@ Item {
                 height: parent.height
                 padding: 0
                 color: Theme.text
-                placeholderText: "Find an application"
+                placeholderText: "Find an app or > command"
                 placeholderTextColor: Theme.muted
                 font.family: Theme.font
                 font.pixelSize: 12
@@ -80,7 +89,7 @@ Item {
                 selectionColor: Theme.text
                 selectedTextColor: Theme.base
                 background: Item {}
-                Accessible.name: "Find an application"
+                Accessible.name: "Find an app or enter > followed by a terminal command"
                 Keys.onDownPressed: launcher.move(1)
                 Keys.onUpPressed: launcher.move(-1)
                 Keys.onReturnPressed: launcher.launch(launcher.results[list.currentIndex])
@@ -91,7 +100,7 @@ Item {
             width: parent.width
             Label {
                 width: parent.width - 50
-                text: launcher.query.trim() ? "RESULTS" : "APPLICATIONS"
+                text: launcher.commandMode ? "TERMINAL" : launcher.query.trim() ? "RESULTS" : "APPLICATIONS"
                 font.pixelSize: 9
                 font.letterSpacing: 1
                 color: Theme.muted
@@ -128,7 +137,7 @@ Item {
                 width: list.width
                 height: 46
                 Key {
-                    width: parent.width - 38
+                    width: parent.width - (row.modelData.terminalCommand ? 0 : 38)
                     height: parent.height
                     color: "transparent"
                     hint: "Open " + row.modelData.name
@@ -157,6 +166,7 @@ Item {
                             width: parent.width
                             visible: text !== ""
                             text: row.modelData.genericName
+                            elide: Text.ElideRight
                             color: row.chosen ? "#484848" : Theme.muted
                             font.pixelSize: 9
                         }
@@ -166,6 +176,7 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     width: 34
+                    visible: !row.modelData.terminalCommand
                     height: 34
                     color: "transparent"
                     hint: launcher.pins.includes(row.modelData.id) ? "Unpin application" : "Pin application"
@@ -190,7 +201,7 @@ Item {
                     ink: Theme.muted
                 }
                 Label {
-                    text: "No matching applications"
+                    text: launcher.commandMode ? "Enter a command after >" : "No matching applications"
                     color: Theme.muted
                 }
             }
@@ -204,7 +215,7 @@ Item {
             }
         }
         Label {
-            text: "↑ ↓  SELECT     ↵  OPEN     ESC  CLOSE"
+            text: launcher.commandMode ? "↵  RUN IN TERMINAL     ESC  CLOSE" : "↑ ↓  SELECT     ↵  OPEN     ESC  CLOSE"
             font.pixelSize: 9
             color: Theme.muted
         }

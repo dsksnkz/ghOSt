@@ -1,5 +1,20 @@
 # ghOSt progress
 
+## 2026-10-10 / Terminal commands in launcher
+
+Type `> command` in the existing launcher to reveal an explicit Run in terminal
+row; Enter or clicking that row launches `kitty --start-as=normal --hold -e
+/bin/bash -lc command`. The complete command is one argv item, preserving
+quoting, pipelines and shell syntax. Ordinary queries remain app searches;
+an empty `>` cannot run anything. Command rows cannot be pinned and command text
+is not persisted. Preview mode returns before any execution; tests use it only.
+Node command/argv regression checks, offscreen Qt Enter/row/pin/search tests,
+existing input tests and production compile pass. No user command or terminal
+was actually launched during verification. Screenshot with harmless sample text
+in `docs/images/2026-10-10-launcher-commands/`; live Launcher/JS installed and
+named ghOSt reload invoked. Snapshot `.local/backups/2026-10-10-launcher-commands/`.
+
+
 ## 2026-10-10 / Serpantinum uninstall — active removal complete, root links pending
 
 Direct user request explicitly authorizes removing the legacy shell/processes.

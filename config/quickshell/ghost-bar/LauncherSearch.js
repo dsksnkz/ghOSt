@@ -1,4 +1,22 @@
 // Pure ranking logic, shared by QML and the Node regression tests.
+function commandMode(query) {
+    return /^\s*>/.test(query);
+}
+
+function commandEntry(query) {
+    if (!commandMode(query)) return null;
+    const command = query.replace(/^\s*>/, "").trim();
+    if (!command) return null;
+    return { id: "ghost-terminal-command", name: "Run in terminal",
+        genericName: command, categories: ["TerminalEmulator"], terminalCommand: command };
+}
+
+function commandArgs(command) {
+    // The entire user command is one shell argument, never concatenated into
+    // a wrapper string. Pipes/quotes are interpreted only after explicit Run.
+    return ["kitty", "--start-as=normal", "--hold", "-e", "/bin/bash", "-lc", command];
+}
+
 function ranked(entries, query, pins) {
     const words = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
     return entries.filter(e => !e.noDisplay && e.name).map(entry => {

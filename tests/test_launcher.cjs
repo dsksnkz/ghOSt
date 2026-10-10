@@ -23,3 +23,14 @@ assert.equal(context.iconFor(entries[1]), 'terminal');
 for (const bad of ['{', 'null', '42', '{}']) assert.equal(context.readPins(bad).length, 0);
 assert.deepEqual(Array.from(context.readPins('["web",3,"web","kitty"]')), ['web','kitty']);
 console.log('Launcher: 15 ranking, filtering, icon and preference checks passed');
+assert.equal(context.commandMode('  > echo hi'), true);
+assert.equal(context.commandMode('echo hi'), false);
+assert.equal(context.commandEntry('>   '), null);
+assert.equal(context.commandEntry('kitty'), null);
+const command = 'printf "%s\\n" "two words" | sort; echo "$HOME"';
+assert.equal(context.commandEntry('> ' + command).terminalCommand, command);
+assert.equal(context.commandEntry('> ' + command).id, 'ghost-terminal-command');
+assert.deepEqual(Array.from(context.commandArgs(command)),
+    ['kitty', '--start-as=normal', '--hold', '-e', '/bin/bash', '-lc', command]);
+assert.equal(context.iconFor(context.commandEntry('> ls')), 'terminal');
+console.log('Launcher: explicit command mode, blank rejection and quoted/piped argv checks passed; no execution');
