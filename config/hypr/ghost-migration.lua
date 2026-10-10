@@ -8,9 +8,9 @@ hl.bind(mod .. " + Space", hl.dsp.exec_cmd(bar .. "toggle launcher"))
 hl.bind(mod .. " + R", hl.dsp.exec_cmd(bar .. "settings about"))
 hl.bind(mod .. " + B", hl.dsp.exec_cmd(bar .. "settings wallpaper"))
 hl.bind(mod .. " + N", hl.dsp.exec_cmd(bar .. "settings network"))
--- The old guide/autohide pages have no exact ghOSt equivalent.
+-- The old guide page has no exact ghOSt equivalent.
 hl.bind(mod .. " + H", hl.dsp.exec_cmd(bar .. "settings about"))
-hl.bind(mod .. " + A", hl.dsp.exec_cmd(bar .. "settings widgets"))
+hl.bind(mod .. " + A", hl.dsp.exec_cmd("zeditor"))
 
 for workspace = 1, 10 do
     local key = tostring(workspace % 10)

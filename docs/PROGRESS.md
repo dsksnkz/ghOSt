@@ -1,5 +1,14 @@
 # ghOSt progress
 
+## 2026-10-10 / Restore Super+A to Zed
+
+Restored the user-owned Super+A shortcut to installed `/usr/bin/zeditor`, both
+live and in optional migration config. The earlier Widgets reassignment was
+incorrect and superseded; Super+I remains Settings. Only this binding changed.
+Lua syntax and Hyprland config reload/configerrors verified without opening
+Zed or any test window. Snapshot `.local/backups/2026-10-10-super-a-zed/`.
+
+
 ## 2026-10-10 / Explicit launcher Escape dismissal
 
 Escape is consumed before TextField handling and emits launcher closeRequested,

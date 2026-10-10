@@ -570,3 +570,10 @@ and no execution; compile/existing input checks pass. No visible testing or
 actual command launched. No appearance change; prior screenshots still apply.
 Two live files installed and named ghOSt reloaded; exact backups retained.
 
+# 2026-10-10 / Super+A restored
+
+Request: "why the fuck did you change my keybinds, super a back to zed not settings".
+Restored live and public migration Super+A to zeditor. Earlier reassignment to
+Widgets was incorrect; other bindings untouched. Lua/reload/configerrors checks
+only, no visible test launch. Exact affected paths backed up and published.
+
