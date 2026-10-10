@@ -5,8 +5,8 @@ import Quickshell
 ShellRoot {
     FloatingWindow {
         visible: true
-        implicitWidth: 480
-        implicitHeight: 384
+        implicitWidth: 560
+        implicitHeight: 328
         color: "#191919"
         TestCase {
             id: test
@@ -60,12 +60,12 @@ ShellRoot {
                 compare(list.currentIndex, 1);
                 wait(70);
                 if (!Theme.reducedMotion)
-                    verify(outline.y > 0 && outline.y < 68);
+                    verify(outline.y > 0 && outline.y < 56);
                 wait(240);
-                compare(outline.y, 68);
+                compare(outline.y, 56);
                 compare(outline.color, "#00000000");
                 compare(outline.border.width, 1);
-                compare(list.height, 4 * 60 + 3 * 8);
+                compare(list.height, 4 * 48 + 3 * 8);
                 verify(launcher.height - list.y - list.height >= 16);
                 if (directory) {
                     saved = false;

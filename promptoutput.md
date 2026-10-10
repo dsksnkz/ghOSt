@@ -540,3 +540,11 @@ existing input/compile and Node checks pass; actual render recorded. Installed
 two affected live files and reloaded ghOSt; backup retained. No test app/command
 executed. Background command mode and fresh-open reset preserved.
 
+# 2026-10-10 / Wider, flatter launcher
+
+Clarification: "i mean wider and flatter" supersedes "make it flatter and smaller".
+Changed launcher to 560×328, 48px rows/32px icons/44px search, retaining 18px
+labels, four whole rows, bottom breathing room and animated stroke selection.
+Offscreen keyboard/animation/geometry and compile pass; actual render inspected.
+Two live files installed and named ghOSt reloaded with exact-path backups.
+

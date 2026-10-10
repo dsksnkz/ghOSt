@@ -17,7 +17,7 @@ Item {
         const entry = Search.commandEntry(query);
         return entry ? [entry] : [];
     }
-    implicitHeight: 352
+    implicitHeight: 296
     function navigateKey(event) {
         if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
             move(event.key === Qt.Key_Down ? 1 : -1);
@@ -66,8 +66,8 @@ Item {
     }
     G2Surface {
         width: parent.width
-        height: 48
-        radius: 18
+        height: 44
+        radius: 16
         smoothing: 0.6
         color: "#252525"
         Icon {
@@ -102,11 +102,11 @@ Item {
     ListView {
         id: list
         objectName: "launcher-list"
-        y: 64
+        y: 56
         width: parent.width
         // Whole rows only: preserve a bottom breathing margin rather than
         // showing a cropped fifth icon beneath the four visible results.
-        height: Math.max(60, Math.floor((parent.height - y - 16 + spacing) / (60 + spacing)) * (60 + spacing) - spacing)
+        height: Math.max(48, Math.floor((parent.height - y - 16 + spacing) / (48 + spacing)) * (48 + spacing) - spacing)
         clip: true
         spacing: 8
         model: launcher.results
@@ -118,8 +118,8 @@ Item {
             objectName: "launcher-selection"
             y: list.currentItem ? list.currentItem.y : 0
             width: list.width
-            height: 60
-            radius: 18
+            height: 48
+            radius: 16
             smoothing: 0.6
             color: "transparent"
             border.width: 1
@@ -138,12 +138,12 @@ Item {
             required property int index
             readonly property bool chosen: ListView.isCurrentItem
             width: list.width
-            height: 60
+            height: 48
             Key {
                 id: rowKey
                 width: parent.width
                 height: parent.height
-                radius: 18
+                radius: 16
                 smoothing: 0.6
                 color: "transparent"
                 hoverFeedback: false
@@ -156,9 +156,9 @@ Item {
                     id: appIcon
                     x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 40; height: 40
+                    width: 32; height: 32
                     source: row.modelData.icon ? Quickshell.iconPath(row.modelData.icon, true) : ""
-                    sourceSize: Qt.size(40 * Screen.devicePixelRatio, 40 * Screen.devicePixelRatio)
+                    sourceSize: Qt.size(32 * Screen.devicePixelRatio, 32 * Screen.devicePixelRatio)
                     visible: status === Image.Ready
                     fillMode: Image.PreserveAspectFit
                     smooth: true
@@ -166,13 +166,13 @@ Item {
                 Icon {
                     x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 40; height: 40
+                    width: 32; height: 32
                     visible: appIcon.status !== Image.Ready
                     name: Search.iconFor(row.modelData)
                     ink: Theme.text
                 }
                 Label {
-                    x: 88
+                    x: 76
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - x - 54
                     text: row.modelData.name

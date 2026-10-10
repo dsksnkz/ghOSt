@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-10 / Wider, flatter launcher
+
+Latest clarification: wider and flatter, not narrower. Launcher now 560×328
+(previously 480×384), four 48px rows with 8px gaps, 44px search and 32px icons;
+18px labels stay legible and more names fit without truncation. Four whole rows
+and bottom breathing room remain. Grey outline animation, real arrow-key control,
+background commands and fresh-open reset retained. Offscreen key/animation/row
+geometry tests and production compile pass; inspected actual render published
+in `docs/images/2026-10-10-launcher-wide-flat/`. Two live files installed and
+named ghOSt reloaded. Backup `.local/backups/2026-10-10-launcher-wide-flat/`.
+
+
 ## 2026-10-10 / Compact four-row launcher and keyboard outline
 
 Reduced total launcher from 600×412 to 480×384; search 48px, icons 40px,
