@@ -13,7 +13,9 @@ Item {
     property bool previewMode: false
     signal settingsPreviewRequested
     function focusPage() {
-        if (pageLoader.item?.focusSearch)
+        if (pageLoader.item?.beginSession)
+            pageLoader.item.beginSession();
+        else if (pageLoader.item?.focusSearch)
             pageLoader.item.focusSearch();
         else
             content.forceActiveFocus();
@@ -80,7 +82,7 @@ Item {
         }
         return item.status();
     }
-    implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : 46)
+    implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : popup.page === "launcher" ? 32 : 46)
     focus: true
     Keys.onEscapePressed: {
         if (popup.page === "calendar" && pageLoader.item?.actionPage)
@@ -103,10 +105,19 @@ Item {
         }
     ]
     Material {
-        visible: popup.page !== "calendar"
+        visible: popup.page !== "calendar" && popup.page !== "launcher"
         anchors.fill: parent
         anchors.margins: 1
         radius: Theme.outerRadius
+    }
+    G2Surface {
+        visible: popup.page === "launcher"
+        anchors.fill: parent
+        color: "#191919"
+        radius: 22
+        smoothing: 0.6
+        border.width: 1
+        border.color: "#333333"
     }
     Material {
         visible: popup.page === "calendar"
@@ -115,12 +126,12 @@ Item {
     }
     Column {
         id: body
-        x: popup.page === "calendar" ? 0 : 22
-        y: popup.page === "calendar" ? 0 : 19
-        width: parent.width - (popup.page === "calendar" ? 0 : 44)
+        x: popup.page === "calendar" ? 0 : popup.page === "launcher" ? 16 : 22
+        y: popup.page === "calendar" ? 0 : popup.page === "launcher" ? 16 : 19
+        width: parent.width - (popup.page === "calendar" ? 0 : popup.page === "launcher" ? 32 : 44)
         spacing: popup.page === "calendar" ? 0 : 17
         Row {
-            visible: popup.page !== "calendar"
+            visible: popup.page !== "calendar" && popup.page !== "launcher"
             width: parent.width
             Column {
                 width: parent.width - 32
@@ -159,7 +170,7 @@ Item {
             }
         }
         G2Surface {
-            visible: popup.page !== "calendar"
+            visible: popup.page !== "calendar" && popup.page !== "launcher"
             width: parent.width
             height: 1
             color: Theme.line

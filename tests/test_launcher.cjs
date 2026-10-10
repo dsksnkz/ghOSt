@@ -31,6 +31,6 @@ const command = 'printf "%s\\n" "two words" | sort; echo "$HOME"';
 assert.equal(context.commandEntry('> ' + command).terminalCommand, command);
 assert.equal(context.commandEntry('> ' + command).id, 'ghost-terminal-command');
 assert.deepEqual(Array.from(context.commandArgs(command)),
-    ['kitty', '--start-as=normal', '--hold', '-e', '/bin/bash', '-lc', command]);
+    ['/bin/bash', '-lc', command]);
 assert.equal(context.iconFor(context.commandEntry('> ls')), 'terminal');
 console.log('Launcher: explicit command mode, blank rejection and quoted/piped argv checks passed; no execution');

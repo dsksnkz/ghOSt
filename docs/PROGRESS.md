@@ -1,5 +1,28 @@
 # ghOSt progress
 
+## 2026-10-10 / Launcher reference layout and background commands
+
+Latest screenshot supersedes the previous compact launcher. Centered 600×412
+panel (bounded on smaller displays), flat #191919 frame with 22px continuous
+corners, 60px rounded search field, 80px rows, 50px installed app icons and 22px
+JetBrains Mono labels. Removed header/count/footer chrome. Pinning remains
+available on hover rather than permanently filling each row. One transparent
+selection outline moves between rows with a 220ms Bézier animation; reduced
+motion updates instantly. Existing ranking, keyboard navigation and scrolling
+remain. Reopening invokes beginSession, clearing query and last request.
+
+`> command` now dispatches Bash detached, without Kitty or another terminal,
+only on explicit Enter/click. Quotes/pipes remain a single command argument;
+no command history is persisted. Offscreen Qt checks verify reset, application
+restoration, command execution guard and intermediate/up/down outline motion;
+Node argv/ranking tests and existing input/compile checks pass. No actual user
+command or application executed in tests. Inspected actual component renders
+with installed Spotify icon and harmless sample text published at
+`docs/images/2026-10-10-launcher-reference/`. Four live files installed; named
+ghOSt reload invoked. Snapshot `.local/backups/2026-10-10-launcher-reference/`.
+Native background-command execution itself remains untested, deliberately.
+
+
 ## 2026-10-10 / Terminal commands in launcher
 
 Type `> command` in the existing launcher to reveal an explicit Run in terminal

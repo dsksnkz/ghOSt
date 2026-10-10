@@ -513,3 +513,18 @@ Node and Qt offscreen guard/dispatch tests pass along with existing input and
 compile checks; no actual command executed in testing. Sample-only screenshot
 published. Source/live files snapshotted, installed and named ghOSt reloaded.
 
+# 2026-10-10 / Launcher screenshot composition
+
+Request: "it runs in background, without showing terminal. also input resets everytime it opens. make it look like this:, with the selection bar animated moving up or down".
+
+Implemented background Bash dispatch with no terminal, explicit > mode and
+Enter/click guard. Fresh openings clear input. Rebuilt launcher around supplied
+rounded search/outlined result composition: centered 600px frame, installed
+application artwork, larger labels, no header/footer/count blocks, retained
+hover pin controls and scroll. Selection outline animates both directions.
+Qt offscreen reset/selection tests, Node ranking/argv, existing input and compile
+checks pass; no commands executed during tests. Screenshots contain only Spotify
+and harmless command text, published with source. Four live files deployed and
+ghOSt reloaded, with reversible exact-path snapshots. Native command launch
+remains user-verification pending. Earlier Kitty-command behavior superseded.
+
