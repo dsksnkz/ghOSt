@@ -1,5 +1,24 @@
 # ghOSt progress
 
+## 2026-10-11 / System power profile controls
+
+Explicit user power-policy request: activated existing power-profiles-daemon
+Power Saver (previously Balanced); verified `powerprofilesctl get` power-saver.
+Added reusable Saver / Normal / Performance controls to the shell battery popup
+and Settings Battery. Normal maps to Balanced. Selection follows the real system
+PowerProfiles service rather than optimistic local state; CLI setter errors are
+shown, busy requests disabled, unsupported Performance disabled. Existing daemon
+supports all three; TLP is inactive and was not modified. No packages, CPU sysfs,
+drivers/firmware/fan controls, session actions or game settings changed.
+Offscreen real pointer/preview checks verify three buttons/mapping/availability,
+passive live Saver observation and no test-driven live profile switching.
+Production compile and existing input tests pass. Live component/parents/qmldir
+installed and named ghOSt reload invoked; Saver remains active after tests/reload.
+Snapshot `.local/backups/2026-10-11-power-profiles/`. Screenshot:
+`docs/images/2026-10-11-power-profiles/power-controls.png`. Real Normal/Performance
+switches deliberately not exercised unattended; user can select them explicitly.
+
+
 ## 2026-10-10 / Restore Super+A to Zed
 
 Restored the user-owned Super+A shortcut to installed `/usr/bin/zeditor`, both

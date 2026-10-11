@@ -424,6 +424,10 @@ Item {
     Component {
         id: batteryPage
         Column {
+            PowerProfileControls {
+                width: body.width
+                previewMode: content.previewMode
+            }
             spacing: 19
             Label {
                 text: Desk.hasBattery ? Desk.charge + "%" : "AC"

@@ -1305,6 +1305,12 @@ Item {
         Column {
             width: body.width
             spacing: 24
+            ControlGroup {
+                PowerProfileControls {
+                    width: parent.width
+                    previewMode: settings.previewMode
+                }
+            }
             Row {
                 objectName: "settings-battery-summary"
                 width: parent.width

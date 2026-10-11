@@ -577,3 +577,17 @@ Restored live and public migration Super+A to zeditor. Earlier reassignment to
 Widgets was incorrect; other bindings untouched. Lua/reload/configerrors checks
 only, no visible test launch. Exact affected paths backed up and published.
 
+# 2026-10-11 / Power Saver and shell controls
+
+Request: "turn on power saver mode on the laptop and add buttons that control saver, normal and performance in the shell".
+
+Activated existing system Power Saver from Balanced. Added Saver/Normal/
+Performance to shell battery popup and Settings Battery, real observed selection,
+busy/error handling and unavailable-performance guard. Normal maps to Balanced.
+Existing service/CLI reused; no install, hardware/firmware/fan/game configuration
+change. Offscreen buttons/preview isolation/passive live Saver observation,
+compile and existing input checks pass. Test modes never switch live Normal or
+Performance. Four live files installed and named ghOSt reloaded; Saver confirmed.
+Exact affected paths backed up; profile prior state Balanced recorded. Actual
+component screenshot published alongside code; other modes await user selection.
+
