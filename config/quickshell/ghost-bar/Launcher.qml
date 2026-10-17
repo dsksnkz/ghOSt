@@ -9,6 +9,14 @@ Item {
     property bool previewMode: false
     property alias query: search.text
     property string lastRequest: ""
+    // Shared geometry keeps scrolling, row rendering and the outline aligned.
+    readonly property int rowHeight: 48
+    readonly property int rowGap: 8
+    readonly property int rowStride: rowHeight + rowGap
+    readonly property int appIconSize: 32
+    readonly property int bottomMargin: 16
+    readonly property int motionDuration: 220
+    readonly property var motionCurve: [0.2, 0.75, 0.25, 1, 1, 1]
     readonly property var pins: Search.readPins(preferences.pinnedIds)
     readonly property var searchCatalogue: Search.prepare(DesktopEntries.applications.values)
     readonly property bool commandMode: Search.commandMode(query)
@@ -22,9 +30,8 @@ Item {
     signal closeRequested
     function navigateKey(event) {
         if (event.key === Qt.Key_Escape) {
+            clearRequest();
             keyboardScroll.stop();
-            query = "";
-            lastRequest = "";
             closeRequested();
             event.accepted = true;
         } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
@@ -35,42 +42,72 @@ Item {
     Keys.priority: Keys.BeforeItem
     Keys.onPressed: event => navigateKey(event)
 
-    function focusSearch() { search.forceActiveFocus(); }
-    function beginSession() {
-        keyboardScroll.stop();
+    function focusSearch() {
+        search.forceActiveFocus();
+    }
+    function clearRequest() {
         query = "";
         lastRequest = "";
+    }
+    function resetSelection() {
+        keyboardScroll.stop();
         list.currentIndex = results.length ? 0 : -1;
         list.contentY = list.originY;
+    }
+    function beginSession() {
+        clearRequest();
+        resetSelection();
         focusSearch();
     }
+    function scrollTargetForIndex(index) {
+        const rowTop = list.originY + index * rowStride;
+        const rowBottom = rowTop + rowHeight;
+        const maximumOffset = list.originY + Math.max(0, list.contentHeight - list.height);
+        let targetOffset = list.contentY;
+
+        if (rowTop < targetOffset)
+            targetOffset = rowTop;
+        else if (rowBottom > targetOffset + list.height)
+            targetOffset = rowBottom - list.height;
+
+        return Math.max(list.originY, Math.min(maximumOffset, targetOffset));
+    }
+    function listViewportHeight(availableHeight) {
+        const usableHeight = availableHeight - bottomMargin;
+        const wholeRows = Math.floor((usableHeight + rowGap) / rowStride);
+        return Math.max(rowHeight, wholeRows * rowStride - rowGap);
+    }
     function move(delta) {
-        if (!results.length) return;
+        if (!results.length)
+            return;
+
         list.currentIndex = Math.max(0, Math.min(results.length - 1, list.currentIndex + delta));
-        const top = list.originY + list.currentIndex * (48 + list.spacing);
-        const bottom = top + 48;
-        let target = list.contentY;
-        if (top < target) target = top;
-        else if (bottom > target + list.height) target = bottom - list.height;
-        target = Math.max(list.originY, Math.min(list.originY + Math.max(0, list.contentHeight - list.height), target));
+        const targetOffset = scrollTargetForIndex(list.currentIndex);
         // Retarget from the current frame when keys repeat; never snap the
         // viewport with positionViewAtIndex while the outline is animating.
         keyboardScroll.stop();
         if (Theme.reducedMotion)
-            list.contentY = target;
+            list.contentY = targetOffset;
         else {
-            keyboardScroll.to = target;
+            keyboardScroll.to = targetOffset;
             keyboardScroll.start();
         }
     }
     function pin(entry) {
-        if (!entry || entry.terminalCommand) return;
-        preferences.pinnedIds = JSON.stringify(pins.includes(entry.id) ? pins.filter(id => id !== entry.id) : [...pins, entry.id]);
+        if (!entry || entry.terminalCommand)
+            return;
+
+        const nextPins = pins.includes(entry.id)
+            ? pins.filter(id => id !== entry.id)
+            : [...pins, entry.id];
+        preferences.pinnedIds = JSON.stringify(nextPins);
     }
     function launch(entry) {
-        if (!entry) return;
+        if (!entry)
+            return;
         lastRequest = entry.id;
-        if (previewMode) return;
+        if (previewMode)
+            return;
         if (entry.terminalCommand)
             Desk.launch(Search.commandArgs(entry.terminalCommand));
         else
@@ -78,21 +115,22 @@ Item {
         Desk.close();
     }
     function status() {
-        return JSON.stringify({query, count: results.length,
-            selected: results[list.currentIndex]?.id || "", pins, lastRequest});
+        return JSON.stringify({
+            query,
+            count: results.length,
+            selected: results[list.currentIndex]?.id || "",
+            pins,
+            lastRequest
+        });
     }
-    onResultsChanged: {
-        keyboardScroll.stop();
-        list.currentIndex = results.length ? 0 : -1;
-        list.contentY = list.originY;
-    }
+    onResultsChanged: resetSelection()
     NumberAnimation {
         id: keyboardScroll
         target: list
         property: "contentY"
-        duration: 220
+        duration: launcher.motionDuration
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: [0.2, 0.75, 0.25, 1, 1, 1]
+        easing.bezierCurve: launcher.motionCurve
     }
     Component.onCompleted: Qt.callLater(focusSearch)
     Settings {
@@ -142,9 +180,9 @@ Item {
         width: parent.width
         // Whole rows only: preserve a bottom breathing margin rather than
         // showing a cropped fifth icon beneath the four visible results.
-        height: Math.max(48, Math.floor((parent.height - y - 16 + spacing) / (48 + spacing)) * (48 + spacing) - spacing)
+        height: launcher.listViewportHeight(parent.height - y)
         clip: true
-        spacing: 8
+        spacing: launcher.rowGap
         model: launcher.results
         currentIndex: 0
         boundsBehavior: Flickable.StopAtBounds
@@ -153,9 +191,9 @@ Item {
         highlightFollowsCurrentItem: false
         highlight: G2Surface {
             objectName: "launcher-selection"
-            y: list.originY + Math.max(0, list.currentIndex) * (48 + list.spacing)
+            y: list.originY + Math.max(0, list.currentIndex) * launcher.rowStride
             width: list.width
-            height: 48
+            height: launcher.rowHeight
             radius: 16
             smoothing: 0.6
             color: "transparent"
@@ -163,9 +201,9 @@ Item {
             border.color: "#555555"
             Behavior on y {
                 NumberAnimation {
-                    duration: Theme.reducedMotion ? 0 : 220
+                    duration: Theme.reducedMotion ? 0 : launcher.motionDuration
                     easing.type: Easing.BezierSpline
-                    easing.bezierCurve: [0.2, 0.75, 0.25, 1, 1, 1]
+                    easing.bezierCurve: launcher.motionCurve
                 }
             }
         }
@@ -175,7 +213,7 @@ Item {
             required property int index
             readonly property bool chosen: ListView.isCurrentItem
             width: list.width
-            height: 48
+            height: launcher.rowHeight
             Key {
                 id: rowKey
                 width: parent.width
@@ -193,9 +231,10 @@ Item {
                     id: appIcon
                     x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 32; height: 32
+                    width: launcher.appIconSize
+                    height: launcher.appIconSize
                     source: row.modelData.icon ? Quickshell.iconPath(row.modelData.icon, true) : ""
-                    sourceSize: Qt.size(32 * Screen.devicePixelRatio, 32 * Screen.devicePixelRatio)
+                    sourceSize: Qt.size(launcher.appIconSize * Screen.devicePixelRatio, launcher.appIconSize * Screen.devicePixelRatio)
                     visible: status === Image.Ready
                     fillMode: Image.PreserveAspectFit
                     smooth: true
@@ -203,7 +242,8 @@ Item {
                 Icon {
                     x: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 32; height: 32
+                    width: launcher.appIconSize
+                    height: launcher.appIconSize
                     visible: appIcon.status !== Image.Ready
                     name: Search.iconFor(row.modelData)
                     ink: Theme.text

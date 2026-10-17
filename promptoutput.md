@@ -606,3 +606,18 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-17 / Readable source organization
+
+Request: "ok make it better", following discussion of editable/readable code.
+
+Focused readability pass: named launcher geometry/motion values, extracted reset
+and scroll helpers, expanded dense functions, preserved cached search. Settings
+catalogue/group geometry moved into a small independent JS module with pure unit
+tests. Added `docs/CODE_MAP.md` so file ownership, generated assets, private files
+and safe verification commands are discoverable. Exact saved-original navigation
+data/layout comparison and existing Node/Qt/Settings/distribution/power-preview
+tests pass. Four runtime files deployed; ghOSt reload clean. No design, animation
+timing, bindings, system policy or game changes. Backups and clean render retained.
+This improves the touched areas; it does not claim the entire repository has
+been refactored or reviewed exhaustively.
+

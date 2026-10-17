@@ -4,11 +4,19 @@ function commandMode(query) {
 }
 
 function commandEntry(query) {
-    if (!commandMode(query)) return null;
+    if (!commandMode(query))
+        return null;
     const command = query.replace(/^\s*>/, "").trim();
-    if (!command) return null;
-    return { id: "ghost-terminal-command", name: "Run: " + command,
-        genericName: command, categories: ["TerminalEmulator"], terminalCommand: command };
+    if (!command)
+        return null;
+
+    return {
+        id: "ghost-terminal-command",
+        name: "Run: " + command,
+        genericName: command,
+        categories: ["TerminalEmulator"],
+        terminalCommand: command
+    };
 }
 
 function commandArgs(command) {
@@ -43,7 +51,10 @@ function rankedPrepared(catalogue, query, pins) {
             else if (name.startsWith(word)) score += 60;
             else if (name.includes(word)) score += 30;
             else if (extra.includes(word)) score += 10;
-            else { score = -1; break; }
+            else {
+                score = -1;
+                break;
+            }
         }
         if (score >= 0)
             hits.push({entry, score, pinned: pinned.has(entry.id)});
@@ -67,5 +78,7 @@ function readPins(text) {
     try {
         const value = JSON.parse(text);
         return Array.isArray(value) ? [...new Set(value.filter(id => typeof id === "string"))] : [];
-    } catch (_) { return []; }
+    } catch (_) {
+        return [];
+    }
 }

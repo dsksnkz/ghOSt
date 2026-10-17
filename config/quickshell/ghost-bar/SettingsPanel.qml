@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
+import "SettingsNavigation.js" as Navigation
 
 Item {
     id: settings
@@ -21,10 +22,16 @@ Item {
     readonly property real navigationStride: navigationRowHeight + navigationRowGap
     readonly property real navigationInset: 0
     readonly property real navigationGroupGap: 16
+    readonly property var navigationMetrics: ({
+        rowHeight: navigationRowHeight,
+        rowGap: navigationRowGap,
+        inset: navigationInset,
+        groupGap: navigationGroupGap
+    })
     // The new screenshot supersedes the old 40% glyph sizing.
     readonly property real iconRatio: 0.6
     function navigationGroupHeight(count) {
-        return count * navigationRowHeight + Math.max(0, count - 1) * navigationRowGap + 2 * navigationInset;
+        return Navigation.groupHeight(count, navigationMetrics);
     }
     property bool previewMode: false
     property string page: "general"
@@ -81,101 +88,13 @@ Item {
     readonly property var outputs: Pipewire.nodes.values.filter(n => !n.isStream && n.isSink && n.audio)
     readonly property var inputs: Pipewire.nodes.values.filter(n => !n.isStream && !n.isSink && n.audio)
     readonly property var source: Pipewire.defaultAudioSource
-    readonly property var categories: [
-        {
-            id: "network",
-            name: "Wireless Network",
-            icon: "wifi"
-        },
-        {
-            id: "bluetooth",
-            name: "Bluetooth",
-            icon: "bluetooth"
-        },
-        {
-            id: "general",
-            name: "General",
-            icon: "settings"
-        },
-        {
-            id: "airplane",
-            name: "Airplane Mode",
-            icon: "network"
-        },
-        {
-            id: "accessibility",
-            name: "Accessibility",
-            icon: "accessibility"
-        },
-        {
-            id: "sound",
-            name: "Sound",
-            icon: "volume"
-        },
-        {
-            id: "battery",
-            name: "Battery",
-            icon: "battery"
-        },
-        {
-            id: "widgets",
-            name: "Sidebar widgets",
-            icon: "appearance"
-        },
-        {
-            id: "brightness",
-            name: "Brightness",
-            icon: "brightness"
-        },
-        {
-            id: "wallpaper",
-            name: "Wallpaper",
-            icon: "wallpaper"
-        },
-        {
-            id: "notifications",
-            name: "Notifications",
-            icon: "notifications"
-        },
-        {
-            id: "storage",
-            name: "Storage",
-            icon: "storage"
-        },
-        {
-            id: "applications",
-            name: "Applications",
-            icon: "app"
-        },
-        {
-            id: "about",
-            name: "System information",
-            icon: "info"
-        }
-    ]
+    readonly property var categories: Navigation.categories()
     readonly property var filteredCategories: categories.filter(c => !query || c.name.toLowerCase().includes(query.toLowerCase()))
-    readonly property var categoryGroups: [["network", "bluetooth", "general", "airplane", "accessibility"], ["sound", "battery", "brightness"], ["widgets", "wallpaper", "notifications"], ["storage", "applications", "about"]]
+    readonly property var categoryGroups: Navigation.groups()
     readonly property var filteredGroups: categoryGroups.map(group => group.map(id => filteredCategories.find(c => c.id === id)).filter(c => !!c)).filter(group => group.length)
     readonly property var navLayout: navigationLayout()
     function navigationLayout() {
-        const groups = [], rows = [];
-        let y = 0;
-        for (const group of filteredGroups) {
-            const height = navigationGroupHeight(group.length);
-            groups.push({
-                y,
-                height
-            });
-            group.forEach((category, index) => rows.push(Object.assign({}, category, {
-                    y: y + navigationInset + index * navigationStride
-                })));
-            y += height + navigationGroupGap;
-        }
-        return {
-            groups,
-            rows,
-            height: Math.max(0, y - navigationGroupGap)
-        };
+        return Navigation.layout(filteredGroups, navigationMetrics);
     }
     signal closeRequested
     function choose(id) {

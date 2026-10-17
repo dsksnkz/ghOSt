@@ -1,5 +1,31 @@
 # ghOSt progress
 
+## 2026-10-17 / Readability and organization pass
+
+Refactored without intentional behavior/appearance changes. Launcher row height,
+gap/stride, icon size, bottom breathing room and existing 220ms curve now have
+named shared values. Extracted clear/reset, viewport-height and scroll-target
+functions; pin and status logic expanded for readability. Optimized cached search
+kept intact and command dispatch still isolated behind explicit user action.
+Moved Settings page catalogue/grouping and pure geometry to
+`SettingsNavigation.js`, removing roughly 90 lines of configuration/layout from
+the already-large SettingsPanel. Kept page order, group order and all identifiers.
+Added `docs/CODE_MAP.md` with file responsibilities, editable/generated/private
+boundaries and actual offscreen test commands. This is a focused pass, not a
+claim that every module has been audited or that the large Settings UI is fully
+decomposed; further page/component extraction remains separate work.
+
+Verified exact catalogue/groups and five filtered layouts against saved original;
+new pure navigation tests cover 14 pages, geometry, inset, empty layout and no
+data mutation. Existing Node launcher, real Qt launcher/scroll/Escape, general
+input, ten Settings routing transitions, 33 Settings unit tests, power preview,
+production compile and distribution-copy tests pass. Screenshot remains visually
+unchanged (`docs/images/2026-10-17-readability/launcher.png`). Four affected runtime
+files installed; ghOSt reload reports Configuration Loaded, live module parity
+checked. No shortcut, animation timing, power mode (Balanced), game, network,
+driver or service changes. Snapshot `.local/backups/2026-10-17-readability/`.
+
+
 ## 2026-10-17 / Bounded desktop efficiency pass
 
 Profiled the current shell before edits: its lifetime CPU read rounded to 0.0%,
