@@ -34,3 +34,11 @@ assert.deepEqual(Array.from(context.commandArgs(command)),
     ['/bin/bash', '-lc', command]);
 assert.equal(context.iconFor(context.commandEntry('> ls')), 'terminal');
 console.log('Launcher: explicit command mode, blank rejection and quoted/piped argv checks passed; no execution');
+const prepared = context.prepare(entries);
+for (const query of ['', 'kitty', 'terminal', ' internet ', 'kitty browser', 'missing']) {
+    for (const pins of [[], ['web'], ['kitty', 'tools']]) {
+        assert.deepEqual(Array.from(context.rankedPrepared(prepared, query, pins), entry => entry.id), ids(query, pins));
+    }
+}
+assert.equal(context.rankedPrepared(prepared, 'terminal', [])[0], entries[1]);
+console.log('Launcher: cached catalogue preserves ranking, pins, empty search and native entry identity');

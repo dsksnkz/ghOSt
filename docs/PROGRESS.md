@@ -1,5 +1,32 @@
 # ghOSt progress
 
+## 2026-10-17 / Bounded desktop efficiency pass
+
+Profiled the current shell before edits: its lifetime CPU read rounded to 0.0%,
+so no claim of a large idle CPU problem. A game was running and was left alone;
+current Balanced profile, shortcuts, services and visual design were preserved.
+Launcher now prepares normalized catalogue strings only when desktop entries
+change; each query reuses the catalogue and creates a Set for pin membership
+instead of repeated linear pin lookups inside the sorting comparator. Native
+DesktopEntry identity/execute and ranking semantics retained. Sidebar brightness
+timer now stops on external displays instead of waking every three seconds
+and immediately skipping its read; an in-flight read cannot be restarted.
+
+Reproducible microbenchmark: `node scripts/benchmark_launcher.cjs
+.local/backups/2026-10-17-efficiency/LauncherSearch.js`. 2,000 synthetic entries,
+400 pins, 64 mixed queries per trial, five trials: median 328.13ms before vs
+94.38ms cached (3.48×). Catalogue preparation excluded from steady-state query
+timing; exact result order compared with saved original. This is not a measured
+desktop frame-rate or total CPU improvement. First trial measured 3.25×.
+Node ranking/command/catalogue tests, offscreen real launcher input/scroll/Escape,
+sidebar timer guards, existing input suite and production compile pass. Actual
+unchanged component render: `docs/images/2026-10-17-efficiency/launcher.png`.
+Three live files deployed; named ghOSt reload loaded without errors, byte parity
+checked, current profile still Balanced. Snapshot:
+`.local/backups/2026-10-17-efficiency/`. No visible testing, game launch/restart,
+network change, package install or hardware/driver/firmware tuning.
+
+
 ## 2026-10-11 / System power profile controls
 
 Explicit user power-policy request: activated existing power-profiles-daemon

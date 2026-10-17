@@ -10,10 +10,11 @@ Item {
     property alias query: search.text
     property string lastRequest: ""
     readonly property var pins: Search.readPins(preferences.pinnedIds)
+    readonly property var searchCatalogue: Search.prepare(DesktopEntries.applications.values)
     readonly property bool commandMode: Search.commandMode(query)
     readonly property var results: {
         if (!commandMode)
-            return Search.ranked(DesktopEntries.applications.values, query, pins);
+            return Search.rankedPrepared(searchCatalogue, query, pins);
         const entry = Search.commandEntry(query);
         return entry ? [entry] : [];
     }

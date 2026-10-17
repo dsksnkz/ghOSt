@@ -51,7 +51,7 @@ Item {
     function refresh() {
         if (previewMode || !opened)
             return;
-        if (screen?.name?.startsWith("eDP-"))
+        if (screen?.name?.startsWith("eDP-") && !brightnessQuery.running)
             brightnessQuery.running = true;
     }
     onOpenedChanged: {
@@ -77,9 +77,10 @@ Item {
         }
     }
     Timer {
+        objectName: "sidebar-brightness-refresh"
         interval: 3000
         repeat: true
-        running: sidebar.opened && !sidebar.previewMode
+        running: sidebar.opened && !sidebar.previewMode && !!sidebar.screen?.name?.startsWith("eDP-")
         onTriggered: sidebar.refresh()
     }
 

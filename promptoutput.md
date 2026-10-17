@@ -591,3 +591,18 @@ Performance. Four live files installed and named ghOSt reloaded; Saver confirmed
 Exact affected paths backed up; profile prior state Balanced recorded. Actual
 component screenshot published alongside code; other modes await user selection.
 
+# 2026-10-17 / Desktop and code efficiency
+
+Request: "hey im away, improve speed of code and desktop efficiency".
+
+Inspected idle shell/processes, timers and existing source before changing code.
+Cached launcher catalogue normalization, replaced repeated pin-array sorting
+lookups with per-query Set membership, preserved native entries and exact order.
+Disabled useless sidebar brightness timer wakeups on external monitors and
+guarded overlapping reads. Saved-original comparison: 2,000 apps/400 pins/64
+queries, five-trial medians 328.13ms vs 94.38ms (3.48× query microbenchmark,
+not a desktop FPS claim). Node and real offscreen input/scroll/Escape/timer tests
+and compile pass. Three live files installed; ghOSt reload and parity verified.
+Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
+driver or visual changes. Current Balanced profile preserved; backups retained.
+

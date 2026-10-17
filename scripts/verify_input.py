@@ -13,6 +13,7 @@ result = subprocess.run(["quickshell", "-p", str(entry)], env=environment,
                         capture_output=True, text=True, timeout=15, check=True)
 output = result.stdout + result.stderr
 for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
+                  "PASS: external, closed and preview sidebar brightness timers stay stopped",
                   "PASS: per-output fullscreen visibility and restoration",
                   "PASS: Settings wheel propagation and Bezier selection movement",
                   "PASS: Settings fixed header, search, portrait, gear and all 14 pages",

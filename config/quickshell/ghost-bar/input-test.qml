@@ -294,6 +294,20 @@ ShellRoot {
                 console.info("PASS: weather blur midpoint, rapid scroll settlement, aligned list and reduced motion");
             }
 
+            function test_sidebar_brightness_idle() {
+                const timer = findChild(sidebar, "sidebar-brightness-refresh");
+                sidebar.screen = ({name: "HDMI-A-1"});
+                sidebar.previewMode = false;
+                verify(!timer.running);
+                sidebar.opened = false;
+                sidebar.screen = ({name: "eDP-1"});
+                verify(!timer.running);
+                sidebar.previewMode = true;
+                sidebar.opened = true;
+                verify(!timer.running);
+                console.info("PASS: external, closed and preview sidebar brightness timers stay stopped");
+            }
+
             function test_escape_from_root() {
                 wait(20);
                 sidebar.forceActiveFocus();
