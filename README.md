@@ -4,6 +4,8 @@ Graphical Hyprland Operating System Toolkit.
 
 A monochrome desktop shell for Arch Linux and Hyprland, built with Quickshell.
 
+![](assets/ghOSt-advertisement-poster.jpg)
+
 [Website](https://dsksnkz.github.io/ghOSt/) · [Source guide](docs/source.md) · [Progress](docs/PROGRESS.md)
 
 ## Components
