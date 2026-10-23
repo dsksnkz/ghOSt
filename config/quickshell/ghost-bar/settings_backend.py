@@ -19,7 +19,17 @@ from urllib.parse import unquote, urlparse
 
 SOUND_GROUPS = ('rail', 'sidebar', 'settings')
 SOUND_PRESETS = (*SOUND_GROUPS, 'none', 'custom')
+RAIL_IDS = ('menu', 'workspaces', 'music', 'clock', 'volume', 'network', 'bluetooth', 'battery', 'power')
+
+def valid_rail_layout(value):
+    return (isinstance(value, list) and len(value) == len(RAIL_IDS)
+            and all(isinstance(item, dict) and set(item) == {'id', 'zone'}
+                    and isinstance(item['id'], str) and item['id'] in RAIL_IDS
+                    and item['zone'] in ('left', 'center', 'right', 'hidden') for item in value)
+            and len({item['id'] for item in value}) == len(RAIL_IDS))
+
 DEFAULTS = {'reducedMotion': False, 'usageTracking': False,
+    'railLayout': None,
     'sounds': {'enabled': True, 'volume': 18,
                'presets': {group: group for group in SOUND_GROUPS}, 'files': {}},
     'widgets': {
@@ -64,6 +74,8 @@ def preferences():
     for key in ('wallpaper', 'profilePicture'):
         if isinstance(data.get(key), str):
             result[key] = data[key]
+    if valid_rail_layout(data.get('railLayout')):
+        result['railLayout'] = data['railLayout']
     sounds = data.get('sounds', {})
     if isinstance(sounds, dict):
         if type(sounds.get('enabled')) is bool:
@@ -88,7 +100,12 @@ def preferences():
 
 def setting(key, value):
     data = preferences()
-    if key == 'sounds.volume':
+    if key == 'rail.layout':
+        layout = None if value == 'default' else json.loads(value)
+        if layout is not None and not valid_rail_layout(layout):
+            raise ValueError('Invalid top bar layout')
+        data['railLayout'] = layout
+    elif key == 'sounds.volume':
         number = float(value)
         if not math.isfinite(number) or not 0 <= number <= 100:
             raise ValueError('Click sound volume must be 0-100%')

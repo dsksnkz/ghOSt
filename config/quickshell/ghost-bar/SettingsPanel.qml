@@ -13,8 +13,8 @@ Item {
     // Settings-only tokens. Keep the supplied sidebar and native frame geometry.
     readonly property color primaryInk: "#f1f1f1"
     readonly property color secondaryInk: "#b8b8b8"
-    readonly property color controlSurface: "#2f2f2f"
-    readonly property color controlBorder: "#444444"
+    readonly property color controlSurface: "#212121"
+    readonly property color controlBorder: "#383838"
     readonly property int controlHeight: 56
     readonly property string creatorAttribution: "ghOSt - ChatGPT and dsksnkz"
     readonly property real navigationRowHeight: 44
@@ -417,7 +417,7 @@ Item {
             width: 32
             height: 32
             radius: 8
-            color: "#252525"
+            color: "#191919"
             SvgIcon {
                 anchors.centerIn: parent
                 width: 18
@@ -587,7 +587,7 @@ Item {
             }
             background: G2Surface {
                 radius: 8
-                color: "#252525"
+                color: "#191919"
                 border.width: 1
                 border.color: choice.activeFocus || choice.hovered ? settings.secondaryInk : settings.controlBorder
             }
@@ -604,7 +604,7 @@ Item {
                 }
                 background: G2Surface {
                     radius: 8
-                    color: parent.highlighted ? "#454545" : "transparent"
+                    color: parent.highlighted ? "#303030" : "transparent"
                 }
             }
             popup: Controls.Popup {
@@ -664,7 +664,7 @@ Item {
             anchors.fill: parent
             radius: 10
             smoothing: .6
-            color: "#2c2c2c"
+            color: "#171717"
         }
         G2Surface {
             x: 262
@@ -672,7 +672,7 @@ Item {
             height: 699
             radius: 10
             smoothing: .6
-            color: "#252525"
+            color: "#111111"
         }
         G2Surface {
             id: searchHousing
@@ -682,7 +682,7 @@ Item {
             height: 32
             radius: 8
             smoothing: .6
-            color: "#3b3b3b"
+            color: "#262626"
             border.width: search.activeFocus ? 1 : 0
             border.color: settings.secondaryInk
             SvgIcon {
@@ -801,7 +801,8 @@ Item {
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            layer.enabled: false
+            // Curve-rendered G2 wells must be composited before viewport clipping.
+            layer.enabled: true
             Controls.ScrollBar.vertical: Controls.ScrollBar {
                 policy: Controls.ScrollBar.AsNeeded
             }
@@ -819,7 +820,7 @@ Item {
                     height: settings.navigationRowHeight
                     radius: 10
                     smoothing: .6
-                    color: "#454545"
+                    color: "#303030"
                     Behavior on y {
                         NumberAnimation {
                             duration: Theme.reducedMotion ? 0 : 280
@@ -849,7 +850,7 @@ Item {
                             height: 28
                             radius: 8
                             smoothing: .6
-                            color: modelData.id === settings.page ? "#252525" : "#2f2f2f"
+                            color: modelData.id === settings.page ? "#191919" : "#242424"
                             SvgIcon {
                                 objectName: "settings-navigation-glyph"
                                 anchors.centerIn: parent
@@ -1429,7 +1430,7 @@ Item {
         closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
         background: G2Surface {
             radius: 10
-            color: "#2f2f2f"
+            color: settings.controlSurface
             border.width: 1
             border.color: "#898989"
         }
@@ -1456,7 +1457,7 @@ Item {
                 Accessible.name: "PC name"
                 background: G2Surface {
                     radius: 8
-                    color: "#252525"
+                    color: "#191919"
                     border.width: 1
                     border.color: nameInput.activeFocus ? "#d9d9d9" : "#535353"
                 }
@@ -1717,6 +1718,15 @@ Item {
                 onClicked: if (!settings.previewMode) {
                     Desk.settingsRequested = false;
                     Desk.toggle("launcher", Desk.panelScreen, Math.max(0, scene.width / 2 - 196));
+                }
+            }
+            TopBarEditor {
+                width: parent.width
+                savedLayout: settings.previewMode ? null : Settings.state.preferences?.railLayout || null
+                busy: Settings.busy
+                onApplyRequested: value => {
+                    if (!settings.previewMode)
+                        Settings.preference("rail.layout", value);
                 }
             }
         }

@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261023-wallpaper-picker";
+export const assetVersion = "20261023-rail-editor";
 export const views = {
   rail: {
     title: "Top rail",
@@ -22,8 +22,8 @@ export const views = {
   settings: {
     title: "Settings",
     description: "Device and desktop preferences. Uses standard Linux services.",
-    file: "settings-general.webp", size: [1100, 760], crop: [36, 36, 1024, 699],
-    maxWidth: 1024, kind: "Sample data",
+    file: "settings-dark.png", size: [1024, 699], crop: [0, 0, 1024, 699],
+    maxWidth: 1024, kind: "Qt component render · sample data",
   },
   launcher: {
     title: "App launcher",
@@ -83,6 +83,15 @@ export const motionGroups = {
 
 export function settingsView(index) {
   const [page, label] = settingsPages[index];
+  if (page === "general")
+    return {...views.settings, title: "Settings / General"};
+  if (page === "applications") {
+    return {
+      ...views.settings, title: "Settings / Applications",
+      description: "Drag top-bar elements to move, reorder or hide them. Apply to save.",
+      file: "applications-top-bar.png",
+    };
+  }
   if (page === "wallpaper") {
     return {
       ...views.settings,
@@ -92,7 +101,8 @@ export function settingsView(index) {
       maxWidth: 900, kind: "Qt component render · sample images",
     };
   }
-  return {...views.settings, title: "Settings / " + label, file: "settings-" + page + ".webp"};
+  return {...views.settings, title: "Settings / " + label, file: "settings-" + page + ".webp",
+    size: [1100, 760], crop: [36, 36, 1024, 699], kind: "Sample data"};
 }
 
 export function assetUrl(file) {

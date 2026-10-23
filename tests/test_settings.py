@@ -31,6 +31,31 @@ class Settings(unittest.TestCase):
         self.assertFalse(backend.preferences()['usageTracking'])
         self.assertEqual(backend.usage()['seconds'],0)
         self.assertFalse(backend.paths()[1].exists())
+    def test_rail_layout_persists_without_other_changes(self):
+        layout = [{'id': name, 'zone': 'left' if index % 2 else 'hidden'} for index, name in enumerate(backend.RAIL_IDS)]
+        backend.setting('widgets.network', 'false')
+        with patch.object(backend, 'run') as run:
+            backend.setting('rail.layout', json.dumps(layout))
+            run.assert_not_called()
+        self.assertEqual(backend.preferences()['railLayout'], layout)
+        self.assertFalse(backend.preferences()['widgets']['network'])
+        self.assertIsNotNone(backend.load(backend.paths()[0], {})['railLayout'])
+        backend.setting('rail.layout', 'default')
+        self.assertIsNone(backend.preferences()['railLayout'])
+        self.assertFalse(backend.preferences()['widgets']['network'])
+
+    def test_rail_layout_rejects_duplicates_unknown_ids_and_zones(self):
+        valid = [{'id': name, 'zone': 'right'} for name in backend.RAIL_IDS]
+        invalid = [[], {}, valid[:-1], [valid[0]] * 9,
+                   [{**entry, 'zone': 'elsewhere'} for entry in valid],
+                   [{**entry, 'id': 'missing'} for entry in valid],
+                   [{**entry, 'extra': True} for entry in valid]]
+        for value in invalid:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                backend.setting('rail.layout', json.dumps(value))
+        self.assertFalse(backend.paths()[0].exists())
+        backend.save(backend.paths()[0], {'railLayout': invalid[-1]})
+        self.assertIsNone(backend.preferences()['railLayout'])
     def test_click_sounds_keep_original_defaults(self):
         sounds = backend.preferences()['sounds']
         self.assertTrue(sounds['enabled'])

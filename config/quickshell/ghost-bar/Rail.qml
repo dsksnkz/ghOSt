@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import "RailLayout.js" as Layout
 
 Item {
     id: bar
@@ -10,6 +11,11 @@ Item {
     property var trayWindow: null
     property string screenName: ""
     property bool previewMode: false
+    property var layoutOverride: null
+    readonly property var layout: layoutOverride || (previewMode ? null : Settings.state.preferences?.railLayout) || null
+    readonly property var positions: layout ? Layout.geometry(layout, controls.width) : ({})
+    function elementX(name, original) { return layout ? positions[name]?.x ?? original : original; }
+    function elementVisible(name) { return !layout || (positions[name]?.visible ?? false); }
     readonly property bool fixtureMode: previewMode && Quickshell.env("GHOST_CALENDAR_FIXTURE") === "1"
     readonly property date displayTime: fixtureMode ? new Date(2026, 8, 29, 9, 21) : Desk.now
     readonly property int displayVolume: fixtureMode ? 33 : Desk.volume
@@ -65,7 +71,9 @@ Item {
                 scale: Theme.railVerticalScale
                 transformOrigin: Item.TopLeft
                 Key {
-                    x: 19
+                    objectName: "rail-element-menu"
+                    visible: bar.elementVisible("menu")
+                    x: bar.elementX("menu", 19)
                     y: 7
                     width: 42
                     height: 32
@@ -81,13 +89,16 @@ Item {
                 }
                 Workspaces {
                     id: workspaceWheel
-                    x: 132
+                    objectName: "rail-element-workspaces"
+                    visible: bar.elementVisible("workspaces")
+                    x: bar.elementX("workspaces", 132)
                     y: 0
                     monitor: bar.monitor
                     fixtureWorkspace: bar.fixtureMode ? 5 : -1
                 }
                 G2Surface {
                     x: 1598 + controls.extraWidth
+                    visible: !bar.layout
                     y: 5
                     width: 1
                     height: 36
@@ -95,14 +106,17 @@ Item {
                 }
                 G2Surface {
                     x: 1821 + controls.extraWidth
+                    visible: !bar.layout
                     y: 5
                     width: 1
                     height: 36
                     color: "#3a3a3a"
                 }
                 MusicBar {
-                    active: bar.active
-                    x: 314
+                    objectName: "rail-element-music"
+                    visible: bar.elementVisible("music")
+                    active: bar.active && visible
+                    x: bar.elementX("music", 314)
                     y: 7
                     width: 260
                     height: 32
@@ -111,7 +125,8 @@ Item {
                 Key {
                     id: centerClock
                     objectName: "rail-clock-control"
-                    x: (controls.width - width) / 2
+                    visible: bar.elementVisible("clock")
+                    x: bar.elementX("clock", (controls.width - width) / 2)
                     y: 5
                     width: 124
                     height: 36
@@ -130,7 +145,9 @@ Item {
                     }
                 }
                 Key {
-                    x: 1473 + controls.extraWidth
+                    objectName: "rail-element-volume"
+                    visible: bar.elementVisible("volume")
+                    x: bar.elementX("volume", 1473 + controls.extraWidth)
                     y: 7
                     width: 100
                     height: 32
@@ -165,7 +182,9 @@ Item {
                     }
                 }
                 Key {
-                    x: 1621 + controls.extraWidth
+                    objectName: "rail-element-network"
+                    visible: bar.elementVisible("network")
+                    x: bar.elementX("network", 1621 + controls.extraWidth)
                     y: 7
                     width: 41
                     height: 32
@@ -182,7 +201,9 @@ Item {
                     }
                 }
                 Key {
-                    x: 1673 + controls.extraWidth
+                    objectName: "rail-element-bluetooth"
+                    visible: bar.elementVisible("bluetooth")
+                    x: bar.elementX("bluetooth", 1673 + controls.extraWidth)
                     y: 7
                     width: 41
                     height: 32
@@ -199,7 +220,9 @@ Item {
                     }
                 }
                 Key {
-                    x: 1726 + controls.extraWidth
+                    objectName: "rail-element-battery"
+                    visible: bar.elementVisible("battery")
+                    x: bar.elementX("battery", 1726 + controls.extraWidth)
                     y: 7
                     width: 71
                     height: 32
@@ -227,7 +250,9 @@ Item {
                     }
                 }
                 Key {
-                    x: 1837 + controls.extraWidth
+                    objectName: "rail-element-power"
+                    visible: bar.elementVisible("power")
+                    x: bar.elementX("power", 1837 + controls.extraWidth)
                     y: 7
                     width: 39
                     height: 32

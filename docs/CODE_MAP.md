@@ -13,6 +13,7 @@ in the repository, verify them, then copy only the affected files.
 | Settings navigation | `SettingsNavigation.js` | Stable page IDs, names, icons, grouping and pure layout calculations |
 | Settings pages | `SettingsPanel.qml`, `Settings.qml`, `settings_backend.py` | Page controls, bounded state refresh, and explicit system actions |
 | Wallpaper browsing | `WallpaperPicker.qml` | Dark image/folder browser, bounded thumbnails and selection preview; only confirmation emits an apply request |
+| Top-bar customization | `TopBarEditor.qml`, `RailLayout.js` | Real rail preview, drag regions, hidden tray and pure ordering/placement; `settings_backend.py` validates and saves the full layout |
 | Calendar/sidebar/rail | `CalendarPanel.qml`, `CalendarWindow.qml`, `SidebarFigmaBody.qml`, `Rail.qml` | Their corresponding surfaces; shared icons and corner components stay separate |
 | Lock | `lock.qml`, `lock/` | Session lock/authentication ownership separated from visual scene components |
 
@@ -36,6 +37,8 @@ QT_QUICK_BACKEND=software python3 scripts/verify_launcher_commands.py
 QT_QUICK_BACKEND=software python3 scripts/verify_input.py
 QT_QUICK_BACKEND=software python3 scripts/verify_surface_compile.py
 python3 scripts/verify_wallpaper_picker.py
+node tests/test_rail_layout.cjs
+python3 scripts/verify_rail_layout.py
 ```
 
 The launcher verification uses preview mode: it does not execute typed commands

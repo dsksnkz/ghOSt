@@ -1,5 +1,19 @@
 # ghOSt progress
 
+## 2026-10-23 / Darker Settings and draggable top-bar preview
+
+Darkened Settings surfaces while preserving light text, geometry and motion.
+Applications now has an actual rail preview, draggable Left/Center/Right regions
+and Hidden tray, replacing the initially requested list interpretation after the
+user clarified the interaction. Drop-before/after reorders; Apply saves a validated
+layout and updates the live rail; Restore default retains the previous layout.
+No shortcuts changed and no layout chosen by the agent. Real offscreen drags,
+keyboard, rail actions/default reset, backend persistence and pure geometry pass;
+all 76 Python tests plus existing input/compile/clock and site tests pass.
+Backed up/deployed six runtime files, reloaded and inspected native Applications.
+Safe renders/native controls crop recorded; Pages General/Applications updated.
+[Implementation, limitations and recovery](changes/2026-10-23-settings-rail-layout.md).
+
 ## 2026-10-23 / Dark wallpaper chooser with previews
 
 Replaced the separate wallpaper file dialog with a ghOSt-owned dark folder/image

@@ -606,6 +606,20 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-23 / Dark Settings and visual top-bar editor
+
+Requests: "change the settings to a darker theme, and add a function in applications where it lets the user control which elements exist in the top bar, including its location."
+
+Latest correction: "not just like a list of stuff, make it like a preview of the top rail and use drag and stuff to change elements"
+
+Darkened Settings; replaced the intermediate list editor with a real rail preview,
+draggable group/ordering handles and Hidden tray in Applications. Explicit Apply
+saves a validated layout, live rail reacts, Restore default recovers exact prior
+geometry. Keybindings unchanged; agent did not apply a chosen layout. Real Qt
+drag/key integration, backend persistence/validation, JS geometry, 76 Python tests
+and existing input/compile/clock/site checks pass. Snapshots retained, six runtime
+files deployed and native view inspected. Safe images and Pages views updated.
+
 # 2026-10-23 / Wallpaper file chooser
 
 Request: "the file previewer in the wallpaper switcher is very bad, its hard to tell between text and background color, and change it to dark theme. also make it preview the image in the file manager there"
