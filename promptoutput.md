@@ -621,3 +621,13 @@ timing, bindings, system policy or game changes. Backups and clean render retain
 This improves the touched areas; it does not claim the entire repository has
 been refactored or reviewed exhaustively.
 
+# 2026-10-23 / Center contains only the clock
+
+Request: "for top bar, only use the clock in the center, remove all other. as in the center only clock".
+
+Removed date/weather/divider from center section, centered clock itself exactly.
+Preserved left/right rail content, clock typography and calendar-opening action.
+Offscreen centering at two widths and actual click checks pass, alongside compile
+and input checks. Capture has no private session/MPRIS data; Pages rail image
+updated. Only Rail deployed; named ghOSt reloaded and backups preserved.
+

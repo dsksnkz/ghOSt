@@ -1,11 +1,11 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261007-weather";
+export const assetVersion = "20261023-clock";
 export const views = {
   rail: {
     title: "Top rail",
-    description: "Workspaces and device controls. Scroll switches desktops; clicks open panels.",
-    file: "rail-native.png", size: [1920, 52], crop: [0, 0, 1920, 52],
-    maxWidth: 1200, kind: "Desktop capture",
+    description: "Centered clock, workspaces and device controls.",
+    file: "rail-native.png", size: [1920, 50], crop: [0, 0, 1920, 50],
+    maxWidth: 1200, kind: "Qt component render",
   },
   calendar: {
     title: "Calendar",

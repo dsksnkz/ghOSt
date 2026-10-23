@@ -14,7 +14,8 @@ output = subprocess.check_output(
     text=True,
 )
 state = json.loads(output)
-assert state["rail"]["clockGap"] >= 16, state
+assert state["rail"]["clockOnly"], state
+assert abs(state["rail"]["clockCenterX"] - state["rail"]["railWidth"] / 2) < .01, state
 assert abs(state["rail"]["batteryInkCenter"] - state["rail"]["batteryIconCenter"]) < .01, state
 icons = state["rail"]["rightIcons"]
 assert len(icons) == 5
@@ -26,4 +27,4 @@ assert settings["rowGap"] == 8
 assert settings["bodySpacing"] == 32 and settings["nameGap"] == 18
 assert len(settings["icons"]) == 14
 assert all(abs(icon["glyph"] / icon["well"] - 0.6) < 0.001 for icon in settings["icons"])
-print("PASS: clock spacing, aligned22px rail icons,44px rows,60% glyphs,32px content gaps and18px pencil gap")
+print("PASS: clock-only center, aligned22px rail icons,44px rows,60% glyphs,32px content gaps and18px pencil gap")

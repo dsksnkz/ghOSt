@@ -1,5 +1,20 @@
 # ghOSt progress
 
+## 2026-10-23 / Clock-only center rail
+
+Latest instruction interpreted as center-section only: removed its date, weather
+glyph/temperature and divider, retaining left/right controls unchanged. Clock's
+click target and visible label now center on the actual rail width at any scale;
+same font/weight/height and calendar click retained. Removed obsolete divider-gap
+diagnostic/assertion, replaced with exact center coordinate validation.
+Offscreen real input verifies one visible text, centering at 1920/1366 widths,
+and opening the local calendar; compile and existing input checks pass. Capture
+uses fixed clock and no session-bus/MPRIS access, so no private media is exposed.
+Inspected render under `docs/images/2026-10-23-center-clock/`, updated Pages rail
+asset and metadata. Rail deployed and named ghOSt reloaded without changing
+shortcuts or other surfaces. Snapshot `.local/backups/2026-10-23-center-clock/`.
+
+
 ## 2026-10-17 / Readability and organization pass
 
 Refactored without intentional behavior/appearance changes. Launcher row height,

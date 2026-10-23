@@ -13,10 +13,6 @@ Item {
     readonly property bool fixtureMode: previewMode && Quickshell.env("GHOST_CALENDAR_FIXTURE") === "1"
     readonly property date displayTime: fixtureMode ? new Date(2026, 8, 29, 9, 21) : Desk.now
     readonly property int displayVolume: fixtureMode ? 33 : Desk.volume
-    readonly property var displayWeather: fixtureMode ? ({
-            condition: "rain",
-            temperature: 20
-        }) : Desk.weatherSummary
     function workspaceAction(action, value) {
         if (!fixtureMode)
             return "{}";
@@ -113,57 +109,23 @@ Item {
                     onExpanded: bar.open("media", this)
                 }
                 Key {
-                    x: 853 + controls.extraWidth / 2
+                    id: centerClock
+                    objectName: "rail-clock-control"
+                    x: (controls.width - width) / 2
                     y: 5
-                    width: 218
+                    width: 124
                     height: 36
                     hint: "Calendar"
                     onClicked: bar.open("calendar", this)
                     InkLabel {
                         id: railTime
-                        x: 27
-                        y: 0
-                        width: 94
-                        height: 36
+                        objectName: "rail-clock-text"
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
                         text: Qt.formatDateTime(bar.displayTime, "HH:mm")
                         font.family: Theme.font
                         font.pixelSize: 26
                         font.weight: Font.Bold
-                        color: "#ffffff"
-                    }
-                    G2Surface {
-                        id: clockDivider
-                        x: 123
-                        y: 0
-                        width: 1
-                        height: 36
-                        color: "#ffffff"
-                    }
-                    Label {
-                        x: 143
-                        y: 2
-                        width: 57
-                        height: 16
-                        text: Qt.formatDateTime(bar.displayTime, "MM.dd")
-                        font.family: Theme.font
-                        font.pixelSize: 15
-                        color: "#ffffff"
-                    }
-                    SvgIcon {
-                        x: 143
-                        y: 18
-                        width: 11
-                        height: 16
-                        name: bar.displayWeather.condition === "clear" ? "brightness" : bar.displayWeather.condition === "unknown" ? "cloud" : bar.displayWeather.condition
-                    }
-                    Label {
-                        x: 157
-                        y: 18
-                        width: 43
-                        height: 16
-                        text: typeof bar.displayWeather.temperature === "number" ? Math.round(bar.displayWeather.temperature) + "°" : "—"
-                        font.family: Theme.font
-                        font.pixelSize: 15
                         color: "#ffffff"
                     }
                 }
@@ -300,7 +262,9 @@ Item {
     function spacingStatus() {
         const icons = [soundIcon, networkIcon, bluetoothIcon, batteryIcon, powerIcon];
         return {
-            clockGap: clockDivider.x - railTime.x - railTime.contentWidth,
+            clockOnly: true,
+            railWidth: bar.width,
+            clockCenterX: centerClock.mapToItem(bar, centerClock.width / 2, 0).x,
             clockInkCenter: railTime.mapToItem(bar, 0, railTime.inkCenterY).y,
             batteryInkCenter: batteryText.mapToItem(bar, 0, batteryText.inkCenterY).y,
             batteryIconCenter: batteryIcon.mapToItem(bar, 0, batteryIcon.height / 2).y,
