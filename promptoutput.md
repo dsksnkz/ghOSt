@@ -606,6 +606,17 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-23 / Nautilus
+
+Request: "make nautilus use the folder icon pack you made. and change the theme so that the text dosent blend in to background, and its a dark theme."
+
+Implemented the approved rounded-folder icon overlay and a Nautilus-scoped dark,
+high-contrast stylesheet. Snapshot before applying; activated on the laptop and
+opened Files. Actual isolated and live Nautilus inspected, tests and GTK4 parsing/
+icon lookups pass. Other icon types inherit the previous theme. Icon preference
+affects GTK folder icons across applications; palette remains scoped to Files.
+Privacy-safe native image and recovery notes recorded in docs.
+
 # 2026-10-17 / Readable source organization
 
 Request: "ok make it better", following discussion of editable/readable code.

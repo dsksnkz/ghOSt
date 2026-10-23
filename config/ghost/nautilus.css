@@ -1,0 +1,55 @@
+/* Files only. Keep foreground/background pairs readable in every panel. */
+nautilus-window,
+window.nautilus-window {
+  --window-bg-color: #191919;
+  --window-fg-color: #f2f2f2;
+  --view-bg-color: #191919;
+  --view-fg-color: #f2f2f2;
+  --headerbar-bg-color: #242424;
+  --headerbar-fg-color: #f2f2f2;
+  --headerbar-backdrop-color: #242424;
+  --headerbar-border-color: #414141;
+  --sidebar-bg-color: #222222;
+  --sidebar-fg-color: #f2f2f2;
+  --sidebar-backdrop-color: #222222;
+  --sidebar-border-color: #414141;
+  --secondary-sidebar-bg-color: #222222;
+  --secondary-sidebar-fg-color: #f2f2f2;
+  --card-bg-color: #2d2d2d;
+  --card-fg-color: #f2f2f2;
+  --popover-bg-color: #2d2d2d;
+  --popover-fg-color: #f2f2f2;
+  --dialog-bg-color: #242424;
+  --dialog-fg-color: #f2f2f2;
+  --accent-bg-color: #d6d6d6;
+  --accent-fg-color: #191919;
+  --accent-color: #e0e0e0;
+  --border-color: #414141;
+  background-color: var(--window-bg-color);
+  color: var(--window-fg-color);
+}
+
+/* Override the older global header/popover rules without changing other apps. */
+nautilus-window headerbar,
+window.nautilus-window headerbar {
+  background: var(--headerbar-bg-color);
+  color: var(--headerbar-fg-color);
+  border-color: var(--headerbar-border-color);
+}
+
+nautilus-window popover > contents,
+window.nautilus-window popover > contents {
+  background: var(--popover-bg-color);
+  color: var(--popover-fg-color);
+}
+
+nautilus-window button:hover,
+window.nautilus-window button:hover {
+  background-color: rgb(255 255 255 / 10%);
+}
+
+nautilus-window selection,
+window.nautilus-window selection {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}

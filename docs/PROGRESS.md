@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-23 / Nautilus folders and readable dark theme
+
+Activated the approved rounded-folder artwork through a small inherited icon
+theme; other icon types retain their existing theme. Applied scoped Nautilus
+dark neutral surfaces with paired light foregrounds. GTK icon preferences also
+affect other GTK apps' folder icons; no global palette override added. Backed up
+all affected files/settings before activation. Two tests, GTK4 CSS parsing and
+actual icon lookup pass. Inspected isolated Nautilus and the live native Files
+window, including selected text. Privacy-safe native folder crop retained.
+Details and recovery: [Nautilus theme](changes/2026-10-23-nautilus.md).
+
 ## 2026-10-23 / Clock-only center rail
 
 Latest instruction interpreted as center-section only: removed its date, weather
