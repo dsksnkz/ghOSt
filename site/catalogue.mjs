@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261023-clock";
+export const assetVersion = "20261023-wallpaper-picker";
 export const views = {
   rail: {
     title: "Top rail",
@@ -83,6 +83,15 @@ export const motionGroups = {
 
 export function settingsView(index) {
   const [page, label] = settingsPages[index];
+  if (page === "wallpaper") {
+    return {
+      ...views.settings,
+      title: "Settings / Wallpaper",
+      description: "Browse image thumbnails and preview before applying.",
+      file: "wallpaper-picker.png", size: [860, 500], crop: [0, 0, 860, 500],
+      maxWidth: 900, kind: "Qt component render · sample images",
+    };
+  }
   return {...views.settings, title: "Settings / " + label, file: "settings-" + page + ".webp"};
 }
 

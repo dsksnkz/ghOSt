@@ -47,3 +47,4 @@ Sidebar 1.0 Sidebar.qml
 SidebarBody 1.0 SidebarBody.qml
 SidebarFigmaBody 1.0 SidebarFigmaBody.qml
 PowerProfileControls 1.0 PowerProfileControls.qml
+WallpaperPicker 1.0 WallpaperPicker.qml

@@ -55,6 +55,9 @@ FloatingWindow {
         if (action === "name-cancel")
             content.cancelName();
 
+        if (action === "wallpaper-open")
+            content.openWallpaperPicker();
+
         return JSON.stringify({
             "windowVisible": visible,
             "content": JSON.parse(content.status())

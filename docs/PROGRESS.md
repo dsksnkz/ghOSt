@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-23 / Dark wallpaper chooser with previews
+
+Replaced the separate wallpaper file dialog with a ghOSt-owned dark folder/image
+browser. Explicit readable text/selection colors, image thumbnails and large
+aspect-fit preview; confirmation required before applying. Folder/path/keyboard
+navigation, Escape and invalid-image guards tested with real offscreen Qt input.
+Surface compile, rail/routing checks and all 74 Python tests pass. Snapshotted and
+deployed four runtime files, reloaded named ghOSt cleanly, reopened the chooser
+and inspected native dark layout. Did not change the live wallpaper. Existing
+Pages Wallpaper selection now shows the actual safe Qt component render.
+[Behavior, verification, capture and recovery](changes/2026-10-23-wallpaper-picker.md).
+
 ## 2026-10-23 / Nautilus folders and readable dark theme
 
 Activated the approved rounded-folder artwork through a small inherited icon

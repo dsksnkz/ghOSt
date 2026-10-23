@@ -606,6 +606,18 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-23 / Wallpaper file chooser
+
+Request: "the file previewer in the wallpaper switcher is very bad, its hard to tell between text and background color, and change it to dark theme. also make it preview the image in the file manager there"
+
+Implemented a dark wallpaper folder/image browser, replacing only the native
+wallpaper FileDialog. Thumbnails, large preview, folder/path/keyboard navigation,
+clear text and explicit confirmation; Cancel/Escape never apply. Invalid images
+cannot be confirmed. Actual Qt input/render tests, compile, routing, rail and 74
+Python tests pass. Affected files backed up, deployed to existing ghOSt and opened
+on the laptop; native appearance inspected. No live wallpaper change in tests.
+Safe component render added to docs and the existing Pages Wallpaper view.
+
 # 2026-10-23 / Nautilus
 
 Request: "make nautilus use the folder icon pack you made. and change the theme so that the text dosent blend in to background, and its a dark theme."

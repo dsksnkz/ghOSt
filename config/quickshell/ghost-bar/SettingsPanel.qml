@@ -212,8 +212,13 @@ Item {
             airplaneSnapshot = null;
         }
     }
+    function openWallpaperPicker() {
+        wallpaperDialog.browse(settings.details.preferences?.wallpaper || "");
+    }
     function status() {
         return JSON.stringify({
+            wallpaperPickerVisible: wallpaperDialog.visible,
+            wallpaperPreviewReady: wallpaperDialog.imageReady,
             page,
             query,
             x,
@@ -1374,7 +1379,7 @@ Item {
                 name: "Choose image"
                 value: "Browse"
                 onClicked: if (!settings.previewMode)
-                    wallpaperDialog.open()
+                    settings.openWallpaperPicker()
             }
             Note {
                 text: settings.details.preferences?.wallpaper || "Choose an image to apply through awww"
@@ -1387,11 +1392,12 @@ Item {
         nameFilters: ["PCM WAV (*.wav)"]
         onAccepted: settings.apply("sound-file", settings.soundFileGroup + "=" + selectedFile.toString())
     }
-    FileDialog {
+    WallpaperPicker {
         id: wallpaperDialog
-        title: "Choose wallpaper"
-        nameFilters: ["Images (*.png *.jpg *.jpeg *.webp *.bmp)"]
-        onAccepted: settings.apply("wallpaper", selectedFile.toString())
+        parent: scene
+        x: (scene.width - width) / 2
+        y: (scene.height - height) / 2
+        onImageChosen: file => settings.apply("wallpaper", file.toString())
     }
     FileDialog {
         id: portraitDialog
