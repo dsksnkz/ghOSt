@@ -608,6 +608,13 @@ driver or visual changes. Current Balanced profile preserved; backups retained.
 
 # 2026-10-24 / Slide-only launcher, behind the rail
 
+Latest request: "make it smoother it looks very slow". Shortened launcher-only
+reveal from 220ms OutCubic to 150ms OutQuad, reducing the slow finish. Preserved
+other popup timing, full-size geometry, reduced motion and behind-rail placement.
+Motion/input/compile tests and native geometry observation pass. Backed up and
+deployed Panel/PanelMotion, reloaded named ghOSt. Existing captures remain accurate
+for geometry; this is not a claimed frame-rate performance improvement.
+
 Request: "super space app launcher animation should be the app launcher sliding from top to position without scale change"
 
 Follow-up: "make it spawn behind the top rail"

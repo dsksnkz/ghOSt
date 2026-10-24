@@ -33,6 +33,9 @@ ShellRoot {
                 catch (error) { console.error("FAIL! motion: " + error + " " + error.stack); throw error; }
             }
             function checkMotion() {
+                compare(Motion.duration("launcher", false, 220), 150);
+                compare(Motion.duration("launcher", true, 220), 0);
+                compare(Motion.duration("audio", false, 220), 220);
                 wait(100);
                 panel.launcherAction("query", "> echo ghOSt");
                 const height = panel.height;

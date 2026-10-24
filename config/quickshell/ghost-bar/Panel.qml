@@ -84,8 +84,9 @@ PanelWindow {
 
     Behavior on reveal {
         NumberAnimation {
-            duration: Theme.reducedMotion ? 0 : Theme.panel
-            easing.type: Easing.OutCubic
+            duration: Motion.duration(panelWindow.page, Theme.reducedMotion, Theme.panel)
+            // Quicker finish without the launcher's previous long easing tail.
+            easing.type: panelWindow.page === "launcher" ? Easing.OutQuad : Easing.OutCubic
         }
     }
 }

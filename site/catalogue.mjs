@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261024-launcher-slide";
+export const assetVersion = "20261024-launcher-150";
 export const views = {
   rail: {
     title: "Top rail",
@@ -27,7 +27,7 @@ export const views = {
   },
   launcher: {
     title: "App launcher",
-    description: "Apps and commands. Slides down behind the rail without resizing.",
+    description: "Apps and commands. 150 ms slide behind the rail, without resizing.",
     file: "launcher-slide.png", size: [560, 430], crop: [0, 68, 560, 328],
     maxWidth: 560, kind: "Qt component render · sample command",
   },

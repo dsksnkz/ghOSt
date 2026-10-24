@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-24 / Quicker launcher finish
+
+Latest speed correction supersedes the original launcher's 220ms timing: now
+150ms OutQuad, with less lingering near the final position. Other popups keep
+their timing/curves. No-scale geometry, behind-rail layering and reduced motion
+retained. Duration/geometry tests, existing launcher input and compile pass;
+native observation confirms full size and final y=68 (about 200ms after IPC,
+including startup overhead, not an FPS measurement). Two runtime files backed
+up/deployed and named ghOSt reloaded. Pages description updated; shape/captures
+remain unchanged. [Details](changes/2026-10-24-launcher-slide.md#speed-refinement).
+
 ## 2026-10-24 / Launcher slides behind the rail without scaling
 
 Launcher native window now slides from above the screen to its existing y=68
