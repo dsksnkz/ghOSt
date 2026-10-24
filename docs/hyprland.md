@@ -6,7 +6,7 @@ They use its Lua `hl` API, not legacy `.conf` syntax.
 
 | File | Purpose |
 | --- | --- |
-| [ghost-rules.lua](../config/hypr/ghost-rules.lua) | Settings geometry, QML-owned layer animation and floating clipse terminal |
+| [ghost-rules.lua](../config/hypr/ghost-rules.lua) | Settings/Intro floating geometry, QML-owned layer animation and floating clipse terminal |
 | [ghost-autostart.lua](../config/hypr/ghost-autostart.lua) | Start the installed ghOSt wrapper once; optional wallpaper/clipboard helpers |
 | [ghost-controls.lua](../config/hypr/ghost-controls.lua) | Settings, screenshot, audio and brightness shortcuts |
 | [ghost-migration.lua](../config/hypr/ghost-migration.lua) | Launcher, reload, Settings pages, Zed, clipse and workspace shortcuts |
@@ -24,7 +24,7 @@ dofile(config .. "/hypr/ghost/ghost-autostart.lua")
 ```
 
 First remove or skip duplicate **ghOSt-owned** entries. `install.sh --activate`
-already adds shell startup, its main no-animation rule and Settings window rule;
+already adds shell startup, its main no-animation rule and Settings/Intro window rules;
 the example above is an alternative manual route, not another block to append
 after installer activation. Preserve unrelated startup and rules.
 

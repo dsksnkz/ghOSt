@@ -17,6 +17,14 @@ ShellRoot {
             property int soundRequests: 0
             property int actionRequests: 0
 
+            function test_sidebar_full_percentage() {
+                const percentage = findChild(sidebar, "sidebar-battery-percentage");
+                compare(percentage.text, "100%");
+                compare(percentage.elide, Text.ElideNone);
+                verify(percentage.contentWidth <= percentage.width);
+                console.info("PASS: sidebar 100% fits without ellipsis");
+            }
+
             function test_click_sound_and_action() {
                 mouseClick(clickProbe, 30, 15);
                 compare(soundRequests, 1);

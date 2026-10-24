@@ -28,6 +28,10 @@ ShellRoot {
                     rail.width = width;
                     wait(30);
                     const state = rail.spacingStatus();
+                    compare(state.rightIcons.length, 4);
+                    for (const icon of state.rightIcons)
+                        compare(icon.height, 22);
+                    compare(findChild(rail, "rail-element-volume"), null);
                     verify(Math.abs(state.clockCenterX - width / 2) < 0.01);
                     Desk.close();
                     mouseClick(clock, clock.width / 2, clock.height / 2);

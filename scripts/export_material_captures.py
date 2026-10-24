@@ -6,7 +6,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 captures = Path(sys.argv[1])
-output = ROOT / 'docs/images/2026-10-24-material-icons'
+output = ROOT / (sys.argv[2] if len(sys.argv) > 2 else 'docs/images/2026-10-24-rail-edge-intro')
 output.mkdir(parents=True, exist_ok=True)
 site = ROOT / 'site/assets'
 

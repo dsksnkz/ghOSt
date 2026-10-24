@@ -34,14 +34,15 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
     anchors {
-        left: true
+        left: OsdState.edgeSide === "left"
+        right: OsdState.edgeSide === "right"
         top: true
     }
 
     G2Surface {
         id: card
 
-        x: -30 + 44 * window.reveal
+        x: OsdState.edgeSide === "right" ? window.width - width - (-30 + 44 * window.reveal) : -30 + 44 * window.reveal
         y: 8
         width: 44
         height: 294

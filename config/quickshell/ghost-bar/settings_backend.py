@@ -19,7 +19,7 @@ from urllib.parse import unquote, urlparse
 
 SOUND_GROUPS = ('rail', 'sidebar', 'settings')
 SOUND_PRESETS = (*SOUND_GROUPS, 'none', 'custom')
-RAIL_IDS = ('menu', 'workspaces', 'music', 'clock', 'volume', 'network', 'bluetooth', 'battery', 'power')
+RAIL_IDS = ('menu', 'workspaces', 'music', 'clock', 'network', 'bluetooth', 'battery', 'power')
 
 def valid_rail_layout(value):
     return (isinstance(value, list) and len(value) == len(RAIL_IDS)
@@ -74,8 +74,12 @@ def preferences():
     for key in ('wallpaper', 'profilePicture'):
         if isinstance(data.get(key), str):
             result[key] = data[key]
-    if valid_rail_layout(data.get('railLayout')):
-        result['railLayout'] = data['railLayout']
+    layout = data.get('railLayout')
+    # Read old saved layouts without moving or discarding the remaining entries.
+    if isinstance(layout, list):
+        layout = [entry for entry in layout if not (isinstance(entry, dict) and entry.get('id') == 'volume')]
+    if valid_rail_layout(layout):
+        result['railLayout'] = layout
     sounds = data.get('sounds', {})
     if isinstance(sounds, dict):
         if type(sounds.get('enabled')) is bool:

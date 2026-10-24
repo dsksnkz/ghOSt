@@ -4,7 +4,6 @@ var items = [
     {id: "workspaces", name: "Workspaces", zone: "left", width: 99},
     {id: "music", name: "Music", zone: "left", width: 260},
     {id: "clock", name: "Clock", zone: "center", width: 124},
-    {id: "volume", name: "Volume", zone: "right", width: 106},
     {id: "network", name: "Network", zone: "right", width: 41},
     {id: "bluetooth", name: "Bluetooth", zone: "right", width: 41},
     {id: "battery", name: "Battery", zone: "right", width: 71},
@@ -59,6 +58,7 @@ function place(layout, id, zone, target, after) {
 }
 
 function geometry(layout, width) {
+    layout = layout.filter(entry => items.some(item => item.id === entry.id));
     var gap = 12, inset = 19, result = {}, groups = {}, sizes = {};
     for (var zone of zones.slice(0, 3)) {
         groups[zone] = layout.filter(entry => entry.zone === zone);

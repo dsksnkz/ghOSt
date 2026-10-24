@@ -1,5 +1,19 @@
 # ghOSt progress
 
+## 2026-10-24 / Rail corrections, edge volume and ghOSt Intro
+
+Rail internet button always uses Wi-Fi artwork; connection state stays real.
+Matched rail/status/button icon heights within each control class, fixed sidebar
+100% clipping and replaced the tiny workspace triangle with a stationary filled
+white6px dot. Removed rail volume, including the editor catalogue; old saved
+layouts migrate by dropping only volume and retaining remaining order/zones.
+Replaced sidebar edge handle with middle-only left/right volume targets. Native
+hover/dead-zone/expiry checks pass without changing volume or clicking anything.
+Added searchable ghOSt Intro with recommended topics and explicit surface links,
+installed its app entry/icon and narrow floating/no-client-fullscreen rule. Real
+native launch reports floating860×620/fullscreen0. No shortcut changes, autostart
+or automatic preference choices. [Behavior, verification and screenshots](changes/2026-10-24-rail-edge-intro.md).
+
 ## 2026-10-24 / Google Material icons and sharper scaled rendering
 
 Replaced all 63 shared control IDs with official Material Symbols Outlined,

@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import sys
 
 root = Path(__file__).resolve().parents[1]
 environment = dict(os.environ, QT_QPA_PLATFORM="offscreen",
@@ -12,6 +13,10 @@ environment = dict(os.environ, QT_QPA_PLATFORM="offscreen",
                    DBUS_SESSION_BUS_ADDRESS="unix:path=/nonexistent-ghost-test-bus")
 environment.pop("WAYLAND_DISPLAY", None)
 environment.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
+if len(sys.argv) > 1:
+    captures = Path(sys.argv[1]).resolve()
+    captures.mkdir(parents=True, exist_ok=True)
+    environment['GHOST_RAIL_CAPTURE_DIR'] = str(captures)
 with tempfile.TemporaryDirectory(prefix="ghost-rail-clock-") as directory:
     runtime = Path(directory) / "runtime"
     shutil.copytree(root / "config/quickshell/ghost-bar", runtime)

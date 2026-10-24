@@ -1,9 +1,9 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261024-material-icons";
+export const assetVersion = "20261024-edge-volume-intro";
 export const views = {
   rail: {
     title: "Top rail",
-    description: "Centered clock, workspaces and device controls.",
+    description: "Clock, workspaces and device controls. Volume opens at either screen edge.",
     file: "rail-native.png", size: [1920, 50], crop: [0, 0, 1920, 50],
     maxWidth: 1200, kind: "Qt component render",
   },

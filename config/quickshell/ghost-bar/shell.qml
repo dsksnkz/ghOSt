@@ -19,6 +19,7 @@ ShellRoot {
     SettingsWindow {
         id: settingsWindow
     }
+    IntroWindow { id: introWindow }
     Variants {
         id: outputs
         model: Quickshell.screens
@@ -72,7 +73,13 @@ ShellRoot {
                 screen: output.modelData
             }
             EdgeHandle {
+                id: leftVolumeEdge
                 screen: output.modelData
+            }
+            EdgeHandle {
+                id: rightVolumeEdge
+                screen: output.modelData
+                side: "right"
             }
             NotificationToast {
                 id: toastWindow
@@ -126,6 +133,15 @@ ShellRoot {
         target: "bar"
         function reload(): void {
             Quickshell.reload(false);
+        }
+        function intro(): void { introWindow.open(); }
+        function captureIntro(path: string): void { introWindow.capture(path); }
+        function edgeVolume(): string {
+            return JSON.stringify({opened: OsdState.opened, side: OsdState.edgeSide,
+                screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount,
+                edges: Array.from(outputs.instances, output => ({screen: output.modelData.name,
+                    top: Math.round((output.modelData.height - Math.min(280, Math.round(output.modelData.height * .4))) / 2),
+                    height: Math.min(280, Math.round(output.modelData.height * .4)), width: 2}))});
         }
         function toggle(name: string): void {
             const screen = Quickshell.screens[0];

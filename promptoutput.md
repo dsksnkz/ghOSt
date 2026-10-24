@@ -1,5 +1,25 @@
 prompts outputs here
 
+## 2026-10-24 / Rail corrections, edge volume and Intro
+
+User requested: Wi-Fi artwork even on Ethernet; equal icon heights per control
+class; unclipped sidebar100%; white workspace dot; no rail volume, replaced by
+middle-only left/right edge OSD with dead zones; remove sidebar edge opener; and
+a searchable, recommended-first ghOSt Intro app that opens floating/windowed.
+
+Implemented all listed surfaces. Old rail layouts migrate without changing other
+element order/zones or preferences. Intro has7 searchable tutorials,3 recommended
+starting topics, explicit buttons, real keyboard search/empty/reset/Escape, app
+entry/icon and narrow floating/client-fullscreen-suppression rule. No automatic
+preference choices or intro autostart. Taste skill applied to hierarchy/contrast,
+not conflicting website hero/GSAP defaults.83 Python tests and real Qt/native
+checks pass. Native edge checks cover both sides/dead zones/expiry, without
+clicks or volume changes, restoring the pointer. Actual Intro is floating860×620,
+fullscreen0; GIO launch and native content capture succeed. Only ghOSt modules,
+app entry/icon and its exact compositor rule deployed; safe captures refreshed.
+No keybinding file, network, package, hardware/session/authentication change.
+Details, limits, backups and screenshots: docs/changes/2026-10-24-rail-edge-intro.md.
+
 ## 2026-10-09 / Super+L launch repair
 
 User reports "super l dosent do shit". Actual launch logs show the lock scene

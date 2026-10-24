@@ -20,6 +20,9 @@ A monochrome desktop shell for Arch Linux and Hyprland, built with Quickshell.
 The website shows component captures and labeled browser motion demonstrations,
 not remote desktop controls. [Google Material SVG icons](docs/icons.md) are bundled with their licence.
 
+[ghOSt Intro](docs/intro.md) is a searchable, floating desktop tutorial app.
+Volume opens at the middle of either screen edge; scroll there or use the OSD slider.
+
 ## Install
 
 Requires Arch Linux, Hyprland, Quickshell with networking/Bluetooth/PipeWire,

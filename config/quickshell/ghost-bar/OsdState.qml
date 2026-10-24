@@ -11,14 +11,19 @@ Singleton {
     property bool interacting: false
     property string kind: "volume"
     property string screenName: ""
+    property string edgeSide: "left"
     property var brightness: null
     property int lastBrightness: -1
     property real pendingBrightness: 0
     readonly property real amount: kind === "brightness" ? brightness ?? 0 : Desk.volume
     readonly property bool available: kind === "brightness" ? brightness !== null : !!Desk.audio
-    function show(value) {
+    function show(value, targetScreen = "", side = "") {
+        if (side)
+            edgeSide = side;
+        else if (!opened)
+            edgeSide = "left";
         kind = value;
-        screenName = Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name || "";
+        screenName = targetScreen || Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name || "";
         opened = true;
         expiry.restart();
     }

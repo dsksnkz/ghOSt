@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=ghOSt Intro
+Comment=Desktop basics and searchable tutorials
+Exec=quickshell ipc -c ghost-bar call bar intro
+Icon=ghost-intro
+Terminal=false
+Categories=Settings;Utility;
+Keywords=ghOSt;tutorial;welcome;introduction;help;
+StartupNotify=false

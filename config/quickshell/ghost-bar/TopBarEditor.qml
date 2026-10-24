@@ -13,7 +13,8 @@ Column {
     signal applyRequested(string value)
 
     function resetDraft() {
-        draft = (savedLayout || Layout.defaults()).map(entry => ({id: entry.id, zone: entry.zone}));
+        draft = (savedLayout || Layout.defaults()).filter(entry => entry.id !== "volume")
+            .map(entry => ({id: entry.id, zone: entry.zone}));
         dirty = false;
     }
     function place(id, zone, target, after) {

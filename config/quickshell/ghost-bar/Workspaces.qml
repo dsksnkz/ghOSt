@@ -162,16 +162,15 @@ Item {
             onScrolled: delta => wheel.scroll(delta)
         }
     }
-    Icon {
+    Rectangle {
         id: indicator
         x: 36 + (23 - width) / 2
         y: 29
-        width: 14
+        width: 6
         height: 6
         z: 5
-        name: "workspace-indicator"
-        fillMode: Image.Stretch
-        ink: "#aeaeae"
+        radius: width / 2
+        color: "#ffffff"
     }
     function status() {
         const rendered = [];
@@ -200,6 +199,7 @@ Item {
                 y: indicator.y,
                 width: indicator.width
             },
+            marker: {shape: "dot", color: indicator.color.toString(), height: indicator.height},
             rendered
         };
     }

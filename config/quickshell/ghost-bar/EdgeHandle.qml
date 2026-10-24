@@ -2,62 +2,40 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import "EdgeVolume.js" as EdgeVolume
 
-// One left-edge target. Its input region expands only while hovered.
+// A two-pixel, middle-only edge target. No sidebar action or broad input mask.
 PanelWindow {
     id: edge
-    implicitWidth: 30
-    implicitHeight: 100
-    anchors {
-        top: true
-        left: true
-    }
-    margins.top: Math.round((screen.height - implicitHeight) / 2)
+    property string side: "left"
+    implicitWidth: 2
+    implicitHeight: EdgeVolume.bounds(screen.height).height
+    anchors { top: true; left: side === "left"; right: side === "right" }
+    margins.top: EdgeVolume.bounds(screen.height).top
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "ghost-left-edge"
+    WlrLayershell.namespace: "ghost-volume-edge-" + side
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-    visible: !Desk.sidebarOpen && !Desk.settingsRequested && !(Hyprland.focusedMonitor?.activeWorkspace?.hasFullscreen ?? false)
-    mask: Region {
-        width: hit.containsMouse ? 30 : 3
-        height: edge.height
-    }
+    readonly property var monitor: Hyprland.monitorFor(screen)
+    visible: !(monitor?.activeWorkspace?.hasFullscreen ?? false)
     MouseArea {
         id: hit
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            UiSounds.play("sidebar");
-            Desk.toggleSidebar(edge.screen.name);
+        onEntered: dwell.restart()
+        onExited: dwell.stop()
+        onWheel: event => {
+            OsdState.show("volume", edge.screen.name, edge.side);
+            OsdState.move(EdgeVolume.step(Desk.volume, event.angleDelta.y));
+            event.accepted = true;
         }
-        G2Surface {
-            x: hit.containsMouse ? 6 : 0
-            y: 18
-            width: hit.containsMouse ? 22 : 2
-            height: 64
-            radius: hit.containsMouse ? 8 : 1
-            color: "#383838"
-            opacity: hit.containsMouse ? 1 : .2
-            Behavior on x {
-                NumberAnimation {
-                    duration: Theme.reducedMotion ? 0 : 180
-                    easing.type: Easing.OutCubic
-                }
-            }
-            Behavior on width {
-                NumberAnimation {
-                    duration: Theme.reducedMotion ? 0 : 180
-                }
-            }
-            SvgIcon {
-                anchors.centerIn: parent
-                width: 14
-                height: 14
-                name: "ghost"
-                opacity: hit.containsMouse ? 1 : 0
-            }
+        onClicked: OsdState.show("volume", edge.screen.name, edge.side)
+        Timer {
+            id: dwell
+            interval: 120
+            onTriggered: if (hit.containsMouse)
+                OsdState.show("volume", edge.screen.name, edge.side)
         }
     }
 }

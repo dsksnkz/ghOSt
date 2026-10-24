@@ -56,6 +56,13 @@ class Settings(unittest.TestCase):
         self.assertFalse(backend.paths()[0].exists())
         backend.save(backend.paths()[0], {'railLayout': invalid[-1]})
         self.assertIsNone(backend.preferences()['railLayout'])
+
+    def test_old_rail_volume_entry_is_removed_without_reordering_other_elements(self):
+        expected = [{'id': name, 'zone': 'left'} for name in backend.RAIL_IDS]
+        legacy = expected[:4] + [{'id': 'volume', 'zone': 'right'}] + expected[4:]
+        backend.save(backend.paths()[0], {'railLayout': legacy, 'sounds': {'volume': 37}})
+        self.assertEqual(backend.preferences()['railLayout'], expected)
+        self.assertEqual(backend.preferences()['sounds']['volume'], 37)
     def test_click_sounds_keep_original_defaults(self):
         sounds = backend.preferences()['sounds']
         self.assertTrue(sounds['enabled'])

@@ -215,21 +215,23 @@ Item {
             }
             Label {
                 x: 64
+                objectName: "sidebar-battery-percentage"
                 anchors.verticalCenter: parent.verticalCenter
                 text: sidebar.previewMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
                 font.pixelSize: 14
                 font.weight: Theme.boldWeight
-                width: 34
+                width: 42
                 height: 22
+                elide: Text.ElideNone
                 verticalAlignment: Text.AlignVCenter
                 color: "#ffffff"
             }
             SvgIcon {
                 id: statusBattery
-                x: 106
+                x: 114
                 anchors.verticalCenter: parent.verticalCenter
-                width: 30
-                height: 26
+                width: 22
+                height: 22
                 name: "battery"
                 visible: Desk.hasBattery || sidebar.previewMode
             }
@@ -272,8 +274,8 @@ Item {
                 Desk.openSettings(sidebar.screen.name)
             SvgIcon {
                 anchors.centerIn: parent
-                width: 23
-                height: 23
+                width: 22
+                height: 22
                 name: "settings"
                 black: true
             }

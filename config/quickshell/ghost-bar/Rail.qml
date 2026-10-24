@@ -81,9 +81,9 @@ Item {
                     onClicked: Desk.toggleSidebar(bar.screenName)
                     SvgIcon {
                         x: 10
-                        y: 4
-                        width: 24
-                        height: 24
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 22
+                        height: 22
                         name: "menu"
                     }
                 }
@@ -145,43 +145,6 @@ Item {
                     }
                 }
                 Key {
-                    objectName: "rail-element-volume"
-                    visible: bar.elementVisible("volume")
-                    x: bar.elementX("volume", 1473 + controls.extraWidth)
-                    y: 7
-                    width: 100
-                    height: 32
-                    hint: "Sound"
-                    onClicked: bar.open("audio", this)
-                    onSecondaryClicked: Desk.mute()
-                    wheelEnabled: true
-                    onScrolled: delta => Desk.setVolume((Desk.volume + (delta > 0 ? 2 : -2)) / 100)
-                    SvgIcon {
-                        id: soundIcon
-                        x: 0
-                        y: 5
-                        width: 22
-                        height: 22
-                        name: Desk.muted ? "mute" : "volume"
-                    }
-                    Meter {
-                        x: 30
-                        y: 10
-                        count: 7
-                        segmentWidth: 3
-                        spacing: 3
-                        value: !bar.fixtureMode && Desk.muted ? 0 : bar.displayVolume / 100
-                    }
-                    Label {
-                        x: 80
-                        y: 9
-                        width: 26
-                        text: bar.displayVolume
-                        font.pixelSize: 10
-                        color: Theme.muted
-                    }
-                }
-                Key {
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
                     x: bar.elementX("network", 1621 + controls.extraWidth)
@@ -196,7 +159,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         width: 22
                         height: 22
-                        name: bar.fixtureMode ? "wifi" : Desk.wired ? "ethernet" : "wifi"
+                        name: "wifi"
                         opacity: bar.fixtureMode || Desk.connected ? 1 : .45
                     }
                 }
@@ -243,7 +206,7 @@ Item {
                         id: batteryIcon
                         x: 41
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 30
+                        width: 22
                         height: 22
                         name: "battery"
                         visible: Desk.hasBattery || bar.previewMode
@@ -285,7 +248,7 @@ Item {
         }
     }
     function spacingStatus() {
-        const icons = [soundIcon, networkIcon, bluetoothIcon, batteryIcon, powerIcon];
+        const icons = [networkIcon, bluetoothIcon, batteryIcon, powerIcon];
         return {
             clockOnly: true,
             railWidth: bar.width,

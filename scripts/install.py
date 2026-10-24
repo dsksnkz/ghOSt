@@ -108,6 +108,8 @@ if lua.exists():
         text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })\n'
     if 'name = "ghost-settings"' not in text:
         text += '\n-- ghOSt Settings only.\nhl.window_rule({ name = "ghost-settings", match = { class = "org.quickshell", title = "ghOSt Settings" }, float = true, size = { 1024, 699 }, center = true, decorate = false, rounding = 0, opacity = "1 override" })\n'
+    if 'name = "ghost-intro"' not in text:
+        text += '\n' + next(line for line in (repo / 'config/hypr/ghost-rules.lua').read_text().splitlines() if 'name = "ghost-intro"' in line) + '\n'
     lua.write_text(text)
 else:
     text = conf.read_text()
@@ -115,6 +117,8 @@ else:
         conf.write_text(text + '\n# ghOSt top bar\nexec-once = ' + str(launcher) + '\n')
 if before != digest(keybinds):
     raise SystemExit("Keybinding verification failed.")
+from install_intro import install as install_intro
+install_intro()
 for entry in record["files"]:
     entry["installed_sha256"] = digest(Path(entry["path"]))
 manifest.write_text(json.dumps(record, indent=2) + "\n")
