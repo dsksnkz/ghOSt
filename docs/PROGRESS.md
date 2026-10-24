@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-24 / Fullscreen on special workspaces
+
+Fixed rail visibility missing fullscreen windows on visible special workspaces.
+Hyprland's normal activeWorkspace remains different from the displayed special
+workspace; the installed Quickshell exposes the latter through lastIpcObject.
+Shared per-output fullscreen state now checks both normal and displayed special
+workspaces, excluding hidden specials. Edge volume uses the same state. Added
+debounced event-driven IPC refresh for special/fullscreen transitions, no polling
+or subprocess. Real native fullscreen special remains untouched; deployed rail
+and both edge targets are now unmapped. Input tests cover entry, exit, hidden
+specials, unrelated outputs and missing monitors; compile/regressions pass.
+[Evidence and recovery](changes/2026-10-24-special-fullscreen.md).
+
 ## 2026-10-24 / Rail corrections, edge volume and ghOSt Intro
 
 Rail internet button always uses Wi-Fi artwork; connection state stays real.

@@ -18,7 +18,8 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     readonly property var monitor: Hyprland.monitorFor(screen)
-    visible: !(monitor?.activeWorkspace?.hasFullscreen ?? false)
+    FullscreenState { id: fullscreenState; monitor: edge.monitor }
+    visible: !fullscreenState.active
     MouseArea {
         id: hit
         anchors.fill: parent

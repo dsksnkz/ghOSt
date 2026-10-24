@@ -347,6 +347,25 @@ ShellRoot {
                 compare(fullscreenState.active, false);
                 fullscreenState.monitor = fixtureMonitor;
                 workspace.hasFullscreen = false;
+                fixtureMonitor.lastIpcObject = {specialWorkspace: {id: -97}};
+                specialWorkspace.hasFullscreen = true;
+                compare(fullscreenState.active, true);
+                // A hidden special workspace, including one on another output,
+                // must not hide this output's rail.
+                fixtureMonitor.lastIpcObject = {specialWorkspace: {id: 0}};
+                compare(fullscreenState.active, false);
+                fixtureMonitor.lastIpcObject = {specialWorkspace: {id: -98}};
+                compare(fullscreenState.active, false);
+                fixtureMonitor.lastIpcObject = {specialWorkspace: {id: -97}};
+                specialWorkspace.hasFullscreen = false;
+                compare(fullscreenState.active, false);
+                specialWorkspace.hasFullscreen = true;
+                compare(fullscreenState.active, true);
+                fullscreenState.monitor = null;
+                compare(fullscreenState.active, false);
+                fullscreenState.monitor = fixtureMonitor;
+                fixtureMonitor.lastIpcObject = {specialWorkspace: {id: 0}};
+                specialWorkspace.hasFullscreen = false;
                 console.info("PASS: per-output fullscreen visibility and restoration");
             }
 
@@ -385,12 +404,15 @@ ShellRoot {
                 id: fixtureMonitor
 
                 property var activeWorkspace: workspace
+                property var lastIpcObject: ({specialWorkspace: {id: 0}})
             }
+            QtObject { id: specialWorkspace; property int id: -97; property bool hasFullscreen: false }
 
             FullscreenState {
                 id: fullscreenState
 
                 monitor: fixtureMonitor
+                workspaces: [specialWorkspace]
             }
 
             SidebarFigmaBody {

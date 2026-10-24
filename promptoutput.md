@@ -1,5 +1,21 @@
 prompts outputs here
 
+## 2026-10-24 / Special-workspace fullscreen hiding
+
+Request: "the top bar still shows when fullscreened some stuff".
+
+Actual inspected state: browser fullscreen2/client2 on visible special:music,
+while the monitor's normal active workspace was nonfullscreen. Rail only read
+the latter. Fixed shared FullscreenState to include the special workspace shown
+on that monitor, never hidden specials. Edge volume inherits this fix. Special
+and fullscreen events refresh Quickshell IPC models with20ms debounce, no poll.
+Deployed three affected files and reloaded named ghOSt. Existing fullscreen app
+left unchanged; native rendering reports railVisible:false and compositor layers
+contain neither ghost-bar nor its edge targets. Real Qt tests exercise normal/
+special transitions, restoration, hidden/unrelated specials and null monitor.
+No application fullscreen toggle, shortcut, reservation, geometry or service edit.
+Recovery, capture and verification: docs/changes/2026-10-24-special-fullscreen.md.
+
 ## 2026-10-24 / Rail corrections, edge volume and Intro
 
 User requested: Wi-Fi artwork even on Ethernet; equal icon heights per control

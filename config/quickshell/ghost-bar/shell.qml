@@ -20,6 +20,23 @@ ShellRoot {
         id: settingsWindow
     }
     IntroWindow { id: introWindow }
+    // Quickshell exposes specialWorkspace only in the monitor's raw IPC map.
+    // Refresh that map on special-workspace events; no polling or subprocess.
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (["activespecial", "activespecialv2", "fullscreen"].includes(event.name))
+                fullscreenRefresh.restart();
+        }
+    }
+    Timer {
+        id: fullscreenRefresh
+        interval: 20
+        onTriggered: {
+            Hyprland.refreshMonitors();
+            Hyprland.refreshWorkspaces();
+        }
+    }
     Variants {
         id: outputs
         model: Quickshell.screens
@@ -29,6 +46,7 @@ ShellRoot {
             readonly property var sidebarSurface: sidebarWindow
             readonly property var calendarSurface: calendarWindow
             readonly property var panelSurface: panelWindow
+            readonly property var railSurface: barWindow
             readonly property var dismissalSurface: dismissalWindow
             property int focusRevision: 0
             property int focusDismissals: 0
@@ -210,6 +228,7 @@ ShellRoot {
         function rendering(): string {
             return JSON.stringify(Array.from(outputs.instances, output => ({
                         screen: output.modelData.name,
+                        railVisible: output.railSurface.visible,
                         calendar: output.calendarSurface.renderingStatus()
                     })));
         }
