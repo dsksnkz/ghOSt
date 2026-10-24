@@ -2,8 +2,11 @@
 from pathlib import Path
 import io
 import json
+import os
 import re
 import subprocess
+import shutil
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from PIL import Image
@@ -14,11 +17,27 @@ MANIFEST = json.loads((ASSETS / "manifest.json").read_text())
 
 
 class IconTests(unittest.TestCase):
-    def test_weather_variants_are_lighter_without_changing_geometry(self):
+    def test_fractional_scale_uses_high_resolution_cached_rasters(self):
+        env = dict(os.environ, QT_QPA_PLATFORM='offscreen', QT_QUICK_BACKEND='software')
+        env.pop('WAYLAND_DISPLAY', None)
+        env.pop('HYPRLAND_INSTANCE_SIGNATURE', None)
+        with tempfile.TemporaryDirectory(prefix='ghost-icon-test-') as directory:
+            config = Path(directory)
+            for name in ('SvgIcon.qml',):
+                shutil.copy2(ASSETS.parent / name, config / name)
+            shutil.copytree(ASSETS, config / 'icons')
+            shutil.copy2(ROOT / 'tests/icon-sampling.qml', config / 'test.qml')
+            result = subprocess.run(['quickshell', '-p', str(config / 'test.qml')],
+                                    env=env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('PASS: cached high-resolution icons', result.stdout + result.stderr)
+
+    def test_weather_variants_use_official_light_outlines(self):
         for name in ("cloud", "brightness", "rain", "snow", "lightning", "storm"):
             original = (ASSETS / "white" / (name + ".svg")).read_text()
             light = (ASSETS / "white" / ("weather-" + name + ".svg")).read_text()
-            self.assertEqual(light, original.replace('stroke-width="2"', 'stroke-width="1.25"'))
+            self.assertNotEqual(light, original)
+            self.assertIn('transform="translate(', light)
             self.assertEqual(light, (ROOT / "site/assets/icons/white" / ("weather-" + name + ".svg")).read_text())
 
     def test_shared_style_reaches_compatibility_icons(self):
@@ -29,18 +48,19 @@ class IconTests(unittest.TestCase):
         self.assertEqual((ASSETS / "black/folder.svg").read_text().split("</title>")[1],
                          (ASSETS / "black/folder-rounded.svg").read_text().split("</title>")[1])
         for name in ("ethernet", "volume", "storage", "security", "play", "pin", "lightning"):
-            self.assertIn("Q", (ASSETS / "black" / (name + ".svg")).read_text(), name)
+            self.assertIn('transform="translate(', (ASSETS / "black" / (name + ".svg")).read_text(), name)
 
-    def test_rounded_folder_has_rounded_inside_corners(self):
-        data = subprocess.check_output([
-            "rsvg-convert", "-w", "240", "-h", "240",
-            str(ASSETS / "black/folder-rounded.svg")])
-        alpha = Image.open(io.BytesIO(data)).convert("RGBA").getchannel("A")
-        # Curved cavity corners retain material where a square cutout wouldn't.
-        for point in ((48, 132), (192, 132), (48, 192), (192, 192), (46, 114)):
-            self.assertGreater(alpha.getpixel(point), 220, point)
-        for point in ((120, 155), (80, 100)):
-            self.assertEqual(alpha.getpixel(point), 0, point)
+    def test_offline_generator_and_official_provenance(self):
+        subprocess.run(['python3', 'scripts/build_icons.py', '--check'], cwd=ROOT, check=True)
+        source = ROOT / 'assets/material-symbols'
+        self.assertIn('Apache License', (source / 'LICENSE').read_text())
+        records = json.loads((source / 'sources.json').read_text())
+        self.assertGreater(len(records), 60)
+        from hashlib import sha256
+        for filename, record in records.items():
+            self.assertEqual(sha256((source / filename).read_bytes()).hexdigest(), record['sha256'])
+            self.assertTrue(record['url'].startswith(('https://raw.githubusercontent.com/google/',
+                                                       'https://fonts.gstatic.com/')))
 
     def test_expected_coverage(self):
         names = {i["name"] for i in MANIFEST}
@@ -51,14 +71,13 @@ class IconTests(unittest.TestCase):
         self.assertTrue(old <= names)
 
     def test_standalone_xml_and_web_parity(self):
-        allowed = {"svg", "title", "path", "circle", "ellipse", "rect"}
+        allowed = {"svg", "title", "path", "circle", "ellipse", "rect", "g"}
         for icon in MANIFEST:
             for tone in ("black", "white"):
                 with self.subTest(name=icon["name"], tone=tone):
                     file = ASSETS / tone / (icon["name"] + ".svg")
                     root = ET.fromstring(file.read_bytes())
                     self.assertEqual(root.attrib["viewBox"], "0 0 24 24")
-                    self.assertEqual(root.attrib["stroke-width"], "2")
                     self.assertEqual(root.attrib["fill"], "none")
                     for element in root.iter():
                         self.assertIn(element.tag.split("}")[-1], allowed)

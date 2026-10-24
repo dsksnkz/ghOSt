@@ -27,6 +27,6 @@ Settings uses the measured1024 × 699 frame:262 px navigation and762 px content.
 
 Terminal work may inspect TemperedOS only as the explicitly authorized terminal visual reference, with more spacing and monochrome treatment. No unrelated legacy code or systems may be imported. The compact power HUD must open first and require deliberate confirmation for disruptive actions; tests must disable those actions.
 
-Icon system 01:61 separate transparent24 px SVGs with1.5 px rounded outline strokes, explicit pure black/white variants, and a font-derived Turret Road G. Existing Canvas controls are not yet migrated. See icons.md.
+Icon system: Google Material Symbols Outlined, explicit black/white SVGs, lighter weather variants and the retained Turret Road G brand mark. Latest user request supersedes the previous ghOSt-owned geometric pack. See icons.md.
 
 Existing shortcut combinations are preserved. Staged migration mappings are not activated automatically. The October 3 manual rail-autostart replacement was explicitly authorized and keeps unrelated services intact.

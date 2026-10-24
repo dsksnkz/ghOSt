@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-24 / Google Material icons and sharper scaled rendering
+
+Replaced all 63 shared control IDs with official Material Symbols Outlined,
+retaining the G brand and six lighter weather variants. Files folder overlay
+also updated; third-party app logos and the independently configured external
+launcher remain unchanged. Pinned sources, hashes and Apache licence included.
+Following the blur correction, shared SVG textures now use cached 2× sampling,
+minimum 48px, with mipmaps for fractional rail/sidebar scales. Logical dimensions,
+spacing, behavior, fonts and animation speeds are unchanged. Versioned cache key
+prevents live reload retaining the old pack. Native rail/Settings inspected after
+deployment; clean reload, safe fixture captures and recovery snapshot retained.
+See [scope and verification](changes/2026-10-24-material-icons.md).
+
 ## 2026-10-24 / Reversible sans-serif trial and gentler emphasis
 
 Applied installed Adwaita Sans across ghOSt text and desktop UI font defaults,

@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261024-font-trial-650";
+export const assetVersion = "20261024-material-icons";
 export const views = {
   rail: {
     title: "Top rail",
@@ -11,12 +11,12 @@ export const views = {
     title: "Calendar",
     description: "Weather, dates and device usage. System readings drive the meters.",
     file: "calendar-native.png", size: [820, 347], crop: [0, 0, 820, 347],
-    maxWidth: 900, kind: "Desktop capture",
+    maxWidth: 900, kind: "Qt component render · sample data",
   },
   sidebar: {
     title: "Sidebar",
     description: "Connections, volume, brightness and notifications. Opens from the rail.",
-    file: "sidebar-frame.webp", size: [1920, 1080], crop: [0, 144, 356, 794],
+    file: "sidebar-material.png", size: [356, 794], crop: [0, 0, 356, 794],
     maxWidth: 356, kind: "Sample data",
   },
   settings: {
@@ -34,14 +34,14 @@ export const views = {
   "sidebar-motion": {
     title: "Sidebar motion",
     description: "Slides in from the left. Complete widget groups follow in random order.",
-    file: "sidebar-frame.webp", size: [1920, 1080], crop: [0, 144, 356, 794],
+    file: "sidebar-material.png", size: [356, 794], crop: [0, 0, 356, 794],
     maxWidth: 356, kind: "Browser motion · sample data", motion: "sidebar",
   },
   "calendar-motion": {
     title: "Calendar motion",
     description: "Frame drops into place, then sections reveal in random order over 1.5 seconds.",
     file: "calendar-native.png", size: [820, 347], crop: [0, 0, 820, 347],
-    maxWidth: 900, kind: "Browser motion · desktop capture", motion: "calendar",
+    maxWidth: 900, kind: "Browser motion · sample data", motion: "calendar",
   },
 };
 

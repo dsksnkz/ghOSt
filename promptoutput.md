@@ -715,3 +715,19 @@ Offscreen centering at two widths and actual click checks pass, alongside compil
 and input checks. Capture has no private session/MPRIS data; Pages rail image
 updated. Only Rail deployed; named ghOSt reloaded and backups preserved.
 
+# 2026-10-24 / Material icon pack and blur correction
+
+Requests: "use google material icons then, and if successful update to github"
+and "some icons just look really blurry fix".
+
+Replaced shared ghOSt control SVGs with official Google Material Symbols Outlined,
+kept lighter weather and the G wordmark, regenerated Files folder overlay. Added
+offline reproducible generation, source hashes and Apache notices. Fixed live
+reload image caching and increased cached raster resolution for scaled small
+icons (2×, minimum48px, mipmaps), without resizing controls or changing spacing.
+Tested rendering, source hashes, real Qt scaled sampling, dismissal/input and
+Settings pages; deployed exact icons/SvgIcon and folder files, named ghOSt reload
+clean and native output inspected. Safe component crops updated in Pages.
+External standalone launcher/app logos are not part of this shared asset pack.
+Verification, backups and publication scope: docs/changes/2026-10-24-material-icons.md.
+

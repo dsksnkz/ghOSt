@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the existing rounded-folder overlay; explicitly opt in with --apply."""
+"""Build the Material folder overlay; explicitly opt in with --apply."""
 import argparse
 import configparser
 import datetime
@@ -24,12 +24,15 @@ def build_theme(destination):
     icons = destination / "scalable/places"
     icons.mkdir(parents=True, exist_ok=True)
     artwork = (REPO / "config/quickshell/ghost-bar/icons/white/folder-rounded.svg").read_text()
+    source = REPO / "config/quickshell/ghost-bar/icons"
+    for notice in ("LICENSE-Material-Symbols.txt", "NOTICE.txt"):
+        shutil.copy2(source / notice, destination / notice)
     for name in FOLDERS:
         (icons / f"{name}.svg").write_text(artwork)
         # GTK recolors symbolic icons for selected/disabled/sidebar states.
         (icons / f"{name}-symbolic.svg").write_text(artwork.replace(' color="#ffffff"', ""))
     (destination / "index.theme").write_text(
-        "[Icon Theme]\nName=ghOSt Folders\nComment=Rounded ghOSt folder icons\n"
+        "[Icon Theme]\nName=ghOSt Folders\nComment=Google Material folder icons\n"
         "Inherits=breeze-dark,Adwaita,hicolor\nDirectories=scalable/places\n\n"
         "[scalable/places]\nSize=48\nMinSize=16\nMaxSize=512\n"
         "Type=Scalable\nContext=Places\n"

@@ -16,10 +16,15 @@ Item {
         id: artwork
 
         anchors.fill: parent
-        source: "icons/" + (icon.black ? "black/" : "white/") + icon.name + ".svg"
-        sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
-        sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
+        // Version the cache key when replacing the pack during a live reload.
+        source: "icons/" + (icon.black ? "black/" : "white/") + icon.name + ".svg?v=material-20261024"
+        // Parent surfaces have fractional scales (rail .9, sidebar .7/1.15).
+        // Cache a larger SVG raster rather than magnifying a tiny 12–18px texture.
+        // This changes sampling resolution only, never the icon's layout size.
+        sourceSize.width: Math.max(48, Math.ceil(width * Screen.devicePixelRatio * 2))
+        sourceSize.height: Math.max(48, Math.ceil(height * Screen.devicePixelRatio * 2))
         fillMode: icon.fillMode
         smooth: true
+        mipmap: true
     }
 }
