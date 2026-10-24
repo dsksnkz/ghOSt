@@ -1,3 +1,6 @@
+-- Historical standalone study, not the current installation entry point.
+-- It includes monitor/global policies that must not replace an existing setup.
+-- Use the scoped snippets documented in docs/hyprland.md for current integration.
 -- ghOSt settings — staged, not installed
 -- Backend mappings below are staged; live shortcuts are not replaced.
 

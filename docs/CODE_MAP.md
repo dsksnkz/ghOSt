@@ -6,6 +6,10 @@ in the repository, verify them, then copy only the affected files.
 
 ## Main responsibilities
 
+Portable Hyprland integration snippets live in `config/hypr/ghost-*.lua`.
+[Integration guide](hyprland.md) explains optional modules and duplicate-binding
+avoidance. The historical `config/hypr/hyprland.lua` is not a deployment template.
+
 | Area | Files | Responsibility |
 | --- | --- | --- |
 | Entry and routing | `shell.qml`, `Desk.qml`, `Panel.qml`, `PanelContent.qml` | Native windows, shared desktop state, panel placement and page routing |

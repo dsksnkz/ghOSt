@@ -28,8 +28,9 @@ Click sounds use Qt Multimedia (`qt6-multimedia`); hardware brightness uses
 `brightnessctl` where a writable backlight exists.
 The music rail uses installed `cava` for 15 background spectrum bars; no audio
 samples are saved. Without Cava the background stays quiet.
-Optional media-key and Super+I mappings are in [ghost-controls.lua](config/hypr/ghost-controls.lua).
-Replace existing matching bindings deliberately; the installer does not add them.
+[Hyprland integration](docs/hyprland.md) contains the current ghOSt window/motion
+rules, portable autostart and optional shortcut replacements. Replace matching
+bindings deliberately; the installer does not add shortcut modules.
 
 The lock screen has descending blinds, a clock/password transition, and rotating
 slats after authentication. It uses Quickshell Wayland session lock and the

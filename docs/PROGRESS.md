@@ -1,5 +1,20 @@
 # ghOSt progress
 
+## 2026-10-24 / Publish current scoped Hyprland integration
+
+Published portable ghOSt-only autostart/rules modules plus current screenshot,
+clipboard and workspace-scroll bindings. All four exported window/layer rules
+match the active ghOSt rules exactly. Lock/scroll helper paths now respect HOME
+and XDG_CONFIG_HOME. Added integration instructions, duplicate-entry warnings and
+a warning that the old standalone Hyprland study is not an installation entry.
+Kept monitor/hardware/environment, saturation, personal applications, user services
+and absolute account paths out of the export. Laptop configuration was only read:
+no live edits, reload, service startup or session action. Lua syntax, mocked API
+and privacy/portability checks pass, along with the site tests. README and Pages
+link to [Hyprland setup](hyprland.md). Existing project files backed up under
+`.local/backups/2026-10-24-hypr-publication/`. Fresh-compositor installation was
+not performed; snippets are manual integration, not a whole-desktop replacement.
+
 ## 2026-10-24 / Quicker launcher finish
 
 Latest speed correction supersedes the original launcher's 220ms timing: now

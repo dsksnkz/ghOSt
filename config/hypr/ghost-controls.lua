@@ -1,8 +1,14 @@
 -- Optional controls for Hyprland's Lua configuration API.
 -- Replace matching old bindings; do not append duplicate key combinations.
 -- No compositor, monitor, wallpaper, autostart or session settings are changed.
+local mod = _G.mainMod or "SUPER"
 
-hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -c ghost-bar call bar settings general"))
+hl.bind(mod .. " + I", hl.dsp.exec_cmd("quickshell ipc -c ghost-bar call bar settings general"))
+
+hl.bind(mod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region"), { locked = true })
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("hyprshot -m region"), { locked = true })
+hl.bind(mod .. " + Print", hl.dsp.exec_cmd("hyprshot -m output -m active"), { locked = true })
+hl.bind(mod .. " + SHIFT + Print", hl.dsp.exec_cmd("hyprshot -m output -m active"), { locked = true })
 
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })

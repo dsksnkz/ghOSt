@@ -606,6 +606,18 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-24 / Publish necessary Hyprland configuration
+
+Request: "update necessary hyprland config to github ghost"
+
+Compared active integration with repository snippets. Added scoped rules and
+portable autostart; updated screenshot/clipboard/workspace bindings and portable
+lock paths. Exported rules match the active laptop exactly. Excluded private and
+unrelated system settings; no active desktop files changed or reloaded. Added
+integration guide and README/Pages links. Lua syntax, recording-only API tests,
+duplicate-key/path/privacy guards and site tests pass. Fresh compositor setup was
+not performed. Snapshot retains the edited source originals locally.
+
 # 2026-10-24 / Slide-only launcher, behind the rail
 
 Latest request: "make it smoother it looks very slow". Shortened launcher-only
