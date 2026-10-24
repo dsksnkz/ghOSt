@@ -10,6 +10,7 @@ in the repository, verify them, then copy only the affected files.
 | --- | --- | --- |
 | Entry and routing | `shell.qml`, `Desk.qml`, `Panel.qml`, `PanelContent.qml` | Native windows, shared desktop state, panel placement and page routing |
 | Launcher | `Launcher.qml`, `LauncherSearch.js` | UI/input/scrolling; separately testable catalogue ranking and command arguments |
+| Popup entrance | `Panel.qml`, `PanelContent.qml`, `PanelMotion.js` | Native launcher slides at full size below the rail; other popup transforms remain separate |
 | Settings navigation | `SettingsNavigation.js` | Stable page IDs, names, icons, grouping and pure layout calculations |
 | Settings pages | `SettingsPanel.qml`, `Settings.qml`, `settings_backend.py` | Page controls, bounded state refresh, and explicit system actions |
 | Wallpaper browsing | `WallpaperPicker.qml` | Dark image/folder browser, bounded thumbnails and selection preview; only confirmation emits an apply request |
@@ -39,6 +40,7 @@ QT_QUICK_BACKEND=software python3 scripts/verify_surface_compile.py
 python3 scripts/verify_wallpaper_picker.py
 node tests/test_rail_layout.cjs
 python3 scripts/verify_rail_layout.py
+python3 scripts/verify_launcher_motion.py
 ```
 
 The launcher verification uses preview mode: it does not execute typed commands

@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261023-rail-editor";
+export const assetVersion = "20261024-launcher-slide";
 export const views = {
   rail: {
     title: "Top rail",
@@ -27,9 +27,9 @@ export const views = {
   },
   launcher: {
     title: "App launcher",
-    description: "Find and open apps. Searches installed entries and keeps pinned favourites.",
-    file: "launcher.png", size: [1600, 820], crop: [605, 54, 392, 550],
-    maxWidth: 480, kind: "Desktop catalogue capture",
+    description: "Apps and commands. Slides down behind the rail without resizing.",
+    file: "launcher-slide.png", size: [560, 430], crop: [0, 68, 560, 328],
+    maxWidth: 560, kind: "Qt component render · sample command",
   },
   "sidebar-motion": {
     title: "Sidebar motion",

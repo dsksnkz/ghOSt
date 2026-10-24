@@ -82,7 +82,8 @@ Item {
         }
         return item.status();
     }
-    implicitHeight: body.implicitHeight + (popup.page === "calendar" ? 0 : popup.page === "launcher" ? 32 : 46)
+    // Keep the launcher frame full-size even before its Loader has completed.
+    implicitHeight: popup.page === "launcher" ? 328 : body.implicitHeight + (popup.page === "calendar" ? 0 : 46)
     focus: true
     Keys.onEscapePressed: {
         if (popup.page === "calendar" && pageLoader.item?.actionPage)
@@ -92,16 +93,17 @@ Item {
         else
             Desk.close();
     }
-    opacity: popup.reveal
+    // Launcher travels as a full-size window; other popups retain their motion.
+    opacity: popup.page === "launcher" ? 1 : popup.reveal
     transform: [
         Translate {
-            y: (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
+            y: popup.page === "launcher" ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
         },
         Scale {
             origin.x: Desk.panelOrigin
             origin.y: 0
-            xScale: popup.page === "calendar" ? 1 : .18 + .82 * popup.reveal
-            yScale: popup.page === "calendar" ? 1 : .1 + .9 * popup.reveal
+            xScale: popup.page === "calendar" || popup.page === "launcher" ? 1 : .18 + .82 * popup.reveal
+            yScale: popup.page === "calendar" || popup.page === "launcher" ? 1 : .1 + .9 * popup.reveal
         }
     ]
     Material {
@@ -189,7 +191,7 @@ Item {
                     session: sessionPage
                 })[popup.page] || null
             onLoaded: {
-                if (popup.page !== "calendar")
+                if (popup.page !== "calendar" && popup.page !== "launcher")
                     pageEntrance.restart();
                 else
                     pageLoader.opacity = 1;

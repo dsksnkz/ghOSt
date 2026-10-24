@@ -6,6 +6,7 @@ import Quickshell.Hyprland
 import Quickshell.Networking
 import Quickshell.Services.UPower
 import Quickshell.Wayland
+import "PanelMotion.js" as Motion
 
 PanelWindow {
     id: panelWindow
@@ -34,13 +35,14 @@ PanelWindow {
         });
     }
     Component.onCompleted: syncPanel()
-    margins.top: page === "calendar" ? 82 : 68
+    margins.top: Motion.topMargin(page, reveal, implicitHeight)
     margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - 398, Desk.panelX)))
     implicitWidth: page === "calendar" ? Math.floor(Math.min(screen.width * 733 / 1920, (screen.height - 100) * 1200 / 505)) : Math.min(page === "launcher" ? 560 : 392, screen.width - 12)
     implicitHeight: content.implicitHeight
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
-    WlrLayershell.layer: WlrLayer.Overlay
+    // The launcher emerges beneath the rail; other popups keep their layer.
+    WlrLayershell.layer: page === "launcher" ? WlrLayer.Top : WlrLayer.Overlay
     WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     color: "transparent"
     visible: opened || reveal > 0.001

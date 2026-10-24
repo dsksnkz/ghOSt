@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-24 / Launcher slides behind the rail without scaling
+
+Launcher native window now slides from above the screen to its existing y=68
+position at fixed full size; removed launcher content scaling/fades and fixed
+loader-initialization height. Launcher layer is below the rail. Existing 220ms
+curve, reduced-motion handling, keybinds and other-popup behavior retained.
+Actual Qt transform/render tests, launcher input, surface compile and all 76
+Python tests pass. Native layer/geometry checks confirm below-rail stacking and
+560×328 bounds from initial y=-328 to settled y=68. Snapshots retained; three
+runtime files deployed and named ghOSt reloaded. Safe motion captures and Pages
+launcher view updated. Fullscreen interaction not separately tested.
+[Behavior, verification and recovery](changes/2026-10-24-launcher-slide.md).
+
 ## 2026-10-23 / Darker Settings and draggable top-bar preview
 
 Darkened Settings surfaces while preserving light text, geometry and motion.

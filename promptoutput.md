@@ -606,6 +606,19 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-24 / Slide-only launcher, behind the rail
+
+Request: "super space app launcher animation should be the app launcher sliding from top to position without scale change"
+
+Follow-up: "make it spawn behind the top rail"
+
+Launcher now moves its full native window from above the screen to y=68 without
+scaling/fading; frame stays full-size while loading. Runs below the rail while
+other popup layers/animations and shortcuts stay unchanged. Existing duration,
+curve and reduced motion retained. Offscreen render/input, launcher regression,
+compile and 76 Python tests pass; native layers/geometry checked. Backups retained,
+three files deployed and running ghOSt reloaded. Safe captures/Pages updated.
+
 # 2026-10-23 / Dark Settings and visual top-bar editor
 
 Requests: "change the settings to a darker theme, and add a function in applications where it lets the user control which elements exist in the top bar, including its location."
