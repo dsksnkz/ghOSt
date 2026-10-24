@@ -1,5 +1,19 @@
 # ghOSt progress
 
+## 2026-10-24 / Reversible sans-serif trial and gentler emphasis
+
+Applied installed Adwaita Sans across ghOSt text and desktop UI font defaults,
+including meter/visual-lock typography; no downloads or package changes. Latest
+weight correction reduces Medium/DemiBold/Bold by 50 points, leaving regular and
+pre-existing Light text unchanged. Geometry, sizes, motion, icons, code/terminal
+fonts and unrelated preferences retained. Source/live originals and exact desktop
+preferences snapshotted, with a guarded restore helper. Shared labels deployed
+and named ghOSt reloaded; actual family and native rail inspected. All 81 Python
+tests and input/compile/launcher/rail/mock-lock/workspace logic checks pass. Some
+apps own their fonts or need reopening. Safe General/Applications/rail captures
+updated; old captures for other surfaces remain explicitly unrefreshed.
+[Scope, verification and recovery](changes/2026-10-24-font-trial.md).
+
 ## 2026-10-24 / Publish current scoped Hyprland integration
 
 Published portable ghOSt-only autostart/rules modules plus current screenshot,

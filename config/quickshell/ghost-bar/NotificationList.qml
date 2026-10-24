@@ -53,7 +53,7 @@ Flickable {
                         width: parent.width
                         text: modelData.summary
                         font.pixelSize: 11
-                        font.weight: Font.Bold
+                        font.weight: Theme.boldWeight
                         wrapMode: Text.Wrap
                         textFormat: Text.PlainText
                         elide: Text.ElideNone

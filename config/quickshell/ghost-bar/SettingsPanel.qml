@@ -332,7 +332,7 @@ Item {
             text: parent.title
             font.pixelSize: 13
             color: settings.secondaryInk
-            font.weight: Font.Medium
+            font.weight: Theme.mediumWeight
             visible: text !== ""
         }
     }
@@ -387,7 +387,7 @@ Item {
         }
         Label {
             x: 20; y: 52; width: parent.width - 40; height: 36
-            text: parent.value; font.pixelSize: 26; font.weight: Font.Medium
+            text: parent.value; font.pixelSize: 26; font.weight: Theme.mediumWeight
             color: settings.primaryInk
         }
         Label {
@@ -763,7 +763,7 @@ Item {
                 text: settings.displayHost
                 font.family: Theme.textFont
                 font.pixelSize: 16
-                font.weight: Font.Bold
+                font.weight: Theme.boldWeight
                 color: "#ffffff"
             }
             Label {
@@ -866,7 +866,7 @@ Item {
                             height: 18
                             text: modelData.name
                             font.pixelSize: 12
-                            font.weight: modelData.id === settings.page ? Font.Medium : Font.Normal
+                            font.weight: modelData.id === settings.page ? Theme.mediumWeight : Font.Normal
                             color: modelData.id === settings.page ? settings.primaryInk : "#d1d1d1"
                         }
                         SettingsToggle {
@@ -926,7 +926,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         text: settings.categories.find(c => c.id === settings.page)?.name || ""
                         font.pixelSize: 22
-                        font.weight: Font.Medium
+                        font.weight: Theme.mediumWeight
                         color: settings.primaryInk
                     }
                 }
@@ -996,7 +996,7 @@ Item {
                     text: settings.displayHost
                     font.family: Theme.textFont
                     font.pixelSize: 20
-                    font.weight: Font.Bold
+                    font.weight: Theme.boldWeight
                     color: "#ffffff"
                 }
                 Key {
@@ -1440,7 +1440,7 @@ Item {
             Label {
                 text: "PC name"
                 font.pixelSize: 16
-                font.weight: Font.Bold
+                font.weight: Theme.boldWeight
             }
             Controls.TextField {
                 id: nameInput

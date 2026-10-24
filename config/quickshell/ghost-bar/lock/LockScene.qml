@@ -15,7 +15,7 @@ FocusScope {
     property real reveal: credentialsVisible ? 1 : 0
     property real pointerTilt: 0
     readonly property real cursorTilt: reducedMotion ? 0 : pointerTilt * (1 - reveal)
-    readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
+    readonly property string fontFamily: Theme.font
     signal wakeRequested
     signal sleepRequested
     signal activity

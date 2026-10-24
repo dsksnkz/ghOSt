@@ -132,7 +132,7 @@ Item {
                 text: String(parent.workspace).padStart(2, "0")
                 font.family: Theme.font
                 font.pixelSize: 15
-                font.weight: Math.abs(parent.offset) < .5 ? Font.Bold : Font.Medium
+                font.weight: Math.abs(parent.offset) < .5 ? Theme.boldWeight : Theme.mediumWeight
                 color: Qt.rgba(parent.projection.ink / 255, parent.projection.ink / 255, parent.projection.ink / 255, 1)
             }
         }

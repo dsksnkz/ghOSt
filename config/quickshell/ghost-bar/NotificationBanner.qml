@@ -30,7 +30,7 @@ G2Surface {
             width: parent.width
             text: banner.notification?.summary || ""
             font.pixelSize: 12
-            font.weight: Font.Bold
+            font.weight: Theme.boldWeight
             textFormat: Text.PlainText
             wrapMode: Text.Wrap
             maximumLineCount: 2

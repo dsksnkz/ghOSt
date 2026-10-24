@@ -606,6 +606,21 @@ and compile pass. Three live files installed; ghOSt reload and parity verified.
 Unchanged-appearance screenshot recorded. No game, keybind, network, power-mode,
 driver or visual changes. Current Balanced profile preserved; backups retained.
 
+# 2026-10-24 / Font trial and modest weight reduction
+
+Request: "change the font to a macos like font for everything, lets see how it looks and if it looks bad ill reverse it"
+
+Correction: "some font weight is too high, not change the font weight to light but decrease by alittle"
+
+Trial uses installed Adwaita Sans across ghOSt and desktop font defaults; no Apple
+font/download/package install. Shared heavy weights reduced only 50 points,
+regular text unchanged. Kept sizes, layout, motion and icons; terminal/code font
+preferences untouched. Apps with custom typography may ignore defaults or need
+reopening. Shell and desktop preferences have private recovery snapshots and a
+guarded desktop restore script. Offscreen render/input, mock lock, launcher/rail,
+workspace logic and 81 Python tests pass. Native ghOSt family/rail inspected;
+source deployed and named instance reloaded. Safe captures and preview updated.
+
 # 2026-10-24 / Publish necessary Hyprland configuration
 
 Request: "update necessary hyprland config to github ghost"

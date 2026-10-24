@@ -24,6 +24,8 @@ not remote desktop controls. [62 monochrome SVG icons](docs/icons.md) are reusab
 
 Requires Arch Linux, Hyprland, Quickshell with networking/Bluetooth/PipeWire,
 Python 3 with GObject/Gio, and JetBrains Mono Nerd Font Mono.
+The current [reversible font trial](docs/changes/2026-10-24-font-trial.md) uses
+installed Adwaita Sans for UI text; original font assets remain available.
 Click sounds use Qt Multimedia (`qt6-multimedia`); hardware brightness uses
 `brightnessctl` where a writable backlight exists.
 The music rail uses installed `cava` for 15 background spectrum bars; no audio

@@ -139,7 +139,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: gauge.available ? Math.round(gauge.reading) + (gauge.metric === "processor" ? "" : "%") : "—"
                 font.pixelSize: 32
-                font.weight: Font.Medium
+                font.weight: Theme.mediumWeight
             }
 
             Label {

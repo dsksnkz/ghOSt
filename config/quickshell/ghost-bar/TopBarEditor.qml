@@ -42,7 +42,7 @@ Column {
     Label {
         text: "Top bar"
         font.pixelSize: 16
-        font.weight: Font.DemiBold
+        font.weight: Theme.demiWeight
         color: "#f1f1f1"
     }
     Label {

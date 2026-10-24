@@ -6,6 +6,10 @@ in the repository, verify them, then copy only the affected files.
 
 ## Main responsibilities
 
+`Theme.qml` owns the current UI family and emphasis-weight tokens. The temporary
+sans-serif trial also uses `scripts/desktop_font_trial.py` for opt-in local desktop
+defaults and guarded restore; it does not modify terminal/code fonts.
+
 Portable Hyprland integration snippets live in `config/hypr/ghost-*.lua`.
 [Integration guide](hyprland.md) explains optional modules and duplicate-binding
 avoidance. The historical `config/hypr/hyprland.lua` is not a deployment template.

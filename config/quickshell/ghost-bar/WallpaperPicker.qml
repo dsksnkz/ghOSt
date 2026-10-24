@@ -103,7 +103,7 @@ Controls.Popup {
             text: "Choose wallpaper"
             color: "#f2f2f2"
             font.pixelSize: 18
-            font.weight: Font.DemiBold
+            font.weight: Theme.demiWeight
         }
         Key {
             x: parent.width - 80

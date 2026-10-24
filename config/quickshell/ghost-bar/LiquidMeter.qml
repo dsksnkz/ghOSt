@@ -49,18 +49,6 @@ Item {
     onAvailableChanged: if (!useGpu) liquid.requestPaint()
     onUseGpuChanged: liquid.requestPaint()
 
-    FontLoader {
-        id: instrumentFace
-
-        source: "fonts/TurretRoad-Bold.ttf"
-    }
-
-    FontLoader {
-        id: valueFace
-
-        source: "fonts/TurretRoad-Medium.ttf"
-    }
-
     HoverHandler {
         id: hover
 
@@ -158,8 +146,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: meter.titleY
         text: meter.title
-        font.family: instrumentFace.name
-        font.weight: Font.Bold
+        font.family: Theme.font
+        font.weight: Theme.boldWeight
         font.pixelSize: 15
         color: meter.available && meter.titleY + 8 > meter.waterLine ? "#181818" : "#ffffff"
         // Only while a real wave crosses the glyphs: keep the reading legible.
@@ -171,8 +159,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: meter.valueY
         text: meter.available ? Math.round(meter.value).toString().padStart(2, "0") + meter.unit : "—"
-        font.family: valueFace.name
-        font.weight: Font.Medium
+        font.family: Theme.font
+        font.weight: Theme.mediumWeight
         font.pixelSize: meter.unit === "MHz" ? 12 : 15
         color: meter.available && meter.valueY + 8 > meter.waterLine ? "#181818" : "#ffffff"
         style: meter.available && meter.waterLine > y - 6 && meter.waterLine < y + height + 6 ? Text.Outline : Text.Normal

@@ -140,7 +140,7 @@ Item {
                         text: Qt.formatDateTime(bar.displayTime, "HH:mm")
                         font.family: Theme.font
                         font.pixelSize: 26
-                        font.weight: Font.Bold
+                        font.weight: Theme.boldWeight
                         color: "#ffffff"
                     }
                 }
@@ -236,7 +236,7 @@ Item {
                         height: 32
                         text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
                         font.pixelSize: 12
-                        font.weight: Font.Bold
+                        font.weight: Theme.boldWeight
                         color: "#ffffff"
                     }
                     SvgIcon {

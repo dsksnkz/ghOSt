@@ -10,7 +10,12 @@ QtObject {
     readonly property real railHeight: (46 + 18 * railOuterGapScale) * railVerticalScale
     // Reference coordinates stay fixed; the complete calendar scales together.
     readonly property real calendarScale: 1.12
-    readonly property string font: "JetBrainsMono Nerd Font Mono"
+    // Reversible sans-serif trial. Original bundled faces remain available.
+    readonly property string font: "Adwaita Sans"
+    // Keep emphasis, with a modest 50-point reduction for the sans-serif trial.
+    readonly property int mediumWeight: 450
+    readonly property int demiWeight: 550
+    readonly property int boldWeight: 650
     readonly property FontLoader jetRegular: FontLoader {
         source: "fonts/JetBrainsMono-Regular.ttf"
     }
@@ -27,7 +32,7 @@ QtObject {
         source: "fonts/JetBrainsMono-Bold.ttf"
     }
 
-    readonly property string textFont: jetRegular.name
+    readonly property string textFont: font
     readonly property color base: "#080808"
     readonly property color surface: "#101010"
     readonly property color raised: "#181818"

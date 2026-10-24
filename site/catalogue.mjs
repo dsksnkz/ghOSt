@@ -1,5 +1,5 @@
 // Capture coordinates stay fixed; the display scales them as a single unit.
-export const assetVersion = "20261024-launcher-150";
+export const assetVersion = "20261024-font-trial-650";
 export const views = {
   rail: {
     title: "Top rail",

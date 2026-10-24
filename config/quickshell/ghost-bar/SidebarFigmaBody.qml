@@ -218,7 +218,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: sidebar.previewMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
                 font.pixelSize: 14
-                font.weight: Font.Bold
+                font.weight: Theme.boldWeight
                 width: 34
                 height: 22
                 verticalAlignment: Text.AlignVCenter
@@ -361,7 +361,7 @@ Item {
                     text: "Wlan"
                     color: "#000000"
                     font.pixelSize: 14
-                    font.weight: Font.Bold
+                    font.weight: Theme.boldWeight
                 }
             }
             Flickable {
@@ -485,7 +485,7 @@ Item {
                         text: "Bluetooth"
                         color: "#111111"
                         font.pixelSize: 14
-                        font.weight: Font.Bold
+                        font.weight: Theme.boldWeight
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
