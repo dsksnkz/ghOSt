@@ -106,6 +106,9 @@ def capture():
                                    'gpu': 12 + 40 * smooth(index / 45), 'cpu': 18 + 30 * smooth(index / 45),
                                    'memory': 30 + 24 * smooth(index / 45)},
                       OUTPUT / 'calendar' / f'{index:04d}.png')
+            for index in range(5):
+                frame('calendar', {'elapsed': 1500, 'gpu': 52, 'cpu': 48, 'memory': 54, 'forecast': index},
+                      OUTPUT / 'forecast' / f'{index:04d}.png')
             for index in range(30):
                 frame('sidebar', {'reveal': smooth(index / 12), 'elapsed': index * 900 / 29},
                       OUTPUT / 'sidebar' / f'{index:04d}.png')

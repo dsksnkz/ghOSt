@@ -30,6 +30,21 @@ Each hit maps to the nearest frame (half-frame tolerance). Verified on the final
 encode: all 38 kicks and claps produce a visible change on their nearest frame,
 median 0 ms and worst 8.3 ms from the audio onset.
 
+## Style rules (from review)
+
+- Text is plain: pure white (black on light fields), drawn on a final clean layer
+  after grain and colour, never scaled, split or flashed.
+- No per-beat camera punches or colour splits. Beats land as clean events:
+  cuts, cursor clicks, page changes, callouts landing, elements arriving.
+- Features are demonstrated, not described: a cursor scrolls the workspace wheel,
+  clicks the clock (calendar opens), scrolls the forecast, opens media from the
+  rail and drags seek, opens the sidebar from the menu and drags volume, and
+  clicks through Settings.
+
+Sync check (block-based, so local events count): 36/38 hits detected on the
+20 s cut, median 2.5 ms; the other two (callout landing at 5.275 s, password and
+callout at 16.475 s) were confirmed on the frames by eye.
+
 ## Detail layers
 
 Every scene sits on a dimmed, drifting composite of the real desktop (wallpaper

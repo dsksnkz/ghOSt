@@ -88,6 +88,8 @@ ShellRoot {
                 } else if (scene === "calendar") {
                     calendar.elapsed = state.elapsed ?? 1500;
                     calendar.order = [2, 0, 4, 1, 3, 5];
+                    if (state.forecast !== undefined)
+                        calendar.selectForecast(state.forecast);
                     calendar.readings = {
                         gpu: state.gpu ?? 34, cpu: state.cpu ?? 22,
                         memory: state.memory ?? 46, processor: 2800, maximum: 4600
