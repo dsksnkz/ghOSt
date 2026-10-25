@@ -15,7 +15,7 @@ PanelWindow {
     property bool managedFocus: false
     property string page: ""
     property bool opened: false
-    property real reveal: opened ? 1 : 0
+    property real reveal: revealGate.open ? 1 : 0
 
     function syncPanel() {
         const show = Desk.panel !== "" && Desk.panel !== "calendar" && Desk.panelScreen === screen.name;
@@ -75,6 +75,11 @@ PanelWindow {
         }
     }
 
+    // Start the motion after the window has mapped and built its content.
+    RevealGate {
+        id: revealGate
+        target: panelWindow.opened
+    }
     PanelContent {
         id: content
 

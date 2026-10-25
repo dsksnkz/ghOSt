@@ -10,7 +10,13 @@ PanelWindow {
     property var peers: []
     property bool managedFocus: false
     property bool opened: false
-    property real reveal: opened ? 1 : 0
+    property real reveal: revealGate.open ? 1 : 0
+
+    // Start the motion after the window has mapped and built its content.
+    RevealGate {
+        id: revealGate
+        target: sidebar.opened
+    }
     readonly property real screenScale: screen.width / 1920
     // Center vertically on the display while preserving uniform enlargement.
     readonly property real designScale: Math.min(screenScale * 1.15, (screen.width - 32) / 356, Math.max(1, screen.height - 28) / 794)

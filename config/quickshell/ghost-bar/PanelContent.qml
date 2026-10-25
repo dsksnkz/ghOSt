@@ -101,7 +101,7 @@ Item {
     opacity: slides ? 1 : popup.reveal
     transform: [
         Translate {
-            y: popup.page === "media" ? Motion.slideOffset(popup.page, popup.reveal, content.height) : content.slides ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
+            y: content.slides ? Motion.slideOffset(popup.page, popup.reveal, content.height) : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
         },
         Scale {
             origin.x: Desk.panelOrigin

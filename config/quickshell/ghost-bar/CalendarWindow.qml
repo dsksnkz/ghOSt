@@ -35,7 +35,13 @@ PanelWindow {
             window.sync();
         }
     }
-    property real reveal: opened ? 1 : 0
+    property real reveal: revealGate.open ? 1 : 0
+
+    // Start the motion after the window has mapped and built its content.
+    RevealGate {
+        id: revealGate
+        target: window.opened
+    }
     readonly property real designScale: screen.width / 1920
     anchors {
         top: true
@@ -106,7 +112,8 @@ PanelWindow {
         CalendarPanel {
             id: calendar
             anchors.fill: parent
-            active: window.opened
+            // Subframe reveal and telemetry begin with the frame motion, not during window setup.
+            active: window.opened && revealGate.open
             onNavigateRequested: page => {
                 if (page === "launcher") {
                     search.active = true;

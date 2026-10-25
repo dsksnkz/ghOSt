@@ -148,10 +148,20 @@ ShellRoot {
             }
         }
     }
+    FrameProbe {
+        id: frameProbe
+    }
     IpcHandler {
         target: "bar"
         function reload(): void {
             Quickshell.reload(false);
+        }
+        // Read-only frame pacing: arm, perform the action, then read the stats.
+        function frameStart(): void {
+            frameProbe.start();
+        }
+        function frameStop(): string {
+            return frameProbe.stop();
         }
         function intro(): void { introWindow.open(); }
         function captureIntro(path: string): void { introWindow.capture(path); }

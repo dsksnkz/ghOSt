@@ -1,5 +1,12 @@
 prompts outputs here
 
+## 2026-10-25 / Animation pass
+
+User: "still jittery, feels low on fps. also review all animations ... at least
+60fps". Root cause measured (setup frames at animation start); gated reveals and
+still-window launcher deployed. Calendar deferral pending deployment (CS2 running).
+Record: docs/changes/2026-10-25-animation-pass.md.
+
 ## 2026-10-25 / Media slide jitter
 
 User: "its jittery, fix". Slide moved from per-frame window margins to a

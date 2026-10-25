@@ -184,11 +184,10 @@ Item {
     onActiveChanged: {
         if (active) {
             beginReveal();
-            if (!fixtureMode) {
-                telemetry.running = true;
-                weatherProcess.running = true;
-            }
+            if (!fixtureMode)
+                serviceStart.restart();
         } else {
+            serviceStart.stop();
             entrance.stop();
             weatherTransition.stop();
             weatherBlur = 0;
@@ -207,10 +206,18 @@ Item {
         syncWeatherHeadline();
         if (active) {
             beginReveal();
-            if (!fixtureMode) {
-                telemetry.running = true;
-                weatherProcess.running = true;
-            }
+            if (!fixtureMode)
+                serviceStart.restart();
+        }
+    }
+    // Spawning the sampling processes costs a long frame; start them after
+    // the window's 260 ms reveal so the opening motion is not interrupted.
+    Timer {
+        id: serviceStart
+        interval: 300
+        onTriggered: if (cal.active && !cal.fixtureMode) {
+            telemetry.running = true;
+            weatherProcess.running = true;
         }
     }
     SequentialAnimation {

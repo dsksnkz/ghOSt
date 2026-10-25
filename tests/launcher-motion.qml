@@ -26,7 +26,8 @@ ShellRoot {
                 previewMode: true
                 width: 560
                 height: implicitHeight
-                y: Motion.topMargin(popup.page, popup.reveal, implicitHeight)
+                // Window top plus the lead under the rail; content slides inside it.
+                y: Motion.topMargin(popup.page, popup.reveal, implicitHeight) + Motion.windowLead(popup.page)
             }
             function test_motion() {
                 try { checkMotion(); }
@@ -47,7 +48,7 @@ ShellRoot {
                     compare(panel.transform[1].xScale, 1);
                     compare(panel.transform[1].yScale, 1);
                     compare(panel.opacity, 1);
-                    compare(panel.transform[0].y, 0);
+                    fuzzyCompare(panel.transform[0].y, Motion.slideOffset("launcher", amount, height), .001);
                     const start = panel.mapToItem(test, 0, 0);
                     const end = panel.mapToItem(test, panel.width, panel.height);
                     compare(end.x - start.x, 560);
@@ -88,6 +89,9 @@ ShellRoot {
                 compare(panel.transform[0].y, Motion.slideOffset("media", .37, panel.height));
                 popup.reveal = 1;
                 compare(panel.transform[0].y, 0);
+                for (const amount of [0, .5, 1])
+                    compare(Motion.topMargin("launcher", amount, height), 0);
+                compare(Motion.windowLead("launcher"), 68);
                 console.info("PASS: launcher slides from above screen to y68 at constant 560x328, no fade or scale; other popup motion retained");
             }
         }

@@ -1,5 +1,14 @@
 # ghOSt progress
 
+## 2026-10-25 / Animation smoothness pass — calendar part pending
+
+Measured live: motion already ~200 fps; jank was 20–68 ms setup frames at
+animation start. Added RevealGate (popups, calendar, sidebar, toasts), moved the
+launcher to a still-window slide, and added read-only frame-probe IPC. Deployed
+and re-measured: clean in motion except the calendar. Its process-start deferral
+is in source only, because CS2 started.
+[Record](changes/2026-10-25-animation-pass.md).
+
 ## 2026-10-25 / Smooth media popup slide
 
 Fixed jitter: the media window no longer moves; its content slides by a
