@@ -31,10 +31,14 @@ The rail no longer has a volume element. Hover anywhere along either left/right
 edge for0.2seconds to reveal the existing OSD on that side. The active region is2px
 wide and covers the full height. The OSD centers at the pointer's height when
 the dwell completes, clamped near the top/bottom to stay on-screen. It then stays
-fixed and visible while the cursor remains at that edge, with no vertical tracking
-or inactivity timeout. Leaving the edge closes it; returning starts a new dwell.
+fixed and visible without vertical tracking or inactivity timeout. Once open,
+the retention area extends72px inward from the edge and includes the OSD card.
+Moving between those areas has100ms exit grace; moving away from both closes it.
+Returning after it closes starts a new dwell. The inactive trigger remains2px.
 Fullscreen outputs disable the edge targets.
 Hovering alone never changes volume. Scrolling changes volume in2% steps only
-after the dwell. Clicks/wheel events do not bypass the wait. Hardware volume and
+after the dwell, in the expanded edge area or over the OSD. Fill and percentage
+animate over120ms; dragging is immediate and reduced motion disables interpolation.
+Clicks/wheel events do not bypass the wait. Hardware volume and
 brightness keys retain their usual touch/drag OSD and2.2second timeout. The menu
 button still opens the sidebar; edges never do.

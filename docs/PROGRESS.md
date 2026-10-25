@@ -1,5 +1,17 @@
 # ghOSt progress
 
+## 2026-10-25 / Forgiving OSD hover range and animated volume scrolling
+
+An open edge OSD now retains a 72px inward range, its own card hover and active
+slider drag, with 100ms exit grace to bridge input surfaces. Dormant activation
+remains a 2px full-height strip with 200ms dwell and fixed spawn height. Mask
+subtracts the OSD card so expanded edge input does not block its slider/wheel.
+Scroll works over the edge range and popup in 2% steps; fill/percentage interpolate
+for 120ms, disabled during dragging and reduced motion. No idle animation/polling.
+Nonvisual production hold/release tests and compile pass; modules deployed and
+reload logs clean. No physical cursor/game/audio tests or captures during gaming.
+[Details and recovery](changes/2026-10-25-osd-range.md).
+
 ## 2026-10-25 / Edge dwell reduced to0.2s
 
 Changed only activation delay from500ms to200ms, plus matching help/tests. Fixed

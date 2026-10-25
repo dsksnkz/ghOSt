@@ -40,6 +40,7 @@ try:
         volume = state()['amount']
         for target_y in (10, 50, height // 2 - 90, height // 2 + 90, height - 10):
             move(x + width // 2, y + height // 2)
+            time.sleep(.15)
             assert not state()['edgeHeld'], 'Leaving the edge did not release the OSD'
             move(edge_x, y + target_y)
             assert not state()['edgeHeld'], 'OSD bypassed the 0.2s dwell'
@@ -64,6 +65,7 @@ try:
             time.sleep(2.4)
             assert state()['opened'], 'OSD expired while the pointer remained at the edge'
         move(x + width // 2, y + height // 2)
+        time.sleep(.15)
         assert not state()['opened'], 'OSD did not close after leaving edge'
     print('PASS: native full-height 0.2s dwell, fixed origin, edge hold/release and unchanged volume')
 finally:

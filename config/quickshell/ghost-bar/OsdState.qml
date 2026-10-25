@@ -15,6 +15,7 @@ Singleton {
     // Screen-local logical Y. Negative means a non-pointer/keyboard OSD.
     property real pointerY: -1
     property bool edgeHeld: false
+    property bool cardHovered: false
     property var brightness: null
     property int lastBrightness: -1
     property real pendingBrightness: 0
@@ -34,6 +35,7 @@ Singleton {
         if (!ownsEdge(targetScreen, side))
             return;
         edgeHeld = false;
+        cardHovered = false;
         opened = false;
         expiry.stop();
     }

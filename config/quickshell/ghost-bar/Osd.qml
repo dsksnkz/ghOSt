@@ -23,6 +23,11 @@ PanelWindow {
         }
     }
     property real reveal: opened ? 1 : 0
+    property real animatedAmount: OsdState.amount
+    Behavior on animatedAmount {
+        enabled: window.opened && !slider.pressed && !Theme.reducedMotion
+        NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+    }
 
     visible: opened || reveal > 0.001
     implicitWidth: 80
@@ -54,6 +59,12 @@ PanelWindow {
         border.width: 1
         scale: 0.4 + 0.6 * window.reveal
         opacity: window.reveal
+        HoverHandler {
+            onHoveredChanged: {
+                if (window.screen.name === OsdState.screenName)
+                    OsdState.cardHovered = hovered;
+            }
+        }
 
         SvgIcon {
             x: 10
@@ -93,7 +104,7 @@ PanelWindow {
                 G2Surface {
                     anchors.bottom: parent.bottom
                     width: parent.width
-                    height: parent.height * slider.position
+                    height: parent.height * Math.max(0, Math.min(1, window.animatedAmount / 100))
                     radius: 9
                     color: "#c6c6c6"
                 }
@@ -112,8 +123,17 @@ PanelWindow {
             y: 255
             width: 44
             horizontalAlignment: Text.AlignHCenter
-            text: OsdState.available ? Math.round(OsdState.amount) + "%" : "—"
+            text: OsdState.available ? Math.round(window.animatedAmount) + "%" : "—"
             font.pixelSize: 14
+        }
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.NoButton
+            onWheel: event => {
+                if (OsdState.available)
+                    OsdState.move(EdgeVolume.step(OsdState.amount, event.angleDelta.y));
+                event.accepted = true;
+            }
         }
     }
 

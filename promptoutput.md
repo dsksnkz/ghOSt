@@ -1,5 +1,18 @@
 prompts outputs here
 
+## 2026-10-25 / OSD exit range and animated scroll volume
+
+User: "make the it only dissapear after leaving the range abit more, and scroll
+to change volume with osd animations". Open retention extends 72px inward and
+includes popup hover/active slider drag, with 100ms exit grace. Inactive trigger
+stays 2px and 0.2s; spawn height remains latched. Input-mask cutout preserves OSD
+controls. Wheel works over expanded edge or popup, 2% steps, with 120ms fill and
+number animation; reduced motion/drag are immediate. Production nonvisual state
+tests cover release grace and quick reentry; pure geometry/search tests and
+surface compile pass. Deployed exact modules; clean reload logs. No native
+pointer/game/volume manipulation or screenshots. Native interaction/visual
+verification remains pending normal use. Record: docs/changes/2026-10-25-osd-range.md.
+
 ## 2026-10-25 / Dwell0.2seconds
 
 User: "change the time to 0.2s." Updated EdgeHold.dwellMs to200, matching Intro

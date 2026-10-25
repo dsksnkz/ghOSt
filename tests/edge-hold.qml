@@ -44,14 +44,22 @@ ShellRoot {
             OsdState.releaseEdge("fixture", "right");
             verify(OsdState.opened);
             edge.hovered = false;
+            wait(40);
+            verify(OsdState.edgeHeld && OsdState.opened);
+            edge.hovered = true;
+            wait(120);
+            compare(activations.count, 1);
+            compare(OsdState.pointerY, 450);
+            edge.hovered = false;
+            tryCompare(OsdState, "opened", false, 300);
             compare(OsdState.edgeHeld, false);
-            compare(OsdState.opened, false);
 
             edge.pointerY = 700;
             edge.hovered = true;
             tryCompare(edge, "latched", true, 700);
             compare(OsdState.pointerY, 700);
             edge.hovered = false;
+            tryCompare(OsdState, "opened", false, 300);
             OsdState.show("volume", "fixture");
             verify(!OsdState.edgeHeld && OsdState.opened);
             compare(OsdState.pointerY, -1);
