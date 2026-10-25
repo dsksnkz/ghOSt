@@ -40,6 +40,15 @@ def prepare_runtime():
             raise RuntimeError('MediaPanel changed: review the sample-data adapter')
         text = text.replace(old, new)
     media.write_text(text)
+    # The rail's music element shows the same sample track.
+    bar = runtime / 'MusicBar.qml'
+    text = bar.read_text()
+    for old, new in (('readonly property var player: Desk.player', 'readonly property var player: ' + SAMPLE_TRACK),
+                     ('readonly property bool playing: Desk.playing', 'readonly property bool playing: true')):
+        if old not in text:
+            raise RuntimeError('MusicBar changed: review the sample-data adapter')
+        text = text.replace(old, new)
+    bar.write_text(text)
     spectrum = runtime / 'AudioSpectrum.qml'
     spectrum.write_text(spectrum.read_text().replace(
         'property var levels: Array(barCount).fill(0)',
@@ -100,7 +109,8 @@ def capture():
             for index in range(30):
                 frame('sidebar', {'reveal': smooth(index / 12), 'elapsed': index * 900 / 29},
                       OUTPUT / 'sidebar' / f'{index:04d}.png')
-            for page in ('general', 'network', 'sound', 'wallpaper', 'battery', 'about'):
+            for page in ('general', 'network', 'bluetooth', 'sound', 'brightness', 'notifications', 'battery',
+                         'storage', 'applications', 'accessibility', 'about'):
                 frame('settings', {'page': page}, OUTPUT / f'settings-{page}.png')
             frame('media', {}, OUTPUT / 'media.png')
             print('Captured rail, wheel, calendar, sidebar, settings and media frames', flush=True)

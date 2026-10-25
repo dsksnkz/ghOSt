@@ -30,6 +30,17 @@ Each hit maps to the nearest frame (half-frame tolerance). Verified on the final
 encode: all 38 kicks and claps produce a visible change on their nearest frame,
 median 0 ms and worst 8.3 ms from the audio onset.
 
+## Detail layers
+
+Every scene sits on a dimmed, drifting composite of the real desktop (wallpaper
+plus rail, and the panels where relevant). Feature callouts point at measured
+positions inside the captures (`RAIL_POINTS`, `CAL_POINTS`, `MEDIA_POINTS`,
+`SIDE_POINTS`, `SDDM_POINTS`) and draw in on the hits; magnifier lenses show the
+workspace wheel, clock and status area; gauge values count up; a frame-time trace
+shows the measured 5.1 ms frame interval; the open-source section scrolls the
+project's real commit subjects. A HUD frame carries the section, timecode, bar
+count and progress.
+
 ## Sequence
 
 | Time | Bar | Content |

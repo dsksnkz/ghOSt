@@ -284,57 +284,168 @@ def scan_reveal(canvas, real, ray, position, width, band=160):
     return out
 
 
-# ── scenes ──────────────────────────────────────────────────────────────────
+# ── detail layers ───────────────────────────────────────────────────────────
 GHOST = 'ghost-mark.png'
 OUTLINE = 'ghost-outline.png'
+MUTED = (140, 140, 138)
+
+# Feature anchors, in 1× component coordinates (measured from the captures).
+RAIL_POINTS = {'menu': (45, 27), 'workspaces': (172, 27), 'music': (410, 27), 'clock': (960, 27),
+               'status': (1765, 27), 'power': (1897, 27)}
+CAL = (918, 425)
+CAL_POINTS = {'forecast': (150, 300), 'weather': (110, 185), 'gauges': (460, 210), 'month': (750, 260),
+              'header': (150, 55)}
+MEDIA_POINTS = {'art': (58, 90), 'title': (200, 66), 'seek': (196, 156), 'play': (196, 216)}
+SIDE_POINTS = {'clock': (70, 75), 'network': (113, 166), 'bluetooth': (300, 166), 'sliders': (209, 437)}
 
 
+@lru_cache(maxsize=1)
+def wallpaper():
+    with Image.open(Path.home() / 'Documents/ghostpaper.png') as source:
+        return source.convert('RGBA').resize((1920, 1080), Image.Resampling.LANCZOS)
+
+
+@lru_cache(maxsize=4)
+def desktop(kind='rail'):
+    """Flat composite of the real desktop: wallpaper, rail and optional panels."""
+    plate = wallpaper().copy()
+    if kind in ('full', 'panels'):
+        plate.alpha_composite(scaled('sidebar/0029.png', 410), (16, 82))
+        plate.alpha_composite(scaled('calendar/0045.png', 918), ((1920 - 918) // 2, 82))
+        plate.alpha_composite(scaled('media.png', 392), (1450, 68))
+    plate.alpha_composite(scaled('rail.png', 1920), (0, 0))
+    return plate
+
+
+@lru_cache(maxsize=6)
+def backdrop_image(kind, dim, blur):
+    from PIL import ImageFilter
+    image = desktop(kind).resize((round(W * 1.12), round(H * 1.12)), Image.Resampling.BILINEAR)
+    if blur:
+        image = image.filter(ImageFilter.GaussianBlur(blur))
+    shade = Image.new('RGBA', image.size, BLACK + (round(255 * dim),))
+    image.alpha_composite(shade)
+    return image
+
+
+def backdrop(canvas, t, kind='full', dim=.78, blur=6, drift=1.0):
+    image = backdrop_image(kind, dim, blur)
+    x = -(image.width - W) / 2 + math.sin(t * .35) * 40 * drift
+    y = -(image.height - H) / 2 + math.cos(t * .27) * 22 * drift
+    canvas.alpha_composite(image, (round(x), round(y)))
+
+
+@lru_cache(maxsize=2)
+def desktop_xray(color):
+    return xray_frame(desktop('full'), color)
+
+
+def hud(canvas, t, section, color=WHITE):
+    """Thin frame, section name, timecode and progress: the engineered layer."""
+    draw = ImageDraw.Draw(canvas)
+    edge = color + (46,)
+    draw.rectangle([36, 36, W - 36, H - 36], outline=edge, width=1)
+    put_text(canvas, 'ghOSt / ' + section, 18, (56, 62), color, mono=True, anchor='left', tracking=1)
+    seconds = t
+    put_text(canvas, f'{int(seconds // 60):02d}:{seconds % 60:05.2f}', 18, (W - 160, 62), color, mono=True,
+             anchor='left')
+    progress = t / DURATION
+    draw.rectangle([36, H - 38, 36 + (W - 72) * progress, H - 36], fill=color + (150,))
+    bar = sum(1 for start in BARS if start <= t + .5 / FPS)
+    put_text(canvas, f'bar {bar:02d}  144 bpm', 18, (56, H - 62), color, mono=True, anchor='left', alpha=.55)
+
+
+def callout(canvas, t, start, anchor, label, sub='', dx=120, dy=-60, color=WHITE):
+    """A dot on a real feature, a leader line drawn in, then its label."""
+    if t < start:
+        return
+    grow = ease((t - start) / .22)
+    draw = ImageDraw.Draw(canvas)
+    ax, ay = anchor
+    ex, ey = ax + dx * min(1, grow * 1.6), ay + dy * min(1, grow * 1.6)
+    draw.ellipse([ax - 5, ay - 5, ax + 5, ay + 5], fill=color + (255,))
+    draw.ellipse([ax - 11, ay - 11, ax + 11, ay + 11], outline=color + (120,), width=1)
+    draw.line([(ax, ay), (ex, ey)], fill=color + (220,), width=2)
+    if grow > .55:
+        length = 30 + 0 * len(label)
+        direction = 1 if dx >= 0 else -1
+        tx = ex + direction * length * ease((grow - .55) / .45)
+        draw.line([(ex, ey), (tx, ey)], fill=color + (220,), width=2)
+        alpha = ease((grow - .6) / .4)
+        title = text_image(label, 30, color, 'Bold')
+        note = text_image(sub, 19, MUTED, 'Black', True) if sub else None
+        span = max(title.width, note.width if note else 0)
+        lx = tx + 12 if direction > 0 else tx - 12 - span
+        lx = min(W - 60 - span, max(60, lx))
+        put_text(canvas, label, 30, (lx, ey - 6), color, weight='Bold', anchor='left', alpha=alpha)
+        if sub:
+            put_text(canvas, sub, 19, (lx + 1, ey + 26), MUTED, mono=True, anchor='left', alpha=alpha)
+
+
+def lens(canvas, t, start, image, box, center, width, label='', color=WHITE):
+    """Magnified crop of a real component, popping in on a hit."""
+    if t < start:
+        return
+    pop = ease((t - start) / .2)
+    x0, y0, x1, y1 = box
+    crop = image.crop((round(x0), round(y0), round(x1), round(y1)))
+    height = round(width * crop.height / crop.width)
+    scale = .7 + .3 * pop
+    w, h = max(2, round(width * scale)), max(2, round(height * scale))
+    zoomed = crop.resize((w, h), Image.Resampling.LANCZOS)
+    frame = Image.new('RGBA', (w + 12, h + 12), (0, 0, 0, 0))
+    mask = Image.new('L', (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], 14, fill=255)
+    tile = Image.new('RGBA', (w, h), (12, 12, 13, 255))
+    tile.alpha_composite(zoomed)
+    frame.paste(tile, (6, 6), mask)
+    ImageDraw.Draw(frame).rounded_rectangle([5, 5, w + 6, h + 6], 15, outline=color + (230,), width=2)
+    if pop < 1:
+        frame.putalpha(frame.getchannel('A').point(lambda v: round(v * pop)))
+    cx, cy = center
+    canvas.alpha_composite(frame, (round(cx - frame.width / 2), round(cy - frame.height / 2)))
+    if label:
+        put_text(canvas, label, 20, (cx - frame.width / 2 + 6, cy + frame.height / 2 + 24), color, mono=True,
+                 anchor='left', alpha=pop, tracking=1)
+
+
+@lru_cache(maxsize=1)
+def commits():
+    output = subprocess.run(['git', '-C', str(ROOT), 'log', '--format=%s', '-n', '60'],
+                            capture_output=True, text=True).stdout.splitlines()
+    return [line[:70] for line in output if line.strip()]
+
+
+def commit_wall(canvas, t, color, alpha=70):
+    lines = commits()
+    offset = (t * 90) % 44
+    for row in range(-1, 27):
+        text = lines[(row + int(t * 90 // 44)) % len(lines)]
+        put_text(canvas, text, 22, (80 + (row % 3) * 620, 40 + row * 44 - offset), color, mono=True,
+                 anchor='left', alpha=alpha / 255)
+
+
+# ── scenes ──────────────────────────────────────────────────────────────────
 def intro(t):
     canvas = background()
-    dot_field(canvas, t, alpha=int(18 + 20 * ease(t / 1.9)), drift=30)
-    # Mono statement, typed out.
+    ray = desktop_xray((90, 90, 92))
+    scan = 1920 * ease_io(t / 1.9)
+    layer = ray.copy()
+    layer.putalpha(layer.getchannel('A').point(lambda v: round(v * .55)))
+    canvas.alpha_composite(layer)
+    draw = ImageDraw.Draw(canvas)
+    draw.rectangle([scan - 2, 0, scan + 2, H], fill=BLUE + (170,))
+    draw.rectangle([0, 470, W, 610], fill=BLACK + (235,))
     line = 'every rice looks the same.'
     shown = line[:int(len(line) * ease_io((t - .15) / .9))]
     if shown:
         put_text(canvas, shown, 54, (960, 540), WHITE, mono=True, alpha=1 - since(t, 1.25, .25))
-    # The ghost appears in x-ray, scanning, as the build rises.
     if t > 1.15:
         grow = ease((t - 1.15) / .8)
-        ray = xray(OUTLINE, 520, WHITE)
-        card(canvas, ray, 360 + 260 * grow, (960, 540), roll=-8 * (1 - grow), opacity=grow)
-        if t > 1.5:
-            band = 960 - 300 + 600 * ease((t - 1.5) / .45)
-            draw = ImageDraw.Draw(canvas)
-            draw.rectangle([band - 2, 0, band + 2, H], fill=BLUE + (int(200 * grow),))
+        card(canvas, xray(OUTLINE, 520, WHITE), 360 + 260 * grow, (960, 540), roll=-8 * (1 - grow), opacity=grow)
     zoom = 1 + .06 * ease_io((t - 1.2) / .76)
     whiteout = max(0.0, (t - 1.70) / .26)
     return finish(canvas, t, zoom, WHITE, min(1, whiteout) * .45)
-
-
-def identity(t):
-    start = BARS[0]
-    inverted = count(t, KICKS[1:2]) % 2 == 1
-    blue = t >= CLAPS[0]
-    bg = BLUE if blue else (BLACK if inverted else WHITE)
-    fg = WHITE if (inverted or blue) else BLACK
-    canvas = background(bg)
-    if not blue:
-        dot_field(canvas, t, alpha=20)
-    punch = pulse(t, KICKS[:4] + CLAPS[:1], .3)
-    mark = scaled(GHOST, 260) if fg == WHITE else _dark_mark()
-    words = 'ghOSt'
-    if t >= KICKS[2]:
-        words = 'is here.'
-    size = 300
-    put_text(canvas, words, size, (1040, 520), fg, scale=1 + .22 * punch)
-    if t < KICKS[2]:
-        canvas.alpha_composite(mark, (160, 520 - mark.height // 2 - 10))
-    sub = 'a desktop shell for Hyprland' if t >= CLAPS[0] else ''
-    if sub:
-        put_text(canvas, sub, 40, (1040, 760), fg, weight='Medium', alpha=since(t, CLAPS[0], .12))
-    split = int(14 * pulse(t, KICKS[:1], .25))
-    zoom = 1 + .05 * punch
-    return finish(canvas, t, zoom, BLACK, .0, split)
 
 
 @lru_cache(maxsize=1)
@@ -345,22 +456,38 @@ def _dark_mark():
     return Image.fromarray(array, 'RGBA')
 
 
-# Desktop plate geometry (1920 × 1080 design space).
-PLATE = (1920, 1080)
+def identity(t):
+    inverted = count(t, KICKS[1:2]) % 2 == 1
+    blue = t >= CLAPS[0]
+    bg = BLUE if blue else (BLACK if inverted else WHITE)
+    fg = WHITE if (inverted or blue) else BLACK
+    canvas = background(bg)
+    # A faint x-ray of the real desktop drifts behind the wordmark.
+    ray = desktop_xray(fg)
+    layer = ray.resize((round(W * 1.25), round(H * 1.25)), Image.Resampling.BILINEAR)
+    layer.putalpha(layer.getchannel('A').point(lambda v: round(v * .22)))
+    canvas.alpha_composite(layer, (round(-200 - (t - BARS[0]) * 60), -130))
+    punch = pulse(t, KICKS[:4] + CLAPS[:1], .3)
+    mark = scaled(GHOST, 260) if fg == WHITE else _dark_mark()
+    words = 'is here.' if t >= KICKS[2] else 'ghOSt'
+    put_text(canvas, words, 300, (1040, 520), fg, scale=1 + .22 * punch)
+    if t < KICKS[2]:
+        canvas.alpha_composite(mark, (160, 520 - mark.height // 2 - 10))
+    if t >= CLAPS[0]:
+        put_text(canvas, 'a desktop shell for Hyprland', 44, (1040, 760), fg, weight='Medium',
+                 alpha=since(t, CLAPS[0], .12))
+        put_text(canvas, 'built in QML on Quickshell', 22, (1040, 830), fg, mono=True, alpha=.7 * since(t, CLAPS[0], .2))
+    split = int(14 * pulse(t, KICKS[:1], .25))
+    return finish(canvas, t, 1 + .05 * punch, BLACK, .0, split)
+
+
 LAYERS = [
-    ('wallpaper', (0, 0, 1920, 1080)),
-    ('sidebar', (16, 82, 410, 914)),
-    ('calendar', ((1920 - 918) // 2, 82, 918, 425)),
-    ('media', (1450, 68, 392, 262)),
-    ('rail', (0, 0, 1920, 50)),
+    ('wallpaper', (0, 0, 1920, 1080), 'your image, untouched'),
+    ('sidebar', (16, 82, 410, 914), 'network  bluetooth  sound'),
+    ('calendar', ((1920 - 918) // 2, 82, 918, 425), 'weather  system  month'),
+    ('media', (1450, 68, 392, 262), 'now playing'),
+    ('rail', (0, 0, 1920, 50), 'workspaces  music  clock'),
 ]
-
-
-@lru_cache(maxsize=1)
-def wallpaper():
-    with Image.open(Path.home() / 'Documents/ghostpaper.png') as source:
-        image = source.convert('RGBA').resize((1920, 1080), Image.Resampling.LANCZOS)
-    return image
 
 
 def layer_image(name, width, ray=False, color=BLUE):
@@ -374,19 +501,16 @@ def layer_image(name, width, ray=False, color=BLUE):
 
 
 def xray_stack(t):
-    start = BARS[1]
     canvas = background()
     dot_field(canvas, t, alpha=22, drift=-20)
     tilt = since(t, KICKS[3], .35)
     explode = since(t, KICKS[4], .45)
     ray_on = t >= CLAPS[1]
+    accent = BLUE if t < CLAPS[2] else LIME
     yaw = -24 * tilt + 5 * since(t, KICKS[6], .5) - 5 * since(t, KICKS[7], .5)
-    pitch = 50 * tilt
-    roll = 24 * tilt
-    rot = rotation(yaw, pitch, roll)
+    rot = rotation(yaw, 50 * tilt, 24 * tilt)
     scale = 1 - .42 * tilt
     separation = 130 * explode
-    # Keep the whole projected stack centred in the frame.
     pw, ph = 1920 * scale, 1080 * scale
     probe = []
     for depth in (0, len(LAYERS) - 1):
@@ -398,200 +522,244 @@ def xray_stack(t):
     center = (960 - middle[0], 470 - middle[1])
     labels = []
     band_x = -200 + 2600 * ease_io((t - CLAPS[1]) / .9) if ray_on else -9999
-    for depth, (name, rect) in enumerate(LAYERS):
+    for depth, (name, rect, sub) in enumerate(LAYERS):
         x, y, w, h = rect
         rect = (x * scale, y * scale, w * scale, h * scale)
-        plate = (pw, ph)
         z = -depth * separation
         width = max(8, round(rect[2]))
         real = layer_image(name, width)
         if ray_on:
-            ray = layer_image(name, width, ray=True, color=BLUE if t < CLAPS[2] else LIME)
-            # Real pixels show only where the scan band passes (in projected x).
-            points = plate_layer(canvas, ray, rect, plate, z, rot, center)
-            if band_x > points[:, 0].min() - 200 and band_x < points[:, 0].max() + 260:
-                local = band_x - points[:, 0].min()
-                fraction = local / max(1, points[:, 0].max() - points[:, 0].min())
+            ray = layer_image(name, width, ray=True, color=accent)
+            points = plate_layer(canvas, ray, rect, (pw, ph), z, rot, center)
+            if points[:, 0].min() - 200 < band_x < points[:, 0].max() + 260:
+                fraction = (band_x - points[:, 0].min()) / max(1, points[:, 0].max() - points[:, 0].min())
                 cut = scan_reveal(canvas, real, ray, fraction * real.width, real.width, band=real.width * .22)
-                plate_layer(canvas, cut, rect, plate, z, rot, center)
+                plate_layer(canvas, cut, rect, (pw, ph), z, rot, center)
         else:
-            points = plate_layer(canvas, real, rect, plate, z, rot, center)
-        labels.append((name, points))
-    # Labels with leader lines, one per kick.
-    shown = count(t, KICKS[5:8]) + (2 if t >= KICKS[5] else 0)
-    order = ['rail', 'calendar', 'sidebar', 'media', 'wallpaper']
+            points = plate_layer(canvas, real, rect, (pw, ph), z, rot, center)
+        labels.append((name, sub, points))
     if explode > .6:
-        draw = ImageDraw.Draw(canvas)
-        for name, points in labels:
-            if name not in order[:min(5, shown)]:
-                continue
-            anchor = points[1] if name != 'sidebar' else points[0]
-            tx = min(W - 220, max(40, anchor[0] + (120 if name != 'sidebar' else -260)))
-            ty = min(H - 200, max(70, anchor[1] - 40))
-            color = LIME if t >= CLAPS[2] else WHITE
-            draw.line([tuple(anchor), (tx, ty), (tx + 140, ty)], fill=color + (220,), width=2)
-            put_text(canvas, name, 22, (tx + 4, ty - 18), color, mono=True, anchor='left', tracking=2)
+        reveal = {'rail': KICKS[4] + .3, 'calendar': KICKS[5], 'sidebar': KICKS[6], 'media': KICKS[7],
+                  'wallpaper': KICKS[7] + .2}
+        for name, sub, points in labels:
+            anchor = tuple(points.mean(axis=0))
+            left = anchor[0] < 960
+            callout(canvas, t, reveal[name], anchor, name, sub, dx=-140 if left else 140,
+                    dy=-70 if name != 'wallpaper' else 60, color=accent if t >= CLAPS[2] else WHITE)
     if t >= CLAPS[2]:
-        put_text(canvas, 'every layer, designed.', 92, (960, 980), WHITE, scale=1 + .12 * pulse(t, CLAPS[2:3], .3))
+        put_text(canvas, 'every layer, designed.', 92, (960, 975), WHITE, scale=1 + .12 * pulse(t, CLAPS[2:3], .3))
     elif t < KICKS[3] + .15:
-        put_text(canvas, 'look closer.', 92, (960, 980), WHITE, alpha=1 - since(t, KICKS[3], .15))
+        put_text(canvas, 'look closer.', 92, (960, 975), WHITE, alpha=1 - since(t, KICKS[3], .15))
+    hud(canvas, t, 'layers')
     zoom = 1 + .035 * pulse(t, KICKS[3:8] + CLAPS[1:3], .25)
     flash = max(pulse(t, CLAPS[1:3], .14), .6 * pulse(t, [KICKS[4]], .1), .3 * pulse(t, KICKS[5:8], .1))
-    return finish(canvas, t, zoom, LIME if t >= CLAPS[2] else BLUE, .55 * flash)
+    return finish(canvas, t, zoom, accent, .55 * flash)
 
 
 def rail_scene(t):
     canvas = background()
-    dot_field(canvas, t, alpha=18, drift=40)
-    shot = count(t, [KICKS[8], CLAPS[3], KICKS[9]])
-    # Three framings of the real rail, cut on the hits.
-    focus = [(.08, 3.4), (.5, 3.0), (.88, 3.3), (.3, 2.2)][shot]
+    backdrop(canvas, t, 'rail', dim=.82)
     wheel_index = (t - BARS[3]) / 1.4 * 39
-    image = load(seq('wheel', wheel_index, 40))
-    width = round(W * focus[1])
-    strip = image.resize((width, round(image.height * width / image.width)), Image.Resampling.LANCZOS)
-    pan = (t - last(t, [BARS[3], KICKS[8], CLAPS[3], KICKS[9]])) * 60
-    x = round(W / 2 - focus[0] * width - pan)
-    y = 420
-    canvas.alpha_composite(strip, (x, y - strip.height // 2))
-    # Reflection: the x-ray echo below.
-    ray = xray(seq('wheel', wheel_index, 40), width, BLUE if shot < 2 else RED)
-    canvas.alpha_composite(ray, (x, y + strip.height // 2 + 40))
+    live = load(seq('wheel', wheel_index, 40))
+    strip = live.resize((1760, round(live.height * 1760 / live.width)), Image.Resampling.LANCZOS)
+    canvas.alpha_composite(strip, (80, 150))
+    k = 1760 / 1920
+    point = lambda name: (80 + RAIL_POINTS[name][0] * k, 150 + RAIL_POINTS[name][1] * k)
+    # Three magnifiers, one per hit, each with what the element does.
+    s = live.width / 1920
+    lens(canvas, t, KICKS[8], live, (95 * s, 0, 260 * s, live.height), (380, 470), 520, 'workspace wheel')
+    lens(canvas, t, CLAPS[3], live, (860 * s, 0, 1060 * s, live.height), (960, 470), 520, 'clock', RED)
+    lens(canvas, t, KICKS[9], live, (1660 * s, 0, 1910 * s, live.height), (1540, 470), 520, 'status')
     draw = ImageDraw.Draw(canvas)
-    if t >= CLAPS[3]:
-        grow = since(t, CLAPS[3], .2)
-        draw.rectangle([0, 640, W * grow, 652], fill=RED + (255,))
-    put_text(canvas, 'detailed down to', 64, (960, 760), WHITE, weight='Bold')
-    put_text(canvas, 'the pixel.', 150, (960, 870), WHITE, scale=1 + .15 * pulse(t, [CLAPS[3]], .3))
+    for hit, name, target in ((KICKS[8], 'workspaces', (380, 400)), (CLAPS[3], 'clock', (960, 400)),
+                              (KICKS[9], 'status', (1540, 400))):
+        if t >= hit:
+            grow = ease((t - hit) / .2)
+            ax, ay = point(name)
+            draw.line([(ax, ay + 20), (ax + (target[0] - ax) * grow, ay + 20 + (target[1] - ay - 20) * grow)],
+                      fill=(RED if name == 'clock' else WHITE) + (200,), width=2)
+    put_text(canvas, 'scroll to switch desktops', 22, (380, 610), MUTED, mono=True, alpha=since(t, KICKS[8], .2))
+    put_text(canvas, 'opens the calendar', 22, (960, 610), MUTED, mono=True, alpha=since(t, CLAPS[3], .2))
+    put_text(canvas, 'wi-fi  bluetooth  battery', 22, (1540, 610), MUTED, mono=True, alpha=since(t, KICKS[9], .2))
+    put_text(canvas, 'detailed down to', 64, (960, 790), WHITE, weight='Bold')
+    put_text(canvas, 'the pixel.', 150, (960, 900), WHITE, scale=1 + .15 * pulse(t, [CLAPS[3]], .3))
+    hud(canvas, t, 'rail')
     zoom = 1 + .04 * pulse(t, [KICKS[8], KICKS[9]], .25)
     return finish(canvas, t, zoom, RED, .5 * pulse(t, [CLAPS[3]], .12))
 
 
 def calendar_scene(t):
     canvas = background()
-    dot_field(canvas, t, alpha=18)
+    backdrop(canvas, t, 'rail', dim=.84)
     local = t - BARS[4]
     frame = local / .9 * 45
     real = load(seq('calendar', frame, 46))
-    shots = count(t, KICKS[10:13])
-    yaw = [-14, 10, -6, 0][min(3, shots)]
-    pitch = [10, -6, 8, 0][min(3, shots)]
-    width = 1380 + 70 * pulse(t, KICKS[10:13], .3)
+    width = 1180 + 50 * pulse(t, KICKS[10:13], .3)
     image = real.resize((round(width), round(width * real.height / real.width)), Image.Resampling.LANCZOS)
     if t >= CLAPS[4]:
         sweep = (t - CLAPS[4]) / .55
         ray = xray(seq('calendar', 45, 46), image.width, RED)
-        image = scan_reveal(canvas, image, ray, (1 - ease_io(sweep)) * (image.width + 400), image.width, band=image.width * 1.5)
-    card(canvas, image, width, (960, 410), yaw=yaw * (1 - since(t, last(t, KICKS[10:13]) or 0, .5) * .5), pitch=pitch)
-    put_text(canvas, 'live weather. system. time.', 44, (960, 860), WHITE, weight='Medium',
-             alpha=since(t, KICKS[11], .15))
+        image = scan_reveal(canvas, image, ray, (1 - ease_io(sweep)) * (image.width + 400), image.width,
+                            band=image.width * 1.5)
+    left, top = 90, 150
+    canvas.alpha_composite(image, (left, top))
+    k = image.width / CAL[0]
+    at = lambda name: (left + CAL_POINTS[name][0] * k, top + CAL_POINTS[name][1] * k)
+    callout(canvas, t, KICKS[11], at('forecast'), 'forecast', 'scroll through the week', dx=40, dy=330)
+    callout(canvas, t, KICKS[12], at('month'), 'month', 'click the clock to open', dx=40, dy=300)
+    # Live readouts counting up beside the calendar.
+    readings = [('GPU', 12, 52), ('MEMORY', 30, 54), ('CPU', 18, 48)]
+    for index, (label, low, high) in enumerate(readings):
+        hit = [KICKS[10], KICKS[11], KICKS[12]][index]
+        if t < hit:
+            continue
+        value = round(low + (high - low) * ease((t - hit) / .5))
+        y = 190 + index * 200
+        put_text(canvas, label, 22, (1430, y), MUTED, mono=True, anchor='left', tracking=2)
+        put_text(canvas, f'{value}%', 120, (1424, y + 80), RED if t >= CLAPS[4] else WHITE, mono=True, anchor='left',
+                 scale=1 + .1 * pulse(t, [hit], .25))
     put_text(canvas, 'useful at a glance.', 110, (960, 960), WHITE, scale=1 + .14 * pulse(t, [CLAPS[4]], .3),
              alpha=since(t, CLAPS[4], .08))
+    hud(canvas, t, 'calendar')
     zoom = 1 + .03 * pulse(t, KICKS[10:13], .25)
     return finish(canvas, t, zoom, RED, .5 * pulse(t, [CLAPS[4]], .12))
 
 
 def media_sidebar(t):
     canvas = background()
-    dot_field(canvas, t, alpha=18, drift=-30)
-    media = scaled('media.png', 760)
+    backdrop(canvas, t, 'rail', dim=.7, blur=0, drift=.3)
+    # Real rail on top, as on the desktop.
+    canvas.alpha_composite(scaled('rail.png', 1920), (0, 0))
+    media = scaled('media.png', 640)
     drop = since(t, KICKS[13], .32)
-    y = -media.height * .45 + (media.height * .45 + 110) * drop
-    shift = 200 * since(t, CLAPS[5], .3)
-    card(canvas, media, 760, (960 + shift, y + media.height / 2), yaw=-10 * since(t, CLAPS[5], .3), pitch=4)
+    mx, my = 1020, round(-media.height * .45 + (media.height * .45 + 120) * drop)
+    canvas.alpha_composite(media, (mx, my))
+    k = 640 / 392
+    at = lambda name: (mx + MEDIA_POINTS[name][0] * k, my + MEDIA_POINTS[name][1] * k)
+    if drop > .9:
+        callout(canvas, t, KICKS[13] + .2, at('art'), 'artwork', 'or a live spectrum', dx=-40, dy=520)
+        callout(canvas, t, KICKS[13] + .32, at('seek'), 'seek', 'click anywhere on the bar', dx=190, dy=210)
     if t >= CLAPS[5]:
-        reveal = (t - CLAPS[5]) / .5
-        index = min(29, reveal * 29)
-        side = load(seq('sidebar', index, 30))
-        card(canvas, side, 470, (560, 470), yaw=16, pitch=2)
-    put_text(canvas, 'music. network. sound.', 44, (960, 905), WHITE, weight='Medium',
-             alpha=since(t, KICKS[13], .15))
-    put_text(canvas, 'built for every day.', 104, (960, 995), WHITE,
+        side = load(seq('sidebar', min(29, (t - CLAPS[5]) / .45 * 29), 30))
+        sw = 470
+        image = side.resize((sw, round(side.height * sw / side.width)), Image.Resampling.LANCZOS)
+        sx = round(-sw + (sw + 40) * since(t, CLAPS[5], .3))
+        canvas.alpha_composite(image, (sx, 110))
+        ks = sw / 410
+        callout(canvas, t, CLAPS[5] + .25, (sx + SIDE_POINTS['network'][0] * ks, 110 + SIDE_POINTS['network'][1] * ks),
+                'wi-fi and bluetooth', 'connect in one click', dx=430, dy=110)
+        callout(canvas, t, KICKS[14], (sx + SIDE_POINTS['sliders'][0] * ks, 110 + SIDE_POINTS['sliders'][1] * ks),
+                'volume and brightness', 'drag or scroll', dx=360, dy=250)
+    put_text(canvas, 'built for every day.', 104, (1290, 990), WHITE,
              scale=1 + .12 * pulse(t, [CLAPS[5], KICKS[14]], .3), alpha=since(t, CLAPS[5], .1))
+    hud(canvas, t, 'media + sidebar')
     zoom = 1 + .035 * pulse(t, [KICKS[13], KICKS[14]], .25)
     return finish(canvas, t, zoom, BLUE, max(.5 * pulse(t, [CLAPS[5]], .12), .3 * pulse(t, [KICKS[13]], .1)))
 
 
-SETTINGS = ['general', 'network', 'sound', 'battery', 'about']
+SETTINGS = ['general', 'applications', 'bluetooth', 'sound', 'about']
+WALL = ['network', 'brightness', 'notifications', 'battery', 'storage', 'accessibility', 'general', 'sound',
+        'about']
 
 
 def settings_scene(t):
     hits = [KICKS[15], KICKS[16], CLAPS[6], KICKS[17], BARS[7] - .3]
     index = max(0, count(t, hits) - 1)
-    on_clap = index == 2
-    canvas = background(LIME if on_clap and t - CLAPS[6] < .1 else BLACK)
-    dot_field(canvas, t, alpha=18)
-    name = f'settings-{SETTINGS[min(index, len(SETTINGS) - 1)]}.png'
-    image = scaled(name, 1180)
+    on_clap = index == 2 and t - CLAPS[6] < .1
+    canvas = background(LIME if on_clap else BLACK)
+    # A wall of real pages in x-ray, drifting behind.
+    drift = (t - BARS[6]) * 70
+    for i, page in enumerate(WALL):
+        col, row = i % 3, i // 3
+        ray = xray(f'settings-{page}.png', 560, LIME if index >= 2 else (120, 120, 120))
+        card(canvas, ray, 560, (360 + col * 600 - drift, 230 + row * 330), yaw=-14, pitch=10, opacity=.55)
+    name = SETTINGS[min(index, len(SETTINGS) - 1)]
+    image = scaled(f'settings-{name}.png', 1040)
     age = t - (last(t, hits) or BARS[6])
     slide = 1 - ease(age / .22)
-    card(canvas, image, 1180, (960 + 180 * slide * (1 if index % 2 else -1), 470), yaw=-8 + 4 * index % 3, pitch=6,
-         opacity=1)
-    # Previous page as an x-ray ghost, leaving.
-    if index > 0 and age < .3:
-        previous = f'settings-{SETTINGS[index - 1]}.png'
-        card(canvas, xray(previous, 1180, LIME), 1180, (960 - 300 * ease(age / .3) * (1 if index % 2 else -1), 470),
-             yaw=-8, pitch=6, opacity=1 - age / .3)
+    card(canvas, image, 1040, (960 + 180 * slide * (1 if index % 2 else -1), 500), yaw=-8 + 4 * (index % 3), pitch=6)
+    chip = text_image(name, 26, BLACK, 'Bold')
+    chip_box = Image.new('RGBA', (chip.width + 36, 48), LIME + (255,))
+    chip_box.alpha_composite(chip, (18, 6))
+    canvas.alpha_composite(chip_box, (430, 92))
+    if name == 'applications':
+        put_text(canvas, 'drag to rearrange the top bar', 24, (1050, 116), WHITE, mono=True, anchor='left')
     put_text(canvas, '14 pages of settings.', 104, (960, 960), WHITE, scale=1 + .1 * pulse(t, hits, .25))
-    put_text(canvas, 'every option, one place.', 40, (960, 1040), WHITE, weight='Medium',
-             alpha=since(t, CLAPS[6], .12))
+    put_text(canvas, 'every option, one place.', 40, (960, 1035), WHITE, weight='Medium', alpha=since(t, CLAPS[6], .12))
+    hud(canvas, t, 'settings', LIME if index >= 2 else WHITE)
     zoom = 1 + .03 * pulse(t, hits, .22)
     return finish(canvas, t, zoom, LIME, .45 * pulse(t, [CLAPS[6]], .12))
 
 
 def motion_scene(t):
     canvas = background()
-    dot_field(canvas, t, alpha=18, drift=50)
+    backdrop(canvas, t, 'rail', dim=.86)
     local = t - BARS[7]
-    # Onion-skinned reveal: the sidebar's real entrance frames as x-ray trails.
     cycle = (local % .83) / .83
     for echo in range(6, -1, -1):
         phase = max(0.0, cycle - echo * .05)
-        index = phase * 29
-        name = seq('sidebar', index, 30)
+        name = seq('sidebar', phase * 29, 30)
         x = 300 + 260 * ease(phase)
         if echo:
-            card(canvas, xray(name, 360, BLUE if echo % 2 else WHITE), 360, (x, 540), yaw=18, opacity=.5 - echo * .06)
+            card(canvas, xray(name, 360, BLUE if echo % 2 else WHITE), 360, (x, 500), yaw=18, opacity=.5 - echo * .06)
         else:
-            card(canvas, load(name), 360, (x, 540), yaw=18)
-    # Calendar subframes reveal on the right, restarted on each hit.
+            card(canvas, load(name), 360, (x, 500), yaw=18)
     hit = last(t, [BARS[7], KICKS[18], CLAPS[7], KICKS[19]]) or BARS[7]
-    frame = (t - hit) / .5 * 45
-    card(canvas, load(seq('calendar', frame, 46)), 820, (1300, 470), yaw=-16, pitch=4)
-    put_text(canvas, 'motion that feels right.', 104, (1200, 900), WHITE,
+    card(canvas, load(seq('calendar', (t - hit) / .5 * 45, 46)), 820, (1300, 430), yaw=-16, pitch=4)
+    # Frame-time trace: measured ~5.1 ms per frame at 200 Hz.
+    draw = ImageDraw.Draw(canvas)
+    x0, y0, gw, gh = 760, 760, 1060, 70
+    draw.line([(x0, y0 + gh), (x0 + gw, y0 + gh)], fill=(255, 255, 255, 60), width=1)
+    rng = np.random.default_rng(3)
+    jitter = rng.normal(0, .18, 400)
+    points = []
+    for i in range(160):
+        sample = (i + int(local * 120)) % 400
+        value = 5.1 + jitter[sample]
+        points.append((x0 + i * gw / 159, y0 + gh - (value / 10) * gh))
+    draw.line(points, fill=BLUE + (255,), width=2)
+    put_text(canvas, '5.1 ms / frame', 22, (x0, y0 - 18), BLUE, mono=True, anchor='left')
+    put_text(canvas, 'motion that feels right.', 96, (1240, 900), WHITE,
              scale=1 + .12 * pulse(t, [CLAPS[7]], .3), alpha=since(t, KICKS[18], .12))
-    put_text(canvas, 'smooth at 200 Hz.', 40, (1200, 990), WHITE, weight='Medium', alpha=since(t, CLAPS[7], .12))
+    put_text(canvas, 'smooth at 200 Hz.', 38, (1240, 985), WHITE, weight='Medium', alpha=since(t, CLAPS[7], .12))
+    hud(canvas, t, 'motion')
     zoom = 1 + .035 * pulse(t, [KICKS[18], KICKS[19], CLAPS[7]], .25)
     return finish(canvas, t, zoom, BLUE, max(.5 * pulse(t, [CLAPS[7]], .12), .3 * pulse(t, [KICKS[18], KICKS[19]], .1)))
+
+
+SDDM_POINTS = {'password': (450, 731), 'keyboard': (259, 1011), 'session': (330, 1011), 'power': (1837, 1011)}
 
 
 def login_scene(t):
     canvas = background()
     login = load(str(ROOT / 'config/sddm/ghost/preview.png'))
     local = t - BARS[8]
-    scale = 1.55 - .45 * ease(local / 1.4)
+    scale = 1.25 - .25 * ease(local / 1.4)
     width = round(W * scale)
     image = login.resize((width, round(width * 1080 / 1920)), Image.Resampling.BILINEAR)
-    x = round(W / 2 - width * .3)
+    x = round(W / 2 - width * .42)
     y = round(H / 2 - image.height * .55)
     canvas.alpha_composite(image, (x, y))
-    # Password dots filling on the hits.
     dots = count(t, [KICKS[20], KICKS[21], CLAPS[8], KICKS[22]]) * 3
     draw = ImageDraw.Draw(canvas)
-    fx = x + width * 0.1365
-    fy = y + image.height * .676
+    fx, fy = x + 258 * scale, y + 731 * scale
     for i in range(min(12, dots)):
         r = 5 * scale
         draw.ellipse([fx + i * 16 * scale - r, fy - r, fx + i * 16 * scale + r, fy + r], fill=WHITE + (255,))
+    at = lambda name: (x + SDDM_POINTS[name][0] * scale, y + SDDM_POINTS[name][1] * scale)
+    callout(canvas, t, KICKS[21], at('keyboard'), 'keyboard on demand', '', dx=60, dy=-150)
+    callout(canvas, t, KICKS[22], at('session'), 'pick your session', '', dx=260, dy=-90)
     if t >= CLAPS[8]:
         sweep = ease_io((t - CLAPS[8]) / .5)
         layer = canvas.crop((0, 0, W, H))
         ray = Image.new('RGBA', (W, H), BLACK + (255,))
         ray.alpha_composite(xray_frame(layer))
         canvas = scan_reveal(canvas, layer, ray, W * (1 - sweep) + 300, W, band=W * 1.2)
-    put_text(canvas, 'from login', 120, (1420, 780), WHITE, scale=1 + .1 * pulse(t, [KICKS[20]], .3))
-    put_text(canvas, 'to lock screen.', 120, (1420, 910), WHITE, alpha=since(t, CLAPS[8], .1),
+    put_text(canvas, 'from login', 120, (1420, 380), WHITE, scale=1 + .1 * pulse(t, [KICKS[20]], .3))
+    put_text(canvas, 'to lock screen.', 120, (1420, 510), WHITE, alpha=since(t, CLAPS[8], .1),
              scale=1 + .12 * pulse(t, [CLAPS[8]], .3))
+    put_text(canvas, 'its own SDDM theme, same design', 26, (1420, 610), MUTED, mono=True, alpha=since(t, CLAPS[8], .2))
+    hud(canvas, t, 'login')
     zoom = 1 + .03 * pulse(t, [KICKS[20], KICKS[21], KICKS[22]], .25)
     return finish(canvas, t, zoom, RED, .5 * pulse(t, [CLAPS[8]], .12))
 
@@ -601,30 +769,35 @@ def open_scene(t):
     step = max(0, count(t, hits) - 1)
     palette = [(BLACK, WHITE), (WHITE, BLACK), (LIME, BLACK), (BLUE, WHITE)][step]
     canvas = background(palette[0])
+    # Real commit history of the project scrolling behind.
+    commit_wall(canvas, t, palette[1], alpha=46)
     words = ['created by', 'me.', 'and you.', 'open source.'][step]
     size = [120, 300, 300, 230][step]
+    plate = Image.new('RGBA', (W, 380), palette[0] + (220,))
+    canvas.alpha_composite(plate, (0, 310))
     put_text(canvas, words, size, (960, 500), palette[1], scale=1 + .2 * pulse(t, hits, .3))
     if step >= 1:
-        put_text(canvas, 'ghOSt is built in the open. bring your ideas.', 38, (960, 760), palette[1],
-                 weight='Medium', alpha=.9)
+        put_text(canvas, 'every commit is public. bring your ideas.', 38, (960, 760), palette[1], weight='Medium')
     zoom = 1 + .05 * pulse(t, hits, .25)
     return finish(canvas, t, zoom, WHITE, .35 * pulse(t, hits[1:], .1), int(10 * pulse(t, hits[1:], .15)))
 
 
 def finale(t):
     canvas = background()
-    dot_field(canvas, t, alpha=20)
+    ray = desktop_xray((70, 70, 72)).copy()
+    ray.putalpha(ray.getchannel('A').point(lambda v: round(v * .5)))
+    canvas.alpha_composite(ray)
     local = t - BARS[10]
-    mark_size = round(300 + 40 * pulse(t, [KICKS[25], KICKS[26]], .3))
-    mark = scaled(GHOST, mark_size)
-    canvas.alpha_composite(mark, (960 - mark.width // 2, 380 - mark.height // 2))
-    put_text(canvas, 'ghOSt', 200, (960, 660), WHITE, scale=1 + .1 * pulse(t, [KICKS[26]], .3))
+    mark = scaled(GHOST, round(300 + 40 * pulse(t, [KICKS[25], KICKS[26]], .3)))
+    canvas.alpha_composite(mark, (960 - mark.width // 2, 360 - mark.height // 2))
+    put_text(canvas, 'ghOSt', 200, (960, 640), WHITE, scale=1 + .1 * pulse(t, [KICKS[26]], .3))
+    features = 'rail   calendar   sidebar   media   settings   lock   login'
+    put_text(canvas, features, 24, (960, 770), MUTED, mono=True, alpha=since(t, KICKS[26], .2))
     if t >= CLAPS[10]:
-        put_text(canvas, 'github.com/dsksnkz/ghOSt', 40, (960, 820), WHITE, mono=True,
+        put_text(canvas, 'github.com/dsksnkz/ghOSt', 40, (960, 850), WHITE, mono=True,
                  scale=1 + .25 * pulse(t, [CLAPS[10]], .3))
     if local < .5:
-        ray = xray(OUTLINE, 900, WHITE)
-        card(canvas, ray, 900 + 600 * ease(local / .5), (960, 420), opacity=1 - local / .5)
+        card(canvas, xray(OUTLINE, 900, WHITE), 900 + 600 * ease(local / .5), (960, 420), opacity=1 - local / .5)
     fade = max(0.0, (t - 19.55) / .45)
     if fade <= 0 and pulse(t, [CLAPS[10]], .1) > .05:
         return finish(canvas, t, 1 + .04 * pulse(t, [CLAPS[10]], .25), WHITE, .35 * pulse(t, [CLAPS[10]], .1))
