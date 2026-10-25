@@ -72,35 +72,6 @@ Item {
                 color: "#ffffff"
                 opacity: .06
             }
-            // Day scale along the lower edge: hour ticks, quarter-day marks
-            // and a single bright notch at the current time of day.
-            Item {
-                id: dayScale
-                objectName: "rail-day-scale"
-                x: 19
-                width: housing.width - 38
-                y: housing.height - 6
-                height: 5
-                readonly property real progress: (bar.displayTime.getHours() * 60 + bar.displayTime.getMinutes()) / 1440
-                Repeater {
-                    model: 25
-                    Rectangle {
-                        required property int index
-                        x: Math.round(index / 24 * dayScale.width)
-                        y: dayScale.height - height
-                        width: 1
-                        height: index % 6 === 0 ? 4 : 2
-                        color: index % 6 === 0 ? "#333333" : "#1f1f1f"
-                    }
-                }
-                Rectangle {
-                    objectName: "rail-day-now"
-                    x: Math.round(dayScale.progress * dayScale.width)
-                    width: 1
-                    height: dayScale.height
-                    color: "#ffffff"
-                }
-            }
             Item {
                 id: controls
                 // Keep the rail full-width; shrink contents uniformly and anchor groups.
@@ -182,29 +153,6 @@ Item {
                         font.weight: Font.Normal
                         font.letterSpacing: 1
                         color: "#ffffff"
-                    }
-                    // Viewfinder corners framing the clock readout.
-                    Repeater {
-                        model: [[0, 0], [1, 0], [0, 1], [1, 1]]
-                        Item {
-                            required property var modelData
-                            x: modelData[0] ? centerClock.width - 6 : 0
-                            y: modelData[1] ? 25 : 6
-                            width: 6
-                            height: 6
-                            Rectangle {
-                                x: parent.modelData[0] ? 4.8 : 0
-                                width: 1.2
-                                height: 6
-                                color: "#3c3c3c"
-                            }
-                            Rectangle {
-                                y: parent.modelData[1] ? 4.8 : 0
-                                width: 6
-                                height: 1.2
-                                color: "#3c3c3c"
-                            }
-                        }
                     }
                 }
                 Key {

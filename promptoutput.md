@@ -1,5 +1,10 @@
 prompts outputs here
 
+## 2026-10-25 / Rail marks removed
+
+User: "remove the little 'lines' at the bottom of the top bar, and the the square
+surrounding the clock top bar". Day scale and clock corners removed; deployed.
+
 ## 2026-10-25 / Spacious calendar and audio bar
 
 User: "the ui seems cramped abit in space. redesign in a more modern ui. also

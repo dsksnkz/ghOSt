@@ -52,3 +52,12 @@ new features. Hover still changes colour, never scale.
 Evidence (local only): `.local/verification/2026-10-25-rail-calendar-redesign/`.
 Rollback: copy files from `.local/backups/2026-10-25-rail-calendar-redesign/live/`
 into `~/.config/quickshell/ghost-bar/` (one automatic reload).
+
+## Follow-up: rail marks removed
+
+User: "remove the little 'lines' at the bottom of the top bar, and the the square
+surrounding the clock top bar". Removed the day scale (hour ticks and time notch)
+and the four viewfinder corners around the clock. Mono clock, housing, top
+highlight, separators and battery styling remain. Rail clock/layout tests and
+surface compile pass; deployed `Rail.qml` with one clean reload and checked the
+live rail. Snapshot: `.local/backups/2026-10-25-rail-marks-removal/`.

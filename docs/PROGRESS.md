@@ -1,5 +1,12 @@
 # ghOSt progress
 
+## 2026-10-25 / Rail day scale and clock corners removed
+
+User asked to remove the lines along the bottom of the top bar and the frame
+around the clock. Both removed from `Rail.qml`; rail tests and compile pass;
+deployed with one clean reload, live rail checked.
+[Record](changes/2026-10-25-rail-calendar-redesign.md#follow-up-rail-marks-removed).
+
 ## 2026-10-25 / Spacious calendar and media popup
 
 Calendar plane 820 × 380 (Theme constants) with a date header, tonal action
