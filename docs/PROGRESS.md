@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-25 / Clock matches shared sans font
+
+Changed only Rail clock font.family from JetBrains Mono to Theme.font (Adwaita
+Sans). Existing24px/Normal/letter-spacing1, control geometry, centering and click
+action preserved; other rail text unchanged. Low-priority offscreen font/size/
+weight/centering/calendar-action test passes and safe fixture render inspected.
+Backed up project/live Rail and deployed only Rail; automatic reload clean.
+Snapshot: `.local/backups/2026-10-25-clock-sans/{project,live}/`.
+Safe render: `.local/verification/2026-10-25-clock-sans/rail.png`.
+No SDDM change or CalendarPanel deployment. User explicitly approved GitHub
+publication with "push"; this revision includes only the clock change, its test
+and these implementation records.
+
 ## 2026-10-25 / Ghost brand mark
 
 The Turret Road G is replaced by a ghost drawn from the user's sketches: a solid

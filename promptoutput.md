@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-10-25 / Top-bar clock sans font
+
+User: "change the top bar's clock font to match the other sans font".
+Changed only clock family to shared Theme.font (installed Adwaita Sans), keeping
+24px Normal, spacing, fixed geometry and calendar action. Added assertions and
+passed isolated low-priority Qt rail test; reviewed safe component render.
+Only Rail copied live, backed up first under `.local/backups/2026-10-25-clock-sans/`.
+No cursor automation, SDDM/config changes or unrelated deferred deployment.
+User subsequently approved GitHub publication: "push".
+
 ## 2026-10-25 / Ghost brand mark
 
 User: "Use the clean ghost as ghOSt's brand icon and deploy it." Brand source

@@ -18,6 +18,9 @@ ShellRoot {
                 const clock = findChild(rail, "rail-clock-control");
                 const label = findChild(rail, "rail-clock-text");
                 compare(label.text, "09:21");
+                compare(label.font.family, Theme.font);
+                compare(label.font.pixelSize, 24);
+                compare(label.font.weight, Font.Normal);
                 compare(clock.children.filter(child => child.text !== undefined && child.text.length > 0).length, 1);
                 const directory = Quickshell.env("GHOST_RAIL_CAPTURE_DIR");
                 if (directory) {

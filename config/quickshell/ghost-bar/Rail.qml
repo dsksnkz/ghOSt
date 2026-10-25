@@ -148,7 +148,7 @@ Item {
                         anchors.fill: parent
                         horizontalAlignment: Text.AlignHCenter
                         text: Qt.formatDateTime(bar.displayTime, "HH:mm")
-                        font.family: Theme.jetRegular.name
+                        font.family: Theme.font
                         font.pixelSize: 24
                         font.weight: Font.Normal
                         font.letterSpacing: 1
