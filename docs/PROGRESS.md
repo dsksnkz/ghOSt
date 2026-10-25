@@ -1,5 +1,12 @@
 # ghOSt progress
 
+## 2026-10-25 / Smooth media popup slide
+
+Fixed jitter: the media window no longer moves; its content slides by a
+fractional offset inside a still window under the rail. Tests pass; deployed
+with one clean reload. Native animation not watched.
+[Record](changes/2026-10-25-spacious-calendar-audio.md#follow-up-smooth-media-slide).
+
 ## 2026-10-25 / Media popup slides down
 
 Media popup now slides down from behind the rail at full size instead of

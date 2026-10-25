@@ -70,12 +70,24 @@ ShellRoot {
                 compare(panel.opacity, .5);
                 compare(Motion.topMargin("calendar", .5, height), 82);
                 compare(Motion.topMargin("audio", .5, height), 68);
-                compare(Motion.topMargin("media", 0, 262), -262);
-                compare(Motion.topMargin("media", 1, 262), 68);
+                // Media: the window stays still; only content slides, by fractional offsets.
+                for (const amount of [0, .37, 1])
+                    compare(Motion.topMargin("media", amount, 262), 0);
+                compare(Motion.windowLead("media"), 68);
+                compare(Motion.windowLead("audio"), 0);
+                compare(Motion.slideOffset("media", 0, 262), -330);
+                compare(Motion.slideOffset("media", 1, 262), 0);
+                fuzzyCompare(Motion.slideOffset("media", .37, 262), -207.9, .001);
+                compare(Motion.slideOffset("audio", .37, 262), 0);
                 popup.page = "media";
+                popup.reveal = .37;
+                wait(30);
                 compare(panel.transform[1].xScale, 1);
                 compare(panel.transform[1].yScale, 1);
                 compare(panel.opacity, 1);
+                compare(panel.transform[0].y, Motion.slideOffset("media", .37, panel.height));
+                popup.reveal = 1;
+                compare(panel.transform[0].y, 0);
                 console.info("PASS: launcher slides from above screen to y68 at constant 560x328, no fade or scale; other popup motion retained");
             }
         }

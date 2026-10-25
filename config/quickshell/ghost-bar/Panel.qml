@@ -38,7 +38,7 @@ PanelWindow {
     margins.top: Motion.topMargin(page, reveal, implicitHeight)
     margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - 398, Desk.panelX)))
     implicitWidth: page === "calendar" ? Math.floor(Math.min(screen.width * 733 / 1920, (screen.height - 100) * 1200 / 505)) : Math.min(page === "launcher" ? 560 : 392, screen.width - 12)
-    implicitHeight: content.implicitHeight
+    implicitHeight: content.implicitHeight + Motion.windowLead(page)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
     // Sliding popups emerge beneath the rail; other popups keep their layer.
@@ -78,7 +78,9 @@ PanelWindow {
     PanelContent {
         id: content
 
-        anchors.fill: parent
+        y: Motion.windowLead(panelWindow.page)
+        width: parent.width
+        height: implicitHeight
         popup: panelWindow
     }
 

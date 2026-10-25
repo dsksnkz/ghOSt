@@ -6,6 +6,7 @@ import Quickshell.Hyprland
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.UPower
+import "PanelMotion.js" as Motion
 
 Item {
     id: content
@@ -100,7 +101,7 @@ Item {
     opacity: slides ? 1 : popup.reveal
     transform: [
         Translate {
-            y: content.slides ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
+            y: popup.page === "media" ? Motion.slideOffset(popup.page, popup.reveal, content.height) : content.slides ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
         },
         Scale {
             origin.x: Desk.panelOrigin

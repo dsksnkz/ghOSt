@@ -75,3 +75,16 @@ they had finished playing, `PanelMotion.js`, `Panel.qml` and `PanelContent.qml`
 were deployed with one automatic reload and `Configuration Loaded`. The popup
 was not opened on the live desktop, so the native slide is not visually
 checked. Snapshot: `.local/backups/2026-10-25-media-slide/`.
+
+## Follow-up: smooth media slide
+
+User: "its jittery, fix". Cause: the slide moved the layer-shell window by
+changing `margins.top` every frame, rounded to whole pixels, so Hyprland
+re-placed the surface each frame out of step with redraws. Now the media window
+stays still, anchored at the top under the rail (Top layer) with a 68 px lead
+above the card; `PanelContent` slides only its content with a fractional
+`Translate` (`PanelMotion.slideOffset`). The launcher keeps its window motion.
+`launcher-motion.qml` checks the still window, lead height and offsets;
+motion, compile, input and rail tests pass. Deployed `PanelMotion.js`,
+`Panel.qml`, `PanelContent.qml` with one clean reload. CS2 was not running. The
+native animation was not watched. Snapshot: `.local/backups/2026-10-25-media-slide-smooth/`.

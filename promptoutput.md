@@ -1,5 +1,10 @@
 prompts outputs here
 
+## 2026-10-25 / Media slide jitter
+
+User: "its jittery, fix". Slide moved from per-frame window margins to a
+fractional content offset in a still window; deployed with one clean reload.
+
 ## 2026-10-25 / Media popup slide
 
 User: "change the animation from the tray scaling bigger to the tray sliding
