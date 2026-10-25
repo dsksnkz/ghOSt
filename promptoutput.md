@@ -1,5 +1,10 @@
 prompts outputs here
 
+## 2026-10-25 / SDDM theme
+
+User: "Build direction B as a real SDDM theme in the repo, but don't install or
+apply it." Built `config/sddm/ghost/` with an offscreen test and docs; nothing installed.
+
 ## 2026-10-25 / Top-bar clock sans font
 
 User: "change the top bar's clock font to match the other sans font".

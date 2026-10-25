@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-25 / SDDM theme built, not installed
+
+The chosen login mockup (editorial left, ghost watermark) is now a real Qt 6 SDDM
+theme in `config/sddm/ghost/`: sign-in, failure feedback, Caps Lock, user,
+session and layout switching, and power actions gated by SDDM's capabilities.
+The offscreen test with stand-in SDDM objects passes. Not installed, applied or
+run in SDDM test mode. [Guide](sddm.md).
+
 ## 2026-10-25 / Clock matches shared sans font
 
 Changed only Rail clock font.family from JetBrains Mono to Theme.font (Adwaita

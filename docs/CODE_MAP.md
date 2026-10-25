@@ -27,6 +27,7 @@ avoidance. The historical `config/hypr/hyprland.lua` is not a deployment templat
 | Top-bar customization | `TopBarEditor.qml`, `RailLayout.js` | Real rail preview, drag regions, hidden tray and pure ordering/placement; `settings_backend.py` validates and saves the full layout |
 | Calendar/sidebar/rail | `CalendarPanel.qml`, `CalendarWindow.qml`, `SidebarFigmaBody.qml`, `Rail.qml` | Their corresponding surfaces; shared icons and corner components stay separate |
 | Lock | `lock.qml`, `lock/` | Session lock/authentication ownership separated from visual scene components |
+| SDDM theme | `config/sddm/ghost/` | Standalone login greeter, not installed by ghOSt; see [sddm.md](sddm.md) |
 
 In `Launcher.qml`, row geometry and motion values are named once near the top.
 `move()` selects a row; `scrollTargetForIndex()` computes the viewport target;
@@ -51,6 +52,7 @@ python3 scripts/verify_wallpaper_picker.py
 node tests/test_rail_layout.cjs
 python3 scripts/verify_rail_layout.py
 python3 scripts/verify_launcher_motion.py
+python3 scripts/verify_sddm_theme.py
 ```
 
 The launcher verification uses preview mode: it does not execute typed commands

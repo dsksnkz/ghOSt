@@ -1,0 +1,14 @@
+[SddmGreeterTheme]
+Name=ghOSt
+Description=ghOSt monochrome login: editorial left layout with the ghost watermark
+Author=ghOSt
+License=See assets/icons/NOTICE.txt and assets/fonts/OFL-JetBrainsMono.txt
+Type=sddm-theme
+Version=0.1
+Website=https://github.com/dsksnkz/ghOSt
+Screenshot=preview.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=ghost
+Theme-API=2.0
+QtVersion=6
