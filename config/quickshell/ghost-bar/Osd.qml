@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import Quickshell
 import Quickshell.Wayland
+import "EdgeVolume.js" as EdgeVolume
 
 PanelWindow {
     id: window
@@ -26,7 +27,7 @@ PanelWindow {
     visible: opened || reveal > 0.001
     implicitWidth: 80
     implicitHeight: 310
-    margins.top: Math.round((screen.height - implicitHeight) / 2)
+    margins.top: EdgeVolume.osdTop(screen.height, implicitHeight, OsdState.pointerY)
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-osd"

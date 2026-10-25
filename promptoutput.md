@@ -1,5 +1,23 @@
 prompts outputs here
 
+## 2026-10-25 / Full-height edge OSD; gaming-safe continuation
+
+Latest requests: align edge OSD vertically with the pointer, stop lagging the
+laptop, and trigger anywhere on either edge rather than only the center; work
+in background while user plays CS. Full-height2px triggers and pointer-derived
+clamped placement are implemented in project source. Pointer tracking is bounded
+to one update per16ms while active. No volume change on hover; existing fullscreen
+edge suppression remains. Intro help now describes full-height behavior.
+
+An earlier pointer-position pass was deployed before the gaming clarification;
+native test attempts did not pass because synthetic input did not reliably reach
+requested coordinates. Those results are not verification. No helper test process
+remains running. Latest full-height revision is deliberately NOT copied live or
+reloaded during CS. Only low-priority pure JS tests and diff checks were run;
+full-height native verification, new captures and activation remain pending.
+Updated native helper refuses pointer tests if CS2 is running. No game settings,
+network, unrelated services or hardware changed. Record: docs/changes/2026-10-25-full-edge-osd.md.
+
 ## 2026-10-24 / Special-workspace fullscreen hiding
 
 Request: "the top bar still shows when fullscreened some stuff".

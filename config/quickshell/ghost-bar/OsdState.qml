@@ -12,16 +12,21 @@ Singleton {
     property string kind: "volume"
     property string screenName: ""
     property string edgeSide: "left"
+    // Screen-local logical Y. Negative means a non-pointer/keyboard OSD.
+    property real pointerY: -1
     property var brightness: null
     property int lastBrightness: -1
     property real pendingBrightness: 0
     readonly property real amount: kind === "brightness" ? brightness ?? 0 : Desk.volume
     readonly property bool available: kind === "brightness" ? brightness !== null : !!Desk.audio
-    function show(value, targetScreen = "", side = "") {
-        if (side)
+    function show(value, targetScreen = "", side = "", y = -1) {
+        if (side) {
             edgeSide = side;
-        else if (!opened)
+            pointerY = Number.isFinite(y) ? y : -1;
+        } else if (!opened) {
             edgeSide = "left";
+            pointerY = -1;
+        }
         kind = value;
         screenName = targetScreen || Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name || "";
         opened = true;

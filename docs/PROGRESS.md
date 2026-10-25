@@ -1,5 +1,18 @@
 # ghOSt progress
 
+## 2026-10-25 / Full-height pointer-aligned OSD — live activation pending
+
+Latest correction removes the middle-only trigger: both2px edge targets cover
+the full monitor height. Edge OSD placement uses screen-local pointer Y, clamped
+to the screen bounds; non-pointer OSDs retain centered placement. Active edge
+tracking coalesces updates to16ms, with no polling or per-motion subprocess.
+Low-priority pure JS tests pass for full-height coverage, pointer alignment and
+clamping. User is playing CS2 and reported lag: no more native pointer tests,
+captures, Qt suite, desktop deployment or reload during this continuation.
+Native test helper now refuses to move the pointer while CS2 runs. Changes are
+source-only until safe activation; no claim of completed native verification.
+[Scope and remaining work](changes/2026-10-25-full-edge-osd.md).
+
 ## 2026-10-24 / Fullscreen on special workspaces
 
 Fixed rail visibility missing fullscreen windows on visible special workspaces.

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import "EdgeVolume.js" as EdgeVolume
 
 ShellRoot {
     Component.onCompleted: UiSounds.status()
@@ -156,10 +157,10 @@ ShellRoot {
         function captureIntro(path: string): void { introWindow.capture(path); }
         function edgeVolume(): string {
             return JSON.stringify({opened: OsdState.opened, side: OsdState.edgeSide,
-                screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount,
+                screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount, pointerY: OsdState.pointerY,
                 edges: Array.from(outputs.instances, output => ({screen: output.modelData.name,
-                    top: Math.round((output.modelData.height - Math.min(280, Math.round(output.modelData.height * .4))) / 2),
-                    height: Math.min(280, Math.round(output.modelData.height * .4)), width: 2}))});
+                    top: EdgeVolume.bounds(output.modelData.height).top,
+                    height: EdgeVolume.bounds(output.modelData.height).height, width: 2}))});
         }
         function toggle(name: string): void {
             const screen = Quickshell.screens[0];

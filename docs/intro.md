@@ -27,10 +27,12 @@ entry/icon files before installing. It does not replace the icon theme.
 
 ## Edge volume
 
-The rail no longer has a volume element. On either screen edge, hover over the
-center for120ms to reveal the existing OSD on that side. The active region is2px
-wide and up to280px tall, centered vertically (at1080p:y400–680). Both upper and
-lower regions are dead zones. Fullscreen outputs disable the edge targets.
+The rail no longer has a volume element. Hover anywhere along either left/right
+edge for120ms to reveal the existing OSD on that side. The active region is2px
+wide and covers the full height, not just the center. The OSD centers vertically
+on the pointer, clamped near the top/bottom to stay on-screen. Pointer tracking
+is coalesced to at most one window-position update per16ms, only while active.
+Fullscreen outputs disable the edge targets.
 Hovering alone never changes volume. Scroll in2% steps or drag/touch the OSD
 slider; it expires after2.2seconds without interaction. Brightness keys keep
 their existing OSD. The menu button still opens the sidebar; edges never do.
