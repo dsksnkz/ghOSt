@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-25 / Pointer-aligned full-height OSD activated
+
+User explicitly requested activation. Production surfaces compile at low process
+priority. Snapshotted six exact live modules, copied the verified source, and
+ghOSt performed one automatic reload with Configuration Loaded; no additional
+manual reload. Read-only live diagnostics report top0/height1080/width2 on the
+current output. Fullscreen suppression remains active while gaming. No cursor
+movement, game changes, popup, screenshot or interactive/heavy test performed.
+Pointer-placement native tests and fresh captures remain pending normal usage.
+Backup: `.local/backups/2026-10-25-osd-activation-UntdRK/`.
+
 ## 2026-10-25 / Full-height pointer-aligned OSD — live activation pending
 
 Latest correction removes the middle-only trigger: both2px edge targets cover

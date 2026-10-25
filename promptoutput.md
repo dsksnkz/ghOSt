@@ -1,5 +1,14 @@
 prompts outputs here
 
+## 2026-10-25 / Activate full-height pointer-aligned OSD
+
+User: "activate". Low-priority production compile passed. Snapshotted exact six
+live files to `.local/backups/2026-10-25-osd-activation-UntdRK/`, deployed only those
+modules, confirmed one automatic reload/Configuration Loaded. Live read-only
+edge geometry is top0,height1080,width2. No additional reload, cursor movement,
+popup, screenshot, game change or heavy/interactive test. Native pointer position
+checks remain pending; fullscreen edge suppression is preserved during gaming.
+
 ## 2026-10-25 / Full-height edge OSD; gaming-safe continuation
 
 Latest requests: align edge OSD vertically with the pointer, stop lagging the

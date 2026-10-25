@@ -1,7 +1,8 @@
 # Full-height, pointer-aligned edge volume OSD
 
-Status: source implementation and pure logic tests complete; live deployment,
-native verification and new screenshots intentionally pending while CS2 runs.
+Status: activated after the user's explicit "activate" request. Source logic tests
+and production compile pass; native pointer verification and fresh screenshots
+remain pending to avoid disturbing gaming.
 This latest direct correction supersedes the old middle-only edge/dead-zone design.
 
 ## Changes
@@ -39,10 +40,15 @@ a `cs2` process exists. A resource snapshot showed substantial game/background
 load and swap use, but no benchmark established the cause of lag; this change
 does not claim a measured system-wide performance improvement.
 
-Once gaming has finished and activation is appropriate, compile the updated
-surfaces, snapshot current live affected files again, deploy only EdgeHandle,
-EdgeVolume, Osd, OsdState, shell and IntroTopics, then reload named ghOSt once.
-Verify top/middle/bottom on both edges using actual compositor pointer positions,
+On explicit activation, production surfaces compiled at low priority and the six
+exact live modules were snapshotted to
+`.local/backups/2026-10-25-osd-activation-UntdRK/`. Copied only EdgeHandle,
+EdgeVolume, Osd, OsdState, shell and IntroTopics. One automatic named-instance
+reload logged Configuration Loaded; no extra manual reload was sent. Read-only
+live diagnostics report full-height2×1080 targets starting aty0. Fullscreen
+suppression remains in effect. No cursor move or popup test was performed.
+
+When gaming has finished, verify top/middle/bottom on both edges using actual compositor pointer positions,
 plus clamping, unchanged volume, expiry and fullscreen suppression. Capture safe
 OSD output then; do not mark the request fully completed before that verification.
 
