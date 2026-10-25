@@ -102,6 +102,16 @@ ShellRoot {
                 mouseClick(layout.parent);
                 compare(layout.text, "English (US)");
                 compare(keyboard.currentLayout, 1);
+                // On-screen keyboard: hidden by default, toggled by its button.
+                verify(!theme.keyboardOpen);
+                const toggle = findChild(theme, "keyboard-toggle");
+                console.info("keyboard toggle visible: " + toggle.visible);
+                if (toggle.visible) {
+                    mouseClick(toggle);
+                    verify(theme.keyboardOpen);
+                    mouseClick(toggle);
+                    verify(!theme.keyboardOpen);
+                }
                 console.info("PASS: sddm theme renders, logs in with user/password/session, reports failure, cycles session and layout");
             }
         }

@@ -16,6 +16,10 @@ installed or applied** by any ghOSt script; `scripts/install.py` never touches i
   shows "Incorrect password". Caps Lock state is shown under the field.
 - Session and keyboard-layout buttons cycle through SDDM's sessions and layouts.
 - Sleep, restart and power buttons only appear when SDDM reports them available.
+- On-screen keyboard: hidden by default. The keyboard button (bottom left)
+  opens and closes it. The theme hosts its own panel (`KeyboardPanel.qml`), which
+  stops Qt's automatic one from `InputMethod=qtvirtualkeyboard`. If the module is
+  missing, the button is hidden and the theme still loads.
 - Background: off-black field, soft light, fine grain, and an optional faint
   ghost outline (`watermark=false` in `theme.conf` turns it off).
 - Fonts, icons and the outline are bundled under `assets/` with their licences.

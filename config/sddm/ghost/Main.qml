@@ -30,6 +30,7 @@ Item {
     readonly property bool hasLayouts: !!keyboard && !!keyboard.layouts && keyboard.layouts.length > 0
     readonly property string layoutName: hasLayouts ? keyboard.layouts[keyboard.currentLayout].longName : ""
     property string error: ""
+    property bool keyboardOpen: false
     property bool busy: false
     property date now: new Date()
 
@@ -323,8 +324,37 @@ Item {
             x: 240
             y: 992
             spacing: 10
+            Rectangle {
+                objectName: "keyboard-toggle"
+                visible: keyboardLoader.status === Loader.Ready
+                width: 38
+                height: 38
+                radius: root.radius
+                color: root.keyboardOpen ? root.ink : "transparent"
+                border.color: keyHover.hovered ? root.edgeHover : root.edge
+                border.width: 1
+                Image {
+                    anchors.centerIn: parent
+                    width: 17
+                    height: 17
+                    opacity: root.keyboardOpen ? 1 : .7
+                    source: "assets/icons/" + (root.keyboardOpen ? "keyboard-black" : "keyboard") + ".svg"
+                    sourceSize.width: 68
+                    sourceSize.height: 68
+                }
+                HoverHandler {
+                    id: keyHover
+                    cursorShape: Qt.PointingHandCursor
+                }
+                TapHandler {
+                    onTapped: {
+                        root.keyboardOpen = !root.keyboardOpen;
+                        password.forceActiveFocus();
+                    }
+                }
+            }
             Repeater {
-                model: [["display", "session"], ["keyboard", "layout"]]
+                model: [["display", "session"], ["language", "layout"]]
                 Rectangle {
                     id: pill
                     required property var modelData
@@ -410,5 +440,16 @@ Item {
                 }
             }
         }
+    }
+
+    // Loaded separately so a missing virtual-keyboard module cannot break the theme.
+    Loader {
+        id: keyboardLoader
+        source: "KeyboardPanel.qml"
+        width: Math.min(parent.width, 1200 * root.fit)
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: parent.height - (item ? item.height : 0)
+        z: 10
+        onLoaded: item.open = Qt.binding(() => root.keyboardOpen)
     }
 }

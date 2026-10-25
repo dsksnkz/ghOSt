@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-25 / SDDM on-screen keyboard behind a button
+
+The user confirmed the theme works at a real login, but the virtual keyboard
+covered the screen (system `InputMethod=qtvirtualkeyboard`). The theme now hosts
+its own hidden InputPanel with a toggle button; the layout pill uses the language
+icon. The theme test passes with the keyboard module loaded. Needs re-copying to
+`/usr/share/sddm/themes/ghost` by the user.
+
 ## 2026-10-25 / SDDM theme built, not installed
 
 The chosen login mockup (editorial left, ghost watermark) is now a real Qt 6 SDDM
