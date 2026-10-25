@@ -1,5 +1,12 @@
 # ghOSt progress
 
+## 2026-10-25 / Ghost brand mark
+
+The Turret Road G is replaced by a ghost drawn from the user's sketches: a solid
+24 × 24 mark with pixel-aligned eye and mouth cutouts, generated through
+`build_icons.py`. Icon, site and compile checks pass; deployed with one clean
+reload, along with the Intro app icon. [Record](changes/2026-10-25-ghost-brand.md).
+
 ## 2026-10-25 / Animation smoothness pass — calendar part pending
 
 Measured live: motion already ~200 fps; jank was 20–68 ms setup frames at

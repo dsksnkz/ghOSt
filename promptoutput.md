@@ -1,5 +1,11 @@
 prompts outputs here
 
+## 2026-10-25 / Ghost brand mark
+
+User: "Use the clean ghost as ghOSt's brand icon and deploy it." Brand source
+replaced, icons regenerated, deployed with one reload; Intro icon updated.
+Record: docs/changes/2026-10-25-ghost-brand.md.
+
 ## 2026-10-25 / Animation pass
 
 User: "still jittery, feels low on fps. also review all animations ... at least

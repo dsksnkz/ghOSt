@@ -2,4 +2,4 @@ Google Material Symbols Outlined - Google, Apache License 2.0.
 https://github.com/google/material-design-icons
 Control sources pinned to 10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7; weather sources from Google Fonts.
 Modified for ghOSt: normalized SVG bounds and monochrome color.
-ghost.svg is the separate Turret Road G brand outline, under its bundled OFL.
+ghost.svg is the separate ghOSt ghost brand mark, original ghOSt artwork.

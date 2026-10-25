@@ -17,7 +17,7 @@ Item {
 
         anchors.fill: parent
         // Version the cache key when replacing the pack during a live reload.
-        source: "icons/" + (icon.black ? "black/" : "white/") + icon.name + ".svg?v=material-20261024"
+        source: "icons/" + (icon.black ? "black/" : "white/") + icon.name + ".svg?v=ghost-20261025"
         // Parent surfaces have fractional scales (rail .9, sidebar .7/1.15).
         // Cache a larger SVG raster rather than magnifying a tiny 12–18px texture.
         // This changes sampling resolution only, never the icon's layout size.

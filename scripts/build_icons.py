@@ -105,7 +105,7 @@ def build(check=False):
             "https://github.com/google/material-design-icons\n"
             f"Control sources pinned to {REVISION}; weather sources from Google Fonts.\n"
             "Modified for ghOSt: normalized SVG bounds and monochrome color.\n"
-            "ghost.svg is the separate Turret Road G brand outline, under its bundled OFL.\n")
+            "ghost.svg is the separate ghOSt ghost brand mark, original ghOSt artwork.\n")
         for name, body in {**icons, **variants}.items():
             for tone, color in (("black", "#000000"), ("white", "#ffffff")):
                 files[directory / tone / f"{name}.svg"] = svg(name, body, color)

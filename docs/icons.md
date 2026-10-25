@@ -1,7 +1,7 @@
 # Icons
 
 ghOSt uses Google Material Symbols Outlined for its 63 system/control icon IDs,
-plus the existing Turret Road G brand mark. Both folder IDs share one Material
+plus the ghOSt ghost brand mark. Both folder IDs share one Material
 folder. Six weather variants use Google's lighter weight 200; other controls use
 regular 400, unfilled. Third-party application logos retain their own identities.
 
@@ -22,7 +22,9 @@ Normal builds are offline. No package installation, icon font or network runtime
 Material Symbols are Apache 2.0; full licence and modification notice ship in both
 export directories. Google artwork is normalized to a 24 × 24 viewBox with a
 one-pixel raster safety margin, exported in black/white without editing its paths.
-The G logo retains its [Turret Road OFL](../config/quickshell/ghost-bar/fonts/OFL-TurretRoad.txt).
+The ghost brand mark (2026-10-25, replacing the Turret Road G) is original ghOSt
+artwork drawn from the user's sketch: one solid 24 × 24 shape with pixel-aligned
+eye and mouth cutouts, source `assets/material-symbols/ghost-brand.svg`.
 
 ## Files and rebuild
 
