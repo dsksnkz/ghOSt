@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-25 / Rail and calendar redesign
+
+User: "remake the calendar bar / the top tray using your own design. dont overload
+the features, keep it minimalist, but zero AI ui slop. add style". Scope: rail and
+calendar, deploy when tested. Monochrome instrument style, no new features.
+Tests pass; deployed with one reload. Live calendar popup visual not opened.
+Record: docs/changes/2026-10-25-rail-calendar-redesign.md.
+
 ## 2026-10-25 / OSD exit range and animated scroll volume
 
 User: "make the it only dissapear after leaving the range abit more, and scroll

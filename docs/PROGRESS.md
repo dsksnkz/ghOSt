@@ -1,5 +1,16 @@
 # ghOSt progress
 
+## 2026-10-25 / Rail and calendar redesign
+
+User asked for an own-design minimalist rail and calendar with style. Rail keeps
+geometry and layout editor; adds hairline day scale with current-time notch, mono
+clock in viewfinder corners, shorter separators, no power glow. Calendar keeps
+733 × 310 plane, reveal and weather motion; becomes three hairline-divided columns
+with segmented tick gauges replacing liquid diamonds (no shader rendering). Rail,
+layout, compile, calendar IPC, 83 Python and site tests pass. Deployed three
+modules with one clean reload; live rail captured. Live calendar popup not opened.
+[Change record](changes/2026-10-25-rail-calendar-redesign.md).
+
 ## 2026-10-25 / Forgiving OSD hover range and animated volume scrolling
 
 An open edge OSD now retains a 72px inward range, its own card hover and active

@@ -79,10 +79,19 @@ PanelWindow {
         id: frame
         anchors.fill: parent
         radius: Theme.outerRadius * window.designScale
-        color: "#151515"
-        border.color: "#474747"
+        color: "#0b0b0b"
+        border.color: "#272727"
         border.width: 1
         opacity: window.reveal
+        // Machined top edge: a faint highlight inside the outline.
+        Rectangle {
+            x: frame.radius
+            y: 1
+            width: frame.width - 2 * frame.radius
+            height: 1
+            color: "#ffffff"
+            opacity: .06
+        }
         transform: Translate {
             y: -28 * (1 - window.reveal)
         }

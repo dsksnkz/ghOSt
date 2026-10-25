@@ -51,16 +51,55 @@ Item {
             width: 1920 - 38 * Theme.railOuterGapScale
             height: 46 * Theme.railVerticalScale
             radius: Theme.outerRadius
+            id: housing
             gradient: null
-            color: "#191919"
+            color: "#0b0b0b"
             border.width: 0
             G2Surface {
                 anchors.fill: parent
                 anchors.margins: -1
                 radius: Theme.outerRadius + 1
                 color: "transparent"
-                border.color: "#4d4d4d"
+                border.color: "#272727"
                 border.width: 1
+            }
+            // Machined top edge: a faint highlight inside the outline.
+            Rectangle {
+                x: housing.radius
+                y: 1
+                width: housing.width - 2 * housing.radius
+                height: 1
+                color: "#ffffff"
+                opacity: .06
+            }
+            // Day scale along the lower edge: hour ticks, quarter-day marks
+            // and a single bright notch at the current time of day.
+            Item {
+                id: dayScale
+                objectName: "rail-day-scale"
+                x: 19
+                width: housing.width - 38
+                y: housing.height - 6
+                height: 5
+                readonly property real progress: (bar.displayTime.getHours() * 60 + bar.displayTime.getMinutes()) / 1440
+                Repeater {
+                    model: 25
+                    Rectangle {
+                        required property int index
+                        x: Math.round(index / 24 * dayScale.width)
+                        y: dayScale.height - height
+                        width: 1
+                        height: index % 6 === 0 ? 4 : 2
+                        color: index % 6 === 0 ? "#333333" : "#1f1f1f"
+                    }
+                }
+                Rectangle {
+                    objectName: "rail-day-now"
+                    x: Math.round(dayScale.progress * dayScale.width)
+                    width: 1
+                    height: dayScale.height
+                    color: "#ffffff"
+                }
             }
             Item {
                 id: controls
@@ -99,18 +138,18 @@ Item {
                 G2Surface {
                     x: 1598 + controls.extraWidth
                     visible: !bar.layout
-                    y: 5
+                    y: 16
                     width: 1
-                    height: 36
-                    color: "#3a3a3a"
+                    height: 14
+                    color: "#2c2c2c"
                 }
                 G2Surface {
                     x: 1821 + controls.extraWidth
                     visible: !bar.layout
-                    y: 5
+                    y: 16
                     width: 1
-                    height: 36
-                    color: "#3a3a3a"
+                    height: 14
+                    color: "#2c2c2c"
                 }
                 MusicBar {
                     objectName: "rail-element-music"
@@ -138,10 +177,34 @@ Item {
                         anchors.fill: parent
                         horizontalAlignment: Text.AlignHCenter
                         text: Qt.formatDateTime(bar.displayTime, "HH:mm")
-                        font.family: Theme.font
-                        font.pixelSize: 26
-                        font.weight: Theme.boldWeight
+                        font.family: Theme.jetRegular.name
+                        font.pixelSize: 24
+                        font.weight: Font.Normal
+                        font.letterSpacing: 1
                         color: "#ffffff"
+                    }
+                    // Viewfinder corners framing the clock readout.
+                    Repeater {
+                        model: [[0, 0], [1, 0], [0, 1], [1, 1]]
+                        Item {
+                            required property var modelData
+                            x: modelData[0] ? centerClock.width - 6 : 0
+                            y: modelData[1] ? 25 : 6
+                            width: 6
+                            height: 6
+                            Rectangle {
+                                x: parent.modelData[0] ? 4.8 : 0
+                                width: 1.2
+                                height: 6
+                                color: "#3c3c3c"
+                            }
+                            Rectangle {
+                                y: parent.modelData[1] ? 4.8 : 0
+                                width: 6
+                                height: 1.2
+                                color: "#3c3c3c"
+                            }
+                        }
                     }
                 }
                 Key {
@@ -198,8 +261,8 @@ Item {
                         width: 38
                         height: 32
                         text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
+                        font.family: Theme.jetRegular.name
                         font.pixelSize: 12
-                        font.weight: Theme.boldWeight
                         color: "#ffffff"
                     }
                     SvgIcon {
@@ -221,20 +284,6 @@ Item {
                     height: 32
                     hint: "Power"
                     onClicked: bar.open("session", this)
-                    Canvas {
-                        x: 0
-                        y: -4
-                        width: 39
-                        height: 39
-                        onPaint: {
-                            const c = getContext("2d"), g = c.createRadialGradient(19.5, 19.5, 1, 19.5, 19.5, 18);
-                            c.clearRect(0, 0, width, height);
-                            g.addColorStop(0, "rgba(255,255,255,.19)");
-                            g.addColorStop(1, "rgba(255,255,255,0)");
-                            c.fillStyle = g;
-                            c.fillRect(0, 0, width, height);
-                        }
-                    }
                     SvgIcon {
                         id: powerIcon
                         x: 8.5
