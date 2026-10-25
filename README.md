@@ -20,19 +20,12 @@ A monochrome desktop shell for Arch Linux and Hyprland, built with Quickshell.
 The website shows component captures and labeled browser motion demonstrations,
 not remote desktop controls. [Google Material SVG icons](docs/icons.md) are bundled with their licence.
 
-[ghOSt Intro](docs/intro.md) is a searchable, floating desktop tutorial app.
-Volume opens at the middle of either screen edge; scroll there or use the OSD slider.
 
 ## Install
 
 Requires Arch Linux, Hyprland, Quickshell with networking/Bluetooth/PipeWire,
 Python 3 with GObject/Gio, and JetBrains Mono Nerd Font Mono.
-The current [reversible font trial](docs/changes/2026-10-24-font-trial.md) uses
-installed Adwaita Sans for UI text; original font assets remain available.
-Click sounds use Qt Multimedia (`qt6-multimedia`); hardware brightness uses
-`brightnessctl` where a writable backlight exists.
-The music rail uses installed `cava` for 15 background spectrum bars; no audio
-samples are saved. Without Cava the background stays quiet.
+
 [Hyprland integration](docs/hyprland.md) contains the current ghOSt window/motion
 rules, portable autostart and optional shortcut replacements. Replace matching
 bindings deliberately; the installer does not add shortcut modules.
@@ -56,17 +49,3 @@ bars deliberately to avoid overlap.
 `./install.sh --restore` restores verified integration snapshots. Later edits
 may require reconciliation. Backups live in `~/.local/state/ghost/backups`.
 
-## Limits and checks
-
-An embedded equalizer remains pending. The new lock's real PAM/compositor round trip
-requires normal user verification; automated checks never lock the desktop. Notifications preserve
-an existing server; observation-mode DND cannot silence that server's banners.
-Unavailable readings and services are shown honestly. Private preferences,
-notification history and recovery snapshots are not published.
-
-[Verification](docs/verification.md) · [Install/source details](docs/source.md)
-
-```sh
-python3 -m unittest discover -s tests -v
-node --test tests/test_site.mjs
-```
