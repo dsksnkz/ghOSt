@@ -10,6 +10,9 @@ QtObject {
     readonly property real railHeight: (46 + 18 * railOuterGapScale) * railVerticalScale
     // Reference coordinates stay fixed; the complete calendar scales together.
     readonly property real calendarScale: 1.12
+    // Calendar design plane; the window keeps this aspect ratio at every size.
+    readonly property real calendarPlaneWidth: 820
+    readonly property real calendarPlaneHeight: 380
     // Reversible sans-serif trial. Original bundled faces remain available.
     readonly property string font: "Adwaita Sans"
     // Keep emphasis, with a modest 50-point reduction for the sans-serif trial.
@@ -49,8 +52,8 @@ QtObject {
     readonly property int panel: 220
 
     function calendarWidth(screenWidth, screenHeight) {
-        const desired = screenWidth * 733 / 1920 * calendarScale;
-        const heightLimit = Math.max(1, screenHeight - 100) * 733 / 310;
+        const desired = screenWidth * calendarPlaneWidth / 1920 * calendarScale;
+        const heightLimit = Math.max(1, screenHeight - 100) * calendarPlaneWidth / calendarPlaneHeight;
         return Math.floor(Math.min(desired, screenWidth - 32, heightLimit));
     }
 

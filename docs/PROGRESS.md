@@ -1,5 +1,15 @@
 # ghOSt progress
 
+## 2026-10-25 / Spacious calendar and media popup
+
+Calendar plane 820 × 380 (Theme constants) with a date header, tonal action
+tiles, whitespace-separated columns, rounded fill gauges and circular day keys.
+New MediaPanel for the popup opened from the rail audio element: artwork or
+live bars, title/artist/album, seek bar, white play circle. The rail element
+itself was briefly restyled by mistake and is restored. Input, rail, compile,
+calendar IPC and 83 Python tests pass. Deployed, clean reloads. Neither popup
+opened on the live desktop. [Change record](changes/2026-10-25-spacious-calendar-audio.md).
+
 ## 2026-10-25 / Rail and calendar redesign
 
 User asked for an own-design minimalist rail and calendar with style. Rail keeps

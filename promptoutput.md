@@ -1,5 +1,14 @@
 prompts outputs here
 
+## 2026-10-25 / Spacious calendar and audio bar
+
+User: "the ui seems cramped abit in space. redesign in a more modern ui. also
+redesign the audio bar in top bar". Calendar enlarged to 820 × 380 with header and
+whitespace. Correction: "change the bar which appears after clicking the audio
+element ... not change the audio element top bar" — rail element restored; new
+MediaPanel popup. Tests pass; deployed with clean reloads.
+Record: docs/changes/2026-10-25-spacious-calendar-audio.md.
+
 ## 2026-10-25 / Rail and calendar redesign
 
 User: "remake the calendar bar / the top tray using your own design. dont overload

@@ -98,7 +98,7 @@ Item {
     property string notice: ""
     property int elapsed: 1500
     property var order: [0, 1, 2, 3, 4, 5]
-    implicitHeight: width * 310 / 733
+    implicitHeight: width * Theme.calendarPlaneHeight / Theme.calendarPlaneWidth
     function beginReveal() {
         let shuffled = [0, 1, 2, 3, 4, 5];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -285,7 +285,7 @@ Item {
             }
         }
     }
-    // Segmented instrument gauge: a row of hairline ticks, lit up to the level.
+    // Rounded fill bar with label and mono readout.
     component Gauge: Item {
         id: gauge
         property string title: ""
@@ -298,7 +298,7 @@ Item {
         property real shown: level
         Behavior on shown {
             NumberAnimation {
-                duration: Theme.reducedMotion ? 0 : 320
+                duration: Theme.reducedMotion ? 0 : 420
                 easing.type: Easing.OutCubic
             }
         }
@@ -309,7 +309,7 @@ Item {
                 level: shown
             };
         }
-        width: 197
+        width: 220
         height: 52
         activeFocusOnTab: true
         Keys.onReturnPressed: clicked()
@@ -317,11 +317,9 @@ Item {
         Accessible.role: Accessible.Button
         Accessible.name: title + ": " + (available ? Math.round(value) + unit : "Unavailable")
         Label {
-            y: 4
+            y: 6
             text: gauge.title
-            font.pixelSize: 9
-            font.weight: Theme.demiWeight
-            font.letterSpacing: 1.6
+            font.pixelSize: 12
             color: hover.hovered || gauge.activeFocus ? Theme.text : Theme.muted
             Behavior on color {
                 ColorAnimation {
@@ -329,39 +327,39 @@ Item {
                 }
             }
         }
-        Text {
+        Row {
             anchors.right: parent.right
-            y: -4
-            text: gauge.available ? Math.round(gauge.value) + (gauge.unit === "%" ? "" : " ") : "—"
-            font.family: Theme.jetRegular.name
-            font.pixelSize: 21
-            font.weight: Font.Light
-            color: Theme.text
-            renderType: Text.QtRendering
+            y: 0
+            spacing: 3
             Text {
-                anchors.left: parent.right
-                anchors.baseline: parent.baseline
-                anchors.leftMargin: 1
+                text: gauge.available ? Math.round(gauge.value) : "—"
+                font.family: Theme.jetRegular.name
+                font.pixelSize: 20
+                font.weight: Font.Light
+                color: Theme.text
+                renderType: Text.QtRendering
+            }
+            Text {
                 visible: gauge.available
+                y: 8
                 text: gauge.unit
                 font.family: Theme.jetRegular.name
                 font.pixelSize: 10
                 color: Theme.muted
+                renderType: Text.QtRendering
             }
-            anchors.rightMargin: gauge.available ? (gauge.unit === "%" ? 9 : 22) : 0
         }
-        Row {
-            y: 32
-            spacing: 3
-            Repeater {
-                model: 40
-                Rectangle {
-                    required property int index
-                    width: 2
-                    height: index % 10 === 0 ? 12 : 8
-                    y: 12 - height
-                    color: (index + .5) / 40 <= gauge.shown ? Theme.text : "#2b2b2b"
-                }
+        Rectangle {
+            y: 36
+            width: parent.width
+            height: 4
+            radius: 2
+            color: "#1d1d1d"
+            Rectangle {
+                width: Math.max(gauge.shown > 0 ? height : 0, parent.width * gauge.shown)
+                height: parent.height
+                radius: 2
+                color: Theme.text
             }
         }
         HoverHandler {
@@ -376,47 +374,102 @@ Item {
         }
     }
     component Caption: Label {
-        font.pixelSize: 9
-        font.weight: Theme.demiWeight
-        font.letterSpacing: 1.6
+        font.pixelSize: 12
         color: Theme.muted
+    }
+    // Tonal square button used for the header actions and month arrows.
+    component Tile: Key {
+        property string icon: ""
+        property real iconSize: 18
+        width: 36
+        height: 36
+        radius: 7
+        color: "#151515"
+        SvgIcon {
+            anchors.centerIn: parent
+            width: parent.iconSize
+            height: parent.iconSize
+            name: parent.icon
+        }
     }
     readonly property string mono: Theme.jetRegular.name
     Item {
-        width: 733
-        height: 310
-        scale: cal.width / 733
+        width: Theme.calendarPlaneWidth
+        height: Theme.calendarPlaneHeight
+        scale: cal.width / Theme.calendarPlaneWidth
         transformOrigin: Item.TopLeft
-        // Three columns on a 28 px margin, separated by hairlines.
-        Repeater {
-            model: [244.5, 488.5]
-            Rectangle {
-                required property real modelData
-                x: modelData
-                y: 30
-                width: 1
-                height: 250
-                color: "#1e1e1e"
+        // Header: the selected date, with actions on the right.
+        Item {
+            x: 32
+            y: 28
+            width: 756
+            height: 44
+            Text {
+                objectName: "calendar-date-title"
+                y: -2
+                text: Qt.formatDateTime(cal.selectedDate, "dddd d MMMM")
+                font.family: Theme.font
+                font.pixelSize: 26
+                font.weight: Font.Light
+                color: Theme.text
+                renderType: Text.QtRendering
             }
+            Caption {
+                y: 32
+                text: cal.selectedDate.toDateString() === cal.now.toDateString() ? "Today" : Qt.formatDateTime(cal.selectedDate, "yyyy")
+            }
+            Row {
+                anchors.right: parent.right
+                spacing: 8
+                opacity: cal.groupOpacity(5)
+                Repeater {
+                    model: [
+                        {icon: "search", hint: "Applications", page: "launcher"},
+                        {icon: "settings", hint: "Settings", page: "settings"},
+                        {icon: "power", hint: "Power", page: "session"}
+                    ]
+                    Tile {
+                        required property var modelData
+                        icon: modelData.icon
+                        hint: modelData.hint
+                        onClicked: cal.navigateRequested(modelData.page)
+                    }
+                }
+            }
+        }
+        Rectangle {
+            x: 32
+            y: 96
+            width: 756
+            height: 1
+            color: "#1b1b1b"
         }
         Item {
             id: weatherSection
-            x: 28
-            y: 26
-            width: 192
-            height: 260
+            x: 32
+            y: 120
+            width: 220
+            height: 230
             opacity: cal.groupOpacity(0)
             readonly property string condition: cal.displayedCondition
             readonly property var temperature: cal.displayedTemperature
             Caption {
-                text: "WEATHER"
+                text: "Weather"
+            }
+            // Wheel anywhere over the weather column steps through the forecast.
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: event => {
+                    cal.selectForecast(cal.forecastIndex + (event.angleDelta.y > 0 ? -1 : 1));
+                }
             }
             Item {
                 id: weatherHeadline
                 objectName: "weather-headline"
-                y: 26
-                width: 192
-                height: 64
+                y: 30
+                width: 220
+                height: 60
                 opacity: 1 - 0.7 * cal.weatherBlur
                 layer.enabled: cal.weatherBlur > 0
                 layer.effect: MultiEffect {
@@ -426,16 +479,16 @@ Item {
                 }
                 WeatherGlyph {
                     id: weatherArt
-                    y: 4
-                    scale: 54 / 108
+                    y: 2
+                    scale: 52 / 108
                     transformOrigin: Item.TopLeft
                     condition: weatherSection.condition
                     active: cal.active
                     reducedMotion: cal.reducedMotion
                 }
                 Text {
-                    x: 74
-                    y: -6
+                    x: 70
+                    y: -8
                     text: typeof weatherSection.temperature === "number" ? Math.round(weatherSection.temperature) : "—"
                     font.family: cal.mono
                     font.pixelSize: 44
@@ -443,33 +496,27 @@ Item {
                     color: Theme.text
                     renderType: Text.QtRendering
                     Text {
-                        x: parent.contentWidth + 2
-                        y: 8
+                        x: parent.contentWidth + 3
+                        y: 9
                         visible: typeof weatherSection.temperature === "number"
                         text: "°C"
                         font.family: cal.mono
-                        font.pixelSize: 13
+                        font.pixelSize: 12
                         color: Theme.muted
                     }
                 }
                 Label {
-                    x: 77
-                    y: 48
+                    x: 72
+                    y: 46
                     text: weatherSection.condition === "unknown" ? "No data" : weatherSection.condition.charAt(0).toUpperCase() + weatherSection.condition.slice(1)
-                    font.pixelSize: 11
+                    font.pixelSize: 12
                     color: Theme.muted
                 }
             }
-            Rectangle {
-                y: 104
-                width: 192
-                height: 1
-                color: "#1e1e1e"
-            }
             Item {
                 objectName: "weather-forecast-list"
-                y: 116
-                width: 192
+                y: 104
+                width: 220
                 height: 130
                 clip: true
                 Column {
@@ -488,31 +535,22 @@ Item {
                             required property var modelData
                             required property int index
                             readonly property bool current: index === cal.forecastIndex
-                            width: 192
+                            width: 220
                             height: 26
-                            radius: 3
-                            color: "transparent"
+                            radius: 6
+                            color: current ? "#151515" : "transparent"
                             opacity: current ? 1 : Math.abs(index - cal.forecastIndex) > 1 ? .35 : .6
                             hint: cal.labelDay(modelData.date) + " forecast"
                             onClicked: cal.selectForecast(index)
-                            Rectangle {
-                                x: 0
-                                y: 8
-                                width: 2
-                                height: 10
-                                color: Theme.text
-                                visible: day.current
-                            }
                             Label {
-                                x: 12
+                                x: 10
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: 82
+                                width: 96
                                 text: cal.labelDay(day.modelData.date)
-                                font.pixelSize: 11
-                                font.weight: day.current ? Theme.mediumWeight : Font.Normal
+                                font.pixelSize: 12
                             }
                             SvgIcon {
-                                x: 100
+                                x: 118
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: 15
                                 height: 15
@@ -520,7 +558,7 @@ Item {
                             }
                             Text {
                                 anchors.right: parent.right
-                                anchors.rightMargin: 6
+                                anchors.rightMargin: 10
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: Math.round(day.modelData.temperature) + "°"
                                 font.family: cal.mono
@@ -531,34 +569,27 @@ Item {
                         }
                     }
                 }
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.NoButton
-                    onWheel: event => {
-                        cal.selectForecast(cal.forecastIndex + (event.angleDelta.y > 0 ? -1 : 1));
-                    }
-                }
                 Label {
                     visible: !(cal.weather.days?.length)
                     y: 4
                     text: cal.weather.error || "Weather unavailable"
-                    font.pixelSize: 10
+                    font.pixelSize: 11
                     color: Theme.muted
-                    width: 190
+                    width: 210
                     wrapMode: Text.WordWrap
                 }
             }
         }
         Caption {
-            x: 268
-            y: 26
-            text: "SYSTEM"
+            x: 300
+            y: 120
+            text: "System"
             opacity: Math.max(cal.groupOpacity(1), cal.groupOpacity(2), cal.groupOpacity(3))
         }
         Gauge {
             id: gpuMeter
-            x: 268
-            y: 60
+            x: 300
+            y: 150
             title: "GPU"
             value: cal.readings.gpu ?? null
             opacity: cal.groupOpacity(1)
@@ -566,67 +597,38 @@ Item {
         }
         Gauge {
             id: ramMeter
-            x: 268
-            y: 118
-            title: "RAM"
+            x: 300
+            y: 226
+            title: "Memory"
             value: cal.readings.memory ?? null
             opacity: cal.groupOpacity(2)
             onClicked: cal.notice = "RAM · " + (available ? Math.round(value) + "%" : "Unavailable")
         }
         Gauge {
             id: cpuMeter
-            x: 268
-            y: 176
-            title: cal.clockMetric ? "CPU CLOCK" : "CPU"
+            x: 300
+            y: 300
+            title: cal.clockMetric ? "CPU clock" : "CPU"
             value: cal.clockMetric ? cal.readings.processor ?? null : cal.readings.cpu ?? null
             maximum: cal.clockMetric ? cal.readings.maximum ?? 0 : 100
             unit: cal.clockMetric ? "MHz" : "%"
             opacity: cal.groupOpacity(3)
             onClicked: cal.clockMetric = !cal.clockMetric
         }
-        Row {
-            x: 268
-            y: 248
-            spacing: 8
-            opacity: cal.groupOpacity(5)
-            Repeater {
-                model: [
-                    {icon: "search", hint: "Applications", page: "launcher"},
-                    {icon: "settings", hint: "Settings", page: "settings"},
-                    {icon: "power", hint: "Power", page: "session"}
-                ]
-                Key {
-                    required property var modelData
-                    width: 60
-                    height: 32
-                    radius: 5
-                    border.width: activeFocus ? 1 : 1
-                    border.color: activeFocus ? Theme.text : "#2c2c2c"
-                    hint: modelData.hint
-                    onClicked: cal.navigateRequested(modelData.page)
-                    SvgIcon {
-                        anchors.centerIn: parent
-                        width: 17
-                        height: 17
-                        name: parent.modelData.icon
-                    }
-                }
-            }
-        }
         Label {
-            x: 268
-            y: 290
-            width: 197
+            x: 300
+            y: 344
+            width: 220
             text: cal.notice
-            font.pixelSize: 9
+            font.pixelSize: 10
             color: Theme.muted
         }
         Item {
             id: monthView
-            x: 513
-            y: 26
-            width: 192
-            height: 260
+            x: 552
+            y: 120
+            width: 236
+            height: 236
             opacity: cal.groupOpacity(4)
             readonly property real cell: width / 7
             Keys.onPressed: event => {
@@ -639,37 +641,28 @@ Item {
                 }
             }
             Caption {
-                text: Qt.formatDateTime(cal.month, "MMMM yyyy").toUpperCase()
+                text: Qt.formatDateTime(cal.month, "MMMM yyyy")
                 color: Theme.text
             }
             Row {
                 anchors.right: parent.right
                 y: -6
-                Key {
-                    width: 22
-                    height: 22
-                    radius: 3
+                spacing: 4
+                Tile {
+                    width: 26
+                    height: 26
+                    iconSize: 12
+                    icon: "back"
                     hint: "Previous month"
                     onClicked: cal.monthStep(-1)
-                    SvgIcon {
-                        anchors.centerIn: parent
-                        width: 12
-                        height: 12
-                        name: "back"
-                    }
                 }
-                Key {
-                    width: 22
-                    height: 22
-                    radius: 3
+                Tile {
+                    width: 26
+                    height: 26
+                    iconSize: 12
+                    icon: "forward"
                     hint: "Next month"
                     onClicked: cal.monthStep(1)
-                    SvgIcon {
-                        anchors.centerIn: parent
-                        width: 12
-                        height: 12
-                        name: "forward"
-                    }
                 }
             }
             Grid {
@@ -682,51 +675,50 @@ Item {
                         required property int index
                         text: modelData
                         width: monthView.cell
-                        height: 20
+                        height: 22
                         horizontalAlignment: Text.AlignHCenter
                         color: index > 4 ? Theme.faint : Theme.muted
-                        font.pixelSize: 9
-                        font.weight: Theme.demiWeight
+                        font.pixelSize: 10
                     }
                 }
                 Repeater {
                     model: 42
-                    Key {
-                        id: dayKey
+                    Item {
+                        id: dayCell
                         required property int index
                         readonly property date day: new Date(cal.month.getFullYear(), cal.month.getMonth(), index - cal.offset + 1)
                         readonly property bool today: day.toDateString() === cal.now.toDateString()
+                        readonly property bool picked: day.toDateString() === cal.selectedDate.toDateString()
                         readonly property bool inMonth: day.getMonth() === cal.month.getMonth()
                         width: monthView.cell
-                        height: 25
-                        radius: 3
-                        selected: today
-                        border.width: !today && day.toDateString() === cal.selectedDate.toDateString() ? 1 : 0
-                        border.color: Theme.muted
-                        hint: Qt.formatDateTime(day, "dddd dd MMMM yyyy")
-                        onClicked: cal.selectedDate = day
-                        Text {
+                        height: 30
+                        Key {
                             anchors.centerIn: parent
-                            text: dayKey.day.getDate()
-                            font.family: cal.mono
-                            font.pixelSize: 11
-                            font.weight: dayKey.today ? Font.Medium : Font.Normal
-                            color: dayKey.today ? Theme.base : !dayKey.inMonth ? "#3a3a3a" : index % 7 > 4 ? Theme.muted : Theme.text
-                            renderType: Text.QtRendering
+                            width: 28
+                            height: 28
+                            radius: 14
+                            selected: dayCell.today
+                            color: dayCell.today ? Theme.text : dayCell.picked ? "#1d1d1d" : "transparent"
+                            hint: Qt.formatDateTime(dayCell.day, "dddd dd MMMM yyyy")
+                            onClicked: cal.selectedDate = dayCell.day
+                            Text {
+                                anchors.centerIn: parent
+                                text: dayCell.day.getDate()
+                                font.family: cal.mono
+                                font.pixelSize: 11
+                                font.weight: dayCell.today ? Font.Medium : Font.Normal
+                                color: dayCell.today ? Theme.base : !dayCell.inMonth ? "#3a3a3a" : dayCell.index % 7 > 4 ? Theme.muted : Theme.text
+                                renderType: Text.QtRendering
+                            }
                         }
                     }
                 }
             }
-            Caption {
-                y: 233
-                width: parent.width
-                text: Qt.formatDateTime(cal.selectedDate, "dddd · d MMMM").toUpperCase()
-            }
         }
         G2Surface {
             visible: cal.actionPage !== ""
-            x: 250
-            y: 70
+            x: 205
+            y: 100
             width: 410
             height: 230
             radius: Theme.outerRadius

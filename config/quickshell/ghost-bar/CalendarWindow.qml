@@ -44,7 +44,7 @@ PanelWindow {
     margins.top: 82 * designScale
     margins.left: Math.round((screen.width - implicitWidth) / 2)
     implicitWidth: Theme.calendarWidth(screen.width, screen.height)
-    implicitHeight: Math.round(implicitWidth * 310 / 733)
+    implicitHeight: Math.round(implicitWidth * Theme.calendarPlaneHeight / Theme.calendarPlaneWidth)
     color: "transparent"
     visible: opened || reveal > .001
     exclusionMode: ExclusionMode.Ignore

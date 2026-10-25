@@ -83,7 +83,9 @@ Item {
         return item.status();
     }
     // Keep the launcher frame full-size even before its Loader has completed.
-    implicitHeight: popup.page === "launcher" ? 328 : body.implicitHeight + (popup.page === "calendar" ? 0 : 46)
+    // Calendar and media draw their own header inside the page.
+    readonly property bool ownHeader: popup.page === "calendar" || popup.page === "media"
+    implicitHeight: popup.page === "launcher" ? 328 : body.implicitHeight + (ownHeader ? 0 : 46)
     focus: true
     Keys.onEscapePressed: {
         if (popup.page === "calendar" && pageLoader.item?.actionPage)
@@ -107,7 +109,7 @@ Item {
         }
     ]
     Material {
-        visible: popup.page !== "calendar" && popup.page !== "launcher"
+        visible: !content.ownHeader && popup.page !== "launcher"
         anchors.fill: parent
         anchors.margins: 1
         radius: Theme.outerRadius
@@ -126,14 +128,32 @@ Item {
         anchors.fill: parent
         radius: Theme.outerRadius
     }
+    G2Surface {
+        id: mediaFrame
+        visible: popup.page === "media"
+        anchors.fill: parent
+        radius: Theme.outerRadius
+        color: "#0b0b0b"
+        border.color: "#272727"
+        border.width: 1
+        // Machined top edge, matching the calendar frame.
+        Rectangle {
+            x: mediaFrame.radius
+            y: 1
+            width: mediaFrame.width - 2 * mediaFrame.radius
+            height: 1
+            color: "#ffffff"
+            opacity: .06
+        }
+    }
     Column {
         id: body
-        x: popup.page === "calendar" ? 0 : popup.page === "launcher" ? 16 : 22
-        y: popup.page === "calendar" ? 0 : popup.page === "launcher" ? 16 : 19
-        width: parent.width - (popup.page === "calendar" ? 0 : popup.page === "launcher" ? 32 : 44)
-        spacing: popup.page === "calendar" ? 0 : 17
+        x: content.ownHeader ? 0 : popup.page === "launcher" ? 16 : 22
+        y: content.ownHeader ? 0 : popup.page === "launcher" ? 16 : 19
+        width: parent.width - (content.ownHeader ? 0 : popup.page === "launcher" ? 32 : 44)
+        spacing: content.ownHeader ? 0 : 17
         Row {
-            visible: popup.page !== "calendar" && popup.page !== "launcher"
+            visible: !content.ownHeader && popup.page !== "launcher"
             width: parent.width
             Column {
                 width: parent.width - 32
@@ -172,7 +192,7 @@ Item {
             }
         }
         G2Surface {
-            visible: popup.page !== "calendar" && popup.page !== "launcher"
+            visible: !content.ownHeader && popup.page !== "launcher"
             width: parent.width
             height: 1
             color: Theme.line
@@ -416,11 +436,9 @@ Item {
     }
     Component {
         id: mediaPage
-        MusicBar {
+        MediaPanel {
             active: content.popup.opened
-            compact: false
             width: body.width
-            property string soundGroup: "rail"
         }
     }
     Component {
