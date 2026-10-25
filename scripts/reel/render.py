@@ -20,6 +20,9 @@ ASSETS = ROOT / '.local/reel'
 MUSIC = Path.home() / 'Downloads/mixkit-cbpd-400-20s-drop2.mp3'
 OUTPUT = ASSETS / 'ghOSt-showreel.mp4'
 W, H, FPS, DURATION = 1920, 1080, 60, 20.0
+# Playback speed: 0.85 renders the same reel 15% slower, with the music
+# time-stretched to match (pitch kept), so every hit stays on its beat.
+SPEED = float(__import__('os').environ.get('GHOST_REEL_SPEED', '1'))
 
 # Measured from the soundtrack (scripts/reel/README.md explains the method).
 KICKS = [1.96, 2.58, 3.2, 3.825, 4.86, 5.275, 5.9, 6.52, 7.145, 8.18, 8.595, 9.215, 9.84,
@@ -634,7 +637,7 @@ SCENES = [(0, intro), (BARS[0], identity), (BARS[1], xray_stack), (BARS[3], rail
 
 
 def render_frame(index):
-    t = index / FPS
+    t = min(DURATION - .5 / FPS, index / FPS * SPEED)
     scene = [function for start, function in SCENES if t >= start - 1e-6][-1]
     return scene(t).tobytes()
 
@@ -661,12 +664,15 @@ def _lower_priority():
 
 def render(workers=3):
     prepare_marks()
-    frames = int(DURATION * FPS)
+    frames = round(DURATION / SPEED * FPS)
+    output = OUTPUT if SPEED == 1 else OUTPUT.with_name(f'ghOSt-showreel-{round(SPEED * 100)}.mp4')
+    # atempo pulls drum attacks ~14 ms early; the delay re-centres them (measured at 0.85).
+    audio = [] if SPEED == 1 else ['-af', f'atempo={SPEED},adelay=14:all=1']
     encoder = subprocess.Popen(
         ['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}',
          '-r', str(FPS), '-i', '-', '-i', str(MUSIC), '-map', '0:v', '-map', '1:a',
          '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
-         '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', str(OUTPUT)],
+         *audio, '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', str(output)],
         stdin=subprocess.PIPE)
     with Pool(workers, initializer=_lower_priority) as pool:
         for done, data in enumerate(pool.imap(render_frame, range(frames), chunksize=4)):
@@ -676,7 +682,7 @@ def render(workers=3):
     encoder.stdin.close()
     if encoder.wait():
         raise SystemExit('ffmpeg failed')
-    print('Wrote', OUTPUT)
+    print('Wrote', output)
 
 
 if __name__ == '__main__':

@@ -10,6 +10,11 @@ python3 scripts/reel/render.py    # -> .local/reel/ghOSt-showreel.mp4
 python3 scripts/reel/render.py preview 2.0 4.7 9.6   # single frames for review
 ```
 
+`GHOST_REEL_SPEED=0.85 python3 scripts/reel/render.py` renders the same reel 15%
+slower (`ghOSt-showreel-85.mp4`, 23.5 s): scene time is scaled, the music is
+time-stretched with pitch kept and delayed 14 ms to cancel the stretch's transient
+shift. Measured: all 27 kicks within one frame (median 1.7 ms).
+
 The soundtrack is `~/Downloads/mixkit-cbpd-400-20s-drop2.mp3` (the 20 s cut with the
 beat entering at 0:02). It is not committed.
 
