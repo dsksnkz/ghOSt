@@ -10,7 +10,7 @@ var topics = [
      action: "wallpaper", button: "Open Wallpaper", keywords: "background picture image theme"},
     {id: "sound", title: "Sound and edge volume", icon: "volume", recommended: true,
      summary: "Use either screen edge to reveal the volume slider.",
-     body: "Touch anywhere along the left or right screen edge for a moment. The OSD follows your pointer's height and stays inside the screen. Scroll there in 2% steps, or drag the OSD slider. Touching an edge alone never changes volume. Fullscreen apps keep their edges. Settings → Sound also controls output, input and interface click sounds.",
+     body: "Hold the pointer anywhere along the left or right screen edge for half a second. The OSD appears at that height and stays fixed until you leave the edge. Scroll there in 2% steps. Hovering alone never changes volume. Fullscreen apps keep their edges. Volume/brightness keys also open the usual touch/drag OSD. Settings → Sound controls output, input and interface click sounds.",
      action: "sound", button: "Open Sound", keywords: "audio speaker microphone sfx click mute brightness osd"},
     {id: "workspaces", title: "Move between desktops", icon: "display", recommended: false,
      summary: "Switch workspaces without losing your windows.",

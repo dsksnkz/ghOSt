@@ -14,12 +14,42 @@ Singleton {
     property string edgeSide: "left"
     // Screen-local logical Y. Negative means a non-pointer/keyboard OSD.
     property real pointerY: -1
+    property bool edgeHeld: false
     property var brightness: null
     property int lastBrightness: -1
     property real pendingBrightness: 0
     readonly property real amount: kind === "brightness" ? brightness ?? 0 : Desk.volume
     readonly property bool available: kind === "brightness" ? brightness !== null : !!Desk.audio
+    function ownsEdge(targetScreen, side) {
+        return edgeHeld && screenName === targetScreen && edgeSide === side;
+    }
+    function holdEdge(targetScreen, side, y) {
+        if (ownsEdge(targetScreen, side))
+            return;
+        show("volume", targetScreen, side, y);
+        edgeHeld = true;
+        expiry.stop();
+    }
+    function releaseEdge(targetScreen, side) {
+        if (!ownsEdge(targetScreen, side))
+            return;
+        edgeHeld = false;
+        opened = false;
+        expiry.stop();
+    }
+    function keepVisible() {
+        if (edgeHeld)
+            expiry.stop();
+        else
+            expiry.restart();
+    }
     function show(value, targetScreen = "", side = "", y = -1) {
+        // Audio callbacks during edge scrolling must preserve its latched origin.
+        if (edgeHeld && !side && value === "volume") {
+            opened = true;
+            return;
+        }
+        edgeHeld = false;
         if (side) {
             edgeSide = side;
             pointerY = Number.isFinite(y) ? y : -1;
@@ -30,7 +60,7 @@ Singleton {
         kind = value;
         screenName = targetScreen || Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name || "";
         opened = true;
-        expiry.restart();
+        keepVisible();
     }
     function request(value) {
         if (value === "brightness") {
@@ -40,7 +70,7 @@ Singleton {
             show(value);
     }
     function move(value) {
-        expiry.restart();
+        keepVisible();
         if (kind === "volume")
             Desk.setVolume(value / 100);
         else {
@@ -81,7 +111,9 @@ Singleton {
     Timer {
         id: expiry
         interval: 2200
-        onTriggered: if (osd.interacting)
+        onTriggered: if (osd.edgeHeld)
+            stop()
+        else if (osd.interacting)
             restart()
         else
             osd.opened = false

@@ -157,7 +157,8 @@ ShellRoot {
         function captureIntro(path: string): void { introWindow.capture(path); }
         function edgeVolume(): string {
             return JSON.stringify({opened: OsdState.opened, side: OsdState.edgeSide,
-                screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount, pointerY: OsdState.pointerY,
+                screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount,
+                pointerY: OsdState.pointerY, edgeHeld: OsdState.edgeHeld,
                 edges: Array.from(outputs.instances, output => ({screen: output.modelData.name,
                     top: EdgeVolume.bounds(output.modelData.height).top,
                     height: EdgeVolume.bounds(output.modelData.height).height, width: 2}))});

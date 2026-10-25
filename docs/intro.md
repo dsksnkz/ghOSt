@@ -28,11 +28,13 @@ entry/icon files before installing. It does not replace the icon theme.
 ## Edge volume
 
 The rail no longer has a volume element. Hover anywhere along either left/right
-edge for120ms to reveal the existing OSD on that side. The active region is2px
-wide and covers the full height, not just the center. The OSD centers vertically
-on the pointer, clamped near the top/bottom to stay on-screen. Pointer tracking
-is coalesced to at most one window-position update per16ms, only while active.
+edge for0.5seconds to reveal the existing OSD on that side. The active region is2px
+wide and covers the full height. The OSD centers at the pointer's height when
+the dwell completes, clamped near the top/bottom to stay on-screen. It then stays
+fixed and visible while the cursor remains at that edge, with no vertical tracking
+or inactivity timeout. Leaving the edge closes it; returning starts a new dwell.
 Fullscreen outputs disable the edge targets.
-Hovering alone never changes volume. Scroll in2% steps or drag/touch the OSD
-slider; it expires after2.2seconds without interaction. Brightness keys keep
-their existing OSD. The menu button still opens the sidebar; edges never do.
+Hovering alone never changes volume. Scrolling changes volume in2% steps only
+after the dwell. Clicks/wheel events do not bypass the wait. Hardware volume and
+brightness keys retain their usual touch/drag OSD and2.2second timeout. The menu
+button still opens the sidebar; edges never do.

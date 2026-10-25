@@ -1,5 +1,22 @@
 prompts outputs here
 
+## 2026-10-25 / 0.5s dwell, fixed placement, close on edge exit
+
+User: "change the osd to: it appears in the position of the cursor when touched
+the edge of the screen for 0.5s, then stays on the edge until mouse moves out of
+edge. it dosent follow the cursor vertically after already spawned".
+
+Implemented nonvisual EdgeHold500ms dwell/latch; early exit cancels. OSD samples
+Y at activation and holds it, stays visible without2.2s inactivity expiry, closes
+when leaving. No motion tracking timer. Pre-dwell clicks/wheel cannot bypass the
+delay; post-dwell scroll keeps2% steps. Keyboard OSD retains normal timeout/slider.
+Headless production state/timer tests with fake services pass, including remaining
+visible past2.2s, audio updates not moving it and release/reentry. Pure JS/compile
+pass. Deployed six modules and confirmed one clean automatic reload, no manual
+extra reload or physical cursor/game interaction. Screenshots/native pointer
+verification deferred during gaming; no claim those were performed. Recovery and
+evidence: docs/changes/2026-10-25-edge-dwell.md.
+
 ## 2026-10-25 / Activate full-height pointer-aligned OSD
 
 User: "activate". Low-priority production compile passed. Snapshotted exact six

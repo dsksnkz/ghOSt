@@ -1,5 +1,20 @@
 # ghOSt progress
 
+## 2026-10-25 / Half-second edge dwell and fixed OSD latch
+
+Latest direct behavior replaces vertical following: full-height edge requires
+500ms continuous hover, captures Y once on opening, stays fixed/visible until
+leaving, then closes. Early exit cancels; movement along the edge does not move
+the popup or restart dwell. Click/wheel cannot bypass the wait; post-dwell wheel
+still adjusts2%. Edge OSD no longer expires after2.2s; ordinary keyboard OSD
+keeps its existing timeout/touch behavior. Removed pointer-tracking timer.
+Production timer/state tests with fake audio/settings pass, including early
+cancel, capture-at-dwell, fixed position, hold past timeout, audio callbacks,
+release/reentry and normal expiry. Low-priority logic/compile pass. Deployed six
+modules, one automatic reload/Configuration Loaded; read-only diagnostics ready.
+No physical cursor tests, popups, screenshots or game changes while gaming.
+[Implementation and verification limits](changes/2026-10-25-edge-dwell.md).
+
 ## 2026-10-25 / Pointer-aligned full-height OSD activated
 
 User explicitly requested activation. Production surfaces compile at low process

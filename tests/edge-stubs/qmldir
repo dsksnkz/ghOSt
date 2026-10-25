@@ -1,0 +1,4 @@
+singleton Desk 1.0 Desk.qml
+singleton Settings 1.0 Settings.qml
+singleton OsdState 1.0 OsdState.qml
+EdgeHold 1.0 EdgeHold.qml
