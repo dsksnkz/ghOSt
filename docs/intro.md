@@ -28,7 +28,7 @@ entry/icon files before installing. It does not replace the icon theme.
 ## Edge volume
 
 The rail no longer has a volume element. Hover anywhere along either left/right
-edge for0.5seconds to reveal the existing OSD on that side. The active region is2px
+edge for0.2seconds to reveal the existing OSD on that side. The active region is2px
 wide and covers the full height. The OSD centers at the pointer's height when
 the dwell completes, clamped near the top/bottom to stay on-screen. It then stays
 fixed and visible while the cursor remains at that edge, with no vertical tracking

@@ -1,5 +1,10 @@
 # Half-second edge dwell and fixed-position OSD
 
+Latest correction: user reduced dwell to **200ms (0.2s)**. That delay supersedes
+the original500ms implementation below; all latch/exit behavior is unchanged.
+Updated headless production timer tests pass. Only EdgeHold/IntroTopics were
+deployed; snapshot `.local/backups/2026-10-25-edge-200ms/{project,live}/`.
+
 Latest instruction supersedes the earlier pointer-following design. Both screen
 edges remain full-height and2px wide; existing fullscreen suppression remains.
 

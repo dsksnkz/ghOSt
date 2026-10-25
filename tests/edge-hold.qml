@@ -12,20 +12,20 @@ ShellRoot {
     TestCase {
         name: "EdgeHold"
         function test_dwell_latch_release() {
-            compare(edge.dwellMs, 500);
+            compare(edge.dwellMs, 200);
             edge.pointerY = 200;
             edge.hovered = true;
-            wait(250);
+            wait(80);
             compare(edge.latched, false);
             compare(OsdState.opened, false);
             edge.hovered = false;
-            wait(300);
+            wait(250);
             compare(activations.count, 0);
 
             edge.hovered = true;
-            wait(300);
-            edge.pointerY = 450;
             wait(100);
+            edge.pointerY = 450;
+            wait(50);
             compare(edge.latched, false);
             tryCompare(edge, "latched", true, 400);
             compare(activations.count, 1);
@@ -56,7 +56,7 @@ ShellRoot {
             verify(!OsdState.edgeHeld && OsdState.opened);
             compare(OsdState.pointerY, -1);
             tryCompare(OsdState, "opened", false, 2600);
-            console.log("PASS: 500ms dwell/cancel, fixed origin, held visibility, audio updates, release/reentry and normal expiry");
+            console.log("PASS: edge dwell/cancel, fixed origin, held visibility, audio updates, release/reentry and normal expiry");
         }
     }
 }

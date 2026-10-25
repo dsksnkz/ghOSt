@@ -1,5 +1,13 @@
 # ghOSt progress
 
+## 2026-10-25 / Edge dwell reduced to0.2s
+
+Changed only activation delay from500ms to200ms, plus matching help/tests. Fixed
+spawn position, edge-held visibility, release behavior and fullscreen suppression
+unchanged. Nonvisual production timer/state tests pass at low priority; no cursor
+automation or visible tests. Two runtime files deployed in one batch. Snapshot:
+`.local/backups/2026-10-25-edge-200ms/{project,live}/`.
+
 ## 2026-10-25 / Half-second edge dwell and fixed OSD latch
 
 Latest direct behavior replaces vertical following: full-height edge requires

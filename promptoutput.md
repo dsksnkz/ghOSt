@@ -1,5 +1,13 @@
 prompts outputs here
 
+## 2026-10-25 / Dwell0.2seconds
+
+User: "change the time to 0.2s." Updated EdgeHold.dwellMs to200, matching Intro
+help, docs and test timings. Real nonvisual production timer/state tests pass;
+fixed placement/hold/exit and normal keyboard expiry unchanged. Deployed only
+EdgeHold and IntroTopics, with exact originals snapshotted under
+`.local/backups/2026-10-25-edge-200ms/`. No cursor or game interaction.
+
 ## 2026-10-25 / 0.5s dwell, fixed placement, close on edge exit
 
 User: "change the osd to: it appears in the position of the cursor when touched

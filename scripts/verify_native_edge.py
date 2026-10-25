@@ -23,7 +23,7 @@ def state():
 
 def move(x, y):
     subprocess.run(['ydotool', 'mousemove', '-a', '-x', str(x), '-y', str(y)], check=True)
-    time.sleep(.25)
+    time.sleep(.06)
 
 
 pointer = query('hyprctl', 'cursorpos', '-j')
@@ -42,8 +42,8 @@ try:
             move(x + width // 2, y + height // 2)
             assert not state()['edgeHeld'], 'Leaving the edge did not release the OSD'
             move(edge_x, y + target_y)
-            assert not state()['edgeHeld'], 'OSD bypassed the 0.5s dwell'
-            time.sleep(.4)
+            assert not state()['edgeHeld'], 'OSD bypassed the 0.2s dwell'
+            time.sleep(.25)
             actual_pointer = query('hyprctl', 'cursorpos', '-j')
             assert abs(actual_pointer['x'] - edge_x) <= 1, ('Pointer did not reach edge', actual_pointer)
             local_y = actual_pointer['y'] - y
@@ -65,6 +65,6 @@ try:
             assert state()['opened'], 'OSD expired while the pointer remained at the edge'
         move(x + width // 2, y + height // 2)
         assert not state()['opened'], 'OSD did not close after leaving edge'
-    print('PASS: native full-height 0.5s dwell, fixed origin, edge hold/release and unchanged volume')
+    print('PASS: native full-height 0.2s dwell, fixed origin, edge hold/release and unchanged volume')
 finally:
     move(pointer['x'], pointer['y'])

@@ -21,6 +21,6 @@ with tempfile.TemporaryDirectory(prefix='ghost-edge-hold-') as directory:
     result = subprocess.run(['quickshell', '-p', str(runtime / 'test.qml')], env=env,
                             capture_output=True, text=True, timeout=12)
 output = result.stdout + result.stderr
-assert result.returncode == 0 and 'PASS: 500ms dwell/cancel' in output, output
+assert result.returncode == 0 and 'PASS: edge dwell/cancel' in output, output
 assert not any(error in output for error in ('FAIL!', 'ReferenceError', 'TypeError')), output
 print('PASS: nonvisual production dwell/latch/expiry state with fake audio and settings')

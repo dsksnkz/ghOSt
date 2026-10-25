@@ -5,7 +5,7 @@ QtObject {
     id: hold
     property bool hovered: false
     property real pointerY: 0
-    readonly property int dwellMs: 500
+    readonly property int dwellMs: 200
     property bool latched: false
     signal activated(real y)
     signal released
