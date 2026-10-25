@@ -1,10 +1,11 @@
 # ghOSt progress
 
-## 2026-10-25 / Media popup slides down — live activation pending
+## 2026-10-25 / Media popup slides down
 
 Media popup now slides down from behind the rail at full size instead of
 scaling; other popups unchanged. Motion, compile, input and rail tests pass.
-Not deployed because CS2 was running.
+Held while CS2 ran; deployed after the user finished playing, one clean reload.
+Native slide not visually checked.
 [Record](changes/2026-10-25-spacious-calendar-audio.md#follow-up-media-popup-slides-down).
 
 ## 2026-10-25 / Rail day scale and clock corners removed

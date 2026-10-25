@@ -4,7 +4,7 @@ prompts outputs here
 
 User: "change the animation from the tray scaling bigger to the tray sliding
 from top to bottom, only for the audio tray". Implemented and tested; deployment
-held because CS2 was running.
+held while CS2 ran, then deployed on "I'm done playing" with one clean reload.
 
 ## 2026-10-25 / Rail marks removed
 

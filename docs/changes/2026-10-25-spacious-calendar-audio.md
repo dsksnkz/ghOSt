@@ -70,7 +70,8 @@ scale or fade. Other popups keep their scale motion. Duration stays
 start/end positions and unit scale/opacity; motion, compile, input and rail
 tests pass.
 
-Not deployed: CS2 was running when activation was attempted, so the live
-profile still has the scaling motion. Source files to copy when safe:
-`PanelMotion.js`, `Panel.qml`, `PanelContent.qml`. Snapshot:
-`.local/backups/2026-10-25-media-slide/`.
+First activation attempt was held because CS2 was running. After the user said
+they had finished playing, `PanelMotion.js`, `Panel.qml` and `PanelContent.qml`
+were deployed with one automatic reload and `Configuration Loaded`. The popup
+was not opened on the live desktop, so the native slide is not visually
+checked. Snapshot: `.local/backups/2026-10-25-media-slide/`.
