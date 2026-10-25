@@ -58,3 +58,19 @@ element; that change was reverted, and `MusicBar.qml` is byte-identical to
 Evidence (local only): `.local/verification/2026-10-25-spacious-calendar-audio/`.
 Rollback: copy `.local/backups/2026-10-25-spacious-calendar-audio/live/*` into
 `~/.config/quickshell/ghost-bar/`.
+
+## Follow-up: media popup slides down
+
+User: "change the animation from the tray scaling bigger to the tray sliding
+from top to bottom, only for the audio tray". The media page now uses the
+launcher's motion: `PanelMotion.topMargin` moves the full-size window from
+above the screen to y 68, on the Top layer so it emerges beneath the rail; no
+scale or fade. Other popups keep their scale motion. Duration stays
+`Theme.panel` (220 ms, OutCubic). `launcher-motion.qml` asserts media
+start/end positions and unit scale/opacity; motion, compile, input and rail
+tests pass.
+
+Not deployed: CS2 was running when activation was attempted, so the live
+profile still has the scaling motion. Source files to copy when safe:
+`PanelMotion.js`, `Panel.qml`, `PanelContent.qml`. Snapshot:
+`.local/backups/2026-10-25-media-slide/`.

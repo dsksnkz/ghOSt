@@ -95,17 +95,18 @@ Item {
         else
             Desk.close();
     }
-    // Launcher travels as a full-size window; other popups retain their motion.
-    opacity: popup.page === "launcher" ? 1 : popup.reveal
+    // Launcher and media travel as full-size windows; other popups retain their motion.
+    readonly property bool slides: popup.page === "launcher" || popup.page === "media"
+    opacity: slides ? 1 : popup.reveal
     transform: [
         Translate {
-            y: popup.page === "launcher" ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
+            y: content.slides ? 0 : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
         },
         Scale {
             origin.x: Desk.panelOrigin
             origin.y: 0
-            xScale: popup.page === "calendar" || popup.page === "launcher" ? 1 : .18 + .82 * popup.reveal
-            yScale: popup.page === "calendar" || popup.page === "launcher" ? 1 : .1 + .9 * popup.reveal
+            xScale: popup.page === "calendar" || content.slides ? 1 : .18 + .82 * popup.reveal
+            yScale: popup.page === "calendar" || content.slides ? 1 : .1 + .9 * popup.reveal
         }
     ]
     Material {

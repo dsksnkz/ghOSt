@@ -41,8 +41,8 @@ PanelWindow {
     implicitHeight: content.implicitHeight
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
-    // The launcher emerges beneath the rail; other popups keep their layer.
-    WlrLayershell.layer: page === "launcher" ? WlrLayer.Top : WlrLayer.Overlay
+    // Sliding popups emerge beneath the rail; other popups keep their layer.
+    WlrLayershell.layer: page === "launcher" || page === "media" ? WlrLayer.Top : WlrLayer.Overlay
     WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     color: "transparent"
     visible: opened || reveal > 0.001

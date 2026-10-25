@@ -70,6 +70,12 @@ ShellRoot {
                 compare(panel.opacity, .5);
                 compare(Motion.topMargin("calendar", .5, height), 82);
                 compare(Motion.topMargin("audio", .5, height), 68);
+                compare(Motion.topMargin("media", 0, 262), -262);
+                compare(Motion.topMargin("media", 1, 262), 68);
+                popup.page = "media";
+                compare(panel.transform[1].xScale, 1);
+                compare(panel.transform[1].yScale, 1);
+                compare(panel.opacity, 1);
                 console.info("PASS: launcher slides from above screen to y68 at constant 560x328, no fade or scale; other popup motion retained");
             }
         }

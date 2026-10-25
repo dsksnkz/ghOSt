@@ -1,5 +1,11 @@
 prompts outputs here
 
+## 2026-10-25 / Media popup slide
+
+User: "change the animation from the tray scaling bigger to the tray sliding
+from top to bottom, only for the audio tray". Implemented and tested; deployment
+held because CS2 was running.
+
 ## 2026-10-25 / Rail marks removed
 
 User: "remove the little 'lines' at the bottom of the top bar, and the the square
