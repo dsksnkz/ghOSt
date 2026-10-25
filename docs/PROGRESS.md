@@ -6,7 +6,10 @@ The chosen login mockup (editorial left, ghost watermark) is now a real Qt 6 SDD
 theme in `config/sddm/ghost/`: sign-in, failure feedback, Caps Lock, user,
 session and layout switching, and power actions gated by SDDM's capabilities.
 The offscreen test with stand-in SDDM objects passes. Not installed, applied or
-run in SDDM test mode. [Guide](sddm.md).
+run in SDDM test mode by the agent. The user then previewed it in test mode (loaded
+cleanly) and installed it themselves: `/usr/share/sddm/themes/ghost` plus
+`/etc/sddm.conf.d/zz-ghost.conf` (`Current=ghost`). Undo by deleting that file,
+which restores nier-automata. Not yet seen on a real login. [Guide](sddm.md).
 
 ## 2026-10-25 / Clock matches shared sans font
 
