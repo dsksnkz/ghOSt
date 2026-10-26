@@ -52,7 +52,15 @@ def prepare_runtime():
     spectrum = runtime / 'AudioSpectrum.qml'
     spectrum.write_text(spectrum.read_text().replace(
         'property var levels: Array(barCount).fill(0)',
-        'property var levels: [.3,.5,.9,.6,.8,.4,.7,.85,.5,.6,.95,.4,.7,.3,.5]'))
+        'property var levels: Theme.reelLevels'))
+    # Sample spectrum levels the reel can step frame by frame (private copy only).
+    theme = runtime / 'Theme.qml'
+    text = theme.read_text()
+    marker = 'property bool reducedMotion: false'
+    if marker not in text:
+        raise RuntimeError('Theme changed: review the spectrum adapter')
+    theme.write_text(text.replace(marker, marker + '\n    property var reelLevels: '
+                                  '[.3,.5,.9,.6,.8,.4,.7,.85,.5,.6,.95,.4,.7,.3,.5]', 1))
     return runtime
 
 
@@ -116,6 +124,15 @@ def capture():
                          'storage', 'applications', 'accessibility', 'about'):
                 frame('settings', {'page': page}, OUTPUT / f'settings-{page}.png')
             frame('media', {}, OUTPUT / 'media.png')
+            import math as _m
+            for index in range(24):
+                levels = [round(.18 + .78 * abs(_m.sin(index * .55 + band * .9) * _m.cos(index * .23 + band * .37)), 3)
+                          for band in range(15)]
+                frame('media', {'levels': levels}, OUTPUT / 'media-pulse' / f'{index:04d}.png')
+            for index, query in enumerate(['', 'g', 'gh', 'gho', 'ghos', 'ghost']):
+                frame('launcher', {'query': query}, OUTPUT / 'launcher' / f'{index:04d}.png')
+            frame('toast', {}, OUTPUT / 'toast.png')
+            frame('intro', {}, OUTPUT / 'intro.png')
             print('Captured rail, wheel, calendar, sidebar, settings and media frames', flush=True)
             subprocess.run(['quickshell', 'ipc', '-i', instance, 'call', 'reel', 'stop'],
                            env=environment, capture_output=True, timeout=5)

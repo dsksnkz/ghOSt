@@ -61,6 +61,36 @@ ShellRoot {
                 previewMode: true
             }
             G2Surface {
+                id: launcherFrame
+                visible: stage.scene === "launcher"
+                width: 560
+                height: 328
+                color: "#191919"
+                radius: 22
+                smoothing: 0.6
+                border.width: 1
+                border.color: "#333333"
+                Launcher {
+                    id: launcher
+                    x: 16
+                    y: 16
+                    width: 528
+                    previewMode: true
+                }
+            }
+            IntroPanel {
+                id: intro
+                visible: stage.scene === "intro"
+                width: 860
+                height: 620
+            }
+            NotificationBanner {
+                id: toast
+                visible: stage.scene === "toast"
+                width: 360
+                notification: ({app: "Music", summary: "Now playing", body: "Midnight City - M83"})
+            }
+            G2Surface {
                 id: mediaFrame
                 visible: stage.scene === "media"
                 width: 392
@@ -101,7 +131,16 @@ ShellRoot {
                     sidebar.entranceTime = state.elapsed ?? 900;
                     item = sidebarFrame;
                 } else if (scene === "media") {
+                    if (state.levels)
+                        Theme.reelLevels = state.levels;
                     item = mediaFrame;
+                } else if (scene === "launcher") {
+                    launcher.query = state.query ?? "";
+                    item = launcherFrame;
+                } else if (scene === "intro") {
+                    item = intro;
+                } else if (scene === "toast") {
+                    item = toast;
                 } else {
                     settings.choose(state.page ?? "general");
                     item = settings;

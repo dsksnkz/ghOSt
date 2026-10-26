@@ -18,6 +18,30 @@ shift. Measured: all 27 kicks within one frame (median 1.7 ms).
 The soundtrack is `~/Downloads/mixkit-cbpd-400-20s-drop2.mp3` (the 20 s cut with the
 beat entering at 0:02). It is not committed.
 
+## Desktop showcase (`showcase.py`)
+
+A 20 s, 3840 × 2160, 60 fps "screen recording" in the r/unixporn style, adapted to
+ghOSt from a Catppuccin/Waybar brief: the ghost wallpaper with slight parallax,
+the real rail sliding in on the drop, frosted fastfetch (ghost block-art logo,
+no brand logos) and monochrome btop tiles, horizontal workspace slides to Neovim
+(a real ghOSt source file) and a dark start page, the real launcher typing
+"ghost", ghOSt Intro opening as its real floating window while a terminal tiles
+in (dwindle), a top-centre toast, the media popup with a spectrum pulsing on the
+kicks, a slow push-in with shallow focus, then windows closing back to the rail.
+No cursor. Window hairline borders with a slow sheen are cinematic styling; the
+user's real Hyprland config has borders off.
+
+```sh
+systemd-run --user --wait --collect -p MemoryMax=5G -p MemorySwapMax=0 \
+    nice -n 10 python3 scripts/reel/showcase.py
+```
+
+Run it in a memory-capped scope. At 4K, live audio muxing made ffmpeg buffer the
+slow video for interleaving and memory grew without bound (it OOM-killed the
+desktop app once); the script now encodes video alone and adds the music in a
+second copy pass, with small caches and a bounded batch pipeline. Measured peak:
+2.9 GB.
+
 ## Beat map
 
 Measured from the soundtrack, not assumed from a tempo: kick onsets from the low
