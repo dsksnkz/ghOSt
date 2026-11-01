@@ -12,6 +12,7 @@ G2Surface {
     property int fontSize: 11
     property alias hovered: mouse.containsMouse
     property bool hoverFeedback: true
+    property bool pressFeedback: true
     property bool wheelEnabled: false
 
     signal clicked
@@ -27,8 +28,8 @@ G2Surface {
     border.color: Theme.text
     Keys.onReturnPressed: clicked()
     Keys.onSpacePressed: clicked()
-    color: selected ? Theme.text : mouse.pressed ? Theme.line : "transparent"
-    scale: mouse.pressed ? 0.97 : 1
+    color: selected ? Theme.text : mouse.pressed && pressFeedback ? Theme.line : "transparent"
+    scale: mouse.pressed && pressFeedback ? 0.97 : 1
     Controls.ToolTip.visible: false
     Controls.ToolTip.delay: 550
     Controls.ToolTip.text: hint
@@ -42,7 +43,7 @@ G2Surface {
         radius: root.radius
         smoothing: root.smoothing
         color: root.color.r > 0.5 ? "#111111" : "#ffffff"
-        opacity: mouse.pressed ? 0.16 : mouse.containsMouse && root.hoverFeedback ? 0.09 : 0
+        opacity: mouse.pressed && root.pressFeedback ? 0.16 : mouse.containsMouse && root.hoverFeedback ? 0.09 : 0
 
         Behavior on opacity {
             enabled: root.hoverFeedback

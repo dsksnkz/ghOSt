@@ -76,6 +76,7 @@ Item {
         height: 18
         radius: 4
         hoverFeedback: false
+        pressFeedback: false
         hint: music.playing ? "pause" : "play"
         enabled: !!music.player?.canTogglePlaying
         onClicked: music.player.togglePlaying()
@@ -103,6 +104,7 @@ Item {
             anchors.fill: parent
             visible: music.compact
             hoverFeedback: false
+            pressFeedback: false
             hint: "Media controls"
             onClicked: music.expanded()
         }
@@ -121,6 +123,7 @@ Item {
                 height: music.compact ? 20 : 25
                 radius: music.compact ? 4 : 8
                 hoverFeedback: !music.compact
+                pressFeedback: !music.compact
                 hint: modelData
                 enabled: modelData === "previous" ? !!music.player?.canGoPrevious : modelData === "next" ? !!music.player?.canGoNext : !!music.player?.canTogglePlaying
                 onClicked: modelData === "previous" ? music.player.previous() : modelData === "next" ? music.player.next() : music.player.togglePlaying()

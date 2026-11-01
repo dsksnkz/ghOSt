@@ -93,6 +93,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     id: centerClock
                     objectName: "rail-clock-control"
                     visible: bar.elementVisible("clock")
@@ -116,6 +117,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
                     x: bar.elementX("network", 1620)
@@ -134,6 +136,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     objectName: "rail-element-bluetooth"
                     visible: bar.elementVisible("bluetooth")
                     x: bar.elementX("bluetooth", 1660)
@@ -152,6 +155,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     objectName: "rail-element-volume"
                     visible: bar.elementVisible("volume")
                     x: bar.elementX("volume", 1702)
@@ -172,6 +176,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     objectName: "rail-element-battery"
                     visible: bar.elementVisible("battery")
                     x: bar.elementX("battery", 1748)
@@ -212,6 +217,7 @@ Item {
                 }
                 Key {
                     hoverFeedback: false
+                    pressFeedback: false
                     objectName: "rail-element-power"
                     visible: bar.elementVisible("power")
                     x: bar.elementX("power", 1858)

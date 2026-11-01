@@ -22,6 +22,13 @@ ShellRoot {
                 compare(label.font.pixelSize, 20);
                 compare(label.font.weight, Font.Normal);
                 compare(clock.children.filter(child => child.text !== undefined && child.text.length > 0).length, 1);
+                // Pressing a top bar element shows no grey box and no shrink.
+                mousePress(clock, clock.width / 2, clock.height / 2);
+                compare(findChild(clock, "key-hover-feedback").opacity, 0);
+                compare(clock.scale, 1);
+                compare(clock.color, "#00000000");
+                mouseRelease(clock, clock.width / 2, clock.height / 2);
+                Desk.close();
                 const reveal = findChild(rail, "rail-music-reveal");
                 compare(reveal.width, 0);
                 compare(reveal.visible, false);

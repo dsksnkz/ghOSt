@@ -1,5 +1,22 @@
 # ghOSt progress
 
+## 2026-11-01 / Super+Tab crash repair
+
+Two native crashes show the same Qt 6.12 QQuickRepeater::regenerate stack during
+nested model creation. The switcher previously exposed its delegates before
+begin() finished replacing the workspace/window models. Setup now runs outside
+the triggering signal, gates visibility until prepared, and snapshots window
+geometry rather than binding delegates to mutable Hyprland window metadata.
+Inner repeaters use a numeric count; null capture sources do not retry captures.
+Tests now include populated preview fixtures and 30 reopen cycles with changing
+workspace counts; the isolated geometry/input test passes. Deployed only
+SwitcherScene.qml and SwitcherPreview.qml after snapshots under
+`.local/backups/2026-11-01-switcher-crash/`. Native open/close verification uses
+the same IPC entry as Super+Tab without changing workspace or sending key input:
+eight consecutive native open/close cycles passed with PID 95609 unchanged and
+the switcher layer mapped each time. Existing text-input warnings remain.
+Exact upstream Qt fault is not proven; no packages/drivers changed. Not pushed.
+
 ## 2026-11-01 / Remove rail menu icon
 
 Removed the top-left three-line menu control only; other rail positions remain
@@ -1199,3 +1216,5 @@ Settings sidebar buttons restored to the previous style (gaps, groups, tiles, se
 
 Rebuilt: clock and date over the wallpaper, any key or click reveals picture, name and password; blurred wallpaper, shake on error. Blinds, 3D slats and the second exit window are gone. The password field no longer waits for the compositor's lock confirmation, unlock happens from the lock surface after a 380 ms exit, an 800 ms timeout forces it, and the client quits 150 ms later. PAM config unchanged. Tested with a harness and mocked PAM only; never locked per project rules, so a real lock and unlock is unverified. Original failure cause not proven: the 14:16 session restart left no lock client logs.
 User confirmed Super+L locks and returns to the desktop on the real session.
+
+Top bar elements no longer show the press effect (grey box and shrink); `Key.pressFeedback` stays on elsewhere.

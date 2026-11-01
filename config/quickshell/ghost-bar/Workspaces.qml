@@ -155,6 +155,7 @@ Item {
             height: 46
             color: "transparent"
             hoverFeedback: false
+            pressFeedback: false
             hint: "Workspace " + workspace
             onClicked: {
                 Desk.close();
