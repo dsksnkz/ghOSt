@@ -25,7 +25,7 @@ def settle():
     state = wheel()
     assert not state['moving'] and abs(state['position'] - state['target']) < 1e-6
     central = min(state['rendered'], key=lambda item: abs(item['offset']))
-    assert central['workspace'] == state['current'] and central['x'] == 36
+    assert central['workspace'] == state['current'] and central['x'] == 38
     return state
 
 def capture(name):
@@ -43,12 +43,11 @@ call('page', 'rail')
 wheel('reduced', 'false')
 wheel('windows', 'json:[]')
 wheel('current', '5')
-triangle = settle()['triangle']
 state = wheel('current', '1')
 assert state['moving'] and state['target'] == 5, state
 time.sleep(.08)
 state = wheel()
-assert 4 < state['position'] < 5 and state['triangle'] == triangle
+assert 4 < state['position'] < 5
 assert any(abs(item['rotation']) > 1 for item in state['rendered'])
 assert any(item['y'] > 10 and .733 < item['scale'] < 1 for item in state['rendered'])
 assert settle()['current'] == 1
@@ -104,7 +103,6 @@ settle()
 capture('rail-frame')
 for name, phase in [('wheel-quarter',4.25), ('wheel-half',4.5), ('wheel-three-quarter',4.75)]:
     wheel('pose', str(phase))
-    assert wheel()['triangle'] == triangle
     capture(name)
 wheel('current', '1')
 settle()
@@ -118,4 +116,4 @@ for turn, target in enumerate((2,3,4,5,1)):
     for frame in range(12):
         capture('motion-%03d' % (turn*12+frame))
         time.sleep(max(0, start+(frame+1)*.04-time.monotonic()))
-print('PASS: projected rotation/depth, stationary triangle, wrap, eligible higher desktops, accumulated notches, continuous retarget, reduced motion and actual captures')
+print('PASS: projected rotation/depth, wrap, eligible higher desktops, accumulated notches, continuous retarget, reduced motion and actual captures')

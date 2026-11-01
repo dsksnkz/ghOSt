@@ -4,7 +4,6 @@ import argparse
 from datetime import datetime
 import fcntl
 import hashlib
-import io
 import json
 import math
 import os
@@ -14,12 +13,9 @@ import re
 import shutil
 import subprocess
 import time
-import wave
 from urllib.parse import unquote, urlparse
 
-SOUND_GROUPS = ('rail', 'sidebar', 'settings')
-SOUND_PRESETS = (*SOUND_GROUPS, 'none', 'custom')
-RAIL_IDS = ('menu', 'workspaces', 'music', 'clock', 'network', 'bluetooth', 'battery', 'power')
+RAIL_IDS = ('workspaces', 'music', 'clock', 'network', 'bluetooth', 'volume', 'battery', 'power')
 
 def valid_rail_layout(value):
     return (isinstance(value, list) and len(value) == len(RAIL_IDS)
@@ -30,8 +26,6 @@ def valid_rail_layout(value):
 
 DEFAULTS = {'reducedMotion': False, 'usageTracking': False,
     'railLayout': None,
-    'sounds': {'enabled': True, 'volume': 18,
-               'presets': {group: group for group in SOUND_GROUPS}, 'files': {}},
     'widgets': {
     'network': True, 'bluetooth': True, 'volume': True,
     'brightness': True, 'notifications': True}}
@@ -77,29 +71,11 @@ def preferences():
     layout = data.get('railLayout')
     # Read old saved layouts without moving or discarding the remaining entries.
     if isinstance(layout, list):
-        layout = [entry for entry in layout if not (isinstance(entry, dict) and entry.get('id') == 'volume')]
+        layout = [entry for entry in layout if not (isinstance(entry, dict) and entry.get('id') == 'menu')]
+        if not any(isinstance(entry, dict) and entry.get('id') == 'volume' for entry in layout):
+            layout.append({'id': 'volume', 'zone': 'right'})
     if valid_rail_layout(layout):
         result['railLayout'] = layout
-    sounds = data.get('sounds', {})
-    if isinstance(sounds, dict):
-        if type(sounds.get('enabled')) is bool:
-            result['sounds']['enabled'] = sounds['enabled']
-        volume = sounds.get('volume')
-        if type(volume) in (int, float) and math.isfinite(volume) and 0 <= volume <= 100:
-            result['sounds']['volume'] = round(volume)
-        for group in SOUND_GROUPS:
-            preset = sounds.get('presets', {}).get(group) if isinstance(sounds.get('presets'), dict) else None
-            if preset in SOUND_PRESETS:
-                result['sounds']['presets'][group] = preset
-            value = sounds.get('files', {}).get(group) if isinstance(sounds.get('files'), dict) else None
-            # Only our immutable private copies are eligible, never remote audio.
-            if isinstance(value, str):
-                url = urlparse(value)
-                path = Path(unquote(url.path))
-                if (url.scheme == 'file' and not url.netloc
-                        and path.parent == paths()[0].parent / 'ui-sounds'
-                        and re.fullmatch(r'[a-f0-9]{64}\.wav', path.name)):
-                    result['sounds']['files'][group] = value
     return result
 
 def setting(key, value):
@@ -109,68 +85,16 @@ def setting(key, value):
         if layout is not None and not valid_rail_layout(layout):
             raise ValueError('Invalid top bar layout')
         data['railLayout'] = layout
-    elif key == 'sounds.volume':
-        number = float(value)
-        if not math.isfinite(number) or not 0 <= number <= 100:
-            raise ValueError('Click sound volume must be 0-100%')
-        data['sounds']['volume'] = round(number)
-    elif key.startswith('sounds.') and key[7:] in SOUND_GROUPS:
-        group = key[7:]
-        if value not in SOUND_PRESETS:
-            raise ValueError('Unknown click sound')
-        if value == 'custom' and group not in data['sounds']['files']:
-            raise ValueError('Choose a WAV file first')
-        data['sounds']['presets'][group] = value
-    elif key in ('reducedMotion', 'usageTracking', 'sounds.enabled') or (key.startswith('widgets.') and key[8:] in DEFAULTS['widgets']):
+    elif key in ('reducedMotion', 'usageTracking') or (key.startswith('widgets.') and key[8:] in DEFAULTS['widgets']):
         if value not in ('true', 'false'):
             raise ValueError('Expected true or false')
-        if key == 'sounds.enabled':
-            data['sounds']['enabled'] = value == 'true'
-        elif key.startswith('widgets.'):
+        if key.startswith('widgets.'):
             data['widgets'][key[8:]] = value == 'true'
         else:
             data[key] = value == 'true'
     else:
         raise ValueError('Unknown setting')
     save(paths()[0], data)
-
-def sound_file(group, value):
-    """Validate a short PCM WAV and preserve its original in a private copy."""
-    if group not in SOUND_GROUPS:
-        raise ValueError('Unknown sound surface')
-    url = urlparse(value)
-    if url.scheme not in ('', 'file') or url.netloc not in ('', 'localhost'):
-        raise ValueError('Select a local WAV file')
-    path = Path(unquote(url.path)).expanduser().resolve()
-    if not path.is_file() or path.suffix.lower() != '.wav':
-        raise ValueError('Select a WAV file')
-    with path.open('rb') as source:
-        data = source.read(2 * 1024 * 1024 + 1)
-    if len(data) > 2 * 1024 * 1024:
-        raise ValueError('Choose a WAV smaller than 2 MB')
-    try:
-        with wave.open(io.BytesIO(data)) as audio:
-            channels, width, rate, frames, compression, _ = audio.getparams()
-            if (channels not in (1, 2) or width not in (1, 2)
-                    or not 8000 <= rate <= 96000 or not 0 < frames <= 2 * rate
-                    or compression != 'NONE'):
-                raise ValueError('Use a PCM WAV, 8/16-bit mono/stereo, up to 2 seconds')
-            if len(audio.readframes(frames)) != frames * channels * width:
-                raise ValueError('The WAV file is incomplete')
-    except (wave.Error, EOFError) as error:
-        raise ValueError('Use an uncompressed PCM WAV file') from error
-    directory = paths()[0].parent / 'ui-sounds'
-    directory.mkdir(parents=True, exist_ok=True)
-    destination = directory / (hashlib.sha256(data).hexdigest() + '.wav')
-    if not destination.exists():
-        temporary = destination.with_suffix('.tmp')
-        temporary.write_bytes(data)
-        temporary.chmod(0o600)
-        temporary.replace(destination)
-    preferences_data = preferences()
-    preferences_data['sounds']['files'][group] = destination.as_uri()
-    preferences_data['sounds']['presets'][group] = 'custom'
-    save(paths()[0], preferences_data)
 
 def battery():
     for device in Path('/sys/class/power_supply').glob('*'):
@@ -266,6 +190,23 @@ def profile_picture(value):
     settings = preferences()
     settings['profilePicture'] = destination.as_uri()
     save(paths()[0], settings)
+    login_picture(destination)
+
+def login_picture(path):
+    """Give the account service a copy: SDDM cannot read a private home folder."""
+    try:
+        # The account service refuses icons over 1 MB.
+        if path.stat().st_size > 1024 * 1024:
+            small = path.with_name(path.stem + '-login.jpg')
+            if not small.exists():
+                run(['magick', str(path), '-auto-orient', '-resize', '512x512^', '-gravity', 'center',
+                     '-extent', '512x512', '-quality', '90', str(small)])
+            path = small
+        call = ['busctl', '--system', '--allow-interactive-authorization=no', 'call', 'org.freedesktop.Accounts']
+        user = run(call + ['/org/freedesktop/Accounts', 'org.freedesktop.Accounts', 'FindUserById', 'x', str(os.getuid())]).split('"')[1]
+        run(call + [user, 'org.freedesktop.Accounts.User', 'SetIconFile', 's', str(path)])
+    except (OSError, IndexError, subprocess.SubprocessError, ValueError):
+        raise ValueError('Picture saved; login screen picture not updated') from None
 
 def hostname(value):
     if not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', value):
@@ -290,9 +231,6 @@ def action(name, value):
         save(paths()[0], data)
     elif name == 'profile-picture':
         profile_picture(value)
-    elif name == 'sound-file':
-        group, filename = value.split('=', 1)
-        sound_file(group, filename)
     elif name == 'hostname':
         hostname(value)
     elif name in ('dnd','notifications'):

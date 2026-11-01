@@ -1,7 +1,7 @@
 import QtQuick
 
-// ghOSt SDDM greeter (Qt 6, SDDM 0.21+). Editorial left layout: clock and login
-// on a left column, the ghost as a faint outline on the right.
+// ghOSt SDDM greeter (Qt 6, SDDM 0.21+). Session list on the left, profile picture
+// and password in the centre, the ghost outline on the right.
 // Uses only SDDM's context objects: sddm, userModel, sessionModel, keyboard, config.
 Item {
     id: root
@@ -9,30 +9,31 @@ Item {
     height: 1080
 
     readonly property string sans: "Adwaita Sans"
-    readonly property color field: "#0b0b0c"
-    readonly property color ink: "#ececea"
+    readonly property color field: "#171717"
+    readonly property color ink: "#ffffff"
     readonly property color muted: "#8c8c8a"
-    readonly property color well: "#141415"
-    readonly property color edge: "#2a2a2b"
-    readonly property color edgeHover: "#4a4a4b"
-    readonly property real radius: 10
     // Content is drawn on a 1920 × 1080 plane and scaled to fit; the
     // background always fills the whole screen.
     readonly property real fit: Math.min(width / 1920, height / 1080)
 
-    // SDDM user roles: 257 name, 258 real name, 261 needs password.
+    // SDDM user roles: 257 name, 258 real name, 260 icon, 261 needs password.
     property int userIndex: Math.max(0, userModel.lastIndex)
     readonly property string userName: userModel.data(userModel.index(userIndex, 0), 257) || ""
-    readonly property string realName: userModel.data(userModel.index(userIndex, 0), 258) || ""
+    readonly property string userIcon: userModel.data(userModel.index(userIndex, 0), 260) || ""
     // SDDM session role 260: display name.
     property int sessionIndex: Math.max(0, sessionModel.lastIndex)
-    readonly property string sessionName: sessionModel.data(sessionModel.index(sessionIndex, 0), 260) || "Session"
-    readonly property bool hasLayouts: !!keyboard && !!keyboard.layouts && keyboard.layouts.length > 0
-    readonly property string layoutName: hasLayouts ? keyboard.layouts[keyboard.currentLayout].longName : ""
+    readonly property int sessionCount: sessionModel.rowCount()
+    readonly property string sessionName: sessionModel.data(sessionModel.index(sessionIndex, 0), 260) || ""
+    property real sessionPosition: sessionIndex
+    Behavior on sessionPosition {
+        NumberAnimation {
+            duration: 220
+            easing.type: Easing.OutCubic
+        }
+    }
     property string error: ""
     property bool keyboardOpen: false
     property bool busy: false
-    property date now: new Date()
 
     function setting(key, fallback) {
         const value = config.stringValue(key);
@@ -45,16 +46,11 @@ Item {
         error = "";
         sddm.login(userName, password.text, sessionIndex);
     }
-    function step(count, index, delta) {
-        return count > 0 ? (index + delta + count) % count : 0;
+    function selectSession(index) {
+        sessionIndex = Math.max(0, Math.min(sessionCount - 1, index));
+        password.forceActiveFocus();
     }
 
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: root.now = new Date()
-    }
     Connections {
         target: sddm
         function onLoginFailed() {
@@ -69,29 +65,9 @@ Item {
         }
     }
 
-    // ── Background: off-black field, soft light, fine grain ─────────────
     Rectangle {
         anchors.fill: parent
         color: root.field
-    }
-    Canvas {
-        anchors.fill: parent
-        onPaint: {
-            const c = getContext("2d");
-            const cx = width * .22, cy = height * .39, r = Math.max(width, height) * .57;
-            const g = c.createRadialGradient(cx, cy, 0, cx, cy, r);
-            g.addColorStop(0, "rgba(255,255,255,0.055)");
-            g.addColorStop(1, "rgba(255,255,255,0)");
-            c.fillStyle = g;
-            c.fillRect(0, 0, width, height);
-            let seed = 7;
-            const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-            const count = Math.round(width * height * .045);
-            for (let i = 0; i < count; i++) {
-                c.fillStyle = rnd() > .5 ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.05)";
-                c.fillRect(Math.floor(rnd() * width), Math.floor(rnd() * height), 1, 1);
-            }
-        }
     }
 
     Item {
@@ -102,343 +78,205 @@ Item {
         scale: root.fit
 
         Image {
+            objectName: "ghost"
             visible: root.setting("watermark", "true") !== "false"
-            x: 1060
-            y: -140
-            width: 1300
-            height: 1300
+            x: 1508
+            y: 210
+            width: 690
+            height: 690
             rotation: -8
-            opacity: .08
             source: "assets/ghost-outline.svg"
-            sourceSize.width: 2600
-            sourceSize.height: 2600
+            sourceSize.width: 1380
+            sourceSize.height: 1380
         }
 
-        Row {
-            x: 240
-            y: 76
-            spacing: 12
-            Image {
-                width: 24
-                height: 24
-                source: "assets/icons/ghost.svg"
-                sourceSize.width: 96
-                sourceSize.height: 96
+        // Session list: the selected row sits beside the arrow, neighbours fade out.
+        Item {
+            objectName: "sessions"
+            x: 120
+            y: 424
+            width: 340
+            height: 240
+            clip: true
+            WheelHandler {
+                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                onWheel: event => root.selectSession(root.sessionIndex + (event.angleDelta.y > 0 ? -1 : 1))
             }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "ghOSt"
-                font.family: root.sans
-                font.pixelSize: 16
-                font.weight: 550
-                color: root.ink
-            }
-        }
-
-        Column {
-            x: 240
-            y: 268
-            width: 440
-
-            Text {
-                objectName: "clock"
-                leftPadding: -6
-                text: Qt.formatDateTime(root.now, root.setting("clockFormat", "HH:mm"))
-                font.family: clockFont.name
-                font.pixelSize: 168
-                font.weight: Font.Light
-                font.letterSpacing: -5
-                color: root.ink
-                FontLoader {
-                    id: clockFont
-                    source: "assets/fonts/JetBrainsMono-Light.ttf"
+            Canvas {
+                x: 26
+                y: 114
+                width: 12
+                height: 12
+                onPaint: {
+                    const context = getContext("2d");
+                    context.fillStyle = "#8c8c8c";
+                    context.beginPath();
+                    context.moveTo(0, 0);
+                    context.lineTo(12, 6);
+                    context.lineTo(0, 12);
+                    context.closePath();
+                    context.fill();
                 }
             }
-            Text {
-                text: Qt.formatDateTime(root.now, root.setting("dateFormat", "dddd, d MMMM"))
-                font.family: root.sans
-                font.pixelSize: 20
-                color: root.muted
-            }
-            Item {
-                width: 1
-                height: 92
-            }
-
-            // User: click the name or use the arrows to switch when several exist.
-            Row {
-                spacing: 14
-                Rectangle {
-                    width: 44
-                    height: 44
-                    radius: 22
-                    color: root.well
-                    border.color: root.edge
-                    border.width: 1
-                    Text {
-                        anchors.centerIn: parent
-                        text: (root.realName || root.userName).charAt(0).toUpperCase()
-                        font.family: root.sans
-                        font.pixelSize: 17
-                        font.weight: 500
-                        color: root.ink
+            Repeater {
+                model: root.sessionCount
+                Text {
+                    required property int index
+                    readonly property real distance: Math.abs(index - root.sessionPosition)
+                    objectName: "session-" + index
+                    x: 74
+                    y: 120 - height / 2 + (index - root.sessionPosition) * 24
+                    visible: opacity > 0
+                    opacity: distance < 1 ? 1 - .62 * distance : Math.max(0, .38 - .2 * (distance - 1) - (distance > 2 ? .18 * (distance - 2) : 0))
+                    text: sessionModel.data(sessionModel.index(index, 0), 260) || ""
+                    font.family: root.sans
+                    font.pixelSize: 14
+                    color: root.ink
+                    TapHandler {
+                        onTapped: root.selectSession(parent.index)
+                    }
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
-                Text {
-                    objectName: "user-name"
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.realName || root.userName
-                    font.family: root.sans
-                    font.pixelSize: 20
-                    font.weight: 500
-                    color: root.ink
+            }
+        }
+
+        // Profile picture chosen in ghOSt Settings; click to switch when several users exist.
+        Rectangle {
+            objectName: "picture"
+            x: 893
+            y: 430
+            width: 134
+            height: 134
+            color: "#d9d9d9"
+            radius: 12
+            Image {
+                objectName: "picture-image"
+                anchors.fill: parent
+                source: root.userIcon
+                fillMode: Image.PreserveAspectCrop
+                sourceSize.width: 268
+                sourceSize.height: 268
+                asynchronous: true
+            }
+            // Rounds the picture without an effects module: a field-coloured frame
+            // whose inner radius is the picture's radius.
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -10
+                radius: parent.radius + 10
+                color: "transparent"
+                border.color: root.field
+                border.width: 10
+            }
+            TapHandler {
+                enabled: userModel.count > 1
+                onTapped: {
+                    root.userIndex = (root.userIndex + 1) % userModel.count;
+                    root.error = "";
+                    password.text = "";
+                    password.forceActiveFocus();
+                }
+            }
+        }
+
+        Item {
+            id: shaker
+            x: 890
+            y: 608
+            width: 140
+            height: 24
+            readonly property real restX: 890
+            SequentialAnimation {
+                id: shake
+                NumberAnimation { target: shaker; property: "x"; to: shaker.restX - 8; duration: 50 }
+                NumberAnimation { target: shaker; property: "x"; to: shaker.restX + 7; duration: 60 }
+                NumberAnimation { target: shaker; property: "x"; to: shaker.restX - 4; duration: 60 }
+                NumberAnimation { target: shaker; property: "x"; to: shaker.restX; duration: 70 }
+            }
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: "#272727"
+                border.width: 1
+                border.color: root.error ? "#8c8c8c" : "#3b3b3b"
+                opacity: root.busy ? .5 : 1
+                TextInput {
+                    id: password
+                    objectName: "password"
+                    anchors.fill: parent
+                    focus: true
+                    echoMode: TextInput.Password
+                    color: "transparent"
+                    selectionColor: "transparent"
+                    selectedTextColor: "transparent"
+                    cursorDelegate: Item {}
+                    enabled: !root.busy
+                    Keys.onReturnPressed: root.login()
+                    Keys.onEnterPressed: root.login()
+                    Keys.onUpPressed: root.selectSession(root.sessionIndex - 1)
+                    Keys.onDownPressed: root.selectSession(root.sessionIndex + 1)
+                    onTextEdited: root.error = ""
                 }
                 Row {
-                    visible: userModel.count > 1
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
-                    Repeater {
-                        model: [["back", -1], ["forward", 1]]
-                        Rectangle {
-                            required property var modelData
-                            width: 28
-                            height: 28
-                            radius: root.radius - 4
-                            color: hover.hovered ? root.well : "transparent"
-                            Image {
-                                anchors.centerIn: parent
-                                width: 14
-                                height: 14
-                                source: "assets/icons/" + parent.modelData[0] + ".svg"
-                                sourceSize.width: 56
-                                sourceSize.height: 56
-                                opacity: .75
-                            }
-                            HoverHandler {
-                                id: hover
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                            TapHandler {
-                                onTapped: {
-                                    root.userIndex = root.step(userModel.count, root.userIndex, parent.modelData[1]);
-                                    root.error = "";
-                                    password.text = "";
-                                    password.forceActiveFocus();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Item {
-                width: 1
-                height: 28
-            }
-
-            Text {
-                bottomPadding: 10
-                text: "Password"
-                font.family: root.sans
-                font.pixelSize: 13
-                color: root.muted
-            }
-            Item {
-                id: shaker
-                width: 420
-                height: 52
-                SequentialAnimation {
-                    id: shake
-                    loops: 1
-                    NumberAnimation { target: shaker; property: "x"; to: -8; duration: 50 }
-                    NumberAnimation { target: shaker; property: "x"; to: 7; duration: 60 }
-                    NumberAnimation { target: shaker; property: "x"; to: -4; duration: 60 }
-                    NumberAnimation { target: shaker; property: "x"; to: 0; duration: 70 }
-                }
-                Rectangle {
-                    anchors.fill: parent
-                    radius: root.radius
-                    color: root.well
-                    border.width: 1
-                    border.color: root.error ? "#8c8c8a" : password.activeFocus ? "#5a5a5b" : "#3a3a3b"
-                    TextInput {
-                        id: password
-                        objectName: "password"
-                        x: 18
-                        width: parent.width - 18 - 56
-                        anchors.verticalCenter: parent.verticalCenter
-                        focus: true
-                        echoMode: TextInput.Password
-                        passwordCharacter: "•"
-                        font.family: root.sans
-                        font.pixelSize: 18
-                        font.letterSpacing: 3
-                        color: root.ink
-                        selectionColor: "#3a3a3b"
-                        clip: true
-                        enabled: !root.busy
-                        Keys.onReturnPressed: root.login()
-                        Keys.onEnterPressed: root.login()
-                        onTextEdited: root.error = ""
-                    }
-                    Rectangle {
-                        objectName: "submit"
-                        anchors.right: parent.right
-                        anchors.rightMargin: 5
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 42
-                        height: 42
-                        radius: root.radius - 4
-                        color: submitHover.hovered ? "#ffffff" : root.ink
-                        opacity: root.busy ? .5 : 1
-                        Image {
-                            anchors.centerIn: parent
-                            width: 18
-                            height: 18
-                            source: "assets/icons/forward-black.svg"
-                            sourceSize.width: 72
-                            sourceSize.height: 72
-                        }
-                        HoverHandler {
-                            id: submitHover
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: root.login()
-                        }
-                    }
-                }
-            }
-            Text {
-                objectName: "status"
-                topPadding: 12
-                text: root.error ? root.error : root.busy ? "Signing in" : keyboard.capsLock ? "Caps Lock is on" : "Caps Lock is off"
-                font.family: root.sans
-                font.pixelSize: 13
-                font.weight: root.error || keyboard.capsLock ? 550 : Font.Normal
-                color: root.error || keyboard.capsLock ? root.ink : root.muted
-            }
-        }
-
-        // Session and keyboard layout: click to cycle.
-        Row {
-            x: 240
-            y: 992
-            spacing: 10
-            Rectangle {
-                objectName: "keyboard-toggle"
-                visible: keyboardLoader.status === Loader.Ready
-                width: 38
-                height: 38
-                radius: root.radius
-                color: root.keyboardOpen ? root.ink : "transparent"
-                border.color: keyHover.hovered ? root.edgeHover : root.edge
-                border.width: 1
-                Image {
+                    objectName: "password-dots"
+                    readonly property int shown: Math.min(password.text.length, 14)
                     anchors.centerIn: parent
-                    width: 17
-                    height: 17
-                    opacity: root.keyboardOpen ? 1 : .7
-                    source: "assets/icons/" + (root.keyboardOpen ? "keyboard-black" : "keyboard") + ".svg"
-                    sourceSize.width: 68
-                    sourceSize.height: 68
-                }
-                HoverHandler {
-                    id: keyHover
-                    cursorShape: Qt.PointingHandCursor
-                }
-                TapHandler {
-                    onTapped: {
-                        root.keyboardOpen = !root.keyboardOpen;
-                        password.forceActiveFocus();
-                    }
-                }
-            }
-            Repeater {
-                model: [["display", "session"], ["language", "layout"]]
-                Rectangle {
-                    id: pill
-                    required property var modelData
-                    readonly property bool isLayout: modelData[1] === "layout"
-                    visible: !isLayout || root.hasLayouts
-                    width: pillLabel.implicitWidth + 62
-                    height: 38
-                    radius: root.radius
-                    color: "transparent"
-                    border.color: pillHover.hovered ? root.edgeHover : root.edge
-                    border.width: 1
-                    Image {
-                        x: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 15
-                        height: 15
-                        opacity: .7
-                        source: "assets/icons/" + pill.modelData[0] + ".svg"
-                        sourceSize.width: 60
-                        sourceSize.height: 60
-                    }
-                    Text {
-                        id: pillLabel
-                        objectName: "pill-" + pill.modelData[1]
-                        x: 38
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: pill.isLayout ? root.layoutName : root.sessionName
-                        font.family: root.sans
-                        font.pixelSize: 13
-                        color: root.ink
-                    }
-                    HoverHandler {
-                        id: pillHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                    TapHandler {
-                        onTapped: {
-                            if (pill.isLayout)
-                                keyboard.currentLayout = root.step(keyboard.layouts.length, keyboard.currentLayout, 1);
-                            else
-                                root.sessionIndex = root.step(sessionModel.rowCount(), root.sessionIndex, 1);
-                            password.forceActiveFocus();
+                    spacing: shown > 1 ? Math.min(8, (124 - shown * 8) / (shown - 1)) : 0
+                    Repeater {
+                        model: parent.shown
+                        Rectangle {
+                            width: 8
+                            height: 8
+                            radius: 4
+                            color: "#e6e6e6"
                         }
                     }
                 }
             }
         }
 
-        Row {
-            anchors.right: parent.right
-            anchors.rightMargin: 64
-            y: 992
-            spacing: 8
-            Repeater {
-                model: [["sleep", "suspend"], ["restart", "reboot"], ["power", "powerOff"]]
-                Rectangle {
-                    id: action
-                    required property var modelData
-                    readonly property bool primary: modelData[1] === "powerOff"
-                    visible: modelData[1] === "suspend" ? sddm.canSuspend : modelData[1] === "reboot" ? sddm.canReboot : sddm.canPowerOff
-                    width: 38
-                    height: 38
-                    radius: root.radius
-                    color: action.primary ? root.well : "transparent"
-                    border.color: actionHover.hovered ? root.edgeHover : root.edge
-                    border.width: 1
-                    Image {
-                        anchors.centerIn: parent
-                        width: 17
-                        height: 17
-                        opacity: action.primary ? 1 : .7
-                        source: "assets/icons/" + action.modelData[0] + ".svg"
-                        sourceSize.width: 68
-                        sourceSize.height: 68
-                    }
-                    HoverHandler {
-                        id: actionHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                    TapHandler {
-                        onTapped: sddm[action.modelData[1]]()
-                    }
+        Rectangle {
+            objectName: "keyboard-toggle"
+            visible: keyboardLoader.status === Loader.Ready
+            x: 1040
+            y: 606
+            width: 28
+            height: 28
+            radius: 6
+            color: root.keyboardOpen ? root.ink : keyHover.hovered ? "#272727" : "transparent"
+            Image {
+                anchors.centerIn: parent
+                width: 20
+                height: 20
+                opacity: root.keyboardOpen ? 1 : .75
+                source: "assets/icons/" + (root.keyboardOpen ? "keyboard-black" : "keyboard") + ".svg"
+                sourceSize.width: 80
+                sourceSize.height: 80
+            }
+            HoverHandler {
+                id: keyHover
+                cursorShape: Qt.PointingHandCursor
+            }
+            TapHandler {
+                onTapped: {
+                    root.keyboardOpen = !root.keyboardOpen;
+                    password.forceActiveFocus();
                 }
             }
+        }
+
+        Text {
+            objectName: "status"
+            x: 760
+            y: 644
+            width: 400
+            horizontalAlignment: Text.AlignHCenter
+            text: root.error ? root.error : keyboard.capsLock ? "Caps Lock is on" : ""
+            font.family: root.sans
+            font.pixelSize: 13
+            color: root.muted
         }
     }
 

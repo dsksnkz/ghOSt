@@ -11,7 +11,7 @@ var topics = [
     {id: "sound", title: "Sound and edge volume", icon: "volume", recommended: true,
      summary: "Use either screen edge to reveal the volume slider.",
      body: "Hold the pointer anywhere along the left or right screen edge for 0.2 seconds. The OSD appears at that height and stays fixed. Once open, you can move a little inward or onto the OSD without closing it. Scroll in the expanded edge area or over the OSD for animated 2% volume steps; drag its slider for direct adjustment. Move away from both to close. Fullscreen apps keep their edges. Settings → Sound controls output, input and interface click sounds.",
-     action: "sound", button: "Open Sound", keywords: "audio speaker microphone sfx click mute brightness osd"},
+     action: "sound", button: "Open Sound", keywords: "audio speaker microphone mute brightness osd"},
     {id: "workspaces", title: "Move between desktops", icon: "display", recommended: false,
      summary: "Switch workspaces without losing your windows.",
      body: "Scroll over the desktop numbers in the top rail. Super + number opens that desktop. The filled white dot stays below the active number while the wheel turns. Scrolling includes desktops 1–5 and occupied higher desktops.",
@@ -25,8 +25,8 @@ var topics = [
      body: "The top-rail internet button always uses the Wi-Fi symbol, including on Ethernet. Connection details in Settings still identify the actual connection. The sidebar shows available networks and paired Bluetooth devices.",
      action: "network", button: "Open Network", keywords: "ethernet internet router wireless bluetooth"},
     {id: "accessibility", title: "Comfort and motion", icon: "accessibility", recommended: false,
-     summary: "Reduce motion or tune interface sounds.",
-     body: "Settings → Accessibility includes reduced motion. Sound includes interface sound volume and a fixed sound choice for each control group. These options are available here; nothing is enabled or changed without your choice.",
+     summary: "Reduce motion.",
+     body: "Settings → Accessibility includes reduced motion. These options are available here; nothing is enabled or changed without your choice.",
      action: "accessibility", button: "Open Accessibility", keywords: "animation reduced volume quiet disable"}
 ];
 

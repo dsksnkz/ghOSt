@@ -10,7 +10,7 @@ function load(name) {
 const intro = load('IntroTopics');
 assert.equal(intro.search('').length, 7);
 assert.equal(intro.search('ethernet')[0].id, 'connections');
-assert.equal(intro.search('click sounds')[0].id, 'sound');
+assert.equal(intro.search('microphone')[0].id, 'sound');
 assert.equal(intro.search('zzzz missing').length, 0);
 assert.equal(intro.topics.filter(t => t.recommended).length, 3);
 const edge = load('EdgeVolume');

@@ -57,86 +57,12 @@ class Settings(unittest.TestCase):
         backend.save(backend.paths()[0], {'railLayout': invalid[-1]})
         self.assertIsNone(backend.preferences()['railLayout'])
 
-    def test_old_rail_volume_entry_is_removed_without_reordering_other_elements(self):
-        expected = [{'id': name, 'zone': 'left'} for name in backend.RAIL_IDS]
-        legacy = expected[:4] + [{'id': 'volume', 'zone': 'right'}] + expected[4:]
+    def test_old_rail_layout_drops_menu_and_gains_volume(self):
+        kept = [{'id': name, 'zone': 'left'} for name in backend.RAIL_IDS if name != 'volume']
+        legacy = kept[:2] + [{'id': 'menu', 'zone': 'left'}] + kept[2:]
         backend.save(backend.paths()[0], {'railLayout': legacy, 'sounds': {'volume': 37}})
-        self.assertEqual(backend.preferences()['railLayout'], expected)
-        self.assertEqual(backend.preferences()['sounds']['volume'], 37)
-    def test_click_sounds_keep_original_defaults(self):
-        sounds = backend.preferences()['sounds']
-        self.assertTrue(sounds['enabled'])
-        self.assertEqual(sounds['volume'], 18)
-        self.assertEqual(sounds['presets'], {group: group for group in backend.SOUND_GROUPS})
-        self.assertEqual(sounds['files'], {})
-        self.assertFalse(backend.paths()[0].exists())
-    def test_sound_preferences_are_independent_and_local(self):
-        with patch.object(backend, 'run') as run:
-            backend.setting('widgets.network', 'false')
-            backend.setting('sounds.volume', '37')
-            backend.setting('sounds.rail', 'sidebar')
-            backend.setting('sounds.sidebar', 'none')
-            backend.setting('sounds.enabled', 'false')
-            run.assert_not_called()
-        state = backend.preferences()
-        self.assertFalse(state['widgets']['network'])
-        self.assertEqual(state['sounds']['volume'], 37)
-        self.assertEqual(state['sounds']['presets'], {'rail':'sidebar','sidebar':'none','settings':'settings'})
-        self.assertFalse(state['sounds']['enabled'])
-        self.assertEqual(backend.paths()[0].stat().st_mode & 0o777, 0o600)
-    def test_invalid_sound_preferences_do_not_write(self):
-        for key, value in [('sounds.volume', x) for x in ('-1','101','nan','inf','loud')] + [('sounds.rail','missing'),('sounds.rail','custom'),('sounds.other','rail'),('sounds.enabled','yes')]:
-            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
-                backend.setting(key, value)
-        self.assertFalse(backend.paths()[0].exists())
-    def test_corrupt_sound_preferences_fall_back(self):
-        for sounds in ([], {'volume':float('nan')}, {'volume':True}, {'enabled':1}, {'presets':[],'files':3}):
-            backend.save(backend.paths()[0], {'sounds':sounds})
-            self.assertEqual(backend.preferences()['sounds'], backend.DEFAULTS['sounds'])
-    def make_wav(self, frames=2400, width=2, channels=1, rate=48000):
-        buffer = io.BytesIO()
-        with wave.open(buffer, 'wb') as audio:
-            audio.setparams((channels, width, rate, frames, 'NONE', ''))
-            audio.writeframes(b'\0' * frames * channels * width)
-        path = Path(self.directory.name) / 'my click sound.wav'
-        path.write_bytes(buffer.getvalue())
-        return path
-    def test_custom_sound_copies_original_without_system_action(self):
-        path = self.make_wav()
-        original = path.read_bytes()
-        backend.setting('sounds.volume', '0')
-        with patch.object(backend, 'run') as run:
-            backend.action('sound-file', 'rail=' + path.as_uri())
-            run.assert_not_called()
-        sounds = backend.preferences()['sounds']
-        copied = Path(backend.unquote(backend.urlparse(sounds['files']['rail']).path))
-        self.assertNotEqual(copied, path)
-        self.assertEqual(copied.read_bytes(), original)
-        self.assertEqual(path.read_bytes(), original)
-        self.assertEqual(copied.stat().st_mode & 0o777, 0o600)
-        self.assertEqual(sounds['volume'], 0)
-        self.assertEqual(sounds['presets']['rail'], 'custom')
-        backend.setting('sounds.rail', 'settings')
-        backend.setting('sounds.rail', 'custom')
-        backend.action('sound-file', 'sidebar=' + path.as_uri())
-        self.assertEqual(len(list(copied.parent.glob('*.wav'))), 1)
-    def test_invalid_custom_sound_preserves_preferences(self):
-        backend.setting('sounds.volume', '22')
-        before = backend.paths()[0].read_bytes()
-        for value in ('https://example.com/click.wav', 'file://remote/click.wav'):
-            with self.assertRaises(ValueError):backend.sound_file('rail', value)
-        for parameters in ({'frames':96001}, {'width':3}, {'channels':3}, {'frames':0}):
-            path = self.make_wav(**parameters)
-            with self.assertRaises(ValueError):backend.sound_file('rail', path.as_uri())
-        path = self.make_wav()
-        path.write_bytes(path.read_bytes()[:-10])
-        with self.assertRaises(ValueError):backend.sound_file('rail', path.as_uri())
-        with self.assertRaises(ValueError):backend.sound_file('unknown', path.as_uri())
-        self.assertEqual(backend.paths()[0].read_bytes(), before)
-    def test_custom_sound_preferences_reject_remote_and_unowned_paths(self):
-        for value in ('https://example.com/click.wav','file:///tmp/click.wav','file://remote/click.wav'):
-            backend.save(backend.paths()[0], {'sounds':{'files':{'rail':value}}})
-            self.assertEqual(backend.preferences()['sounds']['files'], {})
+        self.assertEqual(backend.preferences()['railLayout'], kept + [{'id': 'volume', 'zone': 'right'}])
+        self.assertNotIn('sounds', backend.preferences())
     def test_preferences_are_independent_and_persistent(self):
         backend.setting('widgets.network','false')
         backend.setting('reducedMotion','true')
@@ -203,21 +129,37 @@ class Settings(unittest.TestCase):
             backend.action('hostname', 'unit-001')
             run.assert_called_once_with(['hostnamectl','--no-ask-password','--static','hostname','unit-001'])
         self.assertFalse(backend.paths()[0].exists())
+    def test_login_picture_uses_account_service_and_shrinks_large_files(self):
+        small=Path(self.directory.name)/'small.png'
+        small.write_bytes(b'x')
+        with patch.object(backend,'run',side_effect=['o "/org/freedesktop/Accounts/User1"','']) as run:
+            backend.login_picture(small)
+        self.assertEqual(run.call_args_list[1].args[0][-5:],['/org/freedesktop/Accounts/User1','org.freedesktop.Accounts.User','SetIconFile','s',str(small)])
+        large=Path(self.directory.name)/'large.png'
+        large.write_bytes(b'x'*(1024*1024+1))
+        with patch.object(backend,'run',side_effect=['','o "/org/freedesktop/Accounts/User1"','']) as run:
+            backend.login_picture(large)
+        self.assertEqual(run.call_args_list[0].args[0][0],'magick')
+        self.assertEqual(run.call_args_list[2].args[0][-1],str(large.with_name('large-login.jpg')))
+        with patch.object(backend,'run',side_effect=ValueError('denied')):
+            with self.assertRaisesRegex(ValueError,'login screen picture not updated'):backend.login_picture(small)
     def test_profile_copy_preserves_original_and_preferences(self):
         image=Path(self.directory.name)/'my picture.png'
         data=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aFfsAAAAASUVORK5CYII=')
         image.write_bytes(data)
         backend.setting('widgets.network','false')
-        with patch.object(backend,'run') as run:
+        with patch.object(backend,'login_picture') as login,patch.object(backend,'run') as run:
             backend.action('profile-picture',image.as_uri())
             run.assert_not_called()
+            login.assert_called_once()
         selected=Path(backend.unquote(backend.urlparse(backend.preferences()['profilePicture']).path))
         self.assertNotEqual(selected,image)
         self.assertEqual(selected.read_bytes(),data)
         self.assertEqual(image.read_bytes(),data)
         self.assertEqual(selected.stat().st_mode&0o777,0o600)
         self.assertFalse(backend.preferences()['widgets']['network'])
-        backend.action('profile-picture',image.as_uri())
+        with patch.object(backend,'login_picture'):
+            backend.action('profile-picture',image.as_uri())
         self.assertEqual(len(list(selected.parent.glob('*.png'))),1)
     def test_profile_rejects_nonimage_and_remote_without_preference_change(self):
         image=Path(self.directory.name)/'not-image.png';image.write_bytes(b'not an image')

@@ -9,19 +9,18 @@ import "SettingsNavigation.js" as Navigation
 
 Item {
     id: settings
-    property string soundGroup: "settings"
     // Settings-only tokens. Keep the supplied sidebar and native frame geometry.
     readonly property color primaryInk: "#f1f1f1"
     readonly property color secondaryInk: "#b8b8b8"
-    readonly property color controlSurface: "#212121"
-    readonly property color controlBorder: "#383838"
+    readonly property color controlSurface: "#1f1f1f"
+    readonly property color controlBorder: "#2e2e2e"
     readonly property int controlHeight: 56
     readonly property string creatorAttribution: "ghOSt - ChatGPT and dsksnkz"
     readonly property real navigationRowHeight: 44
-    readonly property real navigationRowGap: 8
+    readonly property real navigationRowGap: 0
     readonly property real navigationStride: navigationRowHeight + navigationRowGap
     readonly property real navigationInset: 0
-    readonly property real navigationGroupGap: 16
+    readonly property real navigationGroupGap: 0
     readonly property var navigationMetrics: ({
         rowHeight: navigationRowHeight,
         rowGap: navigationRowGap,
@@ -38,10 +37,6 @@ Item {
     property string query: ""
     property real fixtureVolume: 62
     property real fixtureInput: 74
-    property var fixtureSounds: ({enabled: true, volume: 18, presets: {rail: "rail", sidebar: "sidebar", settings: "settings"}, files: {}})
-    readonly property var soundPreferences: previewMode ? fixtureSounds : UiSounds.preferences
-    property real pendingSoundVolume: -1
-    property string soundFileGroup: ""
     property var airplaneSnapshot: null
     property real pendingBrightness: 0
     property string fixtureHost: "Unit-01"
@@ -167,30 +162,6 @@ Item {
         if (!previewMode)
             Settings.preference(name, value);
     }
-    function soundPreference(key, value) {
-        if (!previewMode) {
-            preference("sounds." + key, value);
-            return;
-        }
-        const updated = JSON.parse(JSON.stringify(fixtureSounds));
-        if (key === "volume" || key === "enabled")
-            updated[key] = value;
-        else
-            updated.presets[key] = value;
-        fixtureSounds = updated;
-        pendingSoundVolume = -1;
-    }
-    function chooseSoundFile(group) {
-        soundFileGroup = group;
-        if (!previewMode)
-            soundDialog.open();
-    }
-    function selectSound(group, preset) {
-        if (preset === "custom" && !soundPreferences.files?.[group])
-            chooseSoundFile(group);
-        else
-            soundPreference(group, preset);
-    }
     function gigabytes(value) {
         return typeof value === "number" ? (value / 1e9).toFixed(1) + " GB" : "Unavailable";
     }
@@ -234,9 +205,6 @@ Item {
             navTop: navFlick.y,
             searchTop: searchHousing.y,
             searchWidth: searchHousing.width,
-            portraitTop: sidebarPortrait.parent.y,
-            portraitSize: sidebarPortrait.width,
-            portraitRadius: sidebarPortrait.radius,
             navScroll: navFlick.contentY,
             navContentHeight: navFlick.contentHeight,
             selectionY: navigationSelection.y,
@@ -293,24 +261,6 @@ Item {
         function onStateChanged() {
             if (nameSubmitted && nameDialog.visible && Settings.state.host === settings.nameDraft)
                 nameDialog.close();
-            if (pendingSoundVolume === UiSounds.level)
-                pendingSoundVolume = -1;
-        }
-        function onErrorChanged() {
-            if (Settings.error)
-                settings.pendingSoundVolume = -1;
-        }
-    }
-    Timer {
-        id: soundVolumeCommit
-        interval: 180
-        onTriggered: {
-            if (Settings.busy) {
-                restart();
-                return;
-            }
-            if (settings.pendingSoundVolume >= 0)
-                settings.soundPreference("volume", settings.pendingSoundVolume);
         }
     }
     Timer {
@@ -338,11 +288,9 @@ Item {
     }
     component Card: G2Surface {
         width: parent.width
-        radius: 10
+        radius: 12
         smoothing: .6
         color: settings.controlSurface
-        border.width: 1
-        border.color: settings.controlBorder
     }
     component ControlGroup: Card {
         objectName: "settings-control-group"
@@ -367,11 +315,11 @@ Item {
         property bool actionable: true
         width: (body.width - 16) / 2
         height: 128
-        radius: 10
+        radius: 12
         smoothing: .6
         color: settings.controlSurface
-        border.width: 1
-        border.color: activeFocus ? settings.primaryInk : settings.controlBorder
+        border.width: activeFocus ? 1 : 0
+        border.color: settings.primaryInk
         hint: name
         enabled: actionable
         opacity: 1
@@ -417,7 +365,7 @@ Item {
             width: 32
             height: 32
             radius: 8
-            color: "#191919"
+            color: "#2d2d2d"
             SvgIcon {
                 anchors.centerIn: parent
                 width: 18
@@ -537,120 +485,6 @@ Item {
             onMoved: parent.moved(value)
         }
     }
-    component SoundChoice: Item {
-        property string group: ""
-        property string name: ""
-        width: parent.width
-        height: 48
-        Label {
-            y: 14
-            width: parent.width - 402
-            height: 22
-            text: parent.name
-            font.pixelSize: 13
-        }
-        Controls.ComboBox {
-            id: choice
-            objectName: "settings-sound-preset-" + parent.group
-            anchors.right: parent.right
-            anchors.rightMargin: 96
-            y: 6
-            width: 290
-            height: 36
-            model: UiSounds.choices
-            textRole: "name"
-            valueRole: "id"
-            enabled: settings.previewMode || !Settings.busy
-            currentIndex: UiSounds.choices.findIndex(item => item.id === settings.soundPreferences.presets[parent.group])
-            Accessible.name: parent.name + " click sound"
-            onActivated: index => {
-                UiSounds.play("settings");
-                settings.selectSound(parent.group, UiSounds.choices[index].id);
-                // Keep the label bound to the accepted state, including cancel.
-                currentIndex = Qt.binding(() => UiSounds.choices.findIndex(item => item.id === settings.soundPreferences.presets[parent.group]));
-            }
-            contentItem: Label {
-                leftPadding: 12
-                rightPadding: 32
-                verticalAlignment: Text.AlignVCenter
-                text: choice.displayText
-                font.pixelSize: 12
-                color: settings.primaryInk
-            }
-            indicator: SvgIcon {
-                x: choice.width - 24
-                y: 11
-                width: 14
-                height: 14
-                name: "forward"
-                rotation: 90
-            }
-            background: G2Surface {
-                radius: 8
-                color: "#191919"
-                border.width: 1
-                border.color: choice.activeFocus || choice.hovered ? settings.secondaryInk : settings.controlBorder
-            }
-            delegate: Controls.ItemDelegate {
-                required property var modelData
-                required property int index
-                width: choice.width - 12
-                height: 36
-                highlighted: choice.highlightedIndex === index
-                contentItem: Label {
-                    text: modelData.name
-                    font.pixelSize: 12
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: G2Surface {
-                    radius: 8
-                    color: parent.highlighted ? "#303030" : "transparent"
-                }
-            }
-            popup: Controls.Popup {
-                y: choice.height + 6
-                width: choice.width
-                padding: 6
-                background: G2Surface {
-                    radius: 10
-                    color: settings.controlSurface
-                    border.width: 1
-                    border.color: settings.controlBorder
-                }
-                contentItem: ListView {
-                    implicitHeight: contentHeight
-                    model: choice.popup.visible ? choice.delegateModel : null
-                    currentIndex: choice.highlightedIndex
-                    clip: true
-                }
-            }
-        }
-        Key {
-            anchors.right: parent.right
-            anchors.rightMargin: 48
-            y: 6
-            width: 36
-            height: 36
-            radius: 8
-            hint: "Choose " + parent.name + " WAV"
-            enabled: settings.previewMode || !Settings.busy
-            onClicked: settings.chooseSoundFile(parent.group)
-            SvgIcon { anchors.centerIn: parent; width: 18; height: 18; name: "folder" }
-        }
-        Key {
-            objectName: "settings-sound-play-" + parent.group
-            anchors.right: parent.right
-            y: 6
-            width: 36
-            height: 36
-            radius: 8
-            hint: "Play " + parent.name + " sound"
-            enabled: settings.previewMode ? settings.soundPreferences.enabled && settings.soundPreferences.volume > 0 && settings.soundPreferences.presets[parent.group] !== "none" : UiSounds.allowed(parent.group) && UiSounds.ready(parent.group)
-            function clickSound() {} // Preview exactly the chosen sound, not two.
-            onClicked: UiSounds.play(parent.group)
-            SvgIcon { anchors.centerIn: parent; width: 18; height: 18; name: "play" }
-        }
-    }
 
     Item {
         id: scene
@@ -664,7 +498,7 @@ Item {
             anchors.fill: parent
             radius: 10
             smoothing: .6
-            color: "#171717"
+            color: "#2d2d2d"
         }
         G2Surface {
             x: 262
@@ -674,39 +508,43 @@ Item {
             smoothing: .6
             color: "#111111"
         }
+        Label {
+            x: 25
+            y: 18
+            width: 200
+            height: 28
+            verticalAlignment: Text.AlignVCenter
+            text: "Settings"
+            font.family: Theme.textFont
+            font.pixelSize: 20
+            font.weight: Theme.boldWeight
+            color: "#ffffff"
+        }
         G2Surface {
             id: searchHousing
             x: 17
-            y: 84
+            y: 56
             width: 227
-            height: 32
-            radius: 8
+            height: 30
+            radius: 15
             smoothing: .6
-            color: "#262626"
+            color: "#4a4a4a"
             border.width: search.activeFocus ? 1 : 0
             border.color: settings.secondaryInk
-            SvgIcon {
-                x: 12
-                y: 8
-                width: 16
-                height: 16
-                name: "search"
-                opacity: .75
-            }
             Label {
-                x: 38
+                x: 16
                 y: 7
-                text: "Search settings"
+                text: "Search here"
                 visible: search.text.length === 0
-                color: "#b8b8b8"
+                color: "#979797"
                 font.pixelSize: 12
             }
             TextInput {
                 id: search
                 objectName: "settings-search"
-                x: 38
+                x: 16
                 y: 7
-                width: 151
+                width: 175
                 height: 18
                 color: "#ffffff"
                 font.family: Theme.font
@@ -720,10 +558,10 @@ Item {
             Key {
                 objectName: "settings-search-clear"
                 x: 199
-                y: 6
+                y: 5
                 width: 20
                 height: 20
-                radius: 6
+                radius: 10
                 visible: search.text.length > 0
                 hint: "Clear search"
                 onClicked: settings.query = ""
@@ -735,69 +573,12 @@ Item {
                 }
             }
         }
-        Item {
-            x: 17
-            y: 18
-            width: 227
-            height: 48
-            G2Image {
-                id: sidebarPortrait
-                width: 48
-                height: 48
-                radius: 11
-                source: settings.portraitSource
-            }
-            Key {
-                width: 48
-                height: 48
-                radius: 11
-                smoothing: .6
-                hint: "Choose profile picture"
-                onClicked: settings.requestPortrait("sidebar")
-            }
-            Label {
-                x: 65
-                y: 4
-                width: 104
-                height: 22.14
-                text: settings.displayHost
-                font.family: Theme.textFont
-                font.pixelSize: 16
-                font.weight: Theme.boldWeight
-                color: "#ffffff"
-            }
-            Label {
-                x: 65
-                y: 32
-                width: 104
-                height: 12.9
-                text: "Your PC"
-                font.family: Theme.textFont
-                font.pixelSize: 10
-                color: settings.secondaryInk
-            }
-            Key {
-                x: 173
-                y: 8
-                width: 32
-                height: 32
-                radius: 8
-                hint: "General"
-                onClicked: settings.choose("general")
-                SvgIcon {
-                    anchors.centerIn: parent
-                    width: 28
-                    height: 28
-                    name: "settings"
-                }
-            }
-        }
         Flickable {
             id: navFlick
             x: 17
-            y: 145
+            y: 98
             width: 231
-            height: 530
+            height: 590
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
@@ -810,7 +591,6 @@ Item {
                 id: nav
                 width: 231
                 height: settings.navLayout.height
-                // Logical groups keep their spacing without housings or lines.
                 G2Surface {
                     id: navigationSelection
                     x: 0
@@ -820,10 +600,10 @@ Item {
                     height: settings.navigationRowHeight
                     radius: 10
                     smoothing: .6
-                    color: "#303030"
+                    color: "#535353"
                     Behavior on y {
                         NumberAnimation {
-                            duration: Theme.reducedMotion ? 0 : 280
+                            duration: Theme.reducedMotion ? 0 : 200
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: [0.22, 1, 0.36, 1, 1, 1]
                         }
@@ -833,24 +613,36 @@ Item {
                     model: settings.navLayout.rows
                     Key {
                         required property var modelData
+                        required property int index
+                        readonly property bool current: modelData.id === settings.page
                         objectName: "settings-navigation-" + modelData.id
-                        hoverFeedback: modelData.id !== settings.page
+                        hoverFeedback: !current
                         y: modelData.y
-                        width: 231
+                        width: 227
                         height: settings.navigationRowHeight
                         radius: 10
                         hint: modelData.name
                         color: "transparent"
                         onClicked: settings.choose(modelData.id)
+                        // A hairline between rows, hidden beside the selection.
+                        Rectangle {
+                            x: 52
+                            y: parent.height - 1
+                            width: parent.width - 66
+                            height: 1
+                            color: "#ffffff"
+                            opacity: .55
+                            visible: !parent.current && parent.index < settings.navLayout.rows.length - 1 && settings.navLayout.rows[parent.index + 1].id !== settings.page
+                        }
                         G2Surface {
                             objectName: "settings-navigation-icon"
-                            x: 12
+                            x: 8
                             y: (parent.height - height) / 2
-                            width: 28
-                            height: 28
+                            width: 30
+                            height: 30
                             radius: 8
                             smoothing: .6
-                            color: modelData.id === settings.page ? "#191919" : "#242424"
+                            color: parent.current ? "#2d2d2d" : "#363636"
                             SvgIcon {
                                 objectName: "settings-navigation-glyph"
                                 anchors.centerIn: parent
@@ -860,14 +652,13 @@ Item {
                             }
                         }
                         Label {
-                            x: 52
+                            x: 50
                             y: (parent.height - height) / 2
-                            width: modelData.id === "airplane" ? 112 : 162
+                            width: modelData.id === "airplane" ? 112 : 170
                             height: 18
                             text: modelData.name
-                            font.pixelSize: 12
-                            font.weight: modelData.id === settings.page ? Theme.mediumWeight : Font.Normal
-                            color: modelData.id === settings.page ? settings.primaryInk : "#d1d1d1"
+                            font.pixelSize: 13
+                            color: "#ffffff"
                         }
                         SettingsToggle {
                             visible: modelData.id === "airplane"
@@ -917,16 +708,12 @@ Item {
                     visible: settings.page !== "general"
                     width: parent.width
                     height: 32
-                    SvgIcon {
-                        x: 0; y: 6; width: 20; height: 20
-                        name: settings.categories.find(c => c.id === settings.page)?.icon || "info"
-                    }
                     Label {
-                        x: 36; width: parent.width - 36; height: 32
+                        width: parent.width; height: 32
                         verticalAlignment: Text.AlignVCenter
                         text: settings.categories.find(c => c.id === settings.page)?.name || ""
                         font.pixelSize: 22
-                        font.weight: Theme.mediumWeight
+                        font.weight: Theme.boldWeight
                         color: settings.primaryInk
                     }
                 }
@@ -952,7 +739,7 @@ Item {
                         })[settings.page]
                 }
                 Note {
-                    visible: !settings.previewMode && settings.page !== "sound" && Settings.error !== ""
+                    visible: !settings.previewMode && Settings.error !== ""
                     text: Settings.error
                 }
                 Note {
@@ -967,7 +754,7 @@ Item {
         id: generalPage
         Item {
             width: body.width
-            height: 518
+            height: 456
             G2Image {
                 x: 287
                 y: 0
@@ -1014,33 +801,8 @@ Item {
                     }
                 }
             }
-            Key {
-                x: (parent.width - width) / 2
-                y: 172
-                width: 245
-                height: 18
-                hint: "System information"
-                onClicked: settings.choose("about")
-                SvgIcon {
-                    x: 0
-                    y: 0
-                    width: 18
-                    height: 18
-                    name: "info"
-                }
-                Label {
-                    x: 27
-                    y: 1
-                    width: parent.width - 27
-                    height: 15
-                    text: settings.creatorAttribution
-                    font.family: Theme.textFont
-                    font.pixelSize: 11
-                    color: "#ffffff"
-                }
-            }
             Row {
-                y: 230
+                y: 176
                 width: parent.width
                 spacing: 16
                 Summary {
@@ -1061,7 +823,7 @@ Item {
                 }
             }
             Column {
-                y: 382
+                y: 320
                 width: parent.width
                 spacing: 12
                 DeviceRow {
@@ -1085,45 +847,6 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            Section {
-                title: "Interface sounds"
-                ControlGroup {
-                    objectName: "settings-interface-sounds"
-                    SoundControl {
-                        objectName: "settings-sfx-volume"
-                        name: "Click sound volume"
-                        amount: settings.pendingSoundVolume >= 0 ? settings.pendingSoundVolume : settings.soundPreferences.volume
-                        onMoved: value => {
-                            settings.pendingSoundVolume = Math.round(value);
-                            soundVolumeCommit.restart();
-                        }
-                    }
-                    ToggleRow {
-                        objectName: "settings-sfx-enabled"
-                        name: "Click sounds"
-                        icon: "volume"
-                        checked: settings.soundPreferences.enabled
-                        onToggled: value => settings.soundPreference("enabled", value)
-                    }
-                    Repeater {
-                        model: [{group: "rail", name: "Top rail"}, {group: "sidebar", name: "Sidebar"}, {group: "settings", name: "Settings"}]
-                        SoundChoice {
-                            required property var modelData
-                            group: modelData.group
-                            name: modelData.name
-                        }
-                    }
-                    Note {
-                        visible: !settings.previewMode && ["rail", "sidebar", "settings"].some(group => UiSounds.warning(group))
-                        text: ["rail", "sidebar", "settings"].map(group => UiSounds.warning(group)).find(message => !!message) || ""
-                    }
-                    Note { text: "Custom: PCM WAV, 8/16-bit mono/stereo, up to 2 seconds." }
-                    Note {
-                        visible: !settings.previewMode && Settings.error !== ""
-                        text: Settings.error
-                    }
-                }
-            }
             ControlGroup {
               SoundControl {
                 name: "Output volume"
@@ -1386,12 +1109,6 @@ Item {
                 text: settings.details.preferences?.wallpaper || "Choose an image to apply through awww"
             }
         }
-    }
-    FileDialog {
-        id: soundDialog
-        title: "Choose click sound"
-        nameFilters: ["PCM WAV (*.wav)"]
-        onAccepted: settings.apply("sound-file", settings.soundFileGroup + "=" + selectedFile.toString())
     }
     WallpaperPicker {
         id: wallpaperDialog

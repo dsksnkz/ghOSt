@@ -1,6 +1,6 @@
 // Launcher and media keep a still window under the rail and slide only their
 // content, so the compositor never repositions the surface mid-animation.
-var railGap = 68;
+var railGap = 54;
 
 function duration(page, reducedMotion, standardDuration) {
     return reducedMotion ? 0 : page === "launcher" ? 150 : standardDuration;
@@ -9,7 +9,7 @@ function duration(page, reducedMotion, standardDuration) {
 function topMargin(page, reveal, height) {
     if (page === "launcher" || page === "media")
         return 0;
-    return page === "calendar" ? 82 : railGap;
+    return page === "calendar" ? 68 : railGap;
 }
 
 // Extra window height above the content for pages that slide inside the window.

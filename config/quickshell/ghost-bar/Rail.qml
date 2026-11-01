@@ -6,7 +6,6 @@ import "RailLayout.js" as Layout
 Item {
     id: bar
     property bool active: true
-    property string soundGroup: "rail"
     property var monitor: null
     property var trayWindow: null
     property string screenName: ""
@@ -15,10 +14,20 @@ Item {
     readonly property var layout: layoutOverride || (previewMode ? null : Settings.state.preferences?.railLayout) || null
     readonly property var positions: layout ? Layout.geometry(layout, controls.width) : ({})
     function elementX(name, original) { return layout ? positions[name]?.x ?? original : original; }
-    function elementVisible(name) { return !layout || (positions[name]?.visible ?? false); }
+    function elementVisible(name) { return layout ? positions[name]?.visible ?? false : Layout.items.find(item => item.id === name).zone !== "hidden"; }
     readonly property bool fixtureMode: previewMode && Quickshell.env("GHOST_CALENDAR_FIXTURE") === "1"
     readonly property date displayTime: fixtureMode ? new Date(2026, 8, 29, 9, 21) : Desk.now
     readonly property int displayVolume: fixtureMode ? 33 : Desk.volume
+    property bool fixtureMedia: false
+    // Hidden with no audio; a paused track stays so it can be resumed from the rail.
+    readonly property bool mediaRevealed: fixtureMedia || Desk.playing || !!Desk.player?.trackTitle
+    property real mediaReveal: mediaRevealed ? 1 : 0
+    Behavior on mediaReveal {
+        NumberAnimation {
+            duration: Theme.reducedMotion ? 0 : 280
+            easing.type: Easing.OutCubic
+        }
+    }
     function workspaceAction(action, value) {
         if (!fixtureMode)
             return "{}";
@@ -45,101 +54,52 @@ Item {
         height: Theme.railHeight
         scale: bar.designScale
         transformOrigin: Item.TopLeft
-        Material {
-            x: 19 * Theme.railOuterGapScale
-            y: 16 * Theme.railVerticalScale * Theme.railOuterGapScale
-            width: 1920 - 38 * Theme.railOuterGapScale
-            height: 46 * Theme.railVerticalScale
-            radius: Theme.outerRadius
-            id: housing
-            gradient: null
-            color: "#0b0b0b"
-            border.width: 0
-            G2Surface {
-                anchors.fill: parent
-                anchors.margins: -1
-                radius: Theme.outerRadius + 1
-                color: "transparent"
-                border.color: "#272727"
-                border.width: 1
-            }
-            // Machined top edge: a faint highlight inside the outline.
+        Rectangle {
+            anchors.fill: parent
+            color: "#191919"
             Rectangle {
-                x: housing.radius
-                y: 1
-                width: housing.width - 2 * housing.radius
+                anchors.bottom: parent.bottom
+                width: parent.width
                 height: 1
-                color: "#ffffff"
-                opacity: .06
+                color: "#404040"
             }
             Item {
                 id: controls
-                // Keep the rail full-width; shrink contents uniformly and anchor groups.
-                readonly property real extraWidth: width - 1882
-                width: parent.width / Theme.railVerticalScale
-                height: 46
-                scale: Theme.railVerticalScale
-                transformOrigin: Item.TopLeft
-                Key {
-                    objectName: "rail-element-menu"
-                    visible: bar.elementVisible("menu")
-                    x: bar.elementX("menu", 19)
-                    y: 7
-                    width: 42
-                    height: 32
-                    hint: "Open controls"
-                    onClicked: Desk.toggleSidebar(bar.screenName)
-                    SvgIcon {
-                        x: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 22
-                        height: 22
-                        name: "menu"
-                    }
-                }
+                width: 1920
+                height: 34
                 Workspaces {
                     id: workspaceWheel
                     objectName: "rail-element-workspaces"
                     visible: bar.elementVisible("workspaces")
-                    x: bar.elementX("workspaces", 132)
-                    y: 0
+                    x: bar.elementX("workspaces", 15)
+                    y: 3
                     monitor: bar.monitor
                     fixtureWorkspace: bar.fixtureMode ? 5 : -1
                 }
-                G2Surface {
-                    x: 1598 + controls.extraWidth
-                    visible: !bar.layout
-                    y: 16
-                    width: 1
-                    height: 14
-                    color: "#2c2c2c"
-                }
-                G2Surface {
-                    x: 1821 + controls.extraWidth
-                    visible: !bar.layout
-                    y: 16
-                    width: 1
-                    height: 14
-                    color: "#2c2c2c"
-                }
-                MusicBar {
-                    objectName: "rail-element-music"
-                    visible: bar.elementVisible("music")
-                    active: bar.active && visible
-                    x: bar.elementX("music", 314)
-                    y: 7
-                    width: 260
-                    height: 32
-                    onExpanded: bar.open("media", this)
+                Item {
+                    objectName: "rail-music-reveal"
+                    visible: bar.elementVisible("music") && width > 0
+                    x: bar.elementX("music", 150)
+                    width: 220 * bar.mediaReveal
+                    height: 28
+                    clip: true
+                    MusicBar {
+                        objectName: "rail-element-music"
+                        active: bar.active && visible
+                        width: 220
+                        height: 28
+                        onExpanded: bar.open("media", this)
+                    }
                 }
                 Key {
+                    hoverFeedback: false
                     id: centerClock
                     objectName: "rail-clock-control"
                     visible: bar.elementVisible("clock")
                     x: bar.elementX("clock", (controls.width - width) / 2)
-                    y: 5
+                    y: 0
                     width: 124
-                    height: 36
+                    height: 34
                     hint: "Calendar"
                     onClicked: bar.open("calendar", this)
                     InkLabel {
@@ -149,67 +109,86 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         text: Qt.formatDateTime(bar.displayTime, "HH:mm")
                         font.family: Theme.font
-                        font.pixelSize: 24
+                        font.pixelSize: 20
                         font.weight: Font.Normal
-                        font.letterSpacing: 1
                         color: "#ffffff"
                     }
                 }
                 Key {
+                    hoverFeedback: false
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
-                    x: bar.elementX("network", 1621 + controls.extraWidth)
-                    y: 7
-                    width: 41
-                    height: 32
+                    x: bar.elementX("network", 1620)
+                    y: 2
+                    width: 38
+                    height: 28
                     hint: "Network controls"
                     onClicked: Desk.toggleSidebar(bar.screenName)
                     SvgIcon {
-                        id: networkIcon
-                        x: 9.5
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 22
-                        height: 22
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
                         name: "wifi"
                         opacity: bar.fixtureMode || Desk.connected ? 1 : .45
                     }
                 }
                 Key {
+                    hoverFeedback: false
                     objectName: "rail-element-bluetooth"
                     visible: bar.elementVisible("bluetooth")
-                    x: bar.elementX("bluetooth", 1673 + controls.extraWidth)
-                    y: 7
-                    width: 41
-                    height: 32
+                    x: bar.elementX("bluetooth", 1660)
+                    y: 2
+                    width: 38
+                    height: 28
                     hint: "Bluetooth controls"
                     onClicked: Desk.toggleSidebar(bar.screenName)
                     SvgIcon {
-                        id: bluetoothIcon
-                        x: 9.5
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 22
-                        height: 22
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
                         name: "bluetooth"
                         opacity: bar.fixtureMode || Desk.adapter?.enabled ? 1 : .45
                     }
                 }
                 Key {
+                    hoverFeedback: false
+                    objectName: "rail-element-volume"
+                    visible: bar.elementVisible("volume")
+                    x: bar.elementX("volume", 1702)
+                    y: 2
+                    width: 38
+                    height: 28
+                    hint: "Volume controls"
+                    wheelEnabled: true
+                    onClicked: Desk.toggleSidebar(bar.screenName)
+                    onScrolled: delta => Desk.setVolume(Desk.volume / 100 + delta / 120 * .05)
+                    SvgIcon {
+                        id: volumeIcon
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
+                        name: Desk.muted && !bar.fixtureMode ? "mute" : "volume"
+                    }
+                }
+                Key {
+                    hoverFeedback: false
                     objectName: "rail-element-battery"
                     visible: bar.elementVisible("battery")
-                    x: bar.elementX("battery", 1726 + controls.extraWidth)
-                    y: 7
-                    width: 71
-                    height: 32
+                    x: bar.elementX("battery", 1748)
+                    y: 2
+                    width: 62
+                    height: 28
                     hint: "Battery controls"
                     onClicked: Desk.toggleSidebar(bar.screenName)
                     InkLabel {
                         id: batteryText
-                        x: 0
+                        x: 4
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 38
-                        height: 32
+                        width: 36
+                        height: 28
+                        horizontalAlignment: Text.AlignHCenter
                         text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
-                        font.family: Theme.jetRegular.name
+                        font.family: Theme.font
                         font.pixelSize: 12
                         color: "#ffffff"
                     }
@@ -217,27 +196,48 @@ Item {
                         id: batteryIcon
                         x: 41
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 22
-                        height: 22
+                        width: 16
+                        height: 16
                         name: "battery"
                         visible: Desk.hasBattery || bar.previewMode
                     }
                 }
+                Rectangle {
+                    x: 1844
+                    visible: !bar.layout
+                    y: 1
+                    width: 1
+                    height: 30
+                    color: "#2c2c2c"
+                }
                 Key {
+                    hoverFeedback: false
                     objectName: "rail-element-power"
                     visible: bar.elementVisible("power")
-                    x: bar.elementX("power", 1837 + controls.extraWidth)
-                    y: 7
-                    width: 39
-                    height: 32
+                    x: bar.elementX("power", 1858)
+                    y: 2
+                    width: 38
+                    height: 28
                     hint: "Power"
                     onClicked: bar.open("session", this)
+                    Canvas {
+                        anchors.centerIn: parent
+                        width: 34
+                        height: 34
+                        onPaint: {
+                            const context = getContext("2d");
+                            const glow = context.createRadialGradient(17, 17, 3, 17, 17, 17);
+                            glow.addColorStop(0, Qt.rgba(1, 1, 1, .12));
+                            glow.addColorStop(1, Qt.rgba(1, 1, 1, 0));
+                            context.fillStyle = glow;
+                            context.fillRect(0, 0, width, height);
+                        }
+                    }
                     SvgIcon {
                         id: powerIcon
-                        x: 8.5
-                        y: 5
-                        width: 22
-                        height: 22
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
                         name: "power"
                     }
                 }
@@ -245,7 +245,7 @@ Item {
         }
     }
     function spacingStatus() {
-        const icons = [networkIcon, bluetoothIcon, batteryIcon, powerIcon];
+        const icons = [volumeIcon, batteryIcon, powerIcon];
         return {
             clockOnly: true,
             railWidth: bar.width,

@@ -93,7 +93,7 @@ ShellRoot {
             G2Surface {
                 id: mediaFrame
                 visible: stage.scene === "media"
-                width: 392
+                width: 420
                 height: media.implicitHeight
                 radius: Theme.outerRadius
                 color: "#0b0b0b"

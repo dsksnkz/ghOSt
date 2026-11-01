@@ -1,0 +1,52 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "file",
+    "source": "@HOME@/.config/fastfetch/ascii/ghost.txt",
+    "color": {
+      "1": "97"
+    },
+    "padding": {
+      "top": 0,
+      "left": 1,
+      "right": 4
+    }
+  },
+  "display": {
+    "separator": "  ",
+    "showErrors": false,
+    "color": {
+      "keys": "97",
+      "output": "97",
+      "separator": "97"
+    }
+  },
+  "modules": [
+    {
+      "type": "os",
+      "key": " os"
+    },
+    {
+      "type": "gpu",
+      "key": "󰢮 gpu",
+      "hideType": "integrated"
+    },
+    {
+      "type": "cpu",
+      "key": " cpu"
+    },
+    {
+      "type": "memory",
+      "key": "󰍛 ram"
+    },
+    {
+      "type": "shell",
+      "key": " shell"
+    },
+    {
+      "type": "command",
+      "key": "󰎆 audio",
+      "text": "bash @HOME@/.config/fastfetch/media.sh"
+    }
+  ]
+}

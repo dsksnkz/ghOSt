@@ -270,5 +270,17 @@
   "weather-storm.svg": {
     "url": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/thunderstorm/wght200/24px.svg",
     "sha256": "638e55fc37d1d2669dcf90dc81f8051efee2198b55185358a7118b0a04116862"
+  },
+  "shuffle.svg": {
+    "url": "https://raw.githubusercontent.com/google/material-design-icons/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/web/shuffle/materialsymbolsoutlined/shuffle_24px.svg",
+    "sha256": "2adc47bcffacca03b0f8ed0f23c19e1a6bdfeec63e3e3168be0c601f464b5d57"
+  },
+  "repeat.svg": {
+    "url": "https://raw.githubusercontent.com/google/material-design-icons/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/web/repeat/materialsymbolsoutlined/repeat_24px.svg",
+    "sha256": "96daad841add17ebe430ae7087096ea1976c47c6795e6c44f79c3f9d9cf69112"
+  },
+  "repeat_one.svg": {
+    "url": "https://raw.githubusercontent.com/google/material-design-icons/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/web/repeat_one/materialsymbolsoutlined/repeat_one_24px.svg",
+    "sha256": "df4fecd852ff40058d19daf1d063e2e61b84747e144badb43ded19d22cc1ea57"
   }
 }

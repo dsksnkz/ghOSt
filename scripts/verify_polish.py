@@ -22,7 +22,7 @@ call('page', 'desktop')
 call('sidebar', 'reveal')
 state = json.loads(call('polish'))
 assert state['railFonts'], 'No rendered rail labels inspected'
-assert all(label['family'] == 'JetBrainsMono Nerd Font Mono'
+assert all(label['family'] == 'Adwaita Sans'
            for label in state['railFonts']), state['railFonts']
 buttons = {button['hint']: button for button in state['sidebarControls']}
 for name in ('Power', 'Settings', 'Enable do not disturb'):

@@ -34,9 +34,6 @@ FloatingWindow {
         if (action === "capture")
             return captureResult;
 
-        if (action === "sounds")
-            return JSON.stringify(UiSounds.status());
-
         if (action === "polling")
             return JSON.stringify(Settings.pollingStatus());
 

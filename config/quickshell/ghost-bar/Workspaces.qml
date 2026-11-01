@@ -105,7 +105,8 @@ Item {
             readonly property real offset: slot - wheel.position
             readonly property var projection: Geometry.project(offset)
             x: projection.x
-            y: projection.y
+            // Side numbers sit 1px lower when settled.
+            y: projection.y + (1 - projection.depth) * 1
             width: 23
             height: 18
             opacity: projection.opacity
@@ -126,12 +127,12 @@ Item {
                     angle: projection.rotation
                 }
             ]
-            Label {
+            InkLabel {
                 anchors.fill: parent
                 horizontalAlignment: Text.AlignHCenter
                 text: String(parent.workspace).padStart(2, "0")
                 font.family: Theme.font
-                font.pixelSize: 15
+                font.pixelSize: 13
                 font.weight: Math.abs(parent.offset) < .5 ? Theme.boldWeight : Theme.mediumWeight
                 color: Qt.rgba(parent.projection.ink / 255, parent.projection.ink / 255, parent.projection.ink / 255, 1)
             }
@@ -149,10 +150,11 @@ Item {
         Key {
             required property int modelData
             readonly property int workspace: wheel.workspaceRing[Geometry.modulo(Math.round(wheel.position) + modelData, wheel.workspaceRing.length)] ?? 1
-            x: modelData < 0 ? 0 : modelData === 0 ? 36 : 76
+            x: 38 + modelData * 38
             width: 23
             height: 46
             color: "transparent"
+            hoverFeedback: false
             hint: "Workspace " + workspace
             onClicked: {
                 Desk.close();
@@ -161,16 +163,6 @@ Item {
             wheelEnabled: true
             onScrolled: delta => wheel.scroll(delta)
         }
-    }
-    Rectangle {
-        id: indicator
-        x: 36 + (23 - width) / 2
-        y: 29
-        width: 6
-        height: 6
-        z: 5
-        radius: width / 2
-        color: "#ffffff"
     }
     function status() {
         const rendered = [];
@@ -194,12 +186,6 @@ Item {
             target: targetIndex,
             moving: rotation.running,
             remainder: scrollRemainder,
-            triangle: {
-                x: indicator.x,
-                y: indicator.y,
-                width: indicator.width
-            },
-            marker: {shape: "dot", color: indicator.color.toString(), height: indicator.height},
             rendered
         };
     }

@@ -9,11 +9,10 @@ Column {
     property bool dirty: false
     property bool busy: false
     property string selectedId: ""
-    property string soundGroup: "settings"
     signal applyRequested(string value)
 
     function resetDraft() {
-        draft = (savedLayout || Layout.defaults()).filter(entry => entry.id !== "volume")
+        draft = (savedLayout || Layout.defaults()).filter(entry => Layout.items.some(item => item.id === entry.id))
             .map(entry => ({id: entry.id, zone: entry.zone}));
         dirty = false;
     }

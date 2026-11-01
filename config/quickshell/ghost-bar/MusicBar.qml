@@ -19,8 +19,9 @@ Item {
     Item {
         id: background
         objectName: "music-spectrum-background"
-        anchors.fill: parent
-        visible: music.compact
+        width: parent.width
+        height: 23
+        visible: music.compact && music.playing
         clip: true
         Repeater {
             model: spectrum.barCount
@@ -34,7 +35,7 @@ Item {
                 height: Math.max(2, background.height * spectrum.levels[index])
                 radius: 2
                 color: "#515151"
-                opacity: music.playing ? 0.65 : 0.25
+                opacity: 0.4
                 Behavior on height {
                     NumberAnimation { duration: Theme.reducedMotion ? 0 : 65 }
                 }
@@ -68,40 +69,61 @@ Item {
             }
         }
     }
+    Key {
+        visible: music.compact
+        y: 4
+        width: 18
+        height: 18
+        radius: 4
+        hoverFeedback: false
+        hint: music.playing ? "pause" : "play"
+        enabled: !!music.player?.canTogglePlaying
+        onClicked: music.player.togglePlaying()
+        SvgIcon {
+            anchors.centerIn: parent
+            width: 14
+            height: 14
+            name: music.playing ? "pause" : "play"
+        }
+    }
     Item {
-        x: music.compact ? 6 : 34
-        width: parent.width - (music.compact ? 86 : 114)
-        height: music.compact ? 29 : 66
+        x: music.compact ? 21 : 34
+        y: music.compact ? 5 : 0
+        width: parent.width - (music.compact ? (music.player ? 67 : 21) : 114)
+        height: music.compact ? 16 : 66
         Label {
             objectName: "music-title"
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
-            text: music.player?.trackTitle || "No playback"
-            font.pixelSize: music.compact ? 13 : 18
+            text: music.player?.trackTitle || music.player?.identity || "No playback"
+            font.pixelSize: music.compact ? 12 : 18
             color: music.player ? Theme.text : Theme.muted
         }
         Key {
             anchors.fill: parent
             visible: music.compact
+            hoverFeedback: false
             hint: "Media controls"
             onClicked: music.expanded()
         }
     }
     Row {
         anchors.right: parent.right
-        y: music.compact ? 4 : 23
+        y: music.compact ? 3 : 23
         spacing: 1
+        visible: !music.compact || !!music.player
         Repeater {
-            model: ["previous", music.playing ? "pause" : "play", "next"]
+            model: music.compact ? ["previous", "next"] : ["previous", music.playing ? "pause" : "play", "next"]
             Key {
                 required property string modelData
                 required property int index
-                width: 25
-                height: 25
-                radius: 8
+                width: music.compact ? 22 : 25
+                height: music.compact ? 20 : 25
+                radius: music.compact ? 4 : 8
+                hoverFeedback: !music.compact
                 hint: modelData
-                enabled: index === 0 ? !!music.player?.canGoPrevious : index === 2 ? !!music.player?.canGoNext : !!music.player?.canTogglePlaying
-                onClicked: index === 0 ? music.player.previous() : index === 2 ? music.player.next() : music.player.togglePlaying()
+                enabled: modelData === "previous" ? !!music.player?.canGoPrevious : modelData === "next" ? !!music.player?.canGoNext : !!music.player?.canTogglePlaying
+                onClicked: modelData === "previous" ? music.player.previous() : modelData === "next" ? music.player.next() : music.player.togglePlaying()
                 SvgIcon {
                     anchors.centerIn: parent
                     width: 13
@@ -112,11 +134,11 @@ Item {
         }
     }
     G2Surface {
-        y: music.compact ? 30 : 93
+        y: music.compact ? 23 : 93
         width: parent.width
-        height: music.compact ? 2 : 5
-        radius: 1
-        color: Theme.line
+        height: music.compact ? 1 : 5
+        radius: music.compact ? 0 : 1
+        color: music.compact ? "#2b2b2b" : Theme.line
         G2Surface {
             width: parent.width * (music.player?.length > 0 ? Math.max(0, Math.min(1, music.player.position / music.player.length)) : 0)
             height: parent.height
@@ -133,7 +155,6 @@ Item {
             anchors.margins: -5
             enabled: !!music.player?.canSeek && music.player?.length > 0
             onClicked: event => {
-                UiSounds.play("rail");
                 // The input target has a 5px safety margin beyond each end.
                 const fraction = (event.x - 5) / (width - 10);
                 music.player.position = Math.max(0, Math.min(1, fraction)) * music.player.length;

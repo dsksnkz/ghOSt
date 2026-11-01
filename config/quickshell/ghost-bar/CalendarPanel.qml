@@ -211,10 +211,10 @@ Item {
         }
     }
     // Spawning the sampling processes costs a long frame; start them after
-    // the window's 260 ms reveal so the opening motion is not interrupted.
+    // the window's 150 ms reveal so the opening motion is not interrupted.
     Timer {
         id: serviceStart
-        interval: 300
+        interval: 170
         onTriggered: if (cal.active && !cal.fixtureMode) {
             telemetry.running = true;
             weatherProcess.running = true;
@@ -246,7 +246,7 @@ Item {
         property: "elapsed"
         from: 0
         to: 1500
-        duration: 1500
+        duration: 600
     }
     Timer {
         id: stale
@@ -305,7 +305,7 @@ Item {
         property real shown: level
         Behavior on shown {
             NumberAnimation {
-                duration: Theme.reducedMotion ? 0 : 420
+                duration: Theme.reducedMotion ? 0 : 240
                 easing.type: Easing.OutCubic
             }
         }
@@ -340,7 +340,7 @@ Item {
             spacing: 3
             Text {
                 text: gauge.available ? Math.round(gauge.value) : "—"
-                font.family: Theme.jetRegular.name
+                font.family: Theme.font
                 font.pixelSize: 20
                 font.weight: Font.Light
                 color: Theme.text
@@ -350,7 +350,7 @@ Item {
                 visible: gauge.available
                 y: 8
                 text: gauge.unit
-                font.family: Theme.jetRegular.name
+                font.family: Theme.font
                 font.pixelSize: 10
                 color: Theme.muted
                 renderType: Text.QtRendering
@@ -375,7 +375,6 @@ Item {
         }
         TapHandler {
             onTapped: {
-                UiSounds.play("rail");
                 gauge.clicked();
             }
         }
@@ -399,7 +398,7 @@ Item {
             name: parent.icon
         }
     }
-    readonly property string mono: Theme.jetRegular.name
+    readonly property string mono: Theme.font
     Item {
         width: Theme.calendarPlaneWidth
         height: Theme.calendarPlaneHeight

@@ -1,6 +1,8 @@
 singleton Theme 1.0 Theme.qml
-singleton UiSounds 1.0 UiSounds.qml
 MusicBar 1.0 MusicBar.qml
+SwitcherScene 1.0 SwitcherScene.qml
+SwitcherPreview 1.0 SwitcherPreview.qml
+WorkspaceSwitcher 1.0 WorkspaceSwitcher.qml
 MediaPanel 1.0 MediaPanel.qml
 FrameProbe 1.0 FrameProbe.qml
 RevealGate 1.0 RevealGate.qml

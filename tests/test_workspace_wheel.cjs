@@ -8,7 +8,7 @@ assert.equal(geometry.distance(0,4,5,0),-1);
 assert.equal(geometry.distance(0,3,5,1),3);
 assert.equal(geometry.distance(3,0,5,-1),-3);
 assert.equal(geometry.modulo(-1,5),4);
-for (const [offset,x,y,scale] of [[-1,0,16,11/15],[0,36,10,1],[1,76,16,11/15]]) {
+for (const [offset,x,y,scale] of [[-1,0,14-9*11/15,11/15],[0,38,5,1],[1,76,14-9*11/15,11/15]]) {
     const actual=geometry.project(offset);
     assert.ok(Math.abs(actual.x-x)<1e-8);
     assert.ok(Math.abs(actual.y-y)<1e-8);
@@ -22,5 +22,5 @@ for(let offset=-1.45;offset<=1.45;offset+=.01) {
     assert.ok(actual.opacity>=0 && actual.opacity<=1);
 }
 assert.notEqual(geometry.project(.5).rotation,0);
-assert.notEqual(geometry.project(.5).y,10);
+assert.notEqual(geometry.project(.5).y,5);
 console.log('PASS: workspace eligibility, directed wraparound, measured settled positions and bounded cylindrical projection');

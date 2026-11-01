@@ -7,6 +7,7 @@ Canvas {
     property url source
     property real radius: 0
     property real smoothing: 0.6
+    readonly property int status: picture.status
 
     onSourceChanged: {
         if (source.toString())

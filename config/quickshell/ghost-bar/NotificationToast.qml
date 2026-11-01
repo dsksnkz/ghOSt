@@ -20,7 +20,7 @@ PanelWindow {
         top: true
         left: true
     }
-    margins.top: 76
+    margins.top: 62
     margins.left: Math.round((screen.width - implicitWidth) / 2)
     implicitWidth: 360
     implicitHeight: banner.implicitHeight + 8

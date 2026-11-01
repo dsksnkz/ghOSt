@@ -5,7 +5,6 @@ import Quickshell.Hyprland
 import "EdgeVolume.js" as EdgeVolume
 
 ShellRoot {
-    Component.onCompleted: UiSounds.status()
     // Native development must not leave Quickshell's generic reload panel over
     // the desktop. Errors remain in the runtime log; these are not OSD messages.
     Connections {
@@ -37,6 +36,26 @@ ShellRoot {
             Hyprland.refreshMonitors();
             Hyprland.refreshWorkspaces();
         }
+    }
+    GlobalShortcut {
+        appid: "ghost"
+        name: "switcher"
+        onPressed: Desk.openSwitcher(Hyprland.focusedMonitor?.name ?? "", 1)
+    }
+    GlobalShortcut {
+        appid: "ghost"
+        name: "switcher-back"
+        onPressed: Desk.openSwitcher(Hyprland.focusedMonitor?.name ?? "", -1)
+    }
+    GlobalShortcut {
+        appid: "ghost"
+        name: "scroll-up"
+        onPressed: Desk.superScroll(-1)
+    }
+    GlobalShortcut {
+        appid: "ghost"
+        name: "scroll-down"
+        onPressed: Desk.superScroll(1)
     }
     Variants {
         id: outputs
@@ -80,6 +99,9 @@ ShellRoot {
                 interval: 50
                 onTriggered: if (output.wantsFocus)
                     focusGrab.active = true
+            }
+            WorkspaceSwitcher {
+                screen: output.modelData
             }
             Bar {
                 id: barWindow
@@ -172,6 +194,12 @@ ShellRoot {
                 edges: Array.from(outputs.instances, output => ({screen: output.modelData.name,
                     top: EdgeVolume.bounds(output.modelData.height).top,
                     height: EdgeVolume.bounds(output.modelData.height).height, width: 2}))});
+        }
+        function switcher(): void {
+            Desk.openSwitcher(Hyprland.focusedMonitor?.name ?? "", 1);
+        }
+        function switcherConfirm(): void {
+            Desk.switcherConfirmed();
         }
         function toggle(name: string): void {
             const screen = Quickshell.screens[0];

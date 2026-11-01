@@ -14,6 +14,8 @@ parser.add_argument("--restore", action="store_true", help="restore the last pre
 parser.add_argument("--no-start", action="store_true", help="install without starting Quickshell")
 parser.add_argument("--activate", action="store_true", help="explicitly install ghOSt and add its autostart")
 parser.add_argument("--stage-dir", type=Path, help="optional isolated staging destination")
+parser.add_argument("--no-packages", action="store_true", help="do not install missing packages")
+parser.add_argument("--no-shell-config", action="store_true", help="keep existing bashrc, fish, fastfetch and cava configuration")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
 home = Path.home()
@@ -26,6 +28,19 @@ launcher = home / ".local/bin/ghost-bar"
 lua = config / "hypr/config/autostart.lua"
 conf = config / "hypr/hyprland.conf"
 keybinds = config / "hypr/config/keybinds.lua"
+hyprland = config / "hypr/hyprland.lua"
+HYPR_SNIPPETS = ("ghost-animations.lua", "ghost-switcher.lua")
+# Command -> Arch package for everything the bundled configuration uses.
+PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship": "starship",
+            "zoxide": "zoxide", "playerctl": "playerctl"}
+SHELL_CONFIG = {
+    "bashrc": home / ".bashrc",
+    "fish/config.fish": config / "fish/config.fish",
+    "fastfetch/config.jsonc": config / "fastfetch/config.jsonc",
+    "fastfetch/media.sh": config / "fastfetch/media.sh",
+    "fastfetch/ascii/ghost.txt": config / "fastfetch/ascii/ghost.txt",
+    "cava/config": config / "cava/config",
+}
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
@@ -42,6 +57,48 @@ def copy_profile(destination):
         ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.log"),
     )
 
+def install_packages():
+    missing = [package for command, package in PACKAGES.items() if not shutil.which(command)]
+    if not missing or args.no_packages:
+        return
+    if not shutil.which("pacman"):
+        print("Install these packages with your package manager: " + " ".join(missing))
+        return
+    # Interactive on purpose: sudo asks in this terminal.
+    if subprocess.run(["sudo", "pacman", "-S", "--needed", *missing], check=False).returncode:
+        print("Packages not installed: " + " ".join(missing))
+
+def snapshot(record, path):
+    """Back up a file once, so --restore can put it back or remove it."""
+    if any(entry["path"] == str(path) for entry in record["files"]):
+        return
+    backup = Path(record["backup"])
+    saved = backup / (str(len(record["files"])) + "-" + path.name)
+    if path.exists():
+        shutil.copy2(path, saved)
+    record["files"].append({"path": str(path), "saved": str(saved) if path.exists() else None, "bundled": True})
+
+def install_shell_config(record):
+    for relative, path in SHELL_CONFIG.items():
+        snapshot(record, path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        text = (repo / "config/shell" / relative).read_text().replace("@HOME@", str(home))
+        path.write_text(text)
+        if path.suffix == ".sh":
+            path.chmod(0o755)
+
+def install_hypr_snippets(record):
+    if not hyprland.exists():
+        return
+    snapshot(record, hyprland)
+    for name in HYPR_SNIPPETS:
+        path = config / "hypr" / name
+        snapshot(record, path)
+        shutil.copy2(repo / "config/hypr" / name, path)
+        text = hyprland.read_text()
+        if name not in text:
+            hyprland.write_text(text.rstrip() + "\n\n-- ghOSt\ndofile(" + json.dumps(str(path)) + ")\n")
+
 if args.restore:
     if not manifest.exists():
         raise SystemExit("No ghOSt installation snapshot found.")
@@ -56,7 +113,7 @@ if args.restore:
         path = Path(entry["path"])
         if entry["saved"]:
             shutil.copy2(entry["saved"], path)
-        elif path.exists() and path == launcher:
+        elif path.exists() and (path == launcher or entry.get("bundled")):
             path.unlink()
     print("Restored the previous bar and autostart. ghOSt source and snapshots are retained.")
     raise SystemExit(0)
@@ -95,8 +152,12 @@ if record is None:
     record = {"backup": str(backup), "files": entries, "keybinds_sha256": before}
     manifest.write_text(json.dumps(record, indent=2) + "\n")
 
+install_packages()
 target.mkdir(parents=True, exist_ok=True)
 copy_profile(target)
+if not args.no_shell_config:
+    install_shell_config(record)
+install_hypr_snippets(record)
 launcher.parent.mkdir(parents=True, exist_ok=True)
 launcher.write_text('#!/usr/bin/env bash\nexec quickshell -d -n -c ghost-bar "$@"\n')
 launcher.chmod(0o755)

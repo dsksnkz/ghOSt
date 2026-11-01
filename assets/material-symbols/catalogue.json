@@ -254,5 +254,17 @@
   {
     "name": "ghost",
     "category": "Brand"
+  },
+  {
+    "name": "shuffle",
+    "category": "Media"
+  },
+  {
+    "name": "repeat",
+    "category": "Media"
+  },
+  {
+    "name": "repeat-one",
+    "category": "Media"
   }
 ]

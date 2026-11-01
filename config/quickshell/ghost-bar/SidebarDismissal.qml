@@ -13,7 +13,7 @@ PanelWindow {
     required property var railWindow
     required property var notificationWindow
 
-    readonly property bool mediaOpened: panelWindow.opened && panelWindow.page === "media"
+    readonly property bool pageOpened: panelWindow.opened && (panelWindow.page === "media" || panelWindow.page === "launcher")
     property int presses: 0
     function status() {
         return {
@@ -25,7 +25,7 @@ PanelWindow {
             presses
         };
     }
-    visible: sidebarWindow.opened || calendarWindow.opened || mediaOpened
+    visible: sidebarWindow.opened || calendarWindow.opened || pageOpened
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-sidebar-dismissal"
@@ -77,8 +77,8 @@ PanelWindow {
         Region {
             x: dismissal.panelWindow.margins.left
             y: dismissal.panelWindow.margins.top
-            width: dismissal.mediaOpened ? dismissal.panelWindow.width : 0
-            height: dismissal.mediaOpened ? dismissal.panelWindow.height : 0
+            width: dismissal.pageOpened ? dismissal.panelWindow.width : 0
+            height: dismissal.pageOpened ? dismissal.panelWindow.height : 0
             intersection: Intersection.Subtract
         }
     }

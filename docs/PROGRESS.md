@@ -1,5 +1,12 @@
 # ghOSt progress
 
+## 2026-11-01 / Remove rail menu icon
+
+Removed the top-left three-line menu control only; other rail positions remain
+unchanged. Isolated rail test passes. Project/live Rail backed up in
+`.local/backups/2026-11-01-remove-rail-menu/`; deployed only Rail.qml.
+Publication not yet performed.
+
 ## 2026-10-25 / SDDM on-screen keyboard behind a button
 
 The user confirmed the theme works at a real login, but the virtual keyboard
@@ -1144,3 +1151,40 @@ Known gaps: native validation of the new motion/focus; full independent launcher
 Publication correction: latest tree and Pages images are clean. The earlier chat captures remain recoverable in Git history. History rewriting is not performed unattended.
 
 Evidence and screenshots: [change record](changes/2026-09-29-telemetry-repair.md).
+
+## 2026-11-01 top bar remake
+
+Rail rebuilt to the user's reference: flush full-width #191919 bar, 35px with a 1px hairline (was a floating rounded housing). Workspaces in JetBrains Mono with a 3px dot; compact music is play/pause, small caps title and hairline, with the spectrum only while playing and previous/next only with a player; clock unchanged at 24px sans. Right side is volume (click sidebar, wheel adjusts), battery, separator, power with a soft glow. Network and Bluetooth default to hidden and can be restored in the top-bar editor; the stale menu catalogue entry is gone. Panels, calendar and toast moved up 14px with the shorter bar. Verified: rail clock/layout, input, surface compile, launcher motion, unittest. verify_spacing and verify_workspace_wheel need a preview instance and were not run. Reel RAIL_POINTS are stale until re-measured.
+
+Same day, user revision: restored the previous fonts (shared sans for workspaces and media, JetBrains Mono for battery text as before), reduced contents (clock 20px, icons 16px, workspaces 13px). The media element is hidden until audio plays, then wipes open rightward over 280ms showing title, line and controls; a paused track stays visible so it can be resumed. Tested through a fixture only, not with real playback.
+
+## 2026-11-01 SDDM redesign
+
+`config/sddm/ghost` rebuilt to the user's design: flat #171717, session list with fade on the left (wheel, click, Up/Down), rounded profile picture and password pill in the centre, keyboard button beside it (keyboard closed by default), previous ghost outline in white on the right. Clock, date, user name, layout, submit and power buttons removed per the composition. Settings' profile picture now also goes to AccountsService (`SetIconFile`, because SDDM cannot read a 700 home; images over 1 MB are shrunk with magick), and SDDM reads it through user role 260. Verified offscreen with stand-in objects and mocked backend calls. Not verified: the real greeter, and a real SetIconFile call. The theme needs the user's sudo copy.
+
+## 2026-11-01 media player
+
+MediaPanel rebuilt to the user's reference at 640x296: centred title and artist, rounded artwork in the centre (click toggles play/pause), previous/next and shuffle/repeat on either side, seek bar with times, and a mirrored 37-bar Cava spectrum blurred behind it. Removed: close button, 10s seek keys, album and player name. Title stays white rather than the reference's blue. Added shuffle, repeat and repeat-one Material Symbols through build_icons.py. Verified offscreen with a sample player plus one real-GPU capture for the blur; not yet exercised against a real MPRIS player. Reel media captures need re-rendering.
+
+## 2026-11-01 Settings and desktop batch
+
+Launcher takes exclusive keyboard focus while open, and clicks outside close it. The calendar search button opens the real launcher instead of an embedded copy. Rail hover highlight removed. JetBrains removed from the shell and SDDM font assets; battery and calendar readings use the shared sans. Calendar motion shortened (window 260 to 150 ms, staged entrance 1500 to 600 ms). Player narrowed to 420 px with 25 bars. Tap sounds deleted (UiSounds, WAVs, Settings section, backend, tests). Settings rebuilt to the user's reference: heading, pill search, flush rows with hairlines hidden beside the selection, borderless cards; profile picture now only on General. Fixed backend RAIL_IDS, which still expected the old rail. `config/hypr/ghost-animations.lua` loads last from hyprland.lua with one direct curve. Installer now installs missing packages (pacman via sudo, `--no-packages`), bundled bashrc/fish/fastfetch/cava (`--no-shell-config`) and animations, all restorable; tested only in a throwaway HOME, and the user's own shell configs were not changed. Bundled shell configs drop personal paths and the fisher bootstrap.
+
+Verified: offscreen rail, layout, input, compile, launcher motion, navigation, media, SDDM, unittest; live Settings and launcher opened, Hyprland reports no config errors and the new curve active. Not verified: typing with the pointer elsewhere, Esc, click-outside and the calendar search button on the real desktop; verify_settings, verify_spacing, verify_polish and verify_workspace_wheel need a preview instance. My live check ran over a running game for a few seconds. The installed SDDM copy still has the unused JetBrains files; harmless until the next copy.
+
+Same day: workspace dot removed; the three numbers share one centre line, centred in the bar. `verify_workspace_wheel.py` needs a preview instance and was not run.
+Workspace numbers then centred by glyph ink with equal 38px gaps, measured on the live GPU-rendered bar (offscreen software text rasterises about 1px differently).
+User then asked for the side workspace numbers 1px lower than the centre number (Workspaces.qml).
+
+## 2026-11-01 workspace switcher
+
+Super+Tab (Shift reverses) opens `WorkspaceSwitcher.qml`/`SwitcherScene.qml` through Hyprland global shortcuts in `config/hypr/ghost-switcher.lua`, loaded from hyprland.lua and added to the installer. Blurred wallpaper, centred current workspace, neighbours either side with numbers, wrap-around. Single-frame window captures on open with retry, destroyed on close; idle cost none. Tab/arrows/wheel move, Enter/Space/click confirm with the card expanding to fullscreen over Hyprland's slide, Esc/background click cancel. Test: `scripts/verify_workspace_switcher.py` (offscreen has no shader rendering, geometry and input only). Real GPU check opened via IPC. Not verified: physical Super+Tab keypress, real confirm switch.
+
+Switcher revision: previews render at full resolution and mipmap down (magic row at half); fixed z order that hid non-focused windows behind the wallpaper; slower bezier motion (340 ms move, 260/180 ms reveal, 380 ms expand); Magic Workspaces row (AI, Music) with click and Up/Down keys; scroll accumulates for touchpads. Real GPU: move 200 fps, max 5.4 ms; open 186 fps with 2 frames over 17 ms (max 43 ms); confirm switched desktop for real, then restored. Not verified: physical keys and mouse on the real desktop.
+
+Switcher: SUPER+mouse binds now go through global shortcuts: the switcher moves while open, otherwise workspace_scroll.py runs as before. Releasing Super after moving confirms the selection. Not verified with physical keys.
+
+Switcher motion fix deployed. Live via global shortcut dispatch: cards travel 3 to 4, then back to 2, active desktop unchanged until confirm; move measured 199.8 fps, slowest frame 5.97 ms. Physical Super release and wheel not verified.
+
+Switcher confirm: chosen card zooms from its current position (side clicks no longer jump), windows are captured once per open so a desktop change cannot rebuild previews, zoom 320 ms, and the overlay hides as soon as the card fills the screen instead of fading a stale snapshot.
+The background stays solid during the zoom; fading it exposed the live rail and old desktop around the card.

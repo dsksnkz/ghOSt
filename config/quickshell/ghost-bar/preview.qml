@@ -84,7 +84,7 @@ ShellRoot {
                     controller.page = "settings";
                 }
                 x: frame.width / 2 - width / 2
-                y: controller.page === "calendar" ? 82 : 68
+                y: controller.page === "calendar" ? 68 : 54
                 width: controller.page === "calendar" ? Theme.calendarWidth(frame.width, frame.height) : 392
                 height: implicitHeight
                 visible: !["rail", "icons", "sidebar", "settings", "notification"].includes(controller.page)

@@ -23,15 +23,15 @@ ShellRoot {
         id: userModel
         property int lastIndex: 0
         property int count: 2
-        property var rows: [{ 257: "matte", 258: "", 261: true }, { 257: "guest", 258: "Guest", 261: true }]
+        property var rows: [{ 257: "matte", 258: "", 260: "", 261: true }, { 257: "guest", 258: "Guest", 260: "", 261: true }]
         function index(row, column) { return row; }
         function data(row, role) { return rows[row] ? rows[row][role] : undefined; }
         function rowCount() { return rows.length; }
     }
     QtObject {
         id: sessionModel
-        property int lastIndex: 0
-        property var rows: ["Hyprland", "Plasma (Wayland)"]
+        property int lastIndex: 2
+        property var rows: ["KDE Plasma", "Niri", "Hyprland", "MangoWM", "DunnoWM"]
         function index(row, column) { return row; }
         function data(row, role) { return role === 260 ? rows[row] : undefined; }
         function rowCount() { return rows.length; }
@@ -44,7 +44,7 @@ ShellRoot {
     }
     QtObject {
         id: config
-        function stringValue(key) { return ({ clockFormat: "HH:mm", dateFormat: "dddd, d MMMM", watermark: "true" })[key] || ""; }
+        function stringValue(key) { return ({ watermark: "true" })[key] || ""; }
     }
 
     FloatingWindow {
@@ -73,13 +73,15 @@ ShellRoot {
                 const capture = Quickshell.env("GHOST_SDDM_CAPTURE");
                 if (capture) {
                     saved = false;
+                    findChild(theme, "password").text = "abcd";
+                    wait(50);
                     theme.grabToImage(r => saved = r.saveToFile(capture));
                     tryCompare(test, "saved", true, 3000);
+                    findChild(theme, "password").text = "";
                 }
-                compare(findChild(theme, "user-name").text, "matte");
-                compare(findChild(theme, "pill-session").text, "Hyprland");
-                compare(findChild(theme, "pill-layout").text, "English (UK)");
-                compare(findChild(theme, "status").text, "Caps Lock is off");
+                compare(theme.userName, "matte");
+                compare(theme.userIcon, "");
+                compare(findChild(theme, "status").text, "");
                 keyboard.capsLock = true;
                 compare(findChild(theme, "status").text, "Caps Lock is on");
                 keyboard.capsLock = false;
@@ -87,21 +89,27 @@ ShellRoot {
                 const password = findChild(theme, "password");
                 password.forceActiveFocus();
                 keyClick("h"); keyClick("i");
+                compare(findChild(theme, "password-dots").shown, 2);
                 keyClick(Qt.Key_Return);
-                compare(JSON.stringify(sddm.calls[sddm.calls.length - 1]), JSON.stringify(["login", "matte", "hi", 0]));
+                compare(JSON.stringify(sddm.calls[sddm.calls.length - 1]), JSON.stringify(["login", "matte", "hi", 2]));
                 sddm.loginFailed();
                 wait(50);
                 compare(findChild(theme, "status").text, "Incorrect password");
                 compare(password.text, "");
 
-                // Session and layout cycle on click.
-                const session = findChild(theme, "pill-session");
-                mouseClick(session.parent);
-                compare(session.text, "Plasma (Wayland)");
-                const layout = findChild(theme, "pill-layout");
-                mouseClick(layout.parent);
-                compare(layout.text, "English (US)");
-                compare(keyboard.currentLayout, 1);
+                // Session list: arrows, click and clamped ends.
+                compare(theme.sessionName, "Hyprland");
+                keyClick(Qt.Key_Down);
+                compare(theme.sessionName, "MangoWM");
+                mouseClick(findChild(theme, "session-1"));
+                compare(theme.sessionName, "Niri");
+                keyClick(Qt.Key_Up); keyClick(Qt.Key_Up);
+                compare(theme.sessionIndex, 0);
+                tryCompare(theme, "sessionPosition", 0, 1000);
+                compare(findChild(theme, "session-0").opacity, 1);
+                // Removed by the design.
+                compare(findChild(theme, "submit"), null);
+                compare(findChild(theme, "clock"), null);
                 // On-screen keyboard: hidden by default, toggled by its button.
                 verify(!theme.keyboardOpen);
                 const toggle = findChild(theme, "keyboard-toggle");
@@ -112,7 +120,7 @@ ShellRoot {
                     mouseClick(toggle);
                     verify(!theme.keyboardOpen);
                 }
-                console.info("PASS: sddm theme renders, logs in with user/password/session, reports failure, cycles session and layout");
+                console.info("PASS: sddm theme renders, logs in with user/password/session, reports failure, moves through sessions");
             }
         }
     }

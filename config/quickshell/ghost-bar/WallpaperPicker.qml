@@ -13,7 +13,6 @@ Controls.Popup {
     focus: true
     scale: parent ? parent.scale : 1
     closePolicy: Controls.Popup.CloseOnEscape
-    property string soundGroup: "settings"
     property url selectedFile: ""
     property string selectedName: ""
     readonly property url homeFolder: localUrl(Quickshell.env("HOME"))

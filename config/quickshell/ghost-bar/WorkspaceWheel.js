@@ -21,11 +21,12 @@ function project(offset) {
     var a = Math.min(1.5, Math.abs(offset));
     var angle = a * Math.PI / 3;
     var depth = Math.cos(angle);
-    // Preserve measured settled label origins 0 / 36 / 76px.
-    var radius = (offset < 0 ? 36 : 40) / Math.sin(Math.PI / 3);
+    // Settled label origins 0 / 38 / 76px: the centre digit sits between equal gaps.
+    var radius = 38 / Math.sin(Math.PI / 3);
     return {
-        x: 36 + (offset < 0 ? -1 : 1) * Math.sin(angle) * radius,
-        y: 10 + (1 - depth) * 12,
+        x: 38 + (offset < 0 ? -1 : 1) * Math.sin(angle) * radius,
+        // Scaled about the label's top edge; every digit keeps one centre line.
+        y: 14 - 9 * (1 - (1 - depth) * (8 / 15)),
         scale: 1 - (1 - depth) * (8 / 15),
         rotation: -offset * Math.max(0, 1 - a) * 100,
         opacity: Math.max(0, Math.min(1, (1.45 - a) / .45)),

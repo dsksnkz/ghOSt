@@ -47,7 +47,7 @@ PanelWindow {
         top: true
         left: true
     }
-    margins.top: 82 * designScale
+    margins.top: 68 * designScale
     margins.left: Math.round((screen.width - implicitWidth) / 2)
     implicitWidth: Theme.calendarWidth(screen.width, screen.height)
     implicitHeight: Math.round(implicitWidth * Theme.calendarPlaneHeight / Theme.calendarPlaneWidth)
@@ -59,7 +59,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     Behavior on reveal {
         NumberAnimation {
-            duration: Theme.reducedMotion ? 0 : 260
+            duration: Theme.reducedMotion ? 0 : 150
             easing.type: Easing.OutCubic
         }
     }
@@ -99,12 +99,10 @@ PanelWindow {
             opacity: .06
         }
         transform: Translate {
-            y: -28 * (1 - window.reveal)
+            y: -16 * (1 - window.reveal)
         }
         Keys.onEscapePressed: {
-            if (search.active)
-                search.active = false;
-            else if (calendar.actionPage !== "")
+            if (calendar.actionPage !== "")
                 calendar.actionPage = "";
             else
                 Desk.close();
@@ -115,46 +113,13 @@ PanelWindow {
             // Subframe reveal and telemetry begin with the frame motion, not during window setup.
             active: window.opened && revealGate.open
             onNavigateRequested: page => {
-                if (page === "launcher") {
-                    search.active = true;
-                    Qt.callLater(() => search.item?.focusSearch());
-                } else if (page === "settings")
+                if (page === "launcher")
+                    Desk.toggle("launcher", screen.name, 0);
+                else if (page === "settings")
                     Desk.openSettings(screen.name);
                 else if (page === "session")
                     Desk.toggle("session", screen.name, Math.max(6, screen.width - 410), screen.width - 36);
             }
         }
-        Loader {
-            id: search
-            active: false
-            anchors.centerIn: parent
-            width: 392
-            height: 480
-            sourceComponent: G2Surface {
-                color: Theme.surface
-                radius: 10
-                border.color: Theme.line
-                function focusSearch() {
-                    launcher.focusSearch();
-                }
-                Key {
-                    x: 344
-                    y: 8
-                    width: 32
-                    height: 28
-                    text: "×"
-                    hint: "Close applications"
-                    onClicked: search.active = false
-                }
-                Launcher {
-                    id: launcher
-                    x: 22
-                    y: 40
-                    width: 348
-                }
-            }
-        }
     }
-    onVisibleChanged: if (!visible)
-        search.active = false
 }

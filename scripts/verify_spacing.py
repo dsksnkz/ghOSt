@@ -18,13 +18,13 @@ assert state["rail"]["clockOnly"], state
 assert abs(state["rail"]["clockCenterX"] - state["rail"]["railWidth"] / 2) < .01, state
 assert abs(state["rail"]["batteryInkCenter"] - state["rail"]["batteryIconCenter"]) < .01, state
 icons = state["rail"]["rightIcons"]
-assert len(icons) == 5
-assert all(icon["height"] == 22 for icon in icons)
+assert len(icons) == 3
+assert all(icon["height"] == 16 for icon in icons)
 assert max(icon["centerY"] for icon in icons) - min(icon["centerY"] for icon in icons) < 0.01
 settings = state["settings"]
-assert settings["rowHeight"] == 44 and settings["groupGap"] == 16
-assert settings["rowGap"] == 8
+assert settings["rowHeight"] == 44 and settings["groupGap"] == 0
+assert settings["rowGap"] == 0
 assert settings["bodySpacing"] == 32 and settings["nameGap"] == 18
 assert len(settings["icons"]) == 14
 assert all(abs(icon["glyph"] / icon["well"] - 0.6) < 0.001 for icon in settings["icons"])
-print("PASS: clock-only center, aligned22px rail icons,44px rows,60% glyphs,32px content gaps and18px pencil gap")
+print("PASS: clock-only center, aligned16px rail icons,44px rows,60% glyphs,32px content gaps and18px pencil gap")

@@ -32,6 +32,7 @@ MAPPING = {
     "menu": "menu", "pin": "push_pin", "folder": "folder",
     "folder-rounded": "folder", "terminal": "terminal", "browser": "language",
     "cpu": "memory", "gpu": "developer_board", "memory": "memory_alt",
+    "shuffle": "shuffle", "repeat": "repeat", "repeat-one": "repeat_one",
     "play": "play_arrow", "pause": "pause", "previous": "skip_previous",
     "next": "skip_next", "logout": "logout", "restart": "restart_alt",
     "sleep": "bedtime", "cloud": "cloud", "rain": "rainy",

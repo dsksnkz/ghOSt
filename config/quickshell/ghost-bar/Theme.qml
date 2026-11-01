@@ -5,9 +5,7 @@ QtObject {
     property bool reducedMotion: false
     readonly property real outerRadius: 7
     // Compact height and uniformly scale contents; preserve the frame's width.
-    readonly property real railVerticalScale: 0.9
-    readonly property real railOuterGapScale: 0.5
-    readonly property real railHeight: (46 + 18 * railOuterGapScale) * railVerticalScale
+    readonly property real railHeight: 35
     // Reference coordinates stay fixed; the complete calendar scales together.
     readonly property real calendarScale: 1.12
     // Calendar design plane; the window keeps this aspect ratio at every size.
@@ -19,21 +17,9 @@ QtObject {
     readonly property int mediumWeight: 450
     readonly property int demiWeight: 550
     readonly property int boldWeight: 650
-    readonly property FontLoader jetRegular: FontLoader {
-        source: "fonts/JetBrainsMono-Regular.ttf"
-    }
 
-    readonly property FontLoader jetLight: FontLoader {
-        source: "fonts/JetBrainsMono-Light.ttf"
-    }
 
-    readonly property FontLoader jetMedium: FontLoader {
-        source: "fonts/JetBrainsMono-Medium.ttf"
-    }
 
-    readonly property FontLoader jetBold: FontLoader {
-        source: "fonts/JetBrainsMono-Bold.ttf"
-    }
 
     readonly property string textFont: font
     readonly property color base: "#080808"

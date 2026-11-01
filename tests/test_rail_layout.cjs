@@ -8,14 +8,14 @@ const defaults = layout.defaults();
 assert.equal(defaults.length, 8);
 assert.equal(defaults.filter(item => item.zone === "center")[0].id, "clock");
 const moved = layout.move(defaults, 0, 1);
-assert.equal(moved[0].id, "workspaces");
-assert.equal(defaults[0].id, "menu");
-assert.equal(layout.neighbour(defaults, 3, 1), -1);
+assert.equal(moved[0].id, "music");
+assert.equal(defaults[0].id, "workspaces");
+assert.equal(layout.neighbour(defaults, 2, 1), -1);
 const hidden = layout.place(defaults, "clock", "hidden", "", false);
 assert.equal(hidden.find(entry => entry.id === "clock").zone, "hidden");
 const afterNetwork = layout.place(hidden, "network", "right", "bluetooth", true);
 assert.ok(afterNetwork.findIndex(entry => entry.id === "network") > afterNetwork.findIndex(entry => entry.id === "bluetooth"));
-const leftClock = layout.place(afterNetwork, "clock", "left", "menu", false);
+const leftClock = layout.place(afterNetwork, "clock", "left", "workspaces", false);
 assert.equal(leftClock[0].id, "clock");
 assert.equal(new Set(leftClock.map(entry => entry.id)).size, 8);
 for (let seed = 0; seed < 150; seed++) {

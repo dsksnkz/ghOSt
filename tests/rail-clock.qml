@@ -19,22 +19,36 @@ ShellRoot {
                 const label = findChild(rail, "rail-clock-text");
                 compare(label.text, "09:21");
                 compare(label.font.family, Theme.font);
-                compare(label.font.pixelSize, 24);
+                compare(label.font.pixelSize, 20);
                 compare(label.font.weight, Font.Normal);
                 compare(clock.children.filter(child => child.text !== undefined && child.text.length > 0).length, 1);
+                const reveal = findChild(rail, "rail-music-reveal");
+                compare(reveal.width, 0);
+                compare(reveal.visible, false);
                 const directory = Quickshell.env("GHOST_RAIL_CAPTURE_DIR");
                 if (directory) {
                     rail.grabToImage(result => saved = result.saveToFile(directory + "/rail.png"));
                     tryCompare(test, "saved", true, 1500);
                 }
+                rail.fixtureMedia = true;
+                tryCompare(reveal, "width", 220, 1500);
+                verify(reveal.visible);
+                if (directory) {
+                    saved = false;
+                    rail.grabToImage(result => saved = result.saveToFile(directory + "/rail-media.png"));
+                    tryCompare(test, "saved", true, 1500);
+                }
+                rail.fixtureMedia = false;
+                tryCompare(reveal, "width", 0, 1500);
                 for (const width of [1920, 1366]) {
                     rail.width = width;
                     wait(30);
                     const state = rail.spacingStatus();
-                    compare(state.rightIcons.length, 4);
+                    compare(state.rightIcons.length, 3);
                     for (const icon of state.rightIcons)
-                        compare(icon.height, 22);
-                    compare(findChild(rail, "rail-element-volume"), null);
+                        compare(icon.height, 16);
+                    verify(findChild(rail, "rail-element-volume").visible);
+                    compare(findChild(rail, "rail-element-network").visible, false);
                     verify(Math.abs(state.clockCenterX - width / 2) < 0.01);
                     Desk.close();
                     mouseClick(clock, clock.width / 2, clock.height / 2);

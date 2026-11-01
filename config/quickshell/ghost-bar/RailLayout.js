@@ -1,13 +1,13 @@
 // Shared catalogue and pure layout operations; no service or preference writes.
 var items = [
-    {id: "menu", name: "Sidebar button", zone: "left", width: 42},
     {id: "workspaces", name: "Workspaces", zone: "left", width: 99},
-    {id: "music", name: "Music", zone: "left", width: 260},
+    {id: "music", name: "Music", zone: "left", width: 220},
     {id: "clock", name: "Clock", zone: "center", width: 124},
-    {id: "network", name: "Network", zone: "right", width: 41},
-    {id: "bluetooth", name: "Bluetooth", zone: "right", width: 41},
-    {id: "battery", name: "Battery", zone: "right", width: 71},
-    {id: "power", name: "Power", zone: "right", width: 39}
+    {id: "network", name: "Network", zone: "hidden", width: 38},
+    {id: "bluetooth", name: "Bluetooth", zone: "hidden", width: 38},
+    {id: "volume", name: "Volume", zone: "right", width: 38},
+    {id: "battery", name: "Battery", zone: "right", width: 62},
+    {id: "power", name: "Power", zone: "right", width: 38}
 ];
 var zones = ["left", "center", "right", "hidden"];
 

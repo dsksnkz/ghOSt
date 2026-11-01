@@ -36,14 +36,14 @@ PanelWindow {
     }
     Component.onCompleted: syncPanel()
     margins.top: Motion.topMargin(page, reveal, implicitHeight)
-    margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - 398, Desk.panelX)))
-    implicitWidth: page === "calendar" ? Math.floor(Math.min(screen.width * 733 / 1920, (screen.height - 100) * 1200 / 505)) : Math.min(page === "launcher" ? 560 : 392, screen.width - 12)
+    margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - implicitWidth - 6, Desk.panelX)))
+    implicitWidth: page === "calendar" ? Math.floor(Math.min(screen.width * 733 / 1920, (screen.height - 100) * 1200 / 505)) : Math.min(page === "launcher" ? 560 : page === "media" ? 420 : 392, screen.width - 12)
     implicitHeight: content.implicitHeight + Motion.windowLead(page)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
     // Sliding popups emerge beneath the rail; other popups keep their layer.
     WlrLayershell.layer: page === "launcher" || page === "media" ? WlrLayer.Top : WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: !opened ? WlrKeyboardFocus.None : page === "launcher" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
     color: "transparent"
     visible: opened || reveal > 0.001
 

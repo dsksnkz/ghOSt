@@ -14,7 +14,6 @@ ShellRoot {
 
             property int outsideEvents: 0
             property int escapeEvents: 0
-            property int soundRequests: 0
             property int actionRequests: 0
 
             function test_sidebar_full_percentage() {
@@ -25,11 +24,10 @@ ShellRoot {
                 console.info("PASS: sidebar 100% fits without ellipsis");
             }
 
-            function test_click_sound_and_action() {
+            function test_click_action() {
                 mouseClick(clickProbe, 30, 15);
-                compare(soundRequests, 1);
                 compare(actionRequests, 1);
-                console.info("PASS: click dispatches both fixed SFX and derived action");
+                console.info("PASS: click dispatches derived action");
             }
 
             function test_music_layout() {
@@ -42,8 +40,8 @@ ShellRoot {
                 const background = findChild(musicControls, "music-spectrum-background");
                 compare(spectrum.barCount, 15);
                 compare(background.width, musicControls.width);
-                compare(background.height, musicControls.height);
-                compare(findChild(musicControls, "music-title").font.pixelSize, 13);
+                compare(background.height, 23);
+                compare(findChild(musicControls, "music-title").font.pixelSize, 12);
                 verify(spectrum.acceptFrame(Array(15).fill("500").join(";") + ";"));
                 compare(spectrum.levels[0], 0.5);
                 verify(!spectrum.acceptFrame("1;2;3;"));
@@ -85,15 +83,12 @@ ShellRoot {
                 settingsPanel.choose("general");
                 wait(350);
                 const original = JSON.parse(settingsPanel.status());
-                compare(original.navTop, 145);
-                compare(original.searchTop, 84);
+                compare(original.navTop, 98);
+                compare(original.searchTop, 56);
                 compare(original.searchWidth, 227);
-                compare(original.portraitTop, 18);
-                compare(original.portraitSize, 48);
-                compare(original.portraitRadius, 11);
                 const spacing = settingsPanel.spacingStatus();
                 compare(spacing.rowHeight, 44);
-                compare(spacing.rowGap, 8);
+                compare(spacing.rowGap, 0);
                 compare(spacing.icons.length, 14);
                 for (const icon of spacing.icons) verify(Math.abs(icon.glyph / icon.well - 0.6) < 0.001)
                 const selected = findChild(settingsPanel, "settings-navigation-general");
@@ -111,13 +106,11 @@ ShellRoot {
                 wait(350);
                 const bottom = JSON.parse(settingsPanel.status());
                 verify(bottom.navScroll > 0);
-                compare(bottom.portraitTop, original.portraitTop);
                 compare(bottom.searchTop, original.searchTop);
-                mouseClick(settingsPanel, 41, 42);
+                settingsPanel.choose("general");
+                settingsPanel.requestPortrait("general");
                 verify(JSON.parse(settingsPanel.status()).portraitChooserRequested);
                 settingsPanel.cancelPortrait();
-                mouseClick(settingsPanel, 206, 42);
-                compare(settingsPanel.page, "general");
                 const search = findChild(settingsPanel, "settings-search");
                 verify(search !== null);
                 mouseClick(search, 30, 8);
@@ -141,7 +134,7 @@ ShellRoot {
                 settingsPanel.choose("general");
                 settingsPanel.visible = false;
                 sidebar.visible = true;
-                console.info("PASS: Settings fixed header, search, portrait, gear and all 14 pages");
+                console.info("PASS: Settings fixed header, search, portrait and all 14 pages");
             }
 
             function test_settings_revamp() {
@@ -200,57 +193,6 @@ ShellRoot {
                 sidebar.visible = true;
                 console.info("PASS: Settings live summaries, passive storage, all-page bounds and content scrolling");
             }
-            function test_interface_sounds() {
-                sidebar.visible = false;
-                settingsPanel.visible = true;
-                settingsPanel.choose("sound");
-                wait(200);
-                const control = findChild(settingsPanel, "settings-sfx-volume");
-                const slider = findChild(control, "settings-level-slider");
-                verify(slider !== null);
-                mouseClick(slider, slider.width * .55, 16);
-                wait(250);
-                verify(settingsPanel.fixtureSounds.volume > 18);
-                compare(settingsPanel.fixtureVolume, 62); // Media volume untouched.
-                const selector = findChild(settingsPanel, "settings-sound-preset-rail");
-                selector.forceActiveFocus();
-                keyClick(Qt.Key_Down);
-                wait(20);
-                compare(settingsPanel.fixtureSounds.presets.rail, "sidebar");
-                settingsPanel.selectSound("sidebar", "none");
-                compare(findChild(settingsPanel, "settings-sound-play-sidebar").enabled, false);
-                settingsPanel.selectSound("rail", "custom");
-                compare(settingsPanel.soundFileGroup, "rail");
-                compare(settingsPanel.fixtureSounds.presets.rail, "sidebar");
-                const toggle = findChild(settingsPanel, "settings-sfx-enabled");
-                mouseClick(toggle, toggle.width - 38, 28);
-                compare(settingsPanel.fixtureSounds.enabled, false);
-                compare(findChild(settingsPanel, "settings-sound-play-settings").enabled, false);
-                // Exercise production gain/source/mute policy without audio or disk writes.
-                const previous = Settings.state;
-                Settings.state = {preferences: {sounds: {enabled: true, volume: 65, presets: {rail: "settings", sidebar: "none", settings: "rail"}, files: {}}}};
-                compare(UiSounds.rail.volume, .65);
-                verify(UiSounds.rail.source.toString().endsWith("sounds/settings.wav"));
-                verify(UiSounds.allowed("rail"));
-                compare(UiSounds.allowed("sidebar"), false);
-                compare(UiSounds.allowed("unknown"), false);
-                verify(UiSounds.silent && UiSounds.rail.muted);
-                const lastClick = UiSounds.lastClick;
-                compare(UiSounds.play("rail"), false);
-                compare(UiSounds.lastClick, lastClick);
-                Settings.state = {preferences: {sounds: {enabled: true, volume: 0, presets: {rail: "rail"}, files: {}}}};
-                compare(UiSounds.allowed("rail"), false);
-                Settings.state = {preferences: {sounds: {enabled: false, volume: 18, presets: {rail: "rail"}, files: {}}}};
-                compare(UiSounds.allowed("rail"), false);
-                Settings.state = {preferences: {sounds: {enabled: true, volume: 18, presets: {rail: "custom"}, files: {}}}};
-                compare(UiSounds.allowed("rail"), false);
-                Settings.state = previous;
-                settingsPanel.fixtureSounds = JSON.parse(JSON.stringify(UiSounds.defaults));
-                settingsPanel.visible = false;
-                sidebar.visible = true;
-                console.info("PASS: interface sound volume, actual preset keys, chooser, mute and silent gain/source policy");
-            }
-
             function test_weather_switcher() {
                 sidebar.visible = false;
                 weatherSwitcher.visible = true;
@@ -381,11 +323,6 @@ ShellRoot {
 
             Key {
                 id: clickProbe
-
-                // Observe both base and derived signal handlers without audio.
-                function clickSound() {
-                    test.soundRequests++;
-                }
 
                 x: 700
                 y: 400

@@ -1,19 +1,32 @@
 import QtQuick
+import QtQuick.Effects
+import Quickshell.Services.Mpris
 
-// Popup opened from the rail's audio element: artwork, track, seek and transport.
+// Popup opened from the rail's audio element: track, artwork, transport and seek
+// over the live spectrum.
 Item {
     id: media
     property bool active: false
-    property string soundGroup: "rail"
     readonly property var player: Desk.player
     readonly property bool playing: Desk.playing
     readonly property real length: player?.length > 0 ? player.length : 0
     readonly property real progress: length > 0 ? Math.max(0, Math.min(1, (player?.position ?? 0) / length)) : 0
     readonly property bool hasArt: art.status === Image.Ready
-    implicitHeight: 262
+    readonly property bool repeatOne: player?.loopState === MprisLoopState.Track
+    readonly property bool repeating: repeatOne || player?.loopState === MprisLoopState.Playlist
+    readonly property int centerX: width / 2
+    implicitHeight: 296
 
     function timecode(seconds) {
         return Math.floor(Math.max(0, seconds) / 60) + ":" + String(Math.floor(Math.max(0, seconds) % 60)).padStart(2, "0");
+    }
+    // Mirrored around the artwork, bass outermost so it stays visible beside the cover.
+    function level(index) {
+        const side = (bars.count - 1) / 2;
+        const position = (1 - Math.abs(index - side) / side) * (spectrum.barCount - 1);
+        const low = Math.floor(position);
+        const high = Math.min(spectrum.barCount - 1, low + 1);
+        return spectrum.levels[low] + (spectrum.levels[high] - spectrum.levels[low]) * (position - low);
     }
     function status() {
         return JSON.stringify({
@@ -27,7 +40,7 @@ Item {
 
     AudioSpectrum {
         id: spectrum
-        active: media.active && media.playing && !media.hasArt && !Theme.reducedMotion
+        active: media.active && media.playing && !Theme.reducedMotion
     }
     Timer {
         interval: 1000
@@ -36,238 +49,214 @@ Item {
         onTriggered: media.player.positionChanged()
     }
 
-    // Header
+    Item {
+        id: barField
+        anchors.fill: parent
+        layer.enabled: true
+        layer.textureSize: Qt.size(width / 2, height / 2)
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: false
+            blurEnabled: true
+            blur: .8
+            blurMax: 32
+        }
+        Repeater {
+            id: bars
+            model: 25
+            Rectangle {
+                required property int index
+                objectName: "media-spectrum-bar"
+                readonly property real slot: (barField.width - 32) / bars.count
+                x: 16 + index * slot + (slot - width) / 2
+                y: barField.height - 6 - height
+                width: 9
+                height: Math.max(6, 180 * media.level(index))
+                color: "#5c5c5c"
+                Behavior on height {
+                    NumberAnimation { duration: Theme.reducedMotion ? 0 : 65 }
+                }
+            }
+        }
+    }
+
     Label {
+        id: title
+        objectName: "media-title"
         x: 20
-        y: 18
-        text: media.player?.identity ? "Now playing · " + media.player.identity : "Now playing"
-        width: parent.width - 80
+        y: 20
+        width: parent.width - 40
+        horizontalAlignment: Text.AlignHCenter
+        text: media.player?.trackTitle || "Nothing playing"
+        font.pixelSize: 15
+        font.weight: media.player ? Theme.mediumWeight : Font.Normal
+        color: media.player ? Theme.text : Theme.muted
+    }
+    Label {
+        objectName: "media-artist"
+        x: 20
+        y: 42
+        width: parent.width - 40
+        horizontalAlignment: Text.AlignHCenter
+        text: media.player?.trackArtist || ""
         font.pixelSize: 12
         color: Theme.muted
     }
-    Key {
-        objectName: "media-close"
-        x: parent.width - 48
-        y: 12
-        width: 28
-        height: 28
-        radius: 7
-        color: "#151515"
-        hint: "Close"
-        onClicked: Desk.close()
-        SvgIcon {
-            anchors.centerIn: parent
-            width: 14
-            height: 14
-            name: "close"
-        }
-    }
 
-    // Artwork, or live spectrum bars when the player provides none.
+    // Artwork doubles as the play/pause control.
     G2Surface {
         id: artFrame
-        x: 20
-        y: 52
-        width: 76
-        height: 76
-        radius: 7
+        x: media.centerX - width / 2
+        y: 70
+        width: 132
+        height: 132
+        radius: 12
         color: "#151515"
-        clip: true
-        Image {
+        G2Image {
             id: art
+            objectName: "media-art"
             anchors.fill: parent
+            radius: parent.radius
             source: media.player?.trackArtUrl || ""
-            sourceSize.width: 152
-            sourceSize.height: 152
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            visible: media.hasArt
         }
-        Row {
-            visible: !media.hasArt
-            anchors.centerIn: parent
-            spacing: 3
-            Repeater {
-                model: [1, 3, 5, 7, 9, 11, 13]
-                Item {
-                    required property int modelData
-                    width: 3
-                    height: 30
-                    G2Surface {
-                        objectName: "media-spectrum-bar"
-                        anchors.bottom: parent.bottom
-                        width: 3
-                        height: media.playing ? Math.max(4, 30 * spectrum.levels[parent.modelData]) : 4
-                        radius: 1.5
-                        color: media.playing ? Theme.text : Theme.faint
-                        Behavior on height {
-                            NumberAnimation { duration: Theme.reducedMotion ? 0 : 65 }
-                        }
-                    }
-                }
+        Rectangle {
+            anchors.fill: parent
+            radius: parent.radius
+            color: "#000000"
+            opacity: media.hasArt && (artKey.hovered || !media.playing) ? .4 : 0
+            Behavior on opacity {
+                NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast }
             }
         }
-    }
-    Column {
-        x: 112
-        y: 56
-        width: parent.width - 132
-        spacing: 4
-        Label {
-            id: title
-            objectName: "media-title"
-            width: parent.width
-            text: media.player?.trackTitle || "Nothing playing"
-            font.pixelSize: 17
-            font.weight: media.player ? Theme.mediumWeight : Font.Normal
-            color: media.player ? Theme.text : Theme.muted
-            wrapMode: Text.Wrap
-            maximumLineCount: 2
+        SvgIcon {
+            anchors.centerIn: parent
+            width: 30
+            height: 30
+            name: media.playing ? "pause" : "play"
+            opacity: !media.hasArt || artKey.hovered || !media.playing ? 1 : 0
+            Behavior on opacity {
+                NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast }
+            }
         }
-        Label {
-            width: parent.width
-            visible: text !== ""
-            text: media.player?.trackArtist || ""
-            font.pixelSize: 12
-            color: Theme.muted
-        }
-        Label {
-            width: parent.width
-            visible: text !== ""
-            text: media.player?.trackAlbum || ""
-            font.pixelSize: 11
-            color: Theme.faint
+        Key {
+            id: artKey
+            objectName: "media-toggle"
+            anchors.fill: parent
+            radius: parent.radius
+            hoverFeedback: false
+            hint: media.playing ? "Pause" : "Play"
+            enabled: !!media.player?.canTogglePlaying
+            onClicked: media.player.togglePlaying()
         }
     }
 
-    // Seek bar with mono timecodes.
-    Item {
-        id: seek
-        x: 20
-        y: 148
-        width: parent.width - 40
-        height: 30
-        readonly property bool enabledSeek: !!media.player?.canSeek && media.length > 0
+    Repeater {
+        model: [
+            {id: "previous", side: -1},
+            {id: "next", side: 1}
+        ]
+        Key {
+            required property var modelData
+            objectName: "media-" + modelData.id
+            x: media.centerX + modelData.side * 136 - width / 2
+            y: 116
+            width: 40
+            height: 40
+            radius: 20
+            hint: modelData.id
+            enabled: modelData.side < 0 ? !!media.player?.canGoPrevious : !!media.player?.canGoNext
+            onClicked: modelData.side < 0 ? media.player.previous() : media.player.next()
+            SvgIcon {
+                anchors.centerIn: parent
+                width: 26
+                height: 26
+                name: parent.modelData.id
+            }
+        }
+    }
+    Key {
+        objectName: "media-shuffle"
+        x: media.centerX - 136 - width / 2
+        y: 160
+        width: 28
+        height: 28
+        radius: 14
+        hint: "Shuffle"
+        enabled: !!media.player?.shuffleSupported
+        onClicked: media.player.shuffle = !media.player.shuffle
+        SvgIcon {
+            anchors.centerIn: parent
+            width: 16
+            height: 16
+            name: "shuffle"
+            opacity: media.player?.shuffle ? 1 : .5
+        }
+    }
+    Key {
+        objectName: "media-repeat"
+        x: media.centerX + 136 - width / 2
+        y: 160
+        width: 28
+        height: 28
+        radius: 14
+        hint: "Repeat"
+        enabled: !!media.player?.loopSupported
+        onClicked: media.player.loopState = !media.repeating ? MprisLoopState.Playlist : media.repeatOne ? MprisLoopState.None : MprisLoopState.Track
+        SvgIcon {
+            anchors.centerIn: parent
+            width: 16
+            height: 16
+            name: media.repeatOne ? "repeat-one" : "repeat"
+            opacity: media.repeating ? 1 : .5
+        }
+    }
+
+    Label {
+        objectName: "media-position"
+        x: 8
+        y: 252
+        width: 42
+        height: 20
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignRight
+        text: media.timecode(media.player?.position ?? 0)
+        font.pixelSize: 11
+    }
+    Rectangle {
+        id: track
+        x: 58
+        y: 258
+        width: parent.width - 116
+        height: 8
+        radius: 4
+        color: "#2e2e2e"
         Rectangle {
-            id: track
-            y: 6
-            width: parent.width
-            height: 4
-            radius: 2
-            color: "#1d1d1d"
-            Rectangle {
-                width: Math.max(media.progress > 0 ? height : 0, parent.width * media.progress)
-                height: parent.height
-                radius: 2
-                color: Theme.text
-                Behavior on width {
-                    NumberAnimation { duration: Theme.reducedMotion ? 0 : 250 }
-                }
+            width: Math.max(media.progress > 0 ? height : 0, parent.width * media.progress)
+            height: parent.height
+            radius: 4
+            color: "#c4c4c4"
+            Behavior on width {
+                NumberAnimation { duration: Theme.reducedMotion ? 0 : 250 }
             }
-            Rectangle {
-                x: parent.width * media.progress - width / 2
-                y: (parent.height - height) / 2
-                width: 12
-                height: 12
-                radius: 6
-                color: Theme.text
-                visible: seek.enabledSeek
-                opacity: seekArea.containsMouse || seekArea.pressed ? 1 : 0
-                Behavior on opacity {
-                    NumberAnimation { duration: Theme.reducedMotion ? 0 : Theme.fast }
-                }
-            }
-        }
-        Text {
-            y: 16
-            text: media.timecode(media.player?.position ?? 0)
-            font.family: Theme.jetRegular.name
-            font.pixelSize: 10
-            color: Theme.muted
-        }
-        Text {
-            anchors.right: parent.right
-            y: 16
-            text: media.timecode(media.length)
-            font.family: Theme.jetRegular.name
-            font.pixelSize: 10
-            color: Theme.muted
         }
         MouseArea {
-            id: seekArea
-            y: -4
-            width: parent.width
-            height: 20
-            hoverEnabled: true
-            enabled: seek.enabledSeek
+            objectName: "media-seek"
+            anchors.fill: parent
+            anchors.margins: -6
+            enabled: !!media.player?.canSeek && media.length > 0
             cursorShape: Qt.PointingHandCursor
             onClicked: event => {
-                UiSounds.play("rail");
-                media.player.position = Math.max(0, Math.min(1, event.x / width)) * media.length;
+                media.player.position = Math.max(0, Math.min(1, (event.x - 6) / track.width)) * media.length;
             }
         }
     }
-
-    // Transport: 10 s seek either side of previous / play / next.
-    Row {
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: 192
-        spacing: 14
-        Key {
-            anchors.verticalCenter: parent.verticalCenter
-            width: 40
-            height: 32
-            radius: 7
-            hint: "Seek back"
-            enabled: !!media.player?.canSeek
-            onClicked: media.player.seek(-10)
-            Text {
-                anchors.centerIn: parent
-                text: "−10"
-                font.family: Theme.jetRegular.name
-                font.pixelSize: 11
-                color: Theme.muted
-            }
-        }
-        Repeater {
-            model: ["previous", media.playing ? "pause" : "play", "next"]
-            Key {
-                id: transport
-                required property string modelData
-                required property int index
-                readonly property bool primary: index === 1
-                anchors.verticalCenter: parent.verticalCenter
-                width: primary ? 48 : 36
-                height: primary ? 48 : 36
-                radius: primary ? 24 : 18
-                color: primary && media.player ? Theme.text : "transparent"
-                hint: modelData
-                enabled: index === 0 ? !!media.player?.canGoPrevious : index === 2 ? !!media.player?.canGoNext : !!media.player?.canTogglePlaying
-                onClicked: index === 0 ? media.player.previous() : index === 2 ? media.player.next() : media.player.togglePlaying()
-                SvgIcon {
-                    anchors.centerIn: parent
-                    width: transport.primary ? 22 : 18
-                    height: transport.primary ? 22 : 18
-                    name: transport.modelData
-                    black: transport.primary && !!media.player
-                }
-            }
-        }
-        Key {
-            anchors.verticalCenter: parent.verticalCenter
-            width: 40
-            height: 32
-            radius: 7
-            hint: "Seek forward"
-            enabled: !!media.player?.canSeek
-            onClicked: media.player.seek(10)
-            Text {
-                anchors.centerIn: parent
-                text: "+10"
-                font.family: Theme.jetRegular.name
-                font.pixelSize: 11
-                color: Theme.muted
-            }
-        }
+    Label {
+        objectName: "media-length"
+        x: parent.width - 50
+        y: 252
+        width: 42
+        height: 20
+        verticalAlignment: Text.AlignVCenter
+        text: media.timecode(media.length)
+        font.pixelSize: 11
     }
 }

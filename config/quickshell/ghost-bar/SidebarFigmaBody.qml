@@ -8,7 +8,6 @@ import "Corners.js" as Corners
 
 Item {
     id: sidebar
-    property string soundGroup: "sidebar"
     property var screen
     property bool previewMode: false
     property bool previewLongNames: false
@@ -575,8 +574,6 @@ Item {
             onMoved: if (!sidebar.previewMode)
                 Desk.setVolume(value)
             Accessible.name: "Output volume"
-            onPressedChanged: if (pressed)
-                UiSounds.play("sidebar")
             background: G2Surface {
                 x: volume.leftPadding
                 y: 0
@@ -618,8 +615,6 @@ Item {
             onMoved: if (!sidebar.previewMode)
                 Quickshell.execDetached(["brightnessctl", "set", Math.round(value) + "%"])
             Accessible.name: "Display brightness"
-            onPressedChanged: if (pressed)
-                UiSounds.play("sidebar")
             background: G2Surface {
                 x: brightness.leftPadding
                 y: 0

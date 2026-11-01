@@ -1,5 +1,11 @@
 prompts outputs here
 
+## 2026-11-01 / Remove rail menu icon
+
+User: "remove top left three bars on the top rail".
+Removed that menu control without shifting other elements. Rail fixture passes;
+backed up project/live Rail and deployed only the affected file. Not published.
+
 ## 2026-10-25 / SDDM theme
 
 User: "Build direction B as a real SDDM theme in the repo, but don't install or
@@ -893,3 +899,19 @@ clean and native output inspected. Safe component crops updated in Pages.
 External standalone launcher/app logos are not part of this shared asset pack.
 Verification, backups and publication scope: docs/changes/2026-10-24-material-icons.md.
 
+
+## 2026-11-01 top bar remake
+
+Flush 35px bar matched to the reference and deployed live. Snapshot: `.local/backups/2026-11-01-tahoe-rail/`. Not committed. Solid colour, no compositor blur. Wi-Fi and Bluetooth are hidden by default; Settings top-bar editor restores them.
+
+## 2026-11-01 SDDM redesign
+
+New theme in `config/sddm/ghost`, not installed (needs sudo). Snapshot: `.local/backups/2026-11-01-sddm-redesign/`. Picture flow untested on the real account until the user selects one in Settings.
+
+## 2026-11-01 media player
+
+New player deployed live. Snapshot: `.local/backups/2026-11-01-media-player/`. Test: `scripts/verify_media_panel.py`. Not committed.
+
+## 2026-11-01 Settings and desktop batch
+
+All ten requested items implemented and deployed live. Snapshot: `.local/backups/2026-11-01-settings-batch/`. Not committed. Keyboard behaviours of the launcher still need the user's real-desktop check.

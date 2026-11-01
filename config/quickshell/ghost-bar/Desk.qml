@@ -72,6 +72,26 @@ Singleton {
     PwObjectTracker {
         objects: root.sink ? [root.sink] : []
     }
+    property string switcherScreen: ""
+    signal switcherStepped(int direction)
+    signal switcherConfirmed
+    function openSwitcher(screenName, direction) {
+        if (switcherScreen) {
+            switcherStepped(direction);
+            return;
+        }
+        close();
+        switcherScreen = screenName;
+    }
+    function superScroll(direction) {
+        if (switcherScreen)
+            switcherStepped(direction);
+        else
+            Quickshell.execDetached(["python3", Quickshell.shellPath("workspace_scroll.py"), String(direction)]);
+    }
+    function closeSwitcher() {
+        switcherScreen = "";
+    }
     function toggle(name, screenName, x, center) {
         if (!["launcher", "audio", "calendar", "network", "bluetooth", "battery", "media", "session"].includes(name))
             return;
@@ -88,6 +108,7 @@ Singleton {
     }
     function close() {
         panel = "";
+        switcherScreen = "";
         sidebarOpen = false;
         settingsRequested = false;
     }
