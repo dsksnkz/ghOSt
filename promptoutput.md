@@ -1,5 +1,15 @@
 prompts outputs here
 
+## 2026-11-01 / Super+Tab switcher crash
+
+User: "I pressed super + tab and it crashed again. i asked claude to create an app when super tab. inspect and Fix issue."
+Inspected both native reports: matching nested Qt Repeater model-creation faults.
+Deferred setup out of triggering signals, gated card creation until models are
+ready, snapshot window geometry, and avoid null-source capture retries. Added
+populated fixtures and 30 reopen cycles; isolated test passes. Backed up and
+deployed only the two switcher components. Eight native open/close cycles passed
+with the same shell process, using Super+Tab's IPC path. Publication pending.
+
 ## 2026-11-01 / Remove rail menu icon
 
 User: "remove top left three bars on the top rail".

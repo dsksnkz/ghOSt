@@ -34,10 +34,10 @@ Item {
             scale: preview.width / preview.logicalWidth
             transformOrigin: Item.TopLeft
             Repeater {
-                model: preview.windows
+                model: preview.windows.length
                 Item {
-                    required property var modelData
-                    readonly property var details: modelData.lastIpcObject
+                    required property int index
+                    readonly property var details: preview.windows[index] ?? {}
                     x: (details.at?.[0] ?? 0) - (preview.monitor?.x ?? 0)
                     y: (details.at?.[1] ?? 0) - (preview.monitor?.y ?? 0)
                     width: details.size?.[0] ?? 0
@@ -47,7 +47,7 @@ Item {
                     ScreencopyView {
                         id: capture
                         anchors.fill: parent
-                        captureSource: parent.modelData.wayland ?? null
+                        captureSource: parent.details.source ?? null
                         live: false
                         paintCursor: false
                     }
@@ -56,7 +56,7 @@ Item {
                         property int attempts: 0
                         interval: 120
                         repeat: true
-                        running: !capture.hasContent && attempts < 4
+                        running: capture.captureSource !== null && !capture.hasContent && attempts < 4
                         onTriggered: {
                             attempts++;
                             capture.captureFrame();

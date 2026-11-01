@@ -17,6 +17,11 @@ ShellRoot {
                 id: scene
                 anchors.fill: parent
                 previewMode: true
+                fixtureWindows: ({
+                    1: [{at: [6, 50], size: [1000, 800], focusHistoryID: 0, source: null},
+                        {at: [1012, 50], size: [900, 800], focusHistoryID: 1, source: null}],
+                    "special:ai": [{at: [200, 100], size: [860, 620], source: null}]
+                })
                 property var picks: []
                 property int closes: 0
                 onChosen: workspace => picks = picks.concat([workspace])
@@ -123,6 +128,18 @@ ShellRoot {
                 compare(scene.magics.join(), "music,ai");
                 scene.open = false;
                 tryCompare(scene, "shown", false, 1500);
+                // Exercise nested window delegates and changing workspace models,
+                // not only empty wallpaper cards (the original regression gap).
+                Theme.reducedMotion = true;
+                for (let attempt = 0; attempt < 30; attempt++) {
+                    scene.fixtureRing = attempt % 2 ? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5, 7];
+                    scene.open = true;
+                    tryCompare(scene, "shown", true, 1000);
+                    compare(scene.windowsFor(1).length, 2);
+                    verify(findChild(scene, "switcher-card-1") !== null);
+                    scene.open = false;
+                    tryCompare(scene, "shown", false, 1000);
+                }
                 console.info("PASS: switcher geometry, wrap, keyboard, click, cancel and expansion");
             }
         }

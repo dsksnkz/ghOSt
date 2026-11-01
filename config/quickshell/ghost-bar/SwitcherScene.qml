@@ -13,6 +13,7 @@ Item {
     property bool previewMode: false
     property var fixtureRing: [1, 2, 3, 4, 5]
     property int fixtureCurrent: 1
+    property var fixtureWindows: ({})
     signal chosen(int workspace)
     signal closed
 
@@ -41,12 +42,16 @@ Item {
     signal magicChosen(string special)
     // Set when the chosen card fills the screen: it matches the real desktop, so hide at once.
     property bool handedOver: false
-    readonly property bool shown: !handedOver && (open || reveal > .001 || leaving)
+    property bool prepared: false
+    readonly property bool shown: prepared && !handedOver && (open || reveal > .001 || leaving)
     // Captured once per open: a desktop change mid-animation must not rebuild previews.
     property var windowMap: ({})
     readonly property int selected: ring.length ? ring[Geometry.modulo(target, ring.length)] : 1
 
     function begin() {
+        // Finish changing both models before any nested delegates are created.
+        // Opening previously built the repeaters while their models were changing.
+        prepared = false;
         expandMotion.stop();
         leaving = false;
         handedOver = false;
@@ -60,16 +65,25 @@ Item {
                 id: w.id,
                 windows: w.toplevels?.values.length ?? 0
             })), current);
-        const map = {};
+        const map = previewMode ? fixtureWindows : {};
         if (!previewMode)
             for (const workspace of Hyprland.workspaces.values)
-                map[workspace.id > 0 ? workspace.id : workspace.name] = workspace.toplevels.values.slice();
+                map[workspace.id > 0 ? workspace.id : workspace.name] = workspace.toplevels.values.map(window => {
+                    const details = window.lastIpcObject ?? {};
+                    return {
+                        at: (details.at ?? [0, 0]).slice(),
+                        size: (details.size ?? [0, 0]).slice(),
+                        focusHistoryID: details.focusHistoryID ?? 0,
+                        source: window.wayland ?? null
+                    };
+                });
         windowMap = map;
         positionMotion.enabled = false;
         target = Math.max(0, ring.indexOf(current));
         positionMotion.enabled = true;
         superHeld = true;
         startTarget = target;
+        prepared = true;
         input.forceActiveFocus();
     }
     function step(direction) {
@@ -119,10 +133,16 @@ Item {
         return windowMap[workspace] ?? [];
     }
 
+    // Leave the Wayland/key signal and its binding evaluation before building
+    // nested models. Coalesce repeated shortcuts into one setup pass.
+    function prepareOpen() {
+        if (open)
+            begin();
+    }
     onOpenChanged: if (open)
-        begin()
+        Qt.callLater(prepareOpen)
     Component.onCompleted: if (open)
-        begin()
+        Qt.callLater(prepareOpen)
 
     RevealGate {
         id: revealGate
