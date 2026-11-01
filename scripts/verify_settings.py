@@ -55,7 +55,7 @@ for page in ('general', 'sound', 'battery', 'widgets', 'brightness', 'wallpaper'
     assert state['navHeight'] == 590 and state['navTop'] == 98
     assert (state['searchTop'], state['searchWidth']) == (56, 227)
     assert state['profileFont'] == 'Adwaita Sans'
-    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 220
+    assert len(state['groupHeights']) == 4 and state['groupHeights'][0] == 252
     assert state['groupCategories'][0] == ['network', 'bluetooth', 'general', 'airplane', 'accessibility']
     assert not state['error']
     time.sleep(.25)

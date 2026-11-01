@@ -17,10 +17,10 @@ Item {
     readonly property int controlHeight: 56
     readonly property string creatorAttribution: "ghOSt - ChatGPT and dsksnkz"
     readonly property real navigationRowHeight: 44
-    readonly property real navigationRowGap: 0
+    readonly property real navigationRowGap: 8
     readonly property real navigationStride: navigationRowHeight + navigationRowGap
     readonly property real navigationInset: 0
-    readonly property real navigationGroupGap: 0
+    readonly property real navigationGroupGap: 16
     readonly property var navigationMetrics: ({
         rowHeight: navigationRowHeight,
         rowGap: navigationRowGap,
@@ -498,7 +498,7 @@ Item {
             anchors.fill: parent
             radius: 10
             smoothing: .6
-            color: "#2d2d2d"
+            color: "#171717"
         }
         G2Surface {
             x: 262
@@ -591,6 +591,7 @@ Item {
                 id: nav
                 width: 231
                 height: settings.navLayout.height
+                // Logical groups keep their spacing without housings or lines.
                 G2Surface {
                     id: navigationSelection
                     x: 0
@@ -600,10 +601,10 @@ Item {
                     height: settings.navigationRowHeight
                     radius: 10
                     smoothing: .6
-                    color: "#535353"
+                    color: "#303030"
                     Behavior on y {
                         NumberAnimation {
-                            duration: Theme.reducedMotion ? 0 : 200
+                            duration: Theme.reducedMotion ? 0 : 280
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: [0.22, 1, 0.36, 1, 1, 1]
                         }
@@ -613,36 +614,24 @@ Item {
                     model: settings.navLayout.rows
                     Key {
                         required property var modelData
-                        required property int index
-                        readonly property bool current: modelData.id === settings.page
                         objectName: "settings-navigation-" + modelData.id
-                        hoverFeedback: !current
+                        hoverFeedback: modelData.id !== settings.page
                         y: modelData.y
-                        width: 227
+                        width: 231
                         height: settings.navigationRowHeight
                         radius: 10
                         hint: modelData.name
                         color: "transparent"
                         onClicked: settings.choose(modelData.id)
-                        // A hairline between rows, hidden beside the selection.
-                        Rectangle {
-                            x: 52
-                            y: parent.height - 1
-                            width: parent.width - 66
-                            height: 1
-                            color: "#ffffff"
-                            opacity: .55
-                            visible: !parent.current && parent.index < settings.navLayout.rows.length - 1 && settings.navLayout.rows[parent.index + 1].id !== settings.page
-                        }
                         G2Surface {
                             objectName: "settings-navigation-icon"
-                            x: 8
+                            x: 12
                             y: (parent.height - height) / 2
-                            width: 30
-                            height: 30
+                            width: 28
+                            height: 28
                             radius: 8
                             smoothing: .6
-                            color: parent.current ? "#2d2d2d" : "#363636"
+                            color: modelData.id === settings.page ? "#191919" : "#242424"
                             SvgIcon {
                                 objectName: "settings-navigation-glyph"
                                 anchors.centerIn: parent
@@ -652,13 +641,14 @@ Item {
                             }
                         }
                         Label {
-                            x: 50
+                            x: 52
                             y: (parent.height - height) / 2
-                            width: modelData.id === "airplane" ? 112 : 170
+                            width: modelData.id === "airplane" ? 112 : 162
                             height: 18
                             text: modelData.name
-                            font.pixelSize: 13
-                            color: "#ffffff"
+                            font.pixelSize: 12
+                            font.weight: modelData.id === settings.page ? Theme.mediumWeight : Font.Normal
+                            color: modelData.id === settings.page ? settings.primaryInk : "#d1d1d1"
                         }
                         SettingsToggle {
                             visible: modelData.id === "airplane"

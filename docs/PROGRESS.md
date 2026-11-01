@@ -1192,3 +1192,5 @@ The background stays solid during the zoom; fading it exposed the live rail and 
 ## 2026-11-01 website
 
 `site/index.html` rebuilt as a dark, Apple-style product page with no build step: hero, top bar, switcher, component bento, Settings, login, install. The interactive component gallery (`catalogue.mjs`, `motion.mjs`, old `app.js`) is removed; `icons.html` stays and uses the new shell. Images come from `scripts/capture_site.py`: real components, sample data, sample app list (never this machine's apps or pins), and a generated original wallpaper, because the licence of the user's wallpaper is unknown. Font is Adwaita Sans with its OFL; Apple devices use SF. Older site assets stay because historical docs link to them. Dark only, matching the product. Checked at desktop and 375px in the browser pane: no horizontal overflow, no console errors. Not committed or deployed.
+
+Settings sidebar buttons restored to the previous style (gaps, groups, tiles, selection, no hairlines) on the previous sidebar background; only the heading and pill search stay new. Page cards are unchanged.

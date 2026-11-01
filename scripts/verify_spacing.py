@@ -22,8 +22,8 @@ assert len(icons) == 3
 assert all(icon["height"] == 16 for icon in icons)
 assert max(icon["centerY"] for icon in icons) - min(icon["centerY"] for icon in icons) < 0.01
 settings = state["settings"]
-assert settings["rowHeight"] == 44 and settings["groupGap"] == 0
-assert settings["rowGap"] == 0
+assert settings["rowHeight"] == 44 and settings["groupGap"] == 16
+assert settings["rowGap"] == 8
 assert settings["bodySpacing"] == 32 and settings["nameGap"] == 18
 assert len(settings["icons"]) == 14
 assert all(abs(icon["glyph"] / icon["well"] - 0.6) < 0.001 for icon in settings["icons"])

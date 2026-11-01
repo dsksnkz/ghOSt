@@ -88,7 +88,7 @@ ShellRoot {
                 compare(original.searchWidth, 227);
                 const spacing = settingsPanel.spacingStatus();
                 compare(spacing.rowHeight, 44);
-                compare(spacing.rowGap, 0);
+                compare(spacing.rowGap, 8);
                 compare(spacing.icons.length, 14);
                 for (const icon of spacing.icons) verify(Math.abs(icon.glyph / icon.well - 0.6) < 0.001)
                 const selected = findChild(settingsPanel, "settings-navigation-general");
