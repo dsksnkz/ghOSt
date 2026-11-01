@@ -46,7 +46,6 @@ Super+B wallpaper, Super+N network Settings, Super+R/H Info, Super+M reload,
 Super+number workspaces, Super+Shift+number move to workspace, Super+scroll
 workspace wheel, screenshot/media/brightness keys and Super+L lock.
 The snippets do not install applications or execute session actions as tests.
-`ghost-rules.lua` supplies the lock exit rule; `ghost-lock.lua` no longer repeats it.
 
 ## Intentionally not exported
 

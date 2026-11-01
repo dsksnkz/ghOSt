@@ -10,24 +10,28 @@ ShellRoot {
     id: root
     property bool credentialsVisible: false
     property bool reducedMotion: false
-    property var preparedScreens: []
-    property var finishedScreens: []
+    property url wallpaper
+    property url picture: Qt.resolvedUrl("artwork/profile.jpg")
     signal activity
 
     // PAM is the only source of authorization; no unlock IPC or visual test mode.
-    function releaseWhenPrepared() {
-        if (auth.authenticated && lock.secure && Quickshell.screens.every(screen => preparedScreens.includes(screen.name)))
-            lock.locked = false;
-    }
-    function finishWhenComplete() {
-        if (auth.authenticated && !lock.locked && Quickshell.screens.every(screen => finishedScreens.includes(screen.name)))
-            Qt.quit();
+    function release() {
+        if (!auth.authenticated)
+            return;
+        unlockDeadline.stop();
+        lock.locked = false;
+        quitDelay.start();
     }
     FileView {
         path: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/ghost/settings.json"
         onLoaded: {
             try {
-                root.reducedMotion = JSON.parse(text()).reducedMotion === true;
+                const settings = JSON.parse(text());
+                root.reducedMotion = settings.reducedMotion === true;
+                if (settings.wallpaper)
+                    root.wallpaper = "file://" + settings.wallpaper;
+                if (settings.profilePicture)
+                    root.picture = settings.profilePicture;
             } catch (error) {
                 root.reducedMotion = false;
             }
@@ -46,53 +50,47 @@ ShellRoot {
     LockAuth {
         id: auth
         context: pam
+        onAccepted: unlockDeadline.start()
+    }
+    // A correct password always unlocks, whatever happens to the exit animation.
+    Timer {
+        id: unlockDeadline
+        interval: 800
+        onTriggered: root.release()
+    }
+    // Give the compositor a moment to process the unlock before this client exits.
+    Timer {
+        id: quitDelay
+        interval: 150
+        onTriggered: Qt.quit()
     }
     WlSessionLock {
         id: lock
         locked: true
         WlSessionLockSurface {
-            color: "#171717"
+            color: "#0b0b0c"
             LockScene {
                 id: lockScene
                 anchors.fill: parent
                 reducedMotion: root.reducedMotion
                 credentialsVisible: root.credentialsVisible
-                busy: auth.busy || !lock.secure
+                busy: auth.busy
                 error: auth.error
+                leaving: auth.authenticated
                 now: clock.date
+                wallpaper: root.wallpaper
+                picture: root.picture
+                userName: Quickshell.env("USER") || ""
                 onWakeRequested: root.credentialsVisible = true
                 onSleepRequested: root.credentialsVisible = false
                 onActivity: root.activity()
+                onExited: root.release()
+                onSubmitted: response => auth.submit(response)
                 Connections {
                     target: root
                     function onActivity() { lockScene.restartIdle(); }
                 }
-                onSubmitted: response => auth.submit(response)
             }
-        }
-    }
-    Variants {
-        model: auth.authenticated ? Quickshell.screens : []
-        delegate: ExitOverlay {
-            required property var modelData
-            screen: modelData
-            reducedMotion: root.reducedMotion
-            begin: !lock.locked
-            onPrepared: {
-                root.preparedScreens = root.preparedScreens.concat(modelData.name);
-                root.releaseWhenPrepared();
-            }
-            onFinished: {
-                root.finishedScreens = root.finishedScreens.concat(modelData.name);
-                root.finishWhenComplete();
-            }
-        }
-    }
-    Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            root.releaseWhenPrepared();
-            root.finishWhenComplete();
         }
     }
 }

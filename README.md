@@ -32,8 +32,8 @@ Python 3 with GObject/Gio, and the Adwaita Sans font (`adwaita-fonts`).
 rules, portable autostart and optional shortcut replacements. Replace matching
 bindings deliberately; the installer does not add shortcut modules.
 
-The lock screen has descending blinds, a clock/password transition, and rotating
-slats after authentication. It uses Quickshell Wayland session lock and the
+The lock screen shows a large clock over your wallpaper, and any key brings up
+your picture and the password field. It uses Quickshell Wayland session lock and the
 existing `/etc/pam.d/hyprlock` service. Optional bindings are in
 [ghost-lock.lua](config/hypr/ghost-lock.lua); the installer does not lock your session.
 

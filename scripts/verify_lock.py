@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix="ghost-lock-test-") as directory:
         raise AssertionError((error.stdout or b"").decode() + (error.stderr or b"").decode()) from error
 output = result.stdout + result.stderr
 assert result.returncode == 0, output
-assert "PASS: lock descent, first key, masked submit, PAM failures/success, stationary rotation and reduced motion" in output, output
+assert "PASS: lock clock, first key, masked submit, idle, PAM failures and success, exit always completes" in output, output
 assert "FAIL!" not in output, output
 assert not any(error in output for error in ("ReferenceError", "TypeError", "Binding loop")), output
 print("PASS: lock visuals, input and mocked authentication policy; no real lock or PAM call")

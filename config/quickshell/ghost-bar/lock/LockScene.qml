@@ -11,25 +11,22 @@ FocusScope {
     property bool busy: false
     property string error: ""
     property date now: new Date()
-    property real drop: 0
+    property url wallpaper
+    property url picture: Qt.resolvedUrl("../artwork/profile.jpg")
+    property string userName: ""
+    property bool leaving: false
+    property real entrance: 0
     property real reveal: credentialsVisible ? 1 : 0
-    property real pointerTilt: 0
-    readonly property real cursorTilt: reducedMotion ? 0 : pointerTilt * (1 - reveal)
-    readonly property string fontFamily: Theme.font
+    property real exit: 0
     signal wakeRequested
     signal sleepRequested
     signal activity
     signal submitted(string response)
-
-    function trackCursor(x, y) {
-        // Cursor tilt stays separate from the authenticated opening animation.
-        pointerTilt = Math.max(-30, Math.min(30, (y / Math.max(1, height) * 2 - 1) * 25 + (x / Math.max(1, width) * 2 - 1) * 5));
-    }
-    Behavior on pointerTilt {
-        NumberAnimation { duration: scene.reducedMotion ? 0 : 100; easing.type: Easing.OutCubic }
-    }
+    signal exited
 
     function wake(text) {
+        if (leaving)
+            return;
         wakeRequested();
         activity();
         password.forceActiveFocus();
@@ -37,82 +34,129 @@ FocusScope {
             password.insert(password.cursorPosition, text);
     }
     function rest() {
+        if (leaving)
+            return;
         password.clear();
-        password.focus = false;
         scene.forceActiveFocus();
         sleepRequested();
     }
     function restartIdle() {
-        if (credentialsVisible && !busy)
+        if (credentialsVisible && !busy && !leaving)
             idle.restart();
         else
             idle.stop();
     }
-    onCredentialsVisibleChanged: restartIdle()
-    onBusyChanged: restartIdle()
-    Timer {
-        id: idle
-        objectName: "lock-idle"
-        interval: 10000
-        onTriggered: scene.rest()
-    }
     function submit() {
-        if (busy || password.text.length === 0)
+        if (busy || leaving || password.text.length === 0)
             return;
         const response = password.text;
         password.clear();
         submitted(response);
     }
+    onLeavingChanged: if (leaving) {
+        idle.stop();
+        exitMotion.restart();
+    }
+    onCredentialsVisibleChanged: {
+        restartIdle();
+        if (credentialsVisible)
+            password.forceActiveFocus();
+    }
+    onBusyChanged: restartIdle()
+    onErrorChanged: if (error)
+        shake.restart()
     Component.onCompleted: {
         forceActiveFocus();
-        descent.start();
+        entranceMotion.start();
     }
-    onReducedMotionChanged: if (reducedMotion)
-        descent.complete()
+    Timer {
+        id: idle
+        objectName: "lock-idle"
+        interval: 15000
+        onTriggered: scene.rest()
+    }
     NumberAnimation {
-        id: descent
+        id: entranceMotion
         target: scene
-        property: "drop"
+        property: "entrance"
         to: 1
-        duration: scene.reducedMotion ? 0 : 800
+        duration: scene.reducedMotion ? 0 : 900
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: [0.2, 0.75, 0.25, 1, 1, 1]
+        easing.bezierCurve: [0.16, 1, 0.3, 1, 1, 1]
     }
     Behavior on reveal {
         NumberAnimation {
             duration: scene.reducedMotion ? 0 : 420
-            easing.type: Easing.InOutCubic
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: [0.22, 1, 0.36, 1, 1, 1]
         }
     }
+    NumberAnimation {
+        id: exitMotion
+        target: scene
+        property: "exit"
+        to: 1
+        duration: scene.reducedMotion ? 0 : 380
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: [0.4, 0, 0.2, 1, 1, 1]
+        onFinished: scene.exited()
+    }
+    SequentialAnimation {
+        id: shake
+        loops: 1
+        NumberAnimation { target: passwordFrame; property: "shift"; to: -10; duration: 50 }
+        NumberAnimation { target: passwordFrame; property: "shift"; to: 8; duration: 70 }
+        NumberAnimation { target: passwordFrame; property: "shift"; to: -5; duration: 60 }
+        NumberAnimation { target: passwordFrame; property: "shift"; to: 0; duration: 70 }
+    }
+
     Rectangle {
         anchors.fill: parent
-        color: "#171717"
+        color: "#0b0b0c"
     }
+    // The wallpaper settles in on lock and returns to its exact desktop size on the way out.
     Item {
-        id: backdrop
         anchors.fill: parent
-        layer.enabled: scene.reveal > 0
-        // Keep the 3D viewport unchanged when the blur layer is toggled.
-        // A half-size layer changes orthographic projection on some backends.
-        layer.textureSize: Qt.size(Math.ceil(width), Math.ceil(height))
-        layer.effect: MultiEffect {
-            blurEnabled: true
-            blurMax: 16
-            blur: scene.reveal * 0.8
+        clip: true
+        scale: 1
+        Image {
+            id: sharp
+            objectName: "lock-wallpaper"
+            anchors.fill: parent
+            source: scene.wallpaper
+            sourceSize.width: scene.width
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            scale: (1.05 - .05 * scene.entrance) * (1 + .03 * scene.reveal * (1 - scene.exit))
+            opacity: status === Image.Ready ? 1 : 0
         }
-        Blinds {
-            width: parent.width
-            height: parent.height
-            drop: scene.drop
-            cursorTilt: scene.cursorTilt
+        // One blurred copy, rendered once; waking only fades it in.
+        Image {
+            anchors.fill: parent
+            source: scene.wallpaper
+            sourceSize.width: scene.width
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            scale: sharp.scale
+            visible: scene.reveal * (1 - scene.exit) > .001
+            opacity: scene.reveal * (1 - scene.exit)
+            layer.enabled: visible
+            layer.effect: MultiEffect {
+                autoPaddingEnabled: false
+                blurEnabled: true
+                blur: .75
+                blurMax: 40
+            }
+        }
+        Rectangle {
+            anchors.fill: parent
+            color: "#000000"
+            opacity: (.14 + .24 * scene.reveal) * (1 - scene.exit)
         }
     }
     MouseArea {
         anchors.fill: parent
-        hoverEnabled: true
-        onPositionChanged: scene.trackCursor(mouseX, mouseY)
-        onExited: scene.pointerTilt = 0
-        onClicked: scene.rest()
+        onClicked: scene.credentialsVisible ? scene.activity() : scene.wake("")
     }
     Keys.onPressed: event => {
         if (event.key === Qt.Key_Escape) {
@@ -121,120 +165,123 @@ FocusScope {
             return;
         }
         scene.activity();
-        if (!scene.credentialsVisible) {
-            if (event.text.length > 0 || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                scene.wake(event.text);
-                event.accepted = true;
-            }
+        if (!scene.credentialsVisible && (event.text.length > 0 || event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+            scene.wake(event.text.trim());
+            event.accepted = true;
         }
     }
+
+    Column {
+        id: time
+        objectName: "lock-clock"
+        width: parent.width
+        y: scene.height * .13 + 36 * (1 - scene.entrance) - scene.height * .03 * scene.reveal - 48 * scene.exit
+        opacity: scene.entrance * (1 - scene.exit)
+        spacing: 2
+        Text {
+            objectName: "lock-date"
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            text: Qt.formatDateTime(scene.now, "dddd, d MMMM")
+            font.family: Theme.font
+            font.pixelSize: Math.round(Math.min(26, scene.width / 44))
+            font.weight: Theme.mediumWeight
+            color: "#ffffff"
+        }
+        Text {
+            objectName: "lock-time"
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            text: Qt.formatDateTime(scene.now, "HH:mm")
+            font.family: Theme.font
+            font.pixelSize: Math.round(Math.min(148, scene.width / 7.5))
+            font.weight: Font.DemiBold
+            font.letterSpacing: -2
+            color: "#ffffff"
+            scale: 1 - .1 * scene.reveal
+            transformOrigin: Item.Top
+        }
+    }
+
     Column {
         id: credentials
         objectName: "lock-credentials"
-        width: Math.min(340, scene.width - 48)
-        anchors.centerIn: parent
-        spacing: 28
-        opacity: scene.reveal
-        visible: scene.credentialsVisible || scene.reveal > 0
-        layer.enabled: scene.reveal < 1 && scene.reveal > 0
-        layer.effect: MultiEffect {
-            blurEnabled: true
-            blurMax: 24
-            blur: 1 - scene.reveal
+        width: Math.min(280, scene.width - 48)
+        x: (scene.width - width) / 2
+        y: scene.height * .62 + 28 * (1 - scene.reveal) + 28 * scene.exit
+        spacing: 14
+        opacity: scene.reveal * (1 - scene.exit)
+        visible: opacity > .001
+        G2Image {
+            objectName: "lock-picture"
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 76
+            height: 76
+            radius: 38
+            source: scene.picture
         }
         Text {
+            objectName: "lock-user"
             width: parent.width
-            text: Qt.formatDateTime(scene.now, "HH:mm")
             horizontalAlignment: Text.AlignHCenter
-            font.family: scene.fontFamily
-            font.pixelSize: Math.min(68, scene.width / 9)
-            font.weight: Font.Light
-            color: "#ffffff"
-        }
-        TextField {
-            id: password
-            objectName: "lock-password"
-            width: parent.width
-            height: 52
-            // Keep layout geometry until the entire column finishes fading.
-            // Hiding this field on dismissal made the centered clock jump.
-            visible: true
-            enabled: scene.credentialsVisible && !scene.busy
-            echoMode: TextInput.Password
-            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-            placeholderText: "Password"
-            placeholderTextColor: "#b8b8b8"
-            color: "#ffffff"
-            font.family: scene.fontFamily
-            font.pixelSize: 16
-            leftPadding: 18
-            rightPadding: 18
-            selectByMouse: false
-            persistentSelection: false
-            background: Item {
-                id: glass
-                objectName: "lock-password-glass"
-                // Sample only the blinds, never the password or clock, so the
-                // frosted interior cannot recursively capture credentials.
-                ShaderEffectSource {
-                    id: glassSample
-                    sourceItem: backdrop
-                    sourceRect: Qt.rect(credentials.x + password.x, credentials.y + password.y, glass.width, glass.height)
-                    textureSize: Qt.size(Math.ceil(glass.width / 2), Math.ceil(glass.height / 2))
-                    live: scene.credentialsVisible
-                    visible: false
-                }
-                G2Surface {
-                    id: glassMask
-                    anchors.fill: parent
-                    radius: 15
-                    smoothing: 0.6
-                    color: "white"
-                    visible: false
-                    layer.enabled: true
-                }
-                MultiEffect {
-                    anchors.fill: parent
-                    source: glassSample
-                    blurEnabled: true
-                    blurMax: 16
-                    blur: 1
-                    autoPaddingEnabled: false
-                    maskEnabled: true
-                    maskSource: glassMask
-                }
-                G2Surface {
-                    objectName: "lock-password-border"
-                    anchors.fill: parent
-                    radius: 15
-                    smoothing: 0.6
-                    color: "transparent"
-                    border.width: 1
-                    border.color: password.activeFocus ? "#9c9c9c" : "#555555"
-                }
-            }
-            onAccepted: scene.submit()
-            onTextEdited: scene.activity()
-            TapHandler {
-                onPressedChanged: if (pressed) scene.activity()
-            }
-            Keys.onPressed: event => {
-                scene.activity();
-                if (event.key === Qt.Key_Escape) {
-                    scene.rest();
-                    event.accepted = true;
-                }
-            }
-        }
-        Text {
-            width: parent.width
-            text: scene.busy ? "Checking…" : scene.error
+            text: scene.userName
             visible: text.length > 0
-            wrapMode: Text.WordWrap
+            font.family: Theme.font
+            font.pixelSize: 16
+            font.weight: Theme.mediumWeight
+            color: "#ffffff"
+        }
+        Item {
+            id: passwordFrame
+            property real shift: 0
+            width: parent.width
+            height: 40
+            TextField {
+                id: password
+                objectName: "lock-password"
+                x: passwordFrame.shift
+                width: parent.width
+                height: parent.height
+                enabled: scene.credentialsVisible && !scene.busy && !scene.leaving
+                opacity: scene.busy ? .6 : 1
+                echoMode: TextInput.Password
+                inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                placeholderText: "Enter Password"
+                placeholderTextColor: "#d4d4d4"
+                color: "#ffffff"
+                font.family: Theme.font
+                font.pixelSize: 15
+                horizontalAlignment: TextInput.AlignHCenter
+                leftPadding: 18
+                rightPadding: 18
+                selectByMouse: false
+                background: Rectangle {
+                    radius: height / 2
+                    color: Qt.rgba(1, 1, 1, .16)
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, password.activeFocus ? .38 : .2)
+                }
+                onAccepted: scene.submit()
+                onTextEdited: scene.activity()
+                Keys.onPressed: event => {
+                    scene.activity();
+                    if (event.key === Qt.Key_Escape) {
+                        scene.rest();
+                        event.accepted = true;
+                    }
+                }
+            }
+        }
+        Text {
+            objectName: "lock-message"
+            width: parent.width
+            height: 18
             horizontalAlignment: Text.AlignHCenter
-            font.family: scene.fontFamily
-            font.pixelSize: 12
-            color: "#dddddd"
+            text: scene.error
+            wrapMode: Text.NoWrap
+            font.family: Theme.font
+            font.pixelSize: 13
+            color: "#ffffff"
         }
     }
 }

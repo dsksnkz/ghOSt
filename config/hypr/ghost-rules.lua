@@ -4,7 +4,6 @@ hl.window_rule({ name = "ghost-intro", match = { class = "org.quickshell", title
 
 -- QML owns its motion. Do not add a second compositor animation on top.
 hl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })
-hl.layer_rule({ name = "ghost-lock-exit-motion", match = { namespace = "ghost-lock-exit" }, no_anim = true })
 
 -- Only the clipse terminal floats; ordinary Kitty windows are unaffected.
 hl.window_rule({ name = "ghost-clipse", match = { class = "^clipse$" }, float = true, size = { 900, 600 }, center = true, fullscreen_state = "0 0", suppress_event = "maximize" })
