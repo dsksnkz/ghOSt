@@ -23,7 +23,7 @@ ShellRoot {
         id: userModel
         property int lastIndex: 0
         property int count: 2
-        property var rows: [{ 257: "matte", 258: "", 260: "", 261: true }, { 257: "guest", 258: "Guest", 260: "", 261: true }]
+        property var rows: [{ 257: "matte", 258: "", 260: Quickshell.env("GHOST_SDDM_ICON") || "", 261: true }, { 257: "guest", 258: "Guest", 260: "", 261: true }]
         function index(row, column) { return row; }
         function data(row, role) { return rows[row] ? rows[row][role] : undefined; }
         function rowCount() { return rows.length; }
@@ -75,12 +75,13 @@ ShellRoot {
                     saved = false;
                     findChild(theme, "password").text = "abcd";
                     wait(50);
-                    theme.grabToImage(r => saved = r.saveToFile(capture));
+                    const zoom = Number(Quickshell.env("GHOST_SDDM_CAPTURE_SCALE") || 1);
+                    theme.grabToImage(r => saved = r.saveToFile(capture), Qt.size(theme.width * zoom, theme.height * zoom));
                     tryCompare(test, "saved", true, 3000);
                     findChild(theme, "password").text = "";
                 }
                 compare(theme.userName, "matte");
-                compare(theme.userIcon, "");
+                compare(theme.userIcon, Quickshell.env("GHOST_SDDM_ICON") || "");
                 compare(findChild(theme, "status").text, "");
                 keyboard.capsLock = true;
                 compare(findChild(theme, "status").text, "Caps Lock is on");

@@ -1,47 +1,41 @@
 import assert from "node:assert/strict";
-import {existsSync} from "node:fs";
+import {existsSync, readFileSync} from "node:fs";
 import test from "node:test";
-import {views, settingsPages, settingsView, motionGroups} from "../site/catalogue.mjs";
-import {revealOrder, entranceFrames, groupTiming} from "../site/motion.mjs";
 
-test("only the seven requested views appear", () => {
-  assert.deepEqual(Object.keys(views), [
-    "rail", "calendar", "sidebar", "settings", "launcher", "sidebar-motion", "calendar-motion",
-  ]);
+const read = name => readFileSync(new URL("../site/" + name, import.meta.url), "utf8");
+const page = read("index.html");
+
+test("every local image, script and stylesheet exists", () => {
+  for (const [, path] of page.matchAll(/(?:src|href)="((?:assets\/)?[^"#:]+\.[a-z]+)"/g))
+    assert.ok(existsSync(new URL("../site/" + path, import.meta.url)), path);
 });
 
-test("every view and Settings page has an existing, bounded capture", () => {
-  assert.equal(settingsPages.length, 14);
-  const captures = [...Object.values(views), ...settingsPages.map((_, index) => settingsView(index))];
-  for (const view of captures) {
-    assert.ok(existsSync(new URL("../site/assets/" + view.file, import.meta.url)), view.file);
-    const [left, top, width, height] = view.crop;
-    assert.ok(left >= 0 && top >= 0 && width > 0 && height > 0);
-    assert.ok(left + width <= view.size[0] && top + height <= view.size[1]);
+test("images reserve space and describe themselves", () => {
+  for (const [tag] of page.matchAll(/<img\b[^>]*>/g)) {
+    assert.match(tag, /width="\d+"/);
+    assert.match(tag, /height="\d+"/);
+    assert.match(tag, /alt="/);
   }
 });
 
-test("motion fragments fit their component", () => {
-  for (const kind of ["sidebar", "calendar"]) {
-    const view = views[kind + "-motion"];
-    for (const [left, top, width, height] of motionGroups[kind]) {
-      assert.ok(left >= 0 && top >= 0);
-      assert.ok(left + width <= view.crop[2] && top + height <= view.crop[3]);
-    }
+test("install commands match the installer", () => {
+  assert.match(page, /git clone https:\/\/github\.com\/dsksnkz\/ghOSt\.git/);
+  assert.match(page, /\.\/install\.sh --activate/);
+  assert.match(page, /\.\/install\.sh --restore/);
+  assert.match(readFileSync(new URL("../scripts/install.py", import.meta.url), "utf8"), /"--restore"/);
+});
+
+test("no removed font, no personal path, one primary action", () => {
+  for (const name of ["index.html", "style.css", "icons.html", "icons.css"]) {
+    const text = read(name);
+    assert.doesNotMatch(text, /JetBrains|Turret|\/home\/matte/, name);
+    assert.doesNotMatch(text, /[\u2013\u2014]/, name);
   }
+  assert.equal(page.match(/button primary/g).length, 1);
 });
 
-test("reveal includes each group once and never repeats the previous order", () => {
-  const first = revealOrder(6, [], () => 0.5);
-  const second = revealOrder(6, first, () => 0.5);
-  assert.deepEqual([...first].sort(), [0, 1, 2, 3, 4, 5]);
-  assert.deepEqual([...second].sort(), [0, 1, 2, 3, 4, 5]);
-  assert.notDeepEqual(first, second);
-});
-
-test("entrance direction and total calendar duration follow the brief", () => {
-  assert.match(entranceFrames("sidebar")[0].transform, /translateX\(-/);
-  assert.match(entranceFrames("calendar")[0].transform, /translateY\(-/);
-  const last = groupTiming("calendar", 5);
-  assert.equal(last.delay + last.duration, 1460);
+test("motion stops for people who ask for less", () => {
+  const style = read("style.css");
+  assert.match(style, /prefers-reduced-motion: no-preference/);
+  assert.match(style, /prefers-reduced-motion: reduce/);
 });

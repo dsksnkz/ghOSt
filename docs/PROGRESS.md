@@ -1188,3 +1188,7 @@ Switcher motion fix deployed. Live via global shortcut dispatch: cards travel 3 
 
 Switcher confirm: chosen card zooms from its current position (side clicks no longer jump), windows are captured once per open so a desktop change cannot rebuild previews, zoom 320 ms, and the overlay hides as soon as the card fills the screen instead of fading a stale snapshot.
 The background stays solid during the zoom; fading it exposed the live rail and old desktop around the card.
+
+## 2026-11-01 website
+
+`site/index.html` rebuilt as a dark, Apple-style product page with no build step: hero, top bar, switcher, component bento, Settings, login, install. The interactive component gallery (`catalogue.mjs`, `motion.mjs`, old `app.js`) is removed; `icons.html` stays and uses the new shell. Images come from `scripts/capture_site.py`: real components, sample data, sample app list (never this machine's apps or pins), and a generated original wallpaper, because the licence of the user's wallpaper is unknown. Font is Adwaita Sans with its OFL; Apple devices use SF. Older site assets stay because historical docs link to them. Dark only, matching the product. Checked at desktop and 375px in the browser pane: no horizontal overflow, no console errors. Not committed or deployed.

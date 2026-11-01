@@ -19,14 +19,14 @@ DISCLAIMER: This project was created with AI.
 - **App launcher:** searches installed desktop entries; saves pinned favourites locally.
 - **Motion:** grouped sidebar entrance and randomized calendar reveal, with reduced-motion support.
 
-The website shows component captures and labeled browser motion demonstrations,
-not remote desktop controls. [Google Material SVG icons](docs/icons.md) are bundled with their licence.
+The website shows real components rendered with sample data
+(`scripts/capture_site.py`). [Google Material SVG icons](docs/icons.md) are bundled with their licence.
 
 
 ## Install
 
 Requires Arch Linux, Hyprland, Quickshell with networking/Bluetooth/PipeWire,
-Python 3 with GObject/Gio, and JetBrains Mono Nerd Font Mono.
+Python 3 with GObject/Gio, and the Adwaita Sans font (`adwaita-fonts`).
 
 [Hyprland integration](docs/hyprland.md) contains the current ghOSt window/motion
 rules, portable autostart and optional shortcut replacements. Replace matching

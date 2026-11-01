@@ -915,3 +915,7 @@ New player deployed live. Snapshot: `.local/backups/2026-11-01-media-player/`. T
 ## 2026-11-01 Settings and desktop batch
 
 All ten requested items implemented and deployed live. Snapshot: `.local/backups/2026-11-01-settings-batch/`. Not committed. Keyboard behaviours of the launcher still need the user's real-desktop check.
+
+## 2026-11-01 website
+
+Dark Apple-style product page in `site/`, footer credits the Figma design and AI help. Images rendered by `scripts/capture_site.py` from sample data.

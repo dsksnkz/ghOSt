@@ -3,52 +3,128 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#111111">
-    <meta name="description" content="Rail, calendar, sidebar, settings and launcher for Hyprland.">
+    <meta name="theme-color" content="#0b0b0c">
+    <meta name="color-scheme" content="dark">
+    <meta name="description" content="A monochrome desktop shell for Arch Linux and Hyprland. Free and open source.">
+    <meta property="og:title" content="ghOSt">
+    <meta property="og:description" content="A monochrome desktop shell for Arch Linux and Hyprland.">
+    <meta property="og:image" content="assets/product/desktop.webp">
     <title>ghOSt</title>
-    <link rel="stylesheet" href="style.css?v=20261004-mfd">
+    <link rel="icon" href="assets/icons/white/ghost.svg" type="image/svg+xml">
+    <link rel="preload" href="assets/fonts/AdwaitaSans.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="assets/product/desktop.webp" as="image">
+    <link rel="stylesheet" href="style.css">
+    <script>document.documentElement.classList.add("js")</script>
   </head>
   <body>
-    <header>
+    <header class="nav">
       <a class="brand" href="./" aria-label="ghOSt home">
-        <img src="assets/icons/white/ghost.svg" width="28" height="28" alt="">ghOSt
+        <img src="assets/icons/white/ghost.svg" width="22" height="22" alt="">ghOSt
       </a>
-      <a href="https://github.com/dsksnkz/ghOSt">Source ↗</a>
-    </header>
-    <main>
-      <nav id="surfaces" aria-label="Components">
-        <button type="button" data-view="rail" aria-pressed="false">Top rail</button>
-        <button type="button" data-view="calendar" aria-pressed="true">Calendar</button>
-        <button type="button" data-view="sidebar" aria-pressed="false">Sidebar</button>
-        <button type="button" data-view="settings" aria-pressed="false">Settings</button>
-        <button type="button" data-view="launcher" aria-pressed="false">App launcher</button>
-        <button type="button" data-view="sidebar-motion" aria-pressed="false">Sidebar motion</button>
-        <button type="button" data-view="calendar-motion" aria-pressed="false">Calendar motion</button>
+      <nav aria-label="Main">
+        <a href="#install">Install</a>
+        <a href="https://github.com/dsksnkz/ghOSt">GitHub</a>
       </nav>
-      <section class="display" aria-label="Component display">
-        <div class="display-header">
-          <h1 id="display-title">Calendar</h1>
-          <span id="capture-kind">Desktop capture</span>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>A calmer desktop<br>for Hyprland.</h1>
+        <p>A monochrome shell for Arch Linux. Free, open source and built with Quickshell.</p>
+        <div class="actions">
+          <a class="button primary" href="#install">Install</a>
+          <a class="button" href="https://github.com/dsksnkz/ghOSt">GitHub</a>
         </div>
-        <div id="stage" aria-busy="false"></div>
-        <p id="load-error" role="alert" hidden>Image unavailable. Choose another view or reload.</p>
-        <div id="settings-controls" class="mfd-controls" hidden>
-          <button id="previous-page" type="button" aria-label="Previous Settings page">←</button>
-          <label class="page-picker">
-            <span class="sr-only">Settings page</span>
-            <select id="settings-page"></select>
-          </label>
-          <output id="page-number" aria-label="Page number">01 / 14</output>
-          <button id="next-page" type="button" aria-label="Next Settings page">→</button>
-        </div>
-        <div class="display-footer">
-          <p id="description" aria-live="polite">Weather, dates and device usage. System readings drive the meters.</p>
-          <button id="replay" type="button" hidden>Replay</button>
-          <a id="full-image" href="assets/calendar-native.png" target="_blank" rel="noopener">Full image ↗</a>
+        <img class="hero-shot" src="assets/product/desktop.webp" width="2880" height="1620" fetchpriority="high"
+             alt="The ghOSt desktop: a slim top bar with the calendar open beneath the clock.">
+      </section>
+
+      <section class="statement reveal">
+        <h2>One quiet bar.</h2>
+        <p>Desktops, clock, volume, battery and power. Media appears only while something is playing.</p>
+        <div class="closeups">
+          <img src="assets/product/rail-left.webp" width="900" height="70" loading="lazy"
+               alt="Top bar, left side: desktop numbers and the current track.">
+          <img src="assets/product/rail-right.webp" width="560" height="70" loading="lazy"
+               alt="Top bar, right side: volume, battery and power.">
         </div>
       </section>
+
+      <section class="stage reveal">
+        <h2>Every desktop, at a glance.</h2>
+        <p>Press Super and Tab. Scroll to look around, click to go there. Magic Workspaces sit just below.</p>
+        <img src="assets/product/switcher.webp" width="2880" height="1620" loading="lazy"
+             alt="The desktop switcher: the current desktop in the centre, its neighbours either side, and AI and Music workspaces below.">
+      </section>
+
+      <section class="bento" aria-label="Components">
+        <article class="tile wide reveal">
+          <div>
+            <h3>Your day, under the clock.</h3>
+            <p>Dates, weather and live system readings.</p>
+          </div>
+          <img src="assets/product/calendar.webp" width="1836" height="850" loading="lazy" alt="The calendar panel with weather, system readings and a month view.">
+        </article>
+        <article class="tile tall reveal">
+          <div>
+            <h3>Controls at your side.</h3>
+            <p>Network, Bluetooth, volume, brightness and notifications.</p>
+          </div>
+          <img src="assets/product/sidebar.webp" width="820" height="1828" loading="lazy" alt="The sidebar with network, Bluetooth, volume and brightness controls.">
+        </article>
+        <article class="tile reveal">
+          <div>
+            <h3>Music, centre stage.</h3>
+            <p>Artwork over a live spectrum of whatever is playing.</p>
+          </div>
+          <img src="assets/product/media.webp" width="840" height="592" loading="lazy" alt="The music player with album art and a blurred audio spectrum behind it.">
+        </article>
+        <article class="tile reveal">
+          <div>
+            <h3>Just start typing.</h3>
+            <p>Super and Space opens every app you have installed.</p>
+          </div>
+          <img src="assets/product/launcher.webp" width="1120" height="656" loading="lazy" alt="The app launcher with a search field and a short list of apps.">
+        </article>
+      </section>
+
+      <section class="split reveal">
+        <div>
+          <h2>Settings that stay out of the way.</h2>
+          <p>Fourteen pages and one search field. Network, sound, power, wallpaper and your top bar layout.</p>
+        </div>
+        <img src="assets/product/settings.webp" width="2048" height="1398" loading="lazy" alt="ghOSt Settings, showing the General page with a sidebar of categories.">
+      </section>
+
+      <section class="login reveal">
+        <h2>From the very first screen.</h2>
+        <p>A login theme with your sessions, your picture and nothing else.</p>
+        <img src="assets/product/login.webp" width="2880" height="1620" loading="lazy"
+             alt="The ghOSt login screen: a session list on the left, profile picture and password in the centre, and a ghost outline on the right.">
+      </section>
+
+      <section id="install" class="install reveal">
+        <h2>Install ghOSt.</h2>
+        <p>For Arch Linux with Hyprland and Quickshell.</p>
+        <div class="code">
+          <pre><code id="commands">git clone https://github.com/dsksnkz/ghOSt.git
+cd ghOSt
+./install.sh --activate</code></pre>
+          <button id="copy" class="button" type="button" data-copy="commands">Copy</button>
+        </div>
+        <p class="note" id="install-note">Your existing configs are backed up first. <code>./install.sh --restore</code> puts them back.</p>
+        <p class="note"><a href="https://github.com/dsksnkz/ghOSt/blob/main/docs/hyprland.md">Hyprland setup</a></p>
+      </section>
     </main>
-    <footer>Arch Linux · Hyprland · Quickshell<span><a href="https://github.com/dsksnkz/ghOSt/blob/main/docs/hyprland.md">Hyprland setup ↗</a> · Captures, not remote controls.</span></footer>
-    <script type="module" src="app.js?v=20261004-mfd"></script>
+
+    <footer>
+      <p>Designed in Figma by dsksnkz. Built with the help of AI. Screens show sample data.</p>
+      <nav aria-label="Footer">
+        <a href="icons.html">Icons</a>
+        <a href="https://github.com/dsksnkz/ghOSt/blob/main/docs/source.md">Source guide</a>
+        <a href="https://github.com/dsksnkz/ghOSt">GitHub</a>
+      </nav>
+    </footer>
+    <script src="app.js" defer></script>
   </body>
 </html>
