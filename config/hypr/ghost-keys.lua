@@ -76,6 +76,8 @@ hl.config({ binds = { scroll_event_delay = 10 } })
 
 hl.on("hyprland.start", function()
     hl.exec_cmd(ghost .. " wallpaper")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
     hl.exec_cmd("clipse -listen")
     hl.exec_cmd(ghost .. " intro")
 end)

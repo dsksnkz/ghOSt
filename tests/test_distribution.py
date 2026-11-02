@@ -170,6 +170,11 @@ class DistributionTests(unittest.TestCase):
             main.write_text("-- stock\n")
             restore = self.activate(root, home)
             keys = (home / ".config/hypr/ghost-keys.lua").read_text()
+            self.assertIn("ghost-settings.lua", main.read_text())
+            look = (home / ".config/hypr/ghost-settings.lua").read_text()
+            for setting in ("border_size = 0", "gaps_out = 6", "rounding = 12", "ghost-clipse"):
+                self.assertIn(setting, look)
+            self.assertNotIn("fcitx", look)
             for key in ("SUPER + W", "SUPER + Q", "SUPER + S", "SUPER + E", "SUPER + F", "SUPER + SHIFT + M"):
                 self.assertIn(key, keys)
             self.assertNotIn("/home/matte", keys)
@@ -284,6 +289,7 @@ class DistributionTests(unittest.TestCase):
             (hypr / "config/keybinds.lua").write_text(keys)
             self.activate(root, home)
             self.assertNotIn("ghost-keys.lua", (hypr / "hyprland.lua").read_text())
+            self.assertNotIn("ghost-settings.lua", (hypr / "hyprland.lua").read_text())
             self.assertEqual((hypr / "config/keybinds.lua").read_text(), keys)
             self.assertNotIn("awww-daemon", (hypr / "config/autostart.lua").read_text())
 

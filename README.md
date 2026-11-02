@@ -65,7 +65,7 @@ cd ghOSt
 **Back up anything you've customised.** Your existing files are snapshotted and can be restored, but these are replaced:
 
 - `~/.bashrc`, the fish config, and the fastfetch and cava configs. Use `--no-shell-config` to keep yours.
-- On a stock Hyprland config, ghOSt also adds all its shortcuts and sets its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
+- On a stock Hyprland config, ghOSt also adds its look, all its shortcuts and its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
 
 ghOSt doesn't turn off another bar, so stop any you already run. Network, Bluetooth and power profile controls need their system services enabled, which the installer leaves to you.
 

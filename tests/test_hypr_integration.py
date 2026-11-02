@@ -6,7 +6,7 @@ import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SNIPPETS = ("ghost-keys", "ghost-recovery", "ghost-rules", "ghost-autostart", "ghost-controls", "ghost-migration", "ghost-lock")
+SNIPPETS = ("ghost-keys", "ghost-settings", "ghost-recovery", "ghost-rules", "ghost-autostart", "ghost-controls", "ghost-migration", "ghost-lock")
 
 
 class HyprlandIntegration(unittest.TestCase):
