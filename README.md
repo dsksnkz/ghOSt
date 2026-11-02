@@ -48,6 +48,22 @@ Default installation stages the complete runtime without changing your desktop.
 autostart. It does not disable another bar or replace shortcuts; switch existing
 bars deliberately to avoid overlap.
 
+The shell restarts by itself if it exits unexpectedly, and its bar returns when a
+disconnected display does. Each unplanned exit is logged in
+`~/.local/state/ghost/shell-restarts.log`.
+
+| Command | Action |
+| --- | --- |
+| `ghost shell` | Restart the shell |
+| `ghost start` | Start the shell and keep it running |
+| `ghost stop` | Stop the shell |
+| `ghost lock` | Lock the session; the lock screen returns if it crashes |
+
+`install.sh --activate` also works on a stock Hyprland config. It adds Super+Space,
+Super+I, Super+L and Super+Tab there, and keeps your shortcuts when ghOSt ones exist.
+Network, Bluetooth and power profile controls need their system services enabled,
+which the installer leaves to you.
+
 `./install.sh --restore` restores verified integration snapshots. Later edits
 may require reconciliation. Backups live in `~/.local/state/ghost/backups`.
 

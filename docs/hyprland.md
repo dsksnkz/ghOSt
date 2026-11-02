@@ -10,6 +10,8 @@ They use its Lua `hl` API, not legacy `.conf` syntax.
 | [ghost-autostart.lua](../config/hypr/ghost-autostart.lua) | Start the installed ghOSt wrapper once; optional wallpaper/clipboard helpers |
 | [ghost-controls.lua](../config/hypr/ghost-controls.lua) | Settings, screenshot, audio and brightness shortcuts |
 | [ghost-migration.lua](../config/hypr/ghost-migration.lua) | Launcher, reload, Settings pages, Zed, clipse and workspace shortcuts |
+| [ghost-recovery.lua](../config/hypr/ghost-recovery.lua) | Lets `ghost lock` take over the session lock after a lock client crash |
+| [ghost-keys.lua](../config/hypr/ghost-keys.lua) | Launcher, Settings and lock shortcuts; the installer loads it only for a config without ghOSt shortcuts |
 | [ghost-lock.lua](../config/hypr/ghost-lock.lua) | Existing Super+L/power-key route to ghOSt lock; no lock is executed when loading |
 
 ## Load deliberately

@@ -485,7 +485,7 @@ Item {
                     {
                         label: "Lock",
                         icon: "lock",
-                        command: ["quickshell", "--no-duplicate", "--path", Quickshell.shellPath("lock.qml")]
+                        command: [Quickshell.env("HOME") + "/.local/bin/ghost", "lock"]
                     },
                     {
                         label: "Sleep",

@@ -929,3 +929,7 @@ All ten requested items implemented and deployed live. Snapshot: `.local/backups
 ## 2026-11-01 website
 
 Dark Apple-style product page in `site/`, footer credits the Figma design and AI help. Images rendered by `scripts/capture_site.py` from sample data.
+
+## 2026-11-02 shell recovery
+
+`ghost start` keeps the shell running and logs unplanned exits. Surfaces skip Qt's placeholder screen. `ghost lock` relaunches a crashed lock client, with `allow_session_lock_restore` on. The installer handles stock and missing Hyprland configs and declares its runtime packages. The real exit cause of the HDMI drop is unproven; details and gaps in `docs/PROGRESS.md`.

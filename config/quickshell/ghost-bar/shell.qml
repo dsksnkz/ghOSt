@@ -5,6 +5,11 @@ import Quickshell.Hyprland
 import "EdgeVolume.js" as EdgeVolume
 
 ShellRoot {
+    id: root
+    // With no display attached Qt lists a nameless placeholder and Hyprland a
+    // FALLBACK output. Neither gets surfaces; the rail returns with the display.
+    readonly property var connectedScreens: Quickshell.screens.filter(screen => screen.name && screen.name !== "FALLBACK")
+
     // Native development must not leave Quickshell's generic reload panel over
     // the desktop. Errors remain in the runtime log; these are not OSD messages.
     Connections {
@@ -59,7 +64,7 @@ ShellRoot {
     }
     Variants {
         id: outputs
-        model: Quickshell.screens
+        model: root.connectedScreens
         delegate: Scope {
             id: output
             required property var modelData
@@ -202,7 +207,7 @@ ShellRoot {
             Desk.switcherConfirmed();
         }
         function toggle(name: string): void {
-            const screen = Quickshell.screens[0];
+            const screen = root.connectedScreens[0];
             if (screen)
                 Desk.toggle(name, screen.name, screen.width - 420);
         }
@@ -210,12 +215,12 @@ ShellRoot {
             Desk.close();
         }
         function sidebar(): void {
-            const screen = Quickshell.screens[0];
+            const screen = root.connectedScreens[0];
             if (screen)
                 Desk.toggleSidebar(screen.name);
         }
         function settings(page: string): void {
-            const screen = Quickshell.screens[0];
+            const screen = root.connectedScreens[0];
             if (screen)
                 Desk.openSettings(screen.name, page || "general");
         }

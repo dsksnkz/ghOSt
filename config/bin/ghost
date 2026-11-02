@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# ghOSt command line.
+set -u
+runtime="${XDG_RUNTIME_DIR:-/tmp}"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/ghost"
+config="${XDG_CONFIG_HOME:-$HOME/.config}"
+shell_lock="$runtime/ghost-shell.lock"
+shell_output="$runtime/ghost-shell.out"
+
+compositor_alive() {
+    for _ in 1 2 3; do
+        hyprctl version >/dev/null 2>&1 && return 0
+        sleep 1 9>&-
+    done
+    return 1
+}
+
+# Hyprland lists FALLBACK while nothing is connected; only a real output counts.
+display_connected() {
+    hyprctl monitors 2>/dev/null | grep '^Monitor ' | grep -qv '^Monitor FALLBACK '
+}
+
+record_exit() {
+    mkdir -p "$state"
+    {
+        printf '%s exit %s after %ss\n' "$(date '+%F %T')" "$1" "$2"
+        tail -n 8 "$shell_output"
+        echo
+    } >>"$state/shell-restarts.log"
+    # Keep the newest entries only.
+    tail -n 400 "$state/shell-restarts.log" >"$state/shell-restarts.log.new" &&
+        mv "$state/shell-restarts.log.new" "$state/shell-restarts.log"
+}
+
+# Runs the shell and brings it back unless it was asked to stop. fd 9 holds the
+# lock, so it is closed for everything that could outlive this process.
+supervise() {
+    exec 9>>"$shell_lock"
+    flock -n 9 || return 0
+    truncate -s 0 "$shell_lock"
+    echo $$ >&9
+    local delay=1 started status
+    while compositor_alive; do
+        if ! display_connected; then
+            sleep 1 9>&-
+            continue
+        fi
+        started=$SECONDS
+        quickshell -n -c ghost-bar >"$shell_output" 2>&1 9>&-
+        status=$?
+        if [ "$status" -eq 0 ] &&
+            tail -n 2 "$shell_output" | grep -qE 'Exiting due to IPC request|already running'; then
+            return 0
+        fi
+        # The session ending takes the shell with it; that is not a failure.
+        sleep 1 9>&-
+        compositor_alive || return 0
+        record_exit "$status" "$((SECONDS - started))"
+        # Only a shell that keeps failing straight away waits longer.
+        if [ "$((SECONDS - started))" -lt 30 ]; then
+            sleep "$delay" 9>&-
+            delay=$((delay < 30 ? delay * 2 : 30))
+        else
+            delay=1
+        fi
+    done
+}
+
+start_shell() {
+    setsid -f "$0" supervise >/dev/null 2>&1 </dev/null
+}
+
+# Stops the supervisor first, so that it cannot restart what is being stopped.
+stop_shell() {
+    local pid
+    pid=$(cat "$shell_lock" 2>/dev/null)
+    if [ -n "$pid" ] && tr '\0' ' ' 2>/dev/null <"/proc/$pid/cmdline" | grep -q ' supervise '; then
+        kill "$pid" 2>/dev/null
+    fi
+    quickshell kill -c ghost-bar >/dev/null 2>&1
+    # Starting before the old instance has exited would be refused.
+    for _ in {1..30}; do
+        quickshell list -c ghost-bar 2>&1 | grep -q "No running instances" && return 0
+        sleep 0.1
+    done
+    echo "ghOSt shell did not stop" >&2
+    return 1
+}
+
+restart_shell() {
+    stop_shell || return 1
+    start_shell
+    for _ in {1..50}; do
+        if quickshell ipc -c ghost-bar call bar status >/dev/null 2>&1; then
+            echo "ghOSt shell restarted"
+            return 0
+        fi
+        sleep 0.1
+    done
+    echo "ghOSt shell did not start. Log: quickshell log -c ghost-bar" >&2
+    return 1
+}
+
+# A lock client that dies leaves the session locked with nothing to unlock it,
+# so it is started again until it exits on its own after a correct password.
+lock_session() {
+    if [ ! -e /etc/pam.d/hyprlock ]; then
+        echo "Not locking: /etc/pam.d/hyprlock is missing, so no password could unlock. Install hyprlock." >&2
+        return 1
+    fi
+    exec 9>>"$runtime/ghost-lock.lock"
+    flock -n 9 || return 0
+    local status delay=0.2
+    while :; do
+        quickshell -n --path "$config/quickshell/ghost-bar/lock.qml" >/dev/null 2>&1 9>&-
+        status=$?
+        [ "$status" -eq 0 ] && return 0
+        compositor_alive || return "$status"
+        sleep "$delay" 9>&-
+        delay=2
+    done
+}
+
+case "${1:-}" in
+    shell) restart_shell ;;
+    start) start_shell ;;
+    stop) stop_shell ;;
+    supervise) supervise ;;
+    lock) lock_session ;;
+    *)
+        cat >&2 <<'EOF'
+Usage: ghost shell    Restart the ghOSt shell
+       ghost start    Start the shell and keep it running
+       ghost stop     Stop the shell
+       ghost lock     Lock the session
+EOF
+        [ $# -eq 0 ] || exit 2
+        ;;
+esac
