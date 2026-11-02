@@ -34,7 +34,7 @@ hyprland = config / "hypr/hyprland.lua"
 command = launcher.with_name("ghost")
 HYPR_SNIPPETS = ("ghost-animations.lua", "ghost-switcher.lua", "ghost-recovery.lua")
 # Command or file -> Arch package for everything the shell and bundled configuration use.
-PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship": "starship",
+PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "crunchycleaner-bin": "crunchycleaner-bin","fish": "fish", "starship": "starship",
             "zoxide": "zoxide", "playerctl": "playerctl",
             # The lock screen authenticates through this PAM service.
             "/etc/pam.d/hyprlock": "hyprlock",
