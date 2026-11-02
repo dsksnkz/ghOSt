@@ -34,7 +34,7 @@ hyprland = config / "hypr/hyprland.lua"
 command = launcher.with_name("ghost")
 HYPR_SNIPPETS = ("ghost-animations.lua", "ghost-switcher.lua", "ghost-recovery.lua")
 # Command or file -> Arch package for everything the shell and bundled configuration use.
-PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "crunchycleaner-bin": "crunchycleaner-bin","fish": "fish", "starship": "starship",
+PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship": "starship",
             "zoxide": "zoxide", "playerctl": "playerctl",
             # The lock screen authenticates through this PAM service.
             "/etc/pam.d/hyprlock": "hyprlock",
@@ -45,6 +45,8 @@ PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "crunchycleaner-bin": "cru
             "grim": "grim", "slurp": "slurp", "magick": "imagemagick", "awww-daemon": "awww",
             "pavucontrol": "pavucontrol", "blueman-manager": "blueman",
             "nm-connection-editor": "nm-connection-editor"}
+# Not in the official repositories, so pacman would reject its whole command over them.
+AUR_PACKAGES = {"crunchycleaner": "crunchycleaner-bin"}
 SHELL_CONFIG = {
     "bashrc": home / ".bashrc",
     "fish/config.fish": config / "fish/config.fish",
@@ -76,17 +78,24 @@ def package_missing(requirement):
 
 def install_packages():
     missing = [package for requirement, package in PACKAGES.items() if package_missing(requirement)]
-    if not missing:
-        return
+    aur_missing = [package for requirement, package in AUR_PACKAGES.items() if package_missing(requirement)]
     if args.no_packages:
-        print("Missing packages: " + " ".join(missing))
+        if missing or aur_missing:
+            print("Missing packages: " + " ".join(missing + aur_missing))
         return
-    if not shutil.which("pacman"):
-        print("Install these packages with your package manager: " + " ".join(missing))
-        return
-    # Interactive on purpose: sudo asks in this terminal.
-    if subprocess.run(["sudo", "pacman", "-S", "--needed", *missing], check=False).returncode:
-        print("Packages not installed: " + " ".join(missing))
+    if missing:
+        if shutil.which("pacman"):
+            # Interactive on purpose: sudo asks in this terminal.
+            if subprocess.run(["sudo", "pacman", "-S", "--needed", *missing], check=False).returncode:
+                print("Packages not installed: " + " ".join(missing))
+        else:
+            print("Install these packages with your package manager: " + " ".join(missing))
+    if aur_missing:
+        helper = shutil.which("yay") or shutil.which("paru")
+        if not helper:
+            print("Install these from the AUR: " + " ".join(aur_missing))
+        elif subprocess.run([helper, "-S", "--needed", *aur_missing], check=False).returncode:
+            print("AUR packages not installed: " + " ".join(aur_missing))
 
 def snapshot(record, path):
     """Back up a file once, so --restore can put it back or remove it."""

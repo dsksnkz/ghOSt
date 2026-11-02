@@ -75,6 +75,33 @@ class DistributionTests(unittest.TestCase):
             self.assertFalse((config / "hypr/ghost-animations.lua").exists())
             self.assertFalse(command.exists())
 
+    def run_package_step(self, helpers):
+        with tempfile.TemporaryDirectory(prefix="ghost-packages-test-") as directory:
+            root = Path(directory)
+            home, bin_dir = root / "home", root / "bin"
+            home.mkdir()
+            bin_dir.mkdir()
+            calls = root / "calls"
+            for name in ("sudo", "pacman", "quickshell") + helpers:
+                fake = bin_dir / name
+                fake.write_text('#!/bin/sh\necho "%s $*" >> "%s"\n' % (name, calls))
+                fake.chmod(0o755)
+            environment = {"HOME": str(home), "PATH": str(bin_dir)}
+            result = subprocess.run([sys.executable, str(REPOSITORY / "scripts/install.py"), "--activate", "--no-start"],
+                                    env=environment, check=True, capture_output=True, text=True)
+            return calls.read_text(), result.stdout
+
+    def test_aur_packages_never_reach_pacman(self):
+        calls, _ = self.run_package_step(("yay",))
+        pacman = next(line for line in calls.splitlines() if line.startswith("sudo pacman"))
+        self.assertNotIn("crunchycleaner", pacman)
+        self.assertIn("yay -S --needed crunchycleaner-bin", calls)
+
+    def test_aur_packages_are_listed_without_a_helper(self):
+        calls, output = self.run_package_step(())
+        self.assertNotIn("crunchycleaner", calls)
+        self.assertIn("Install these from the AUR: crunchycleaner-bin", output)
+
     def activate(self, root, home):
         bin_dir = root / "bin"
         bin_dir.mkdir()
