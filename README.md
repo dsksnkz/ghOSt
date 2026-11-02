@@ -97,4 +97,3 @@ The shell restarts by itself if it exits unexpectedly, and the bar returns when 
 - [Login theme](docs/sddm.md): the SDDM theme
 - [Source guide](docs/source.md): how the code is laid out
 - [Icons](docs/icons.md): Google Material SVG icons, bundled with their licence
-- [Progress](docs/PROGRESS.md): build notes and what has been verified

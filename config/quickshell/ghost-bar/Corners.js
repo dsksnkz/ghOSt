@@ -3,7 +3,7 @@
 // Radius and smoothing are separate Figma measurements. The previous single
 // cubic used the rectangle vertex twice, making a 15px corner look nearly square.
 // Parameter equations adapted from figma-squircle (MIT), Tien Pham, 2021.
-// See docs/licenses/figma-squircle.txt and docs/changes/2026-10-04-corners.md.
+// See docs/licenses/figma-squircle.txt.
 function geometry(width, height, radius, smoothing) {
     const budget = Math.max(0, Math.min(width, height) / 2);
     const r = Math.max(0, Math.min(radius, budget));

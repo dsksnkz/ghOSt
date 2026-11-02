@@ -54,7 +54,7 @@ Requirements: Arch/Hyprland, Quickshell with networking/Bluetooth/PipeWire servi
 Qt Multimedia supplies click playback; `brightnessctl` accesses a writable
 standard backlight if available. Optional Lua control mappings are in
 `config/hypr/ghost-controls.lua`; replacing old bindings is deliberate, not an
-automatic install step. See the [interaction migration record](changes/2026-10-08-interactions.md).
+automatic install step.
 
 Fresh installation defaults to an isolated stage. `./install.sh --activate` deliberately installs/starts ghOSt and adds only its own integration. It does not silently disable another bar or replace existing shortcuts. The complete independent lock/EQ/terminal/migration backlog remains documented; shipping the current source does not claim those functions finished.
 

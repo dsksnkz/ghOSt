@@ -1,3 +1,33 @@
 .local/
 *.log
 __pycache__/
+
+# Local notes and working files
+AGENTS.md
+.claude/
+prompts.md
+promptoutput.md
+mainDesigns/
+
+# Docs: only what users and contributors need
+docs/*
+!docs/CODE_MAP.md
+!docs/hyprland.md
+!docs/icons.md
+!docs/licenses/
+!docs/sddm.md
+!docs/source.md
+
+# Source icons and their previews stay; other images and videos do not
+assets/*
+!assets/material-symbols/
+!assets/folder-rounded-preview.svg
+!assets/icons-rounded-sheet.svg
+
+# One-off capture and video tools
+scripts/ad/
+scripts/reel/
+scripts/capture_calendar_motion.py
+scripts/capture_notification_pass.py
+scripts/export_material_captures.py
+scripts/export_notification_pass.py
