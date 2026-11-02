@@ -64,8 +64,8 @@ cd ghOSt
 
 **Back up anything you've customised.** Your existing files are snapshotted and can be restored, but these are replaced:
 
-- `~/.bashrc`, the fish config, and the fastfetch and cava configs. Use `--no-shell-config` to keep yours.
-- On a stock Hyprland config, ghOSt also adds its look, all its shortcuts and its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
+- `~/.bashrc`, and the fish, kitty, fastfetch and cava configs. Use `--no-shell-config` to keep yours.
+- On a stock Hyprland config, ghOSt also adds its look, GTK theme, all its shortcuts and its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
 
 ghOSt doesn't turn off another bar, so stop any you already run. Network, Bluetooth and power profile controls need their system services enabled, which the installer leaves to you.
 
@@ -76,7 +76,7 @@ ghOSt doesn't turn off another bar, so stop any you already run. Network, Blueto
 | `--stage-dir DIR` | Copies the files to `DIR` without changing your desktop |
 | `--no-start` | Installs without starting it |
 | `--no-packages` | Lists missing packages instead of installing them |
-| `--no-shell-config` | Keeps your shell, fastfetch and cava configs |
+| `--no-shell-config` | Keeps your shell, kitty, fastfetch and cava configs |
 | `--restore` | Puts back what the install changed |
 
 Snapshots are kept in `~/.local/state/ghost/backups`. If you've edited a file since installing, `--restore` stops and tells you which one.

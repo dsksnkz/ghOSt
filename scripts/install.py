@@ -52,6 +52,8 @@ PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship"
             "/usr/lib/xdg-desktop-portal-hyprland": "xdg-desktop-portal-hyprland",
             # Without this plugin Qt cannot read WebP, including the default wallpaper.
             "/usr/lib/qt6/plugins/imageformats/libqwebp.so": "qt6-imageformats", "cliphist": "cliphist",
+            "/usr/share/themes/adw-gtk3-dark": "adw-gtk-theme",
+            "/usr/share/fonts/TTF/JetBrainsMono-Regular.ttf": "ttf-jetbrains-mono",
             "kitty": "kitty", "firefox": "firefox", "nautilus": "nautilus", "zeditor": "zed", "hyprshot": "hyprshot"}
 # Not in the official repositories, so pacman would reject its whole command over them.
 AUR_PACKAGES = {"crunchycleaner": "crunchycleaner-bin", "clipse": "clipse"}
@@ -62,6 +64,8 @@ SHELL_CONFIG = {
     "fastfetch/media.sh": config / "fastfetch/media.sh",
     "fastfetch/ascii/ghost.txt": config / "fastfetch/ascii/ghost.txt",
     "cava/config": config / "cava/config",
+    "kitty/kitty.conf": config / "kitty/kitty.conf",
+    "kitty/colors.conf": config / "kitty/colors.conf",
 }
 
 class Progress:
@@ -221,6 +225,23 @@ def install_hypr_snippets(record):
         if name not in text:
             hyprland.write_text(text.rstrip() + "\n\n-- ghOSt\ndofile(" + json.dumps(str(path)) + ")\n")
 
+def install_theme(record):
+    """Dark GTK apps with the ghOSt colours, font and folder icons."""
+    for version in ("3.0", "4.0"):
+        for name in ("settings.ini", "gtk.css", "tempered-colors.css"):
+            path = config / f"gtk-{version}" / name
+            snapshot(record, path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(repo / f"config/shell/gtk-{version}" / name, path)
+    if not shutil.which("gsettings"):
+        return
+    for key, value in (("gtk-theme", "adw-gtk3-dark"), ("font-name", "Adwaita Sans 10")):
+        run("gsettings", "set", "org.gnome.desktop.interface", key, value)
+    # Also sets the icon theme and dark colour scheme.
+    icons = run(sys.executable, str(repo / "scripts/install_nautilus_theme.py"), "--apply")
+    if icons.returncode:
+        print("Folder icons not installed: " + icons.stderr)
+
 def install_wallpaper(record):
     """Make the bundled image the wallpaper, unless one was already chosen in Settings."""
     wallpaper = data / "ghost/wallpaper.webp"
@@ -310,6 +331,7 @@ fresh_desktop = not has_ghost_shortcuts()
 install_hypr_snippets(record)
 if fresh_desktop:
     install_wallpaper(record)
+    install_theme(record)
 # Each install shows the Intro again on its next start.
 (state / "intro-shown").unlink(missing_ok=True)
 launcher.parent.mkdir(parents=True, exist_ok=True)

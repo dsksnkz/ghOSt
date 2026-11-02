@@ -1,0 +1,6 @@
+@import url("tempered-colors.css");
+window, dialog { background-color: @tempered_bg_color; color: @tempered_fg_color; }
+/* Let buttons, selected rows and menus supply their own foreground contrast. */
+headerbar { background: alpha(@tempered_surface_color, .88); border-bottom: 1px solid alpha(@tempered_border_color, .18); }
+button, entry { border-radius: 10px; }
+selection { background-color: @tempered_accent_color; color: @tempered_bg_color; }

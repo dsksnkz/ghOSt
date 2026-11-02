@@ -178,6 +178,10 @@ class DistributionTests(unittest.TestCase):
             for key in ("SUPER + W", "SUPER + Q", "SUPER + S", "SUPER + E", "SUPER + F", "SUPER + SHIFT + M"):
                 self.assertIn(key, keys)
             self.assertNotIn("/home/matte", keys)
+            self.assertIn("shell /usr/bin/fish", (home / ".config/kitty/kitty.conf").read_text())
+            self.assertTrue((home / ".config/kitty/colors.conf").exists())
+            self.assertIn("adw-gtk3-dark", (home / ".config/gtk-3.0/settings.ini").read_text())
+            self.assertTrue((home / ".config/gtk-4.0/tempered-colors.css").exists())
             wallpaper = home / ".local/share/ghost/wallpaper.webp"
             self.assertTrue(wallpaper.exists())
             settings = json.loads((home / ".config/ghost/settings.json").read_text())
@@ -290,6 +294,7 @@ class DistributionTests(unittest.TestCase):
             self.activate(root, home)
             self.assertNotIn("ghost-keys.lua", (hypr / "hyprland.lua").read_text())
             self.assertNotIn("ghost-settings.lua", (hypr / "hyprland.lua").read_text())
+            self.assertFalse((home / ".config/gtk-4.0/settings.ini").exists())
             self.assertEqual((hypr / "config/keybinds.lua").read_text(), keys)
             self.assertNotIn("awww-daemon", (hypr / "config/autostart.lua").read_text())
 
