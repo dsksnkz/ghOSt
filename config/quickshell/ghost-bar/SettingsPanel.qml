@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
 import Quickshell
+import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
@@ -161,6 +162,125 @@ Item {
     function preference(name, value) {
         if (!previewMode)
             Settings.preference(name, value);
+    }
+    // Disk usage browser for the Storage page. One scan, then browsing is instant.
+    property var storageResult: null
+    property var storageTrail: []
+    property bool storageScanning: false
+    property bool storageFailed: false
+    property int storageItems: 0
+    property real storageBytes: 0
+    readonly property var storageNode: storageTrail.length ? storageTrail[storageTrail.length - 1] : storageResult?.tree ?? null
+    readonly property string storageFolder: {
+        const names = storageTrail.map(node => node.n);
+        return [storageResult?.path ?? Quickshell.env("HOME")].concat(names).join("/");
+    }
+    // Mirrors PROTECTED in storage_scan.py, which also refuses them.
+    readonly property bool storageCanEmpty: {
+        const relative = storageTrail.map(node => node.n).join("/");
+        return relative !== "" && ![".config", ".local", ".local/share", ".local/state", ".ssh", ".gnupg", ".pki"].includes(relative);
+    }
+    property bool storageConfirmEmpty: false
+    property bool storageEmptying: false
+    property string storageEmptyMessage: ""
+    onStorageFolderChanged: {
+        storageConfirmEmpty = false;
+        storageEmptyMessage = "";
+    }
+    function emptyStorageFolder() {
+        if (previewMode || storageEmptying || !storageCanEmpty)
+            return;
+        storageConfirmEmpty = false;
+        storageEmptying = true;
+        storageEmpty.command = ["python3", Quickshell.shellPath("storage_scan.py"), "--empty", storageFolder];
+        storageEmpty.running = true;
+    }
+    function bytesLabel(value) {
+        if (value >= 1e9)
+            return (value / 1e9).toFixed(1) + " GB";
+        if (value >= 1e6)
+            return (value / 1e6).toFixed(0) + " MB";
+        return Math.max(1, Math.round(value / 1e3)) + " KB";
+    }
+    function storageAge() {
+        const minutes = Math.floor((Date.now() / 1000 - (storageResult?.scanned ?? 0)) / 60);
+        if (minutes < 1)
+            return "Just now";
+        if (minutes < 60)
+            return minutes + " min ago";
+        if (minutes < 1440)
+            return Math.floor(minutes / 60) + " h ago";
+        return Math.floor(minutes / 1440) + " d ago";
+    }
+    function startStorageScan() {
+        if (previewMode || storageScanning)
+            return;
+        storageFailed = false;
+        storageItems = 0;
+        storageBytes = 0;
+        storageScanning = true;
+        storageScan.running = true;
+    }
+    function readStorageLine(line) {
+        let data;
+        try {
+            data = JSON.parse(line);
+        } catch (error) {
+            return;
+        }
+        if (data.tree) {
+            // Stay in the same folder after a new scan, as far as it still exists.
+            const names = storageTrail.map(node => node.n);
+            const trail = [];
+            let node = data.tree;
+            for (const name of names) {
+                node = (node.c ?? []).find(child => child.n === name && child.d === 1);
+                if (!node)
+                    break;
+                trail.push(node);
+            }
+            storageResult = data;
+            storageTrail = trail;
+        } else if (data.items !== undefined) {
+            storageItems = data.items;
+            storageBytes = data.size;
+        }
+    }
+    Process {
+        id: storageScan
+        command: ["python3", Quickshell.shellPath("storage_scan.py")]
+        stdout: SplitParser {
+            onRead: line => settings.readStorageLine(line)
+        }
+        onExited: code => {
+            settings.storageScanning = false;
+            settings.storageFailed = code !== 0 && storageScan.wasCancelled !== true;
+            storageScan.wasCancelled = false;
+        }
+        property bool wasCancelled: false
+    }
+    Process {
+        id: storageEmpty
+        stdout: SplitParser {
+            onRead: line => {
+                const data = JSON.parse(line);
+                if (data.error)
+                    settings.storageEmptyMessage = "Not deleted: " + data.error;
+                else if (data.failed)
+                    settings.storageEmptyMessage = data.failed + " items could not be deleted";
+            }
+        }
+        onExited: {
+            settings.storageEmptying = false;
+            settings.startStorageScan();
+        }
+    }
+    Process {
+        id: storageCached
+        command: ["python3", Quickshell.shellPath("storage_scan.py"), "--cached"]
+        stdout: SplitParser {
+            onRead: line => settings.readStorageLine(line)
+        }
     }
     function gigabytes(value) {
         return typeof value === "number" ? (value / 1e9).toFixed(1) + " GB" : "Unavailable";
@@ -402,6 +522,92 @@ Item {
             height: 14
             name: "forward"
             visible: parent.actionable && parent.enabled
+            opacity: .7
+        }
+    }
+    component StorageButton: Key {
+        property bool primary: false
+        property string label: ""
+        width: Math.max(88, buttonText.implicitWidth + 32)
+        height: 34
+        radius: 8
+        selected: primary
+        color: primary ? Theme.text : "#2d2d2d"
+        hint: buttonText.text
+        Label {
+            id: buttonText
+            anchors.centerIn: parent
+            text: parent.label
+            font.pixelSize: 12
+            font.weight: Theme.mediumWeight
+            color: parent.primary ? Theme.base : settings.primaryInk
+        }
+    }
+    component StorageRow: Key {
+        objectName: "settings-storage-row"
+        property string name: ""
+        property real size: 0
+        property real share: 0
+        property bool folder: false
+        width: parent.width
+        height: 42
+        radius: 8
+        smoothing: .6
+        color: settings.controlSurface
+        activeFocusOnTab: folder
+        hint: name
+        // The filled part of the row is its share of this folder.
+        G2Surface {
+            width: Math.max(4, parent.width * parent.share)
+            height: parent.height
+            radius: 8
+            color: "#333333"
+        }
+        SvgIcon {
+            x: 14
+            y: 13
+            width: 16
+            height: 16
+            name: "folder"
+            visible: parent.folder
+        }
+        Label {
+            x: 40
+            y: 11
+            width: parent.width - 220
+            height: 20
+            text: parent.name
+            font.pixelSize: 13
+            color: settings.primaryInk
+        }
+        Label {
+            anchors.right: parent.right
+            anchors.rightMargin: 96
+            y: 11
+            height: 20
+            text: Math.round(parent.share * 100) + "%"
+            font.pixelSize: 12
+            color: settings.secondaryInk
+        }
+        Label {
+            anchors.right: parent.right
+            anchors.rightMargin: 34
+            y: 11
+            width: 60
+            height: 20
+            horizontalAlignment: Text.AlignRight
+            text: settings.bytesLabel(parent.size)
+            font.pixelSize: 12
+            color: settings.primaryInk
+        }
+        SvgIcon {
+            anchors.right: parent.right
+            anchors.rightMargin: 12
+            y: 14
+            width: 14
+            height: 14
+            name: "forward"
+            visible: parent.folder
             opacity: .7
         }
     }
@@ -1372,31 +1578,35 @@ Item {
         Column {
             width: body.width
             spacing: 24
-            Row {
-                width: parent.width
-                spacing: 16
-                Summary {
-                    icon: "storage"; name: "Used"
-                    value: settings.gigabytes(settings.details.storage?.used)
-                    detail: settings.details.storage ? "Of " + settings.gigabytes(settings.details.storage.total) : "Storage unavailable"
-                    actionable: false
-                }
-                Summary {
-                    icon: "folder"; name: "Free"
-                    value: settings.gigabytes(settings.details.storage?.free)
-                    detail: "Home filesystem"
-                    actionable: false
-                }
-            }
             // A passive measurement, not a disabled slider suggesting a setter.
             ControlGroup {
-                Label { text: "Used storage"; color: settings.secondaryInk; font.pixelSize: 12 }
+                Item {
+                    width: parent.width
+                    height: 34
+                    Label {
+                        anchors.left: parent.left
+                        anchors.baseline: parent.bottom
+                        anchors.baselineOffset: -8
+                        text: settings.gigabytes(settings.details.storage?.used) + " used"
+                        font.pixelSize: 24
+                        font.weight: Theme.demiWeight
+                        color: settings.primaryInk
+                    }
+                    Label {
+                        anchors.right: parent.right
+                        anchors.baseline: parent.bottom
+                        anchors.baselineOffset: -8
+                        text: settings.gigabytes(settings.details.storage?.free) + " free of " + settings.gigabytes(settings.details.storage?.total)
+                        font.pixelSize: 12
+                        color: settings.secondaryInk
+                    }
+                }
                 G2Surface {
                     objectName: "settings-storage-meter"
                     width: parent.width; height: 8; radius: 4; color: "#414141"
                     Accessible.role: Accessible.ProgressBar
                     Accessible.name: "Used storage"
-                    Accessible.description: settings.details.storage ? Math.round(100 * settings.details.storage.used / settings.details.storage.total) + "%" : "Unavailable"
+                    Accessible.description: settings.details.storage ? Math.round(100 * settings.details.storage.used / settings.details.storage.total) + " percent used" : "Unavailable"
                     G2Surface {
                         objectName: "settings-storage-fill"
                         width: parent.width * Math.max(0, Math.min(1, (settings.details.storage?.used ?? 0) / (settings.details.storage?.total || 1)))
@@ -1404,12 +1614,203 @@ Item {
                     }
                 }
             }
-            DeviceRow {
-                icon: "folder"
-                name: "Home folder"
-                value: "Open"
-                onClicked: if (!settings.previewMode)
-                    Quickshell.execDetached(["xdg-open", Quickshell.env("HOME")])
+            Column {
+                objectName: "settings-storage-browser"
+                width: parent.width
+                spacing: 12
+                Component.onCompleted: if (!settings.previewMode && !settings.storageResult)
+                    storageCached.running = true
+
+                // Title, and when the numbers below were measured.
+                Item {
+                    width: parent.width
+                    height: 34
+                    Label {
+                        y: 7
+                        text: "What's using space"
+                        font.pixelSize: 16
+                        font.weight: Theme.demiWeight
+                        color: settings.primaryInk
+                    }
+                    Row {
+                        anchors.right: parent.right
+                        spacing: 12
+                        visible: settings.storageResult !== null && !settings.storageScanning
+                        Label {
+                            y: 8
+                            text: settings.storageFailed ? "Scan failed" : "Scanned " + settings.storageAge().toLowerCase()
+                            font.pixelSize: 12
+                            color: settings.secondaryInk
+                        }
+                        StorageButton {
+                            objectName: "settings-storage-rescan"
+                            label: "Scan again"
+                            onClicked: settings.startStorageScan()
+                        }
+                    }
+                }
+
+                // Nothing measured yet.
+                ControlGroup {
+                    objectName: "settings-storage-start"
+                    visible: settings.storageResult === null && !settings.storageScanning
+                    Note { text: settings.storageFailed ? "Scan failed." : "Scan to see which folders take up the most space." }
+                    StorageButton {
+                        objectName: "settings-storage-scan"
+                        primary: true
+                        label: "Scan"
+                        onClicked: settings.startStorageScan()
+                    }
+                }
+
+                // Measuring.
+                ControlGroup {
+                    objectName: "settings-storage-progress"
+                    visible: settings.storageScanning
+                    Label {
+                        text: "Scanning"
+                        font.pixelSize: 13
+                        color: settings.primaryInk
+                    }
+                    Note {
+                        text: settings.bytesLabel(settings.storageBytes) + " in " + settings.storageItems.toLocaleString(Qt.locale(), "f", 0) + " items"
+                    }
+                    StorageButton {
+                        objectName: "settings-storage-cancel"
+                        label: "Stop"
+                        onClicked: {
+                            storageScan.wasCancelled = true;
+                            storageScan.running = false;
+                        }
+                    }
+                }
+
+                // The folder being viewed.
+                Column {
+                    visible: settings.storageNode !== null && !settings.storageScanning
+                    width: parent.width
+                    spacing: 12
+                    Item {
+                        width: parent.width
+                        height: 34
+                        StorageButton {
+                            id: storageBack
+                            objectName: "settings-storage-back"
+                            visible: settings.storageTrail.length > 0
+                            width: 34
+                            hint: "Back"
+                            label: ""
+                            onClicked: settings.storageTrail = settings.storageTrail.slice(0, -1)
+                            SvgIcon {
+                                anchors.centerIn: parent
+                                width: 14
+                                height: 14
+                                name: "back"
+                            }
+                        }
+                        Label {
+                            objectName: "settings-storage-folder"
+                            x: storageBack.visible ? 46 : 0
+                            y: 7
+                            width: parent.width - x - 90
+                            height: 20
+                            text: settings.storageFolder.replace(Quickshell.env("HOME"), "Home")
+                            font.pixelSize: 13
+                            color: settings.primaryInk
+                        }
+                        Label {
+                            anchors.right: parent.right
+                            y: 7
+                            height: 20
+                            text: settings.storageNode ? settings.bytesLabel(settings.storageNode.s) : ""
+                            font.pixelSize: 13
+                            font.weight: Theme.demiWeight
+                            color: settings.primaryInk
+                        }
+                    }
+
+                    // Actions on this folder, or the question before deleting.
+                    Row {
+                        visible: !settings.storageConfirmEmpty
+                        spacing: 8
+                        StorageButton {
+                            objectName: "settings-storage-open"
+                            label: "Open in Files"
+                            onClicked: if (!settings.previewMode)
+                                Quickshell.execDetached(["xdg-open", settings.storageFolder])
+                        }
+                        StorageButton {
+                            objectName: "settings-storage-empty"
+                            visible: settings.storageCanEmpty
+                            enabled: !settings.storageEmptying
+                            label: settings.storageEmptying ? "Deleting" : "Delete everything inside"
+                            onClicked: settings.storageConfirmEmpty = true
+                        }
+                    }
+                    ControlGroup {
+                        objectName: "settings-storage-confirm"
+                        visible: settings.storageConfirmEmpty
+                        Label {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            elide: Text.ElideNone
+                            text: "Delete everything inside " + settings.storageFolder.replace(Quickshell.env("HOME"), "Home") + "?"
+                            font.pixelSize: 14
+                            font.weight: Theme.demiWeight
+                            color: settings.primaryInk
+                        }
+                        Note {
+                            text: settings.bytesLabel(settings.storageNode?.s ?? 0) + " will be permanently deleted. It won't go to the trash and can't be undone."
+                        }
+                        Row {
+                            spacing: 8
+                            StorageButton {
+                                objectName: "settings-storage-confirm-cancel"
+                                label: "Cancel"
+                                onClicked: settings.storageConfirmEmpty = false
+                            }
+                            StorageButton {
+                                objectName: "settings-storage-confirm-delete"
+                                primary: true
+                                label: "Delete permanently"
+                                onClicked: settings.emptyStorageFolder()
+                            }
+                        }
+                    }
+                    Note {
+                        visible: settings.storageEmptyMessage !== ""
+                        text: settings.storageEmptyMessage
+                    }
+
+                    // Biggest first. Hidden while confirming, so only the question is on screen.
+                    Column {
+                        visible: !settings.storageConfirmEmpty
+                        width: parent.width
+                        spacing: 6
+                        Repeater {
+                            model: settings.storageNode?.c ?? []
+                            StorageRow {
+                                required property var modelData
+                                name: modelData.n
+                                size: modelData.s
+                                share: settings.storageNode.s > 0 ? modelData.s / settings.storageNode.s : 0
+                                folder: modelData.d === 1
+                                onClicked: if (folder)
+                                    settings.storageTrail = settings.storageTrail.concat([modelData])
+                            }
+                        }
+                        Note {
+                            objectName: "settings-storage-others"
+                            visible: (settings.storageNode?.m ?? 0) > 0
+                            topPadding: 6
+                            text: (settings.storageNode?.m ?? 0).toLocaleString(Qt.locale(), "f", 0) + " smaller items, " + settings.bytesLabel(settings.storageNode?.o ?? 0)
+                        }
+                        Note {
+                            visible: (settings.storageResult?.unreadable ?? 0) > 0 && settings.storageTrail.length === 0
+                            text: (settings.storageResult?.unreadable ?? 0) + " could not be read"
+                        }
+                    }
+                }
             }
         }
     }
