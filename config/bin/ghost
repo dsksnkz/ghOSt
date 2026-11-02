@@ -87,7 +87,14 @@ stop_shell() {
     return 1
 }
 
+# Only one shell runs at a time. Its wrapper goes first, or it would restart it.
+stop_macshell() {
+    pkill -f '^sh .*/macshell-start$' 2>/dev/null
+    quickshell kill -c MacShell >/dev/null 2>&1
+}
+
 restart_shell() {
+    stop_macshell
     stop_shell || return 1
     start_shell
     for _ in {1..50}; do
@@ -123,7 +130,10 @@ lock_session() {
 
 case "${1:-}" in
     shell) restart_shell ;;
-    start) start_shell ;;
+    start)
+        stop_macshell
+        start_shell
+        ;;
     stop) stop_shell ;;
     supervise) supervise ;;
     lock) lock_session ;;

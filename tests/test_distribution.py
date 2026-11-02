@@ -230,7 +230,7 @@ exit 0
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("restarted", result.stdout)
             calls = (root / "calls").read_text().splitlines()
-            self.assertEqual(calls[0], "kill -c ghost-bar")
+            self.assertEqual(calls[:2], ["kill -c MacShell", "kill -c ghost-bar"])
             self.assertIn("ipc -c ghost-bar call bar status", calls[1:])
             usage = subprocess.run([str(REPOSITORY / "config/bin/ghost"), "other"], env=environment,
                                    capture_output=True, text=True, timeout=10)
