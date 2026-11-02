@@ -27,6 +27,10 @@ def install():
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
     (backup / 'before.json').write_text(json.dumps(record, indent=2) + '\n')
+    # Keep the first snapshot, which holds the originals, and this one.
+    older = sorted(backup.parent.glob('intro-*'))
+    for stale in older[1:-1]:
+        shutil.rmtree(stale)
     print('Installed ghOSt Intro entry and icon; snapshot: ' + str(backup))
 
 

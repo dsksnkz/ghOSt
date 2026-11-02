@@ -20,7 +20,7 @@ test("images reserve space and describe themselves", () => {
 
 test("install commands match the installer", () => {
   assert.match(page, /git clone https:\/\/github\.com\/dsksnkz\/ghOSt\.git/);
-  assert.match(page, /\.\/install\.sh --activate/);
+  assert.match(page, /\.\/install\.sh/);
   assert.match(page, /\.\/install\.sh --restore/);
   assert.match(readFileSync(new URL("../scripts/install.py", import.meta.url), "utf8"), /"--restore"/);
 });

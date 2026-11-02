@@ -36,7 +36,8 @@ record_exit() {
 # lock, so it is closed for everything that could outlive this process.
 supervise() {
     exec 9>>"$shell_lock"
-    flock -n 9 || return 0
+    # A previous session's supervisor can take a few seconds to notice it ended.
+    flock -w 6 9 || return 0
     truncate -s 0 "$shell_lock"
     echo $$ >&9
     local delay=1 started status
@@ -128,7 +129,26 @@ lock_session() {
     done
 }
 
+# The wallpaper chosen in Settings, or the bundled one until there is a choice.
+apply_wallpaper() {
+    local file
+    file=$(python3 -c 'import json, sys
+try:
+    print(json.load(open(sys.argv[1])).get("wallpaper", ""))
+except (OSError, ValueError):
+    pass' "$config/ghost/settings.json" 2>/dev/null)
+    [ -f "$file" ] || file="${XDG_DATA_HOME:-$HOME/.local/share}/ghost/wallpaper.webp"
+    [ -f "$file" ] || return 1
+    awww query >/dev/null 2>&1 || setsid -f awww-daemon >/dev/null 2>&1 </dev/null
+    for _ in {1..50}; do
+        awww query >/dev/null 2>&1 && break
+        sleep 0.1
+    done
+    awww img --transition-type none "$file"
+}
+
 case "${1:-}" in
+    wallpaper) apply_wallpaper ;;
     shell) restart_shell ;;
     start)
         stop_macshell
@@ -143,6 +163,7 @@ Usage: ghost shell    Restart the ghOSt shell
        ghost start    Start the shell and keep it running
        ghost stop     Stop the shell
        ghost lock     Lock the session
+       ghost wallpaper    Apply the wallpaper
 EOF
         [ $# -eq 0 ] || exit 2
         ;;

@@ -10,6 +10,8 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
+import tempfile
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--restore", action="store_true", help="restore the last pre-install snapshot")
@@ -17,6 +19,7 @@ parser.add_argument("--no-start", action="store_true", help="install without sta
 parser.add_argument("--activate", action="store_true", help="explicitly install ghOSt and add its autostart")
 parser.add_argument("--stage-dir", type=Path, help="optional isolated staging destination")
 parser.add_argument("--no-packages", action="store_true", help="do not install missing packages")
+parser.add_argument("--progress", action="store_true", help="show a progress bar and keep details in the install log")
 parser.add_argument("--no-shell-config", action="store_true", help="keep existing bashrc, fish, fastfetch and cava configuration")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
@@ -44,9 +47,12 @@ PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship"
             "brightnessctl": "brightnessctl", "xdg-open": "xdg-utils", "wl-copy": "wl-clipboard",
             "grim": "grim", "slurp": "slurp", "magick": "imagemagick", "awww-daemon": "awww",
             "pavucontrol": "pavucontrol", "blueman-manager": "blueman",
-            "nm-connection-editor": "nm-connection-editor"}
+            "nm-connection-editor": "nm-connection-editor",
+            "hyprctl": "hyprland", "quickshell": "quickshell", "git": "git", "gcc": "base-devel",
+            "/usr/lib/xdg-desktop-portal-hyprland": "xdg-desktop-portal-hyprland",
+            "kitty": "kitty", "firefox": "firefox", "nautilus": "nautilus", "zeditor": "zed", "hyprshot": "hyprshot"}
 # Not in the official repositories, so pacman would reject its whole command over them.
-AUR_PACKAGES = {"crunchycleaner": "crunchycleaner-bin"}
+AUR_PACKAGES = {"crunchycleaner": "crunchycleaner-bin", "clipse": "clipse"}
 SHELL_CONFIG = {
     "bashrc": home / ".bashrc",
     "fish/config.fish": config / "fish/config.fish",
@@ -56,6 +62,54 @@ SHELL_CONFIG = {
     "cava/config": config / "cava/config",
 }
 
+class Progress:
+    """A single redrawn bar. Everything else goes to the install log."""
+    WIDTH = 34
+
+    def __init__(self):
+        self.enabled = args.progress
+        self.percent = 0
+        self.label = ""
+        self.log = None
+        self.screen = sys.stdout
+        if self.enabled:
+            state.mkdir(parents=True, exist_ok=True)
+            self.log = (state / "install.log").open("w", buffering=1)
+            sys.stdout = self.log
+            sys.stderr = self.log
+
+    def show(self, percent=None, label=None):
+        if not self.enabled:
+            return
+        self.percent = self.percent if percent is None else max(self.percent, min(100, int(percent)))
+        self.label = self.label if label is None else label
+        filled = self.WIDTH * self.percent // 100
+        bar = "\u2588" * filled + "\u2591" * (self.WIDTH - filled)
+        self.screen.write("\r\033[2K  " + bar + " " + str(self.percent).rjust(3) + "%  " + self.label)
+        self.screen.flush()
+
+    def finish(self, message):
+        if self.enabled:
+            self.show(100, "")
+            self.screen.write("\n\n  " + message + "\n")
+            self.screen.flush()
+
+
+def package_command(command, low, high, label):
+    """Run a package command; with the bar, its (n/m) lines drive the range low to high."""
+    if not args.progress:
+        return subprocess.run(command, check=False).returncode
+    bar.show(low, label)
+    process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, text=True, errors="replace")
+    for line in process.stdout:
+        bar.log.write(line)
+        counted = re.search(r"\((\d+)/(\d+)\)", line)
+        if counted and int(counted[2]):
+            bar.show(low + (high - low) * int(counted[1]) // int(counted[2]))
+    return process.wait()
+
+
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
 
@@ -64,6 +118,9 @@ def run(*command):
 
 def copy_profile(destination):
     """Install the complete public runtime, excluding generated local caches."""
+    # A reinstall replaces the old copy outright, so nothing removed upstream lingers.
+    if destination.exists():
+        shutil.rmtree(destination)
     shutil.copytree(
         repo / "config/quickshell/ghost-bar",
         destination,
@@ -76,26 +133,53 @@ def package_missing(requirement):
         return importlib.util.find_spec(requirement[7:]) is None
     return not (Path(requirement).exists() if requirement.startswith("/") else shutil.which(requirement))
 
+def bootstrap_aur_helper():
+    """AUR packages need a helper, and a fresh Arch install has none."""
+    if not (shutil.which("pacman") and shutil.which("git") and shutil.which("makepkg")):
+        return None
+    with tempfile.TemporaryDirectory(prefix="ghost-yay-") as directory:
+        source = Path(directory) / "yay-bin"
+        if subprocess.run(["git", "clone", "--depth", "1", "https://aur.archlinux.org/yay-bin.git", str(source)],
+                          check=False, stdout=sys.stdout, stderr=sys.stdout).returncode:
+            return None
+        build = ["makepkg", "-si", "--noconfirm", "--needed"]
+        if subprocess.run(build, cwd=source, check=False, stdin=subprocess.DEVNULL,
+                          stdout=sys.stdout, stderr=sys.stdout).returncode:
+            return None
+    return shutil.which("yay")
+
 def install_packages():
     missing = [package for requirement, package in PACKAGES.items() if package_missing(requirement)]
     aur_missing = [package for requirement, package in AUR_PACKAGES.items() if package_missing(requirement)]
     if args.no_packages:
         if missing or aur_missing:
             print("Missing packages: " + " ".join(missing + aur_missing))
-        return
+        return []
+    failed = []
     if missing:
         if shutil.which("pacman"):
-            # Interactive on purpose: sudo asks in this terminal.
-            if subprocess.run(["sudo", "pacman", "-S", "--needed", *missing], check=False).returncode:
-                print("Packages not installed: " + " ".join(missing))
+            # Interactive on purpose: sudo asks in this terminal. With the bar it was asked already.
+            quiet = ["--noconfirm", "--noprogressbar"] if args.progress else []
+            label = "Installing packages"
+            if package_command(["sudo", "pacman", "-S", "--needed", *quiet, *missing], 2, 68, label):
+                # Usually a stale package database; the supported fix is a full upgrade.
+                if not args.progress or package_command(["sudo", "pacman", "-Syu", "--needed", *quiet, *missing], 2, 68, label):
+                    print("Packages not installed: " + " ".join(missing))
+                    failed += missing
         else:
             print("Install these packages with your package manager: " + " ".join(missing))
     if aur_missing:
-        helper = shutil.which("yay") or shutil.which("paru")
+        bar.show(68, "Installing AUR packages")
+        helper = shutil.which("yay") or shutil.which("paru") or bootstrap_aur_helper()
         if not helper:
             print("Install these from the AUR: " + " ".join(aur_missing))
-        elif subprocess.run([helper, "-S", "--needed", *aur_missing], check=False).returncode:
-            print("AUR packages not installed: " + " ".join(aur_missing))
+            failed += aur_missing
+        else:
+            quiet = ["--noconfirm"] if args.progress else []
+            if package_command([helper, "-S", "--needed", *quiet, *aur_missing], 68, 80, "Installing AUR packages"):
+                print("AUR packages not installed: " + " ".join(aur_missing))
+                failed += aur_missing
+    return failed
 
 def snapshot(record, path):
     """Back up a file once, so --restore can put it back or remove it."""
@@ -134,6 +218,23 @@ def install_hypr_snippets(record):
         text = hyprland.read_text()
         if name not in text:
             hyprland.write_text(text.rstrip() + "\n\n-- ghOSt\ndofile(" + json.dumps(str(path)) + ")\n")
+
+def install_wallpaper(record):
+    """Make the bundled image the wallpaper, unless one was already chosen in Settings."""
+    wallpaper = data / "ghost/wallpaper.webp"
+    wallpaper.parent.mkdir(parents=True, exist_ok=True)
+    snapshot(record, wallpaper)
+    shutil.copy2(repo / "config/ghost/wallpaper.webp", wallpaper)
+    settings = config / "ghost/settings.json"
+    try:
+        chosen = json.loads(settings.read_text())
+    except (OSError, ValueError):
+        chosen = {}
+    if not chosen.get("wallpaper"):
+        snapshot(record, settings)
+        chosen["wallpaper"] = str(wallpaper)
+        settings.parent.mkdir(parents=True, exist_ok=True)
+        settings.write_text(json.dumps(chosen, indent=2) + "\n")
 
 if args.restore:
     if not manifest.exists():
@@ -194,12 +295,19 @@ if record is None:
     record = {"backup": str(backup), "files": entries, "keybinds_sha256": before}
     manifest.write_text(json.dumps(record, indent=2) + "\n")
 
-install_packages()
-target.mkdir(parents=True, exist_ok=True)
+bar = Progress()
+bar.show(0, "Preparing")
+failed_packages = install_packages()
+bar.show(82, "Copying ghOSt")
+target.parent.mkdir(parents=True, exist_ok=True)
 copy_profile(target)
+bar.show(88, "Applying configuration")
 if not args.no_shell_config:
     install_shell_config(record)
+fresh_desktop = not has_ghost_shortcuts()
 install_hypr_snippets(record)
+if fresh_desktop:
+    install_wallpaper(record)
 launcher.parent.mkdir(parents=True, exist_ok=True)
 launcher.write_text('#!/usr/bin/env bash\nexec ' + json.dumps(str(command)) + ' start\n')
 launcher.chmod(0o755)
@@ -213,9 +321,6 @@ if autostart.suffix == ".lua":
         text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })\n'
     if 'name = "ghost-settings"' not in text:
         text += '\n-- ghOSt Settings only.\nhl.window_rule({ name = "ghost-settings", match = { class = "org.quickshell", title = "ghOSt Settings" }, float = true, size = { 1024, 699 }, center = true, decorate = false, rounding = 0, opacity = "1 override" })\n'
-    # The Settings wallpaper page needs its daemon; a configured desktop already has its own.
-    if not has_ghost_shortcuts() and "awww-daemon" not in text:
-        text += '\n-- ghOSt wallpaper\nhl.on("hyprland.start", function()\n  hl.exec_cmd("awww-daemon")\nend)\n'
     for rule in ("ghost-intro", "ghost-lock-exit-motion"):
         if 'name = "' + rule + '"' not in text:
             text += '\n' + next(line for line in (repo / 'config/hypr/ghost-rules.lua').read_text().splitlines() if 'name = "' + rule + '"' in line) + '\n'
@@ -231,16 +336,21 @@ install_intro()
 for entry in record["files"]:
     entry["installed_sha256"] = digest(Path(entry["path"]))
 manifest.write_text(json.dumps(record, indent=2) + "\n")
+bar.show(94, "Starting ghOSt")
 if not args.no_start:
     if os.environ.get("HYPRLAND_INSTANCE_SIGNATURE"):
         run("hyprctl", "reload")
-        if shutil.which("awww-daemon") and "awww-daemon" in autostart.read_text():
-            subprocess.Popen(["awww-daemon"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        if fresh_desktop:
+            run(str(command), "wallpaper")
         result = run(str(command), "shell")
         if result.returncode:
             raise SystemExit(result.stderr or result.stdout or "Quickshell failed to start; run ./install.sh --restore")
     else:
         print("ghOSt starts with your next Hyprland session.")
 print("ghOSt installed.")
+if failed_packages:
+    bar.finish("ghOSt installed, but these packages failed: " + " ".join(failed_packages) + "\n  Log: " + str(state / "install.log"))
+else:
+    bar.finish("ghOSt installed.")
 print("Backup: " + record["backup"])
 print("Restore: ./install.sh --restore")

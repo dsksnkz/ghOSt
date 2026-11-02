@@ -43,27 +43,37 @@
 
 ## Install
 
-You need Arch Linux with Hyprland, Quickshell and Python 3.
+You need Arch Linux.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
 cd ghOSt
-./install.sh --activate
+./install.sh
 ```
 
-This installs missing packages after asking for your password, copies ghOSt into place, adds it to your Hyprland startup and starts it.
+It asks before installing, shows a progress bar, then offers to reboot. It installs everything ghOSt uses, including Hyprland, Quickshell, kitty and Firefox, and any AUR packages through `yay`, setting up `yay` if needed.
+
+To reinstall, start from a new clone. The installed copy is replaced completely and nothing is duplicated:
+
+```sh
+rm -rf ghOSt
+git clone https://github.com/dsksnkz/ghOSt.git
+cd ghOSt
+./install.sh
+```
 
 **Back up anything you've customised.** Your existing files are snapshotted and can be restored, but these are replaced:
 
 - `~/.bashrc`, the fish config, and the fastfetch and cava configs. Use `--no-shell-config` to keep yours.
-- On a stock Hyprland config, ghOSt also adds its shortcuts and the `awww` wallpaper daemon. A config that already has ghOSt shortcuts keeps them.
+- On a stock Hyprland config, ghOSt also adds all its shortcuts and sets its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
 
 ghOSt doesn't turn off another bar, so stop any you already run. Network, Bluetooth and power profile controls need their system services enabled, which the installer leaves to you.
 
 | Option | What it does |
 | --- | --- |
-| `./install.sh` | Stages the files without changing your desktop |
-| `--activate` | Installs and starts ghOSt |
+| `./install.sh` | Interactive install |
+| `--activate` | Installs and starts ghOSt without the prompts |
+| `--stage-dir DIR` | Copies the files to `DIR` without changing your desktop |
 | `--no-start` | Installs without starting it |
 | `--no-packages` | Lists missing packages instead of installing them |
 | `--no-shell-config` | Keeps your shell, fastfetch and cava configs |
@@ -77,10 +87,20 @@ Snapshots are kept in `~/.local/state/ghost/backups`. If you've edited a file si
 | --- | --- |
 | <kbd>Super</kbd> + <kbd>Space</kbd> | Launcher |
 | <kbd>Super</kbd> + <kbd>Tab</kbd> | Desktop switcher |
+| <kbd>Super</kbd> + <kbd>W</kbd> | Terminal |
+| <kbd>Super</kbd> + <kbd>S</kbd> | Firefox |
+| <kbd>Super</kbd> + <kbd>E</kbd> | Files |
+| <kbd>Super</kbd> + <kbd>Q</kbd> | Close window |
+| <kbd>Super</kbd> + <kbd>T</kbd> | Float window |
+| <kbd>Super</kbd> + <kbd>F</kbd> / <kbd>G</kbd> | AI and Music workspaces |
+| <kbd>Super</kbd> + <kbd>1</kbd>–<kbd>0</kbd> | Go to desktop; add <kbd>Shift</kbd> to move the window |
+| <kbd>Super</kbd> + <kbd>V</kbd> | Clipboard |
 | <kbd>Super</kbd> + <kbd>I</kbd> | Settings |
 | <kbd>Super</kbd> + <kbd>L</kbd> | Lock |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | Screenshot a region |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> | Exit Hyprland |
 
-More optional shortcuts are in [Hyprland setup](docs/hyprland.md).
+The full list is in [ghost-keys.lua](config/hypr/ghost-keys.lua).
 
 | Command | Action |
 | --- | --- |
@@ -88,6 +108,7 @@ More optional shortcuts are in [Hyprland setup](docs/hyprland.md).
 | `ghost start` | Start the shell and keep it running |
 | `ghost stop` | Stop the shell |
 | `ghost lock` | Lock the session |
+| `ghost wallpaper` | Apply the wallpaper |
 
 The shell restarts by itself if it exits unexpectedly, and the bar returns when a disconnected display does. Unplanned exits are logged in `~/.local/state/ghost/shell-restarts.log`. A lock screen that crashes reopens with the session still locked.
 
