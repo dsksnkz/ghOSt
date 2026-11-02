@@ -147,7 +147,22 @@ except (OSError, ValueError):
     awww img --transition-type none "$file"
 }
 
+# Opens the Intro the first time a session starts after installing.
+first_intro() {
+    [ -e "$state/intro-shown" ] && return 0
+    for _ in {1..150}; do
+        if quickshell ipc -c ghost-bar call bar intro >/dev/null 2>&1; then
+            mkdir -p "$state"
+            touch "$state/intro-shown"
+            return 0
+        fi
+        sleep 0.2
+    done
+    return 1
+}
+
 case "${1:-}" in
+    intro) first_intro ;;
     wallpaper) apply_wallpaper ;;
     shell) restart_shell ;;
     start)

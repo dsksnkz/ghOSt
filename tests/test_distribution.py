@@ -181,6 +181,20 @@ class DistributionTests(unittest.TestCase):
             self.assertFalse(wallpaper.exists())
             self.assertFalse((home / ".config/ghost/settings.json").exists())
 
+    def test_intro_opens_once_until_the_next_install(self):
+        with tempfile.TemporaryDirectory(prefix="ghost-intro-test-") as directory:
+            root = Path(directory)
+            (root / "run").mkdir()
+            fake = root / "quickshell"
+            fake.write_text('#!/bin/bash\necho "$*" >> "%s/calls"\n' % root)
+            fake.chmod(0o755)
+            environment = dict(os.environ, PATH=f"{root}:/usr/bin:/bin", XDG_RUNTIME_DIR=str(root / "run"),
+                               XDG_STATE_HOME=str(root / "state"))
+            for _ in range(2):
+                subprocess.run([str(REPOSITORY / "config/bin/ghost"), "intro"], env=environment, check=True, timeout=10)
+            self.assertEqual((root / "calls").read_text().splitlines(), ["ipc -c ghost-bar call bar intro"])
+            self.assertIn('" intro"', (REPOSITORY / "config/hypr/ghost-keys.lua").read_text())
+
     def test_a_chosen_wallpaper_survives_install(self):
         with tempfile.TemporaryDirectory(prefix="ghost-chosen-test-") as directory:
             root = Path(directory)

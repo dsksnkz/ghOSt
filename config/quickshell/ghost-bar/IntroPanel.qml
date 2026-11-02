@@ -94,8 +94,67 @@ G2Surface {
                     text: intro.selected?.summary || "Try a different word."; font.pixelSize: 14; color: "#cccccc"
                 }
                 Label {
+                    visible: text !== ""
                     width: parent.width; wrapMode: Text.WordWrap; elide: Text.ElideNone
                     text: intro.selected?.body || ""; font.pixelSize: 13; lineHeight: 1.4; color: "#bbbbbb"
+                }
+                Column {
+                    objectName: "intro-shortcuts"
+                    visible: !!intro.selected?.shortcuts
+                    width: parent.width
+                    spacing: 22
+                    Repeater {
+                        model: intro.selected?.shortcuts ?? []
+                        Column {
+                            required property var modelData
+                            width: parent.width
+                            spacing: 8
+                            Label {
+                                text: modelData.group
+                                font.pixelSize: 12
+                                font.weight: Theme.demiWeight
+                                color: "#aaaaaa"
+                            }
+                            Repeater {
+                                model: modelData.items
+                                Item {
+                                    required property var modelData
+                                    width: parent.width
+                                    height: 28
+                                    Label {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - keyRow.width - 12
+                                        text: modelData[0]
+                                        font.pixelSize: 13
+                                        color: "#dddddd"
+                                    }
+                                    Row {
+                                        id: keyRow
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 4
+                                        Repeater {
+                                            model: modelData[1].split(" + ")
+                                            G2Surface {
+                                                required property var modelData
+                                                width: Math.max(26, keyLabel.implicitWidth + 14)
+                                                height: 24
+                                                radius: 6
+                                                color: "#2d2d2d"
+                                                Label {
+                                                    id: keyLabel
+                                                    anchors.centerIn: parent
+                                                    text: parent.modelData
+                                                    font.pixelSize: 11
+                                                    color: "#f2f2f2"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 Key {
                     objectName: "intro-open-action"

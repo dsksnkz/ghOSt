@@ -100,7 +100,7 @@ Snapshots are kept in `~/.local/state/ghost/backups`. If you've edited a file si
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | Screenshot a region |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> | Exit Hyprland |
 
-The full list is in [ghost-keys.lua](config/hypr/ghost-keys.lua).
+The full list is in the Intro, which opens the first time ghOSt starts, and in [ghost-keys.lua](config/hypr/ghost-keys.lua).
 
 | Command | Action |
 | --- | --- |

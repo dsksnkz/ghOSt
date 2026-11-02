@@ -308,6 +308,8 @@ fresh_desktop = not has_ghost_shortcuts()
 install_hypr_snippets(record)
 if fresh_desktop:
     install_wallpaper(record)
+# Each install shows the Intro again on its next start.
+(state / "intro-shown").unlink(missing_ok=True)
 launcher.parent.mkdir(parents=True, exist_ok=True)
 launcher.write_text('#!/usr/bin/env bash\nexec ' + json.dumps(str(command)) + ' start\n')
 launcher.chmod(0o755)

@@ -8,11 +8,13 @@ function load(name) {
   return context;
 }
 const intro = load('IntroTopics');
-assert.equal(intro.search('').length, 7);
+assert.equal(intro.search('').length, 8);
+assert.equal(intro.search('keybinds')[0].id, 'shortcuts');
+assert.equal(intro.search('close window')[0].id, 'shortcuts');
 assert.equal(intro.search('ethernet')[0].id, 'connections');
 assert.equal(intro.search('microphone')[0].id, 'sound');
 assert.equal(intro.search('zzzz missing').length, 0);
-assert.equal(intro.topics.filter(t => t.recommended).length, 3);
+assert.equal(intro.topics.filter(t => t.recommended).length, 4);
 const edge = load('EdgeVolume');
 for (const screen of [600, 768, 1080, 1440, 2160]) {
   const {height, top} = edge.bounds(screen);

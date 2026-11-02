@@ -16,7 +16,7 @@ ShellRoot {
             visible: true
             function test_search_and_action() {
                 wait(150);
-                compare(intro.results.length, 7);
+                compare(intro.results.length, 8);
                 compare(intro.selected.id, "start");
                 const search = findChild(intro, "intro-search");
                 mouseClick(search, 30, 20);
