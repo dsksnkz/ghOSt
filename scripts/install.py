@@ -44,7 +44,7 @@ PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship"
             "/usr/share/fonts/Adwaita/AdwaitaSans-Regular.ttf": "adwaita-fonts",
             "python:gi": "python-gobject", "wpctl": "wireplumber", "nmcli": "networkmanager",
             "bluetoothctl": "bluez-utils", "upower": "upower", "powerprofilesctl": "power-profiles-daemon",
-            "brightnessctl": "brightnessctl", "xdg-open": "xdg-utils", "wl-copy": "wl-clipboard",
+            "brightnessctl": "brightnessctl", "ddcutil": "ddcutil", "xdg-open": "xdg-utils", "wl-copy": "wl-clipboard",
             "grim": "grim", "slurp": "slurp", "magick": "imagemagick", "awww-daemon": "awww",
             "pavucontrol": "pavucontrol", "blueman-manager": "blueman",
             "nm-connection-editor": "nm-connection-editor",

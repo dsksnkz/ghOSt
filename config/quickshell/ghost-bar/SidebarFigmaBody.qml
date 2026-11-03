@@ -17,6 +17,7 @@ Item {
     readonly property bool notificationsAvailable: Notifications.ready
     readonly property int notificationCount: Notifications.count
     property var brightnessPercent: null
+    property var pendingBrightness: null
     property var entranceOrder: [0, 1, 2, 3, 4, 5]
     property real entranceTime: 900
     function beginEntrance() {
@@ -50,8 +51,21 @@ Item {
     function refresh() {
         if (previewMode || !opened)
             return;
-        if (screen?.name?.startsWith("eDP-") && !brightnessQuery.running)
+        if (screen?.name && !brightnessQuery.running && !brightnessWrite.running)
             brightnessQuery.running = true;
+    }
+    // A monitor takes a moment per command, so a drag only sends its latest value.
+    function setBrightness(percent) {
+        brightnessPercent = percent;
+        pendingBrightness = percent;
+        flushBrightness();
+    }
+    function flushBrightness() {
+        if (pendingBrightness === null || brightnessWrite.running)
+            return;
+        brightnessWrite.command = ["python3", Quickshell.shellPath("brightness.py"), "set", screen.name, String(pendingBrightness)];
+        pendingBrightness = null;
+        brightnessWrite.running = true;
     }
     onOpenedChanged: {
         if (opened)
@@ -67,13 +81,20 @@ Item {
     }
     Process {
         id: brightnessQuery
-        command: ["brightnessctl", "-m"]
+        command: ["python3", Quickshell.shellPath("brightness.py"), "get", sidebar.screen?.name ?? ""]
         stdout: StdioCollector {
             onStreamFinished: {
-                const value = Number(text.trim().split(",")[3]?.replace("%", ""));
-                sidebar.brightnessPercent = isFinite(value) ? value : null;
+                const value = parseInt(text.trim());
+                // A monitor can be busy for a moment; keep the last known value.
+                if (isFinite(value))
+                    sidebar.brightnessPercent = value;
             }
         }
+    }
+    Process {
+        id: brightnessWrite
+        onRunningChanged: if (!running)
+            Qt.callLater(sidebar.flushBrightness)
     }
     Timer {
         objectName: "sidebar-brightness-refresh"
@@ -610,10 +631,10 @@ Item {
             from: 0
             to: 100
             value: sidebar.previewMode ? 75 : sidebar.brightnessPercent ?? 0
-            enabled: sidebar.previewMode || (!!sidebar.screen?.name?.startsWith("eDP-") && sidebar.brightnessPercent !== null)
+            enabled: sidebar.previewMode || sidebar.brightnessPercent !== null
             opacity: sidebar.itemProgress(4) * (enabled ? 1 : .4)
             onMoved: if (!sidebar.previewMode)
-                Quickshell.execDetached(["brightnessctl", "set", Math.round(value) + "%"])
+                sidebar.setBrightness(Math.round(value))
             Accessible.name: "Display brightness"
             background: G2Surface {
                 x: brightness.leftPadding
