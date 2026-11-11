@@ -43,15 +43,13 @@
 
 ## Install
 
-You need Arch Linux.
+ghOSt only works for Arch linux.
 
 ```sh
 git clone https://github.com/dsksnkz/ghOSt.git
 cd ghOSt
 ./install.sh
 ```
-
-It asks before installing, shows a progress bar, then offers to reboot. It installs everything ghOSt uses, including Hyprland, Quickshell, kitty and Firefox, and any AUR packages through `yay`, setting up `yay` if needed.
 
 To reinstall, start from a new clone. The installed copy is replaced completely and nothing is duplicated:
 
@@ -66,8 +64,6 @@ cd ghOSt
 
 - `~/.bashrc`, and the fish, kitty, fastfetch and cava configs. Use `--no-shell-config` to keep yours.
 - On a stock Hyprland config, ghOSt also adds its look, GTK theme, all its shortcuts and its default wallpaper. A config that already has ghOSt shortcuts keeps them, and a wallpaper chosen in Settings is kept.
-
-ghOSt doesn't turn off another bar, so stop any you already run. Network, Bluetooth and power profile controls need their system services enabled, which the installer leaves to you.
 
 | Option | What it does |
 | --- | --- |
