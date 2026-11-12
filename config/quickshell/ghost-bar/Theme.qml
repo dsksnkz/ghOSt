@@ -3,6 +3,13 @@ import QtQuick
 
 QtObject {
     property bool reducedMotion: false
+    // The Scale chosen in Settings; it multiplies every shell surface.
+    property real shellScale: 1
+    // Surfaces keep the same share of any display: 1 on a 1920 × 1080 output.
+    function scaleFor(screen) {
+        const width = screen?.width || 1920, height = screen?.height || 1080;
+        return Math.min(width / 1920, height / 1080) * shellScale;
+    }
     readonly property real outerRadius: 7
     // Compact height and uniformly scale contents; preserve the frame's width.
     readonly property real railHeight: 35
@@ -38,7 +45,7 @@ QtObject {
     readonly property int panel: 220
 
     function calendarWidth(screenWidth, screenHeight) {
-        const desired = screenWidth * calendarPlaneWidth / 1920 * calendarScale;
+        const desired = calendarPlaneWidth * scaleFor({width: screenWidth, height: screenHeight}) * calendarScale;
         const heightLimit = Math.max(1, screenHeight - 100) * calendarPlaneWidth / calendarPlaneHeight;
         return Math.floor(Math.min(desired, screenWidth - 32, heightLimit));
     }

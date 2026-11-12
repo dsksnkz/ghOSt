@@ -161,6 +161,74 @@ first_intro() {
     return 1
 }
 
+# Reads one value recorded by the installer.
+manifest_value() {
+    python3 -c 'import json, sys
+try:
+    print(json.load(open(sys.argv[1])).get(sys.argv[2]) or "")
+except (OSError, ValueError):
+    pass' "$state/install.json" "$1" 2>/dev/null
+}
+
+# Checks GitHub for a newer ghOSt and reinstalls it after asking.
+update_ghost() {
+    local source installed latest missing answer
+    source=$(manifest_value source)
+    if [ -z "$source" ] || ! git -C "$source" rev-parse --git-dir >/dev/null 2>&1; then
+        source="${XDG_DATA_HOME:-$HOME/.local/share}/ghost/source"
+        if ! git -C "$source" rev-parse --git-dir >/dev/null 2>&1; then
+            echo "Downloading ghOSt to $source"
+            mkdir -p "$(dirname "$source")"
+            git clone --quiet https://github.com/dsksnkz/ghOSt.git "$source" || {
+                echo "Could not download ghOSt. Check the connection and try again." >&2
+                return 1
+            }
+        fi
+    fi
+    echo "Checking for updates"
+    if ! git -C "$source" fetch --quiet 2>/dev/null; then
+        echo "Could not reach GitHub. Check the connection and try again." >&2
+        return 1
+    fi
+    if ! latest=$(git -C "$source" rev-parse --verify --quiet '@{upstream}'); then
+        echo "$source does not follow a GitHub branch." >&2
+        return 1
+    fi
+    installed=$(manifest_value commit)
+    if [ "$installed" = "$latest" ]; then
+        echo "ghOSt is up to date ($(git -C "$source" log -1 --format='%h %cs' "$latest"))."
+        return 0
+    fi
+    echo
+    if [ -n "$installed" ] && git -C "$source" merge-base --is-ancestor "$installed" "$latest" 2>/dev/null; then
+        echo "$(git -C "$source" rev-list --count "$installed..$latest") new changes:"
+        git -C "$source" log --format='  %s' "$installed..$latest" | head -n 12
+    else
+        echo "Latest changes:"
+        git -C "$source" log --format='  %s' -n 5 "$latest"
+    fi
+    echo
+    read -r -p "Update ghOSt? [y/N] " answer
+    case "$answer" in [yY]*) ;; *) echo "Nothing was changed."; return 0 ;; esac
+    if [ "$(git -C "$source" rev-parse HEAD)" != "$latest" ]; then
+        if [ -n "$(git -C "$source" status --porcelain --untracked-files=no)" ]; then
+            echo "$source has local changes. Commit or stash them, then run ghost update again." >&2
+            return 1
+        fi
+        if ! git -C "$source" merge --quiet --ff-only '@{upstream}'; then
+            echo "$source has commits that are not on GitHub, so it cannot be updated automatically." >&2
+            return 1
+        fi
+    fi
+    # New packages need sudo; ask before the progress bar takes over the terminal.
+    missing=$(python3 "$source/scripts/install.py" --list-missing)
+    if [ -n "$missing" ]; then
+        echo "New packages: $missing"
+        sudo -v || return 1
+    fi
+    python3 "$source/scripts/install.py" --activate --update --progress
+}
+
 case "${1:-}" in
     intro) first_intro ;;
     wallpaper) apply_wallpaper ;;
@@ -172,12 +240,14 @@ case "${1:-}" in
     stop) stop_shell ;;
     supervise) supervise ;;
     lock) lock_session ;;
+    update) update_ghost ;;
     *)
         cat >&2 <<'EOF'
 Usage: ghost shell    Restart the ghOSt shell
        ghost start    Start the shell and keep it running
        ghost stop     Stop the shell
        ghost lock     Lock the session
+       ghost update   Check for updates and install them
        ghost wallpaper    Apply the wallpaper
 EOF
         [ $# -eq 0 ] || exit 2

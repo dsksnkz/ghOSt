@@ -378,7 +378,7 @@ Item {
                 Label {
                     x: 39
                     y: 9
-                    width: 34
+                    width: 90
                     height: 18
                     text: "Wlan"
                     color: "#000000"

@@ -209,7 +209,7 @@ ShellRoot {
         function toggle(name: string): void {
             const screen = root.connectedScreens[0];
             if (screen)
-                Desk.toggle(name, screen.name, screen.width - 420);
+                Desk.toggle(name, screen.name, screen.width - 420 * Theme.scaleFor(screen));
         }
         function close(): void {
             Desk.close();

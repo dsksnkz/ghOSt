@@ -50,6 +50,7 @@ Singleton {
             state = result.state;
             error = "";
             Theme.reducedMotion = !!state.preferences.reducedMotion;
+            Theme.shellScale = state.preferences.shellScale || 1;
         } catch (_) {
             error = "Could not read Settings";
         }

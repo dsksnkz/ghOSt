@@ -35,10 +35,11 @@ PanelWindow {
         });
     }
     Component.onCompleted: syncPanel()
-    margins.top: Motion.topMargin(page, reveal, implicitHeight)
+    readonly property real factor: Theme.scaleFor(screen)
+    margins.top: Math.round(Motion.topMargin(page, reveal, implicitHeight) * factor)
     margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - implicitWidth - 6, Desk.panelX)))
-    implicitWidth: page === "calendar" ? Math.floor(Math.min(screen.width * 733 / 1920, (screen.height - 100) * 1200 / 505)) : Math.min(page === "launcher" ? 560 : page === "media" ? 420 : 392, screen.width - 12)
-    implicitHeight: content.implicitHeight + Motion.windowLead(page)
+    implicitWidth: Math.round(Math.min(page === "launcher" ? 560 : page === "media" ? 420 : 392, (screen.width - 12) / factor) * factor)
+    implicitHeight: Math.ceil((content.implicitHeight + Motion.windowLead(page)) * factor)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
     // Sliding popups emerge beneath the rail; other popups keep their layer.
@@ -80,13 +81,16 @@ PanelWindow {
         id: revealGate
         target: panelWindow.opened
     }
-    PanelContent {
-        id: content
+    Scaled {
+        factor: panelWindow.factor
+        PanelContent {
+            id: content
 
-        y: Motion.windowLead(panelWindow.page)
-        width: parent.width
-        height: implicitHeight
-        popup: panelWindow
+            y: Motion.windowLead(panelWindow.page)
+            width: parent.width
+            height: implicitHeight
+            popup: panelWindow
+        }
     }
 
     Behavior on reveal {

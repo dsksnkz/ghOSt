@@ -375,5 +375,83 @@ exit 0
             self.assertIn("ghost shell", usage.stderr)
 
 
+class UpdateTests(unittest.TestCase):
+    """ghost update against a local stand-in for GitHub; the installer is a stub."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory(prefix="ghost-update-test-")
+        root = Path(self.directory.name)
+        self.home = root / "home"
+        self.origin = root / "origin.git"
+        self.source = root / "source"
+        git = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+        self.env = {**os.environ, **git, "HOME": str(self.home), "XDG_STATE_HOME": str(self.home / ".local/state"),
+                    "XDG_DATA_HOME": str(self.home / ".local/share"), "XDG_RUNTIME_DIR": str(root)}
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(self.origin)], check=True)
+        subprocess.run(["git", "clone", "-q", str(self.origin), str(self.source)], check=True, env=self.env, capture_output=True)
+        (self.source / "scripts").mkdir()
+        # Records how it was called instead of installing anything.
+        (self.source / "scripts/install.py").write_text(
+            "import sys, pathlib\n"
+            "if '--list-missing' in sys.argv: raise SystemExit(0)\n"
+            "pathlib.Path(sys.argv[0]).with_name('ran').write_text(' '.join(sys.argv[1:]))\n")
+        self.commit("Ship one")
+        self.installed = self.head()
+        state = self.home / ".local/state/ghost"
+        state.mkdir(parents=True)
+        (state / "install.json").write_text(json.dumps({"source": str(self.source), "commit": self.installed}))
+
+    def tearDown(self):
+        self.directory.cleanup()
+
+    def commit(self, message):
+        (self.source / "change").write_text(message)
+        subprocess.run(["git", "-C", str(self.source), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(self.source), "commit", "-qm", message], check=True, env=self.env)
+        subprocess.run(["git", "-C", str(self.source), "push", "-q", "origin", "HEAD:main"], check=True, env=self.env)
+
+    def head(self):
+        return subprocess.run(["git", "-C", str(self.source), "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
+
+    def update(self, answer):
+        return subprocess.run([str(REPOSITORY / "config/bin/ghost"), "update"], input=answer, env=self.env,
+                              capture_output=True, text=True)
+
+    def test_up_to_date_changes_nothing(self):
+        result = self.update("")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("ghOSt is up to date", result.stdout)
+        self.assertFalse((self.source / "scripts/ran").exists())
+
+    def test_lists_new_changes_and_declining_changes_nothing(self):
+        subprocess.run(["git", "-C", str(self.source), "reset", "-q", "--hard", self.installed], check=True)
+        other = Path(self.directory.name) / "other"
+        subprocess.run(["git", "clone", "-q", str(self.origin), str(other)], check=True, env=self.env)
+        (other / "new").write_text("x")
+        subprocess.run(["git", "-C", str(other), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(other), "commit", "-qm", "Add a feature"], check=True, env=self.env)
+        subprocess.run(["git", "-C", str(other), "push", "-q"], check=True, env=self.env)
+        result = self.update("n\n")
+        self.assertIn("1 new changes:", result.stdout)
+        self.assertIn("Add a feature", result.stdout)
+        self.assertIn("Nothing was changed.", result.stdout)
+        self.assertEqual(self.head(), self.installed)
+        self.assertFalse((self.source / "scripts/ran").exists())
+        result = self.update("y\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotEqual(self.head(), self.installed)
+        self.assertEqual((self.source / "scripts/ran").read_text(), "--activate --update --progress")
+
+    def test_local_edits_block_the_update(self):
+        subprocess.run(["git", "-C", str(self.source), "reset", "-q", "--hard", self.installed], check=True)
+        self.commit("Remote change")
+        subprocess.run(["git", "-C", str(self.source), "reset", "-q", "--hard", self.installed], check=True)
+        (self.source / "change").write_text("edited")
+        result = self.update("y\n")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("has local changes", result.stderr)
+        self.assertEqual((self.source / "change").read_text(), "edited")
+
+
 if __name__ == "__main__":
     unittest.main()

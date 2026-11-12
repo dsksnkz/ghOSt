@@ -20,9 +20,11 @@ Item {
     readonly property real designScale: width / 1920
     readonly property real planeHeight: designScale > 0 ? height / designScale : 1080
     // Cards are laid out at full size and scaled, so they expand without resampling.
-    readonly property real centreScale: 592 / 1920
-    readonly property real sideScale: 423 / 1920
-    readonly property real magicScale: 293 / 1920
+    // The shell Scale sizes the resting cards; a chosen card still opens to full screen.
+    readonly property real cardScale: Math.min(Theme.shellScale, 1.5)
+    readonly property real centreScale: 592 / 1920 * cardScale
+    readonly property real sideScale: 423 / 1920 * cardScale
+    readonly property real magicScale: 293 / 1920 * cardScale
     readonly property var magic: [
         {key: "special:ai", special: "ai", name: "AI", x: 766},
         {key: "special:music", special: "music", name: "Music", x: 1136}
@@ -267,7 +269,7 @@ Item {
                 objectName: "switcher-card-" + modelData
                 width: 1920
                 height: plane.height
-                x: (offset < 0 ? -654 : 654) * Math.min(1.5, distance)
+                x: (offset < 0 ? -654 : 654) * scene.cardScale * Math.min(1.5, distance)
                 z: chosen ? 10 : 2 - distance
                 visible: distance < 1.5
                 opacity: (chosen ? 1 : Math.min(1, (1.5 - distance) / .5)) * scene.reveal * (chosen || scene.handedOver ? 1 : 1 - scene.expansion)
@@ -310,11 +312,11 @@ Item {
             objectName: "switcher-magic-heading"
             visible: scene.shown
             width: 1920
-            y: plane.height - 305
+            y: plane.height - 305 * scene.cardScale
             horizontalAlignment: Text.AlignHCenter
             text: "Magic Workspaces"
             font.family: Theme.font
-            font.pixelSize: 20
+            font.pixelSize: 20 * scene.cardScale
             color: "#ffffff"
             opacity: scene.reveal * (1 - scene.expansion)
         }
@@ -326,10 +328,10 @@ Item {
                 required property int index
                 readonly property bool selected: scene.magicIndex === index
                 objectName: "switcher-magic-" + modelData.special
-                x: modelData.x - 146.5
-                y: plane.height - 252
-                width: 293
-                height: 293 * plane.height / 1920
+                x: 960 + (modelData.x - 960 - 146.5) * scene.cardScale
+                y: plane.height - 252 * scene.cardScale
+                width: 293 * scene.cardScale
+                height: width * plane.height / 1920
                 opacity: scene.reveal * (1 - scene.expansion)
                 Item {
                     width: 1920
@@ -353,11 +355,11 @@ Item {
                 }
                 Text {
                     width: parent.width
-                    y: parent.height + 12
+                    y: parent.height + 12 * scene.cardScale
                     horizontalAlignment: Text.AlignHCenter
                     text: magicCard.modelData.name
                     font.family: Theme.font
-                    font.pixelSize: 20
+                    font.pixelSize: 20 * scene.cardScale
                     color: "#ffffff"
                 }
                 MouseArea {

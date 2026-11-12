@@ -21,6 +21,8 @@ parser.add_argument("--stage-dir", type=Path, help="optional isolated staging de
 parser.add_argument("--no-packages", action="store_true", help="do not install missing packages")
 parser.add_argument("--progress", action="store_true", help="show a progress bar and keep details in the install log")
 parser.add_argument("--no-shell-config", action="store_true", help="keep existing bashrc, fish, fastfetch and cava configuration")
+parser.add_argument("--update", action="store_true", help="reinstall for ghost update, without showing the Intro again")
+parser.add_argument("--list-missing", action="store_true", help="print the packages this install would add, then exit")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
 home = Path.home()
@@ -278,6 +280,10 @@ if args.restore:
     print("Restored the previous bar and autostart. ghOSt source and snapshots are retained.")
     raise SystemExit(0)
 
+if args.list_missing:
+    print(" ".join(package for requirement, package in {**PACKAGES, **AUR_PACKAGES}.items() if package_missing(requirement)))
+    raise SystemExit(0)
+
 if not args.activate:
     staged = args.stage_dir or data / "ghost/staged/ghost-bar"
     staged = staged.expanduser().resolve()
@@ -332,8 +338,9 @@ install_hypr_snippets(record)
 if fresh_desktop:
     install_wallpaper(record)
     install_theme(record)
-# Each install shows the Intro again on its next start.
-(state / "intro-shown").unlink(missing_ok=True)
+# Each install shows the Intro again on its next start; an update does not.
+if not args.update:
+    (state / "intro-shown").unlink(missing_ok=True)
 launcher.parent.mkdir(parents=True, exist_ok=True)
 launcher.write_text('#!/usr/bin/env bash\nexec ' + json.dumps(str(command)) + ' start\n')
 launcher.chmod(0o755)
@@ -346,7 +353,12 @@ if autostart.suffix == ".lua":
     if "-- ghOSt motion" not in text:
         text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })\n'
     if 'name = "ghost-settings"' not in text:
-        text += '\n-- ghOSt Settings only.\nhl.window_rule({ name = "ghost-settings", match = { class = "org.quickshell", title = "ghOSt Settings" }, float = true, size = { 1024, 699 }, center = true, decorate = false, rounding = 0, opacity = "1 override" })\n'
+        text += '\n-- ghOSt Settings only.\nhl.window_rule({ name = "ghost-settings", match = { class = "org.quickshell", title = "ghOSt Settings" }, float = true, center = true, decorate = false, rounding = 0, opacity = "1 override" })\n'
+    # Settings and the Intro size themselves to the display, so older fixed sizes go.
+    text = text.replace('title = "ghOSt Settings" }, float = true, size = { 1024, 699 }, center = true',
+                        'title = "ghOSt Settings" }, float = true, center = true')
+    text = text.replace('title = "ghOSt Intro" }, float = true, size = { 860, 620 }, center = true',
+                        'title = "ghOSt Intro" }, float = true, center = true')
     for rule in ("ghost-intro", "ghost-lock-exit-motion"):
         if 'name = "' + rule + '"' not in text:
             text += '\n' + next(line for line in (repo / 'config/hypr/ghost-rules.lua').read_text().splitlines() if 'name = "' + rule + '"' in line) + '\n'
@@ -361,6 +373,10 @@ from install_intro import install as install_intro
 install_intro()
 for entry in record["files"]:
     entry["installed_sha256"] = digest(Path(entry["path"]))
+# ghost update checks this source and commit for newer versions.
+record["source"] = str(repo)
+revision = run("git", "-C", str(repo), "rev-parse", "HEAD") if shutil.which("git") else None
+record["commit"] = revision.stdout.strip() if revision and revision.returncode == 0 else None
 manifest.write_text(json.dumps(record, indent=2) + "\n")
 bar.show(94, "Starting ghOSt")
 if not args.no_start:

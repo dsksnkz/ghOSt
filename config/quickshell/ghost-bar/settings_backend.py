@@ -24,7 +24,10 @@ def valid_rail_layout(value):
                     and item['zone'] in ('left', 'center', 'right', 'hidden') for item in value)
             and len({item['id'] for item in value}) == len(RAIL_IDS))
 
-DEFAULTS = {'reducedMotion': False, 'usageTracking': False,
+# Shell surfaces and the Settings window, as a multiple of their monitor-proportional size.
+SCALES = {'shellScale': (0.75, 1.5), 'settingsZoom': (0.75, 1.5)}
+
+DEFAULTS = {'reducedMotion': False, 'usageTracking': False, 'shellScale': 1.0, 'settingsZoom': 1.0,
     'railLayout': None,
     'widgets': {
     'network': True, 'bluetooth': True, 'volume': True,
@@ -62,6 +65,10 @@ def preferences():
     for key in ('reducedMotion', 'usageTracking'):
         if type(data.get(key)) is bool:
             result[key] = data[key]
+    for key, (low, high) in SCALES.items():
+        value = data.get(key)
+        if type(value) in (int, float) and low <= value <= high:
+            result[key] = round(float(value), 2)
     for key in result['widgets']:
         if isinstance(data.get('widgets'),dict) and type(data['widgets'].get(key)) is bool:
             result['widgets'][key] = data['widgets'][key]
@@ -85,6 +92,15 @@ def setting(key, value):
         if layout is not None and not valid_rail_layout(layout):
             raise ValueError('Invalid top bar layout')
         data['railLayout'] = layout
+    elif key in SCALES:
+        try:
+            number = round(float(value), 2)
+        except ValueError:
+            raise ValueError('Expected a number') from None
+        low, high = SCALES[key]
+        if not low <= number <= high:
+            raise ValueError(f'Scale must be between {round(low * 100)}% and {round(high * 100)}%')
+        data[key] = number
     elif key in ('reducedMotion', 'usageTracking') or (key.startswith('widgets.') and key[8:] in DEFAULTS['widgets']):
         if value not in ('true', 'false'):
             raise ValueError('Expected true or false')

@@ -42,7 +42,7 @@ PanelWindow {
         id: revealGate
         target: window.opened
     }
-    readonly property real designScale: screen.width / 1920
+    readonly property real designScale: Theme.scaleFor(screen)
     anchors {
         top: true
         left: true
@@ -118,7 +118,7 @@ PanelWindow {
                 else if (page === "settings")
                     Desk.openSettings(screen.name);
                 else if (page === "session")
-                    Desk.toggle("session", screen.name, Math.max(6, screen.width - 410), screen.width - 36);
+                    Desk.toggle("session", screen.name, Math.max(6, screen.width - 410 * window.designScale), screen.width - 36 * window.designScale);
             }
         }
     }

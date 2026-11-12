@@ -69,6 +69,20 @@ class Settings(unittest.TestCase):
         self.assertFalse(backend.preferences()['widgets']['network'])
         self.assertTrue(backend.preferences()['reducedMotion'])
         self.assertEqual(backend.paths()[0].stat().st_mode&0o777,0o600)
+    def test_scales_default_to_one_and_persist_within_range(self):
+        self.assertEqual(backend.preferences()['shellScale'],1.0)
+        self.assertEqual(backend.preferences()['settingsZoom'],1.0)
+        backend.setting('shellScale','1.25')
+        backend.setting('settingsZoom','0.80')
+        self.assertEqual(backend.preferences()['shellScale'],1.25)
+        self.assertEqual(backend.preferences()['settingsZoom'],0.8)
+        for value in ('0.5','2','big','nan'):
+            with self.assertRaises(ValueError):backend.setting('shellScale',value)
+        self.assertEqual(backend.preferences()['shellScale'],1.25)
+    def test_out_of_range_saved_scale_falls_back(self):
+        for value in (3,'1.2',True,None):
+            backend.save(backend.paths()[0],{'shellScale':value})
+            self.assertEqual(backend.preferences()['shellScale'],1.0)
     def test_unknown_or_wrong_typed_setting_rejected(self):
         for key,value in [('widgets.missing','true'),('wallpaper','true'),('usageTracking','yes')]:
             with self.assertRaises(ValueError):backend.setting(key,value)

@@ -17,7 +17,7 @@ PanelWindow {
         id: revealGate
         target: sidebar.opened
     }
-    readonly property real screenScale: screen.width / 1920
+    readonly property real screenScale: Theme.scaleFor(screen)
     // Center vertically on the display while preserving uniform enlargement.
     readonly property real designScale: Math.min(screenScale * 1.15, (screen.width - 32) / 356, Math.max(1, screen.height - 28) / 794)
 

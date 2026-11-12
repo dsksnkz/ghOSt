@@ -105,6 +105,7 @@ The full list is in the Intro, which opens the first time ghOSt starts, and in [
 | `ghost stop` | Stop the shell |
 | `ghost lock` | Lock the session |
 | `ghost wallpaper` | Apply the wallpaper |
+| `ghost update` | Check for updates and install them |
 
 The shell restarts by itself if it exits unexpectedly, and the bar returns when a disconnected display does. Unplanned exits are logged in `~/.local/state/ghost/shell-restarts.log`. A lock screen that crashes reopens with the session still locked.
 

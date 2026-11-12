@@ -61,11 +61,28 @@ FloatingWindow {
         });
     }
 
+    // Ctrl+scroll, Ctrl+plus and Ctrl+minus change this, on top of the
+    // monitor-proportional shell scale; it is saved when the zoom settles.
+    property real userZoom: 1
+    property bool zoomLoaded: false
+    readonly property real zoom: Theme.scaleFor(screen) * userZoom
+
+    function setZoom(value) {
+        const next = Math.round(Math.max(0.75, Math.min(1.5, value)) * 20) / 20;
+        if (next === userZoom)
+            return;
+        userZoom = next;
+        // Grow the window when the larger controls no longer fit its width.
+        implicitWidth = Math.max(width, Math.round(content.minimumWidth * zoom));
+        implicitHeight = Math.max(height, Math.round(content.minimumHeight * zoom));
+        saveZoom.restart();
+    }
+
     visible: Desk.settingsRequested
     title: "ghOSt Settings"
-    implicitWidth: 1024
-    implicitHeight: 699
-    minimumSize: Qt.size(720, 490)
+    implicitWidth: Math.round(1024 * zoom)
+    implicitHeight: Math.round(699 * zoom)
+    minimumSize: Qt.size(Math.round(content.minimumWidth * zoom), Math.round(content.minimumHeight * zoom))
     color: "transparent"
     Component.onCompleted: Settings.active = visible
     onVisibleChanged: Settings.active = visible
@@ -89,11 +106,56 @@ FloatingWindow {
         active: window.visible
     }
 
+    Connections {
+        target: Settings
+        function onStateChanged() {
+            if (window.zoomLoaded || !Settings.state.preferences?.settingsZoom)
+                return;
+            window.zoomLoaded = true;
+            window.userZoom = Settings.state.preferences.settingsZoom;
+        }
+    }
+
+    Timer {
+        id: saveZoom
+        interval: 500
+        onTriggered: Settings.preference("settingsZoom", window.userZoom.toFixed(2))
+    }
+
     SettingsPanel {
         id: content
 
         anchors.fill: parent
+        zoom: window.zoom
         onCloseRequested: Desk.settingsRequested = false
+    }
+
+    // Above the pages without taking clicks; plain scrolling still reaches the lists.
+    Item {
+        anchors.fill: parent
+        z: 1000
+        WheelHandler {
+            acceptedModifiers: Qt.ControlModifier
+            onWheel: event => {
+                window.setZoom(window.userZoom + (event.angleDelta.y > 0 ? 0.05 : event.angleDelta.y < 0 ? -0.05 : 0));
+                event.accepted = true;
+            }
+        }
+    }
+
+    Shortcut {
+        sequences: ["Ctrl++", "Ctrl+="]
+        onActivated: window.setZoom(window.userZoom + 0.05)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+-"
+        onActivated: window.setZoom(window.userZoom - 0.05)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+0"
+        onActivated: window.setZoom(1)
     }
 
 }

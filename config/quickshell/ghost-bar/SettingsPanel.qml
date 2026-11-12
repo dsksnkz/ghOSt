@@ -49,7 +49,14 @@ Item {
     property bool nameSubmitted: false
     readonly property string displayHost: previewMode ? fixtureHost : details.host || "Computer"
     readonly property url portraitSource: previewMode ? (fixturePortrait.toString() || Qt.resolvedUrl("artwork/profile.jpg")) : (details.preferences?.profilePicture || Qt.resolvedUrl("artwork/profile.jpg"))
-    readonly property real fit: Math.min(width / 1024, height / 699)
+    // Controls keep their size and the layout uses the window's room, as in
+    // GNOME apps. The zoom only shrinks if the window is narrower than the design.
+    property real zoom: 1
+    readonly property real minimumWidth: 1024
+    readonly property real minimumHeight: 490
+    readonly property real fit: Math.min(zoom, width / minimumWidth, height / minimumHeight)
+    // Layers are drawn at the zoomed pixel size, so scaled text stays sharp.
+    readonly property real pixelRatio: Screen.devicePixelRatio || 1
     readonly property var details: previewMode ? ({
             host: "unit-001",
             kernel: "Linux",
@@ -694,12 +701,12 @@ Item {
 
     Item {
         id: scene
-        width: 1024
-        height: 699
+        width: settings.width / scale
+        height: settings.height / scale
         scale: settings.fit
         transformOrigin: Item.TopLeft
-        x: (settings.width - width * scale) / 2
-        y: (settings.height - height * scale) / 2
+        // The page column stays 690 wide and sits centred in the room beside the sidebar.
+        readonly property real pageX: 262 + Math.max(36, Math.round((width - 262 - 690) / 2))
         G2Surface {
             anchors.fill: parent
             radius: 10
@@ -708,8 +715,8 @@ Item {
         }
         G2Surface {
             x: 262
-            width: 762
-            height: 699
+            width: parent.width - 262
+            height: parent.height
             radius: 10
             smoothing: .6
             color: "#111111"
@@ -784,12 +791,14 @@ Item {
             x: 17
             y: 98
             width: 231
-            height: 590
+            height: parent.height - 109
             contentHeight: nav.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             // Curve-rendered G2 wells must be composited before viewport clipping.
             layer.enabled: true
+            layer.smooth: true
+            layer.textureSize: Qt.size(Math.ceil(width * scene.scale * settings.pixelRatio), Math.ceil(height * scene.scale * settings.pixelRatio))
             Controls.ScrollBar.vertical: Controls.ScrollBar {
                 policy: Controls.ScrollBar.AsNeeded
             }
@@ -876,12 +885,14 @@ Item {
 
         Flickable {
             id: pageFlick
-            x: 298
+            x: scene.pageX
             y: 53
             width: 690
-            height: 602
+            height: parent.height - 97
             clip: true
             layer.enabled: true
+            layer.smooth: true
+            layer.textureSize: Qt.size(Math.ceil(width * scene.scale * settings.pixelRatio), Math.ceil(height * scene.scale * settings.pixelRatio))
             contentHeight: body.height
             boundsBehavior: Flickable.StopAtBounds
             Controls.ScrollBar.vertical: Controls.ScrollBar {
@@ -1562,6 +1573,61 @@ Item {
         Column {
             width: body.width
             spacing: 24
+            // Saved when released, so the window does not resize under the pointer.
+            Column {
+                id: scaleControl
+                objectName: "settings-shell-scale"
+                property real draft: Math.round(Theme.shellScale * 100)
+                function commit(value) {
+                    if (value !== Math.round(Theme.shellScale * 100))
+                        settings.preference("shellScale", (value / 100).toFixed(2));
+                }
+                width: parent.width
+                spacing: 14
+                Connections {
+                    target: Theme
+                    function onShellScaleChanged() {
+                        scaleControl.draft = Math.round(Theme.shellScale * 100);
+                    }
+                }
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    SvgIcon {
+                        width: 20
+                        height: 20
+                        name: "display"
+                    }
+                    Label {
+                        width: parent.width - 88
+                        text: "Scale"
+                        font.pixelSize: 13
+                    }
+                    Label {
+                        text: scaleControl.draft + "%"
+                        font.pixelSize: 12
+                        horizontalAlignment: Text.AlignRight
+                        width: 44
+                    }
+                }
+                SettingsSlider {
+                    width: parent.width
+                    from: 75
+                    to: 150
+                    stepSize: 5
+                    snapMode: Controls.Slider.SnapAlways
+                    value: Math.round(Theme.shellScale * 100)
+                    label: "Scale"
+                    enabled: !Settings.busy
+                    onMoved: {
+                        scaleControl.draft = value;
+                        if (!pressed)
+                            scaleControl.commit(value);
+                    }
+                    onPressedChanged: if (!pressed)
+                        scaleControl.commit(value)
+                }
+            }
             ToggleRow {
                 name: "Reduced motion"
                 icon: "accessibility"

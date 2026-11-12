@@ -44,13 +44,15 @@ Item {
         return JSON.stringify(workspaceWheel.status());
     }
     implicitHeight: Theme.railHeight
-    readonly property real designScale: width / 1920
+    // The bar's height sets the scale; the design plane widens with the screen.
+    readonly property real designScale: height > 0 ? height / Theme.railHeight : width / 1920
+    readonly property real planeWidth: width / designScale
     function open(name, item) {
         const center = item.mapToItem(bar, item.width / 2, 0).x;
-        Desk.toggle(name, screenName, Math.max(6, Math.min(width - 398, center - 196)), center);
+        Desk.toggle(name, screenName, Math.max(6, Math.min(width - 398 * designScale, center - 196 * designScale)), center);
     }
     Item {
-        width: 1920
+        width: bar.planeWidth
         height: Theme.railHeight
         scale: bar.designScale
         transformOrigin: Item.TopLeft
@@ -65,7 +67,7 @@ Item {
             }
             Item {
                 id: controls
-                width: 1920
+                width: bar.planeWidth
                 height: 34
                 Workspaces {
                     id: workspaceWheel
@@ -120,7 +122,7 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
-                    x: bar.elementX("network", 1620)
+                    x: bar.elementX("network", controls.width - 300)
                     y: 2
                     width: 38
                     height: 28
@@ -139,7 +141,7 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-bluetooth"
                     visible: bar.elementVisible("bluetooth")
-                    x: bar.elementX("bluetooth", 1660)
+                    x: bar.elementX("bluetooth", controls.width - 260)
                     y: 2
                     width: 38
                     height: 28
@@ -158,7 +160,7 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-volume"
                     visible: bar.elementVisible("volume")
-                    x: bar.elementX("volume", 1702)
+                    x: bar.elementX("volume", controls.width - 218)
                     y: 2
                     width: 38
                     height: 28
@@ -179,7 +181,7 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-battery"
                     visible: bar.elementVisible("battery")
-                    x: bar.elementX("battery", 1748)
+                    x: bar.elementX("battery", controls.width - 172)
                     y: 2
                     width: 62
                     height: 28
@@ -208,7 +210,7 @@ Item {
                     }
                 }
                 Rectangle {
-                    x: 1844
+                    x: controls.width - 76
                     visible: !bar.layout
                     y: 1
                     width: 1
@@ -220,7 +222,7 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-power"
                     visible: bar.elementVisible("power")
-                    x: bar.elementX("power", 1858)
+                    x: bar.elementX("power", controls.width - 62)
                     y: 2
                     width: 38
                     height: 28

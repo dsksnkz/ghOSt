@@ -20,37 +20,41 @@ PanelWindow {
         top: true
         left: true
     }
-    margins.top: 62
+    readonly property real factor: Theme.scaleFor(screen)
+    margins.top: Math.round(62 * factor)
     margins.left: Math.round((screen.width - implicitWidth) / 2)
-    implicitWidth: 360
-    implicitHeight: banner.implicitHeight + 8
+    implicitWidth: Math.round(360 * factor)
+    implicitHeight: Math.ceil((banner.implicitHeight + 8) * factor)
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-notification"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-    NotificationBanner {
-        id: banner
-        property var retained: null
-        Connections {
-            target: Notifications
-            function onToastChanged() {
-                if (Notifications.toast)
-                    banner.retained = Notifications.toast;
+    Scaled {
+        factor: popup.factor
+        NotificationBanner {
+            id: banner
+            property var retained: null
+            Connections {
+                target: Notifications
+                function onToastChanged() {
+                    if (Notifications.toast)
+                        banner.retained = Notifications.toast;
+                }
             }
+            notification: Notifications.toast || retained
+            width: parent.width
+            height: implicitHeight
+            opacity: popup.reveal
+            transform: Translate {
+                y: -8 * (1 - popup.reveal)
+            }
+            onActivated: {
+                Desk.toggleSidebar(popup.displayScreen.name);
+                Notifications.toast = null;
+            }
+            onDismissed: Notifications.toast = null
         }
-        notification: Notifications.toast || retained
-        width: popup.width
-        height: implicitHeight
-        opacity: popup.reveal
-        transform: Translate {
-            y: -8 * (1 - popup.reveal)
-        }
-        onActivated: {
-            Desk.toggleSidebar(popup.displayScreen.name);
-            Notifications.toast = null;
-        }
-        onDismissed: Notifications.toast = null
     }
     Behavior on reveal {
         NumberAnimation {

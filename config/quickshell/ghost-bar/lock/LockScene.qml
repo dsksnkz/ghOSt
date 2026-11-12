@@ -14,6 +14,8 @@ FocusScope {
     property url wallpaper
     property url picture: Qt.resolvedUrl("../artwork/profile.jpg")
     property string userName: ""
+    // The scene is laid out at design size; images load at the real pixel size.
+    property real pixelScale: 1
     property bool leaving: false
     property real entrance: 0
     property real reveal: credentialsVisible ? 1 : 0
@@ -124,7 +126,7 @@ FocusScope {
             objectName: "lock-wallpaper"
             anchors.fill: parent
             source: scene.wallpaper
-            sourceSize.width: scene.width
+            sourceSize.width: scene.width * scene.pixelScale
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             scale: (1.05 - .05 * scene.entrance) * (1 + .03 * scene.reveal * (1 - scene.exit))
@@ -134,7 +136,7 @@ FocusScope {
         Image {
             anchors.fill: parent
             source: scene.wallpaper
-            sourceSize.width: scene.width
+            sourceSize.width: scene.width * scene.pixelScale
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             scale: sharp.scale
