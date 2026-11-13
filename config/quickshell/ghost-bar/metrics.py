@@ -4,7 +4,6 @@ import json
 import math
 from pathlib import Path
 import subprocess
-import sys
 import time
 
 
@@ -70,8 +69,13 @@ def memory_percent(text):
 
 
 def stream_all():
-    previous = None
     ceiling = maximum_frequency()
+    # A short first interval, so the first line already carries a CPU reading.
+    try:
+        previous = cpu_counters(Path('/proc/stat').read_text())
+        time.sleep(.2)
+    except (OSError, ValueError):
+        previous = None
     while True:
         started = time.monotonic()
         data = {'cpu': None, 'gpu': None, 'memory': None, 'processor': None, 'maximum': ceiling}
@@ -91,33 +95,8 @@ def stream_all():
         time.sleep(max(.05, 1 - (time.monotonic() - started)))
 
 
-def stream(metric):
-    previous = None
-    ceiling = maximum_frequency()
-    while True:
-        started = time.monotonic()
-        value = None
-        try:
-            if metric == 'cpu':
-                current = cpu_counters(Path('/proc/stat').read_text())
-                value = cpu_percent(previous, current) if previous else None
-                previous = current
-            elif metric == 'processor':
-                value = frequency(Path('/proc/cpuinfo').read_text())
-            else:
-                value = gpu_percent()
-        except (OSError, ValueError):
-            pass
-        print(json.dumps({'metric': metric, 'value': value,
-                          'maximum': ceiling if metric == 'processor' else 100}), flush=True)
-        time.sleep(max(0.05, 1 - (time.monotonic() - started)))
-
-
 if __name__ == '__main__':
-    metric = sys.argv[1] if len(sys.argv) == 2 else 'cpu'
-    if metric not in ('cpu', 'gpu', 'processor', 'all'):
-        raise SystemExit('Expected cpu, gpu, processor or all')
     try:
-        stream_all() if metric == 'all' else stream(metric)
+        stream_all()
     except BrokenPipeError:
         pass

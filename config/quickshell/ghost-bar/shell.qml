@@ -21,10 +21,27 @@ ShellRoot {
             Quickshell.inhibitReloadPopup();
         }
     }
-    SettingsWindow {
+    // Settings and the Intro are built on first use and then kept; most
+    // sessions never open them, and Settings is the costliest surface to build.
+    LazyLoader {
         id: settingsWindow
+        SettingsWindow {}
     }
-    IntroWindow { id: introWindow }
+    Connections {
+        target: Desk
+        function onSettingsRequestedChanged() {
+            if (Desk.settingsRequested)
+                settingsWindow.active = true;
+        }
+    }
+    LazyLoader {
+        id: introWindow
+        IntroWindow {}
+    }
+    function built(loader) {
+        loader.active = true;
+        return loader.item;
+    }
     // Quickshell exposes specialWorkspace only in the monitor's raw IPC map.
     // Refresh that map on special-workspace events; no polling or subprocess.
     Connections {
@@ -190,8 +207,8 @@ ShellRoot {
         function frameStop(): string {
             return frameProbe.stop();
         }
-        function intro(): void { introWindow.open(); }
-        function captureIntro(path: string): void { introWindow.capture(path); }
+        function intro(): void { root.built(introWindow).open(); }
+        function captureIntro(path: string): void { root.built(introWindow).capture(path); }
         function edgeVolume(): string {
             return JSON.stringify({opened: OsdState.opened, side: OsdState.edgeSide,
                 screen: OsdState.screenName, kind: OsdState.kind, amount: OsdState.amount,
@@ -237,10 +254,10 @@ ShellRoot {
                 })));
         }
         function settingsFlow(action: string): string {
-            return settingsWindow.inspect(action);
+            return root.built(settingsWindow).inspect(action);
         }
         function captureSettings(path: string): bool {
-            return settingsWindow.captureGeneral(path);
+            return root.built(settingsWindow).captureGeneral(path);
         }
         function notifications(): string {
             return JSON.stringify({

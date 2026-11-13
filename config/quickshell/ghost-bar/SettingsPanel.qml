@@ -39,7 +39,6 @@ Item {
     property real fixtureVolume: 62
     property real fixtureInput: 74
     property var airplaneSnapshot: null
-    property real pendingBrightness: 0
     property string fixtureHost: "Unit-01"
     property url fixturePortrait: ""
     property string portraitOrigin: ""
@@ -389,11 +388,6 @@ Item {
             if (nameSubmitted && nameDialog.visible && Settings.state.host === settings.nameDraft)
                 nameDialog.close();
         }
-    }
-    Timer {
-        id: brightnessCommit
-        interval: 180
-        onTriggered: settings.apply("brightness", String(settings.pendingBrightness))
     }
     PwObjectTracker {
         objects: settings.outputs.concat(settings.inputs)
@@ -1264,22 +1258,39 @@ Item {
     Component {
         id: brightnessPage
         Column {
+            id: brightnessList
+            property int controllable: 0
             width: body.width
             spacing: 24
-            ControlGroup {
-              SoundControl {
-                name: "Laptop display"
-                icon: "brightness"
-                amount: settings.details.brightness?.percent ?? 0
-                enabled: !!settings.details.brightness && !Settings.busy
-                onMoved: value => {
-                    settings.pendingBrightness = Math.max(1, value);
-                    brightnessCommit.restart();
+            // One slider per display that answers: a laptop backlight or a monitor's own setting.
+            Repeater {
+                model: settings.previewMode ? [{name: "eDP-1"}] : Quickshell.screens
+                ControlGroup {
+                    id: displayGroup
+                    required property var modelData
+                    readonly property bool available: settings.previewMode || display.percent !== null
+                    visible: available
+                    onAvailableChanged: brightnessList.controllable += available ? 1 : -1
+                    Component.onCompleted: if (available)
+                        brightnessList.controllable++
+                    Component.onDestruction: if (available)
+                        brightnessList.controllable--
+                    DisplayBrightness {
+                        id: display
+                        screenName: displayGroup.modelData.name
+                        active: !settings.previewMode
+                    }
+                    SoundControl {
+                        name: displayGroup.modelData.name.startsWith("eDP-") ? "Laptop display" : displayGroup.modelData.model || displayGroup.modelData.name
+                        icon: "brightness"
+                        amount: settings.previewMode ? settings.details.brightness?.percent ?? 0 : display.percent ?? 0
+                        onMoved: value => display.set(Math.max(1, Math.round(value)))
+                    }
                 }
-              }
             }
             Note {
-                text: settings.details.brightness ? "External displays require a supported display control backend." : "No controllable laptop backlight detected"
+                visible: brightnessList.controllable === 0
+                text: "No controllable display detected"
             }
         }
     }
@@ -1635,7 +1646,7 @@ Item {
                 onToggled: value => settings.preference("reducedMotion", value)
             }
             Note {
-                text: "Immediate panel transitions; weather flashes and moving liquids stop."
+                text: "Immediate panel transitions; weather flashes stop."
             }
         }
     }

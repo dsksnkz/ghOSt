@@ -7,8 +7,7 @@ All code needed by the current ghOSt rail/sidebar/calendar/Settings is published
 - `shell.qml`: native windows, shared focus/dismissal and public IPC entry points.
 - `Rail.qml`, `Workspaces.qml`, `WorkspaceWheel.js`: rail controls and workspace projection/input.
 - `Sidebar.qml`, `SidebarFigmaBody.qml`: native sidebar window, grouped controls and dismissal.
-- `CalendarWindow.qml`, `CalendarPanel.qml`, `LiquidMeter.qml`, `WeatherGlyph.qml`: complete calendar, instrumentation and motion.
-- `shaders/liquid.frag`, `shaders/liquid.frag.qsb`, `WaveGeometry.js`: GPU liquid animation with the original static Canvas silhouette and a cached software fallback.
+- `CalendarWindow.qml`, `CalendarPanel.qml`, `WeatherGlyph.qml`: complete calendar, instrumentation and motion.
 - `SettingsWindow.qml`, `SettingsPanel.qml`, `Settings.qml`, `settings_backend.py`: native Settings, navigation, validated actions and persistence.
 - `SettingsNavigation.qml`: coalesced, repeated page requests for the native Settings window.
 - `MusicBar.qml`: MPRIS transport/progress and bounded playback-indicator animation.
@@ -43,7 +42,6 @@ python3 -m unittest discover -s tests -v
 node tests/test_launcher.cjs
 node tests/test_workspace_wheel.cjs
 node tests/test_corners.js
-node tests/test_wave_geometry.cjs
 node --test tests/test_site.mjs
 git diff --check
 ```
@@ -64,16 +62,6 @@ The owner's latest instruction is desktop-first: edit the project, snapshot the
 exact installed ghOSt files, and hot-reload those changes into the existing ghOSt
 profile while building. Do not substitute another preview window/site for the
 desktop. The opt-in installer default remains safe for other machines.
-
-Liquid animation updates GPU uniforms without repainting/uploading three Canvas
-textures every frame. Canvas supplies the same radius-15 silhouette once, and
-repaints for hover/focus/size changes. Software rendering or shader failure uses
-the original Canvas renderer, with cached geometry/trigonometric basis. The
-checked-in shader is installed with the rest of the profile; no compiler or
-package installation is needed to run it. Rebuild deliberately with
-`bash scripts/build-shaders.sh` using an existing Qt6 `qsb` (`QSB` overrides its
-path). The package targets Qt6.4 format with GLSL, SPIR-V, HLSL and Metal variants;
-only this laptop's Qt6.11/OpenGL native path has been verified.
 
 `quickshell ipc -i INSTANCE call bar rendering` returns read-only per-screen
 calendar renderer, shader status/log, visibility and wave-phase diagnostics. It

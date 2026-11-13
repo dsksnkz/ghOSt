@@ -47,6 +47,10 @@ class Scan:
         except OSError:
             self.unreadable += 1
             entries = []
+        # Only entries large enough to be listed become nodes; a home folder has
+        # millions of small files, and their sizes are all the result needs.
+        small = small_count = 0
+        seen = self.seen
         for entry in entries:
             try:
                 info = entry.stat(follow_symlinks=False)
@@ -59,23 +63,29 @@ class Scan:
                 if info.st_dev != device:
                     continue
                 child = self.folder(entry.path, entry.name, device)
-                child['s'] += info.st_blocks * 512
+                size = child['s'] = child['s'] + info.st_blocks * 512
             else:
                 # Hard links use their space once.
                 if info.st_nlink > 1:
                     key = (info.st_dev, info.st_ino)
-                    if key in self.seen:
+                    if key in seen:
                         continue
-                    self.seen.add(key)
-                child = {'n': entry.name, 's': info.st_blocks * 512}
-                self.size += child['s']
-            total += child['s']
-            children.append(child)
-            self.progress()
+                    seen.add(key)
+                size = info.st_blocks * 512
+                self.size += size
+                child = None
+            total += size
+            if size < MIN_LISTED:
+                small += size
+                small_count += 1
+            else:
+                children.append(child or {'n': entry.name, 's': size})
+        self.progress()
         children.sort(key=lambda child: child['s'], reverse=True)
-        listed = [child for child in children[:MAX_LISTED] if child['s'] >= MIN_LISTED]
+        listed = children[:MAX_LISTED]
         return {'n': name, 's': total, 'd': 1, 'c': listed,
-                'o': total - sum(child['s'] for child in listed), 'm': len(children) - len(listed)}
+                'o': small + sum(child['s'] for child in children[MAX_LISTED:]),
+                'm': small_count + len(children) - len(listed)}
 
 
 def scan(root, on_progress=None):

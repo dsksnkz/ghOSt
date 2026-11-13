@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """ghOSt Settings: bounded standard-service queries and explicit user actions."""
-import argparse
 from datetime import datetime
 import fcntl
 import hashlib
@@ -8,10 +7,10 @@ import json
 import math
 import os
 from pathlib import Path
-import platform
 import re
 import shutil
 import subprocess
+import sys
 import time
 from urllib.parse import unquote, urlparse
 
@@ -157,7 +156,8 @@ def usage(record=False):
             'days': data.get('days', {}), 'samples': samples[-120:]}
 
 def status():
-    result = {'host': platform.node(), 'kernel': platform.release(),
+    system = os.uname()
+    result = {'host': system.nodename, 'kernel': system.release,
               'preferences': preferences(), 'battery': battery(), 'usage': usage(),
               'brightness': None, 'notifications': None,
               'equalizer': bool(shutil.which('easyeffects'))}
@@ -255,15 +255,14 @@ def action(name, value):
         raise ValueError('Unknown action')
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('operation', choices=['status','action','sample'])
-    parser.add_argument('name', nargs='?', default='')
-    parser.add_argument('value', nargs='?', default='')
-    args = parser.parse_args()
+    # No argparse: it added half again to the start time of every call.
+    operation, name, value = (sys.argv[1:] + ['', '', ''])[:3]
+    if operation not in ('status', 'action', 'sample') or len(sys.argv) > 4:
+        sys.exit('usage: settings_backend.py status|action|sample [name] [value]')
     try:
-        if args.operation == 'action':
-            action(args.name, args.value)
-        if args.operation == 'sample':
+        if operation == 'action':
+            action(name, value)
+        if operation == 'sample':
             usage(record=True)
         print(json.dumps({'ok':True, 'state':status()}))
     except (OSError, ValueError, subprocess.TimeoutExpired) as error:

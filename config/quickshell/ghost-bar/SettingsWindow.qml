@@ -63,8 +63,7 @@ FloatingWindow {
 
     // Ctrl+scroll, Ctrl+plus and Ctrl+minus change this, on top of the
     // monitor-proportional shell scale; it is saved when the zoom settles.
-    property real userZoom: 1
-    property bool zoomLoaded: false
+    property real userZoom: Settings.state.preferences?.settingsZoom || 1
     readonly property real zoom: Theme.scaleFor(screen) * userZoom
 
     function setZoom(value) {
@@ -104,16 +103,6 @@ FloatingWindow {
         controller: Desk
         pageContent: content
         active: window.visible
-    }
-
-    Connections {
-        target: Settings
-        function onStateChanged() {
-            if (window.zoomLoaded || !Settings.state.preferences?.settingsZoom)
-                return;
-            window.zoomLoaded = true;
-            window.userZoom = Settings.state.preferences.settingsZoom;
-        }
     }
 
     Timer {

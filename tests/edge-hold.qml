@@ -51,7 +51,7 @@ ShellRoot {
             compare(activations.count, 1);
             compare(OsdState.pointerY, 450);
             edge.hovered = false;
-            tryCompare(OsdState, "opened", false, 300);
+            tryCompare(OsdState, "opened", false, 500);
             compare(OsdState.edgeHeld, false);
 
             edge.pointerY = 700;
@@ -59,12 +59,14 @@ ShellRoot {
             tryCompare(edge, "latched", true, 700);
             compare(OsdState.pointerY, 700);
             edge.hovered = false;
-            tryCompare(OsdState, "opened", false, 300);
+            tryCompare(OsdState, "opened", false, 500);
+            // A change from the keys shows in the top bar, never at the edge.
             OsdState.show("volume", "fixture");
-            verify(!OsdState.edgeHeld && OsdState.opened);
-            compare(OsdState.pointerY, -1);
-            tryCompare(OsdState, "opened", false, 2600);
-            console.log("PASS: edge dwell/cancel, fixed origin, held visibility, audio updates, release/reentry and normal expiry");
+            verify(!OsdState.edgeHeld && !OsdState.opened);
+            verify(OsdState.railOpened);
+            compare(OsdState.railScreen, "fixture");
+            tryCompare(OsdState, "railOpened", false, 2000);
+            console.log("PASS: edge dwell/cancel, fixed origin, held visibility, audio updates, release/reentry and top bar expiry");
         }
     }
 }

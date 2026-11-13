@@ -62,8 +62,6 @@ visual verification where a rendering/backend change is involved.
 
 ## Generated and private files
 
-`shaders/liquid.frag.qsb` is generated from `shaders/liquid.frag` using
-`scripts/build-shaders.sh`. Edit the `.frag` source, not the compiled package.
 SVG artwork is editable text. Recordings, fonts, audio and raster images are
 assets rather than application source.
 

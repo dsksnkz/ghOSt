@@ -22,6 +22,15 @@ Item {
     // Hidden with no audio; a paused track stays so it can be resumed from the rail.
     readonly property bool mediaRevealed: fixtureMedia || Desk.playing || !!Desk.player?.trackTitle
     property real mediaReveal: mediaRevealed ? 1 : 0
+    // Volume and brightness changes replace the clock for a moment.
+    readonly property bool levelShown: !previewMode && OsdState.railOpened && OsdState.railScreen === screenName
+    property real levelReveal: levelShown ? 1 : 0
+    Behavior on levelReveal {
+        NumberAnimation {
+            duration: Theme.reducedMotion ? 0 : 220
+            easing.type: Easing.OutCubic
+        }
+    }
     Behavior on mediaReveal {
         NumberAnimation {
             duration: Theme.reducedMotion ? 0 : 280
@@ -115,6 +124,67 @@ Item {
                         font.pixelSize: 20
                         font.weight: Font.Normal
                         color: "#ffffff"
+                        opacity: 1 - bar.levelReveal
+                    }
+                }
+                Item {
+                    id: level
+                    objectName: "rail-level"
+                    readonly property real amount: Math.max(0, Math.min(100, OsdState.amount))
+                    property real shown: amount
+                    Behavior on shown {
+                        enabled: !Theme.reducedMotion
+                        NumberAnimation {
+                            duration: 120
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                    visible: bar.levelReveal > 0.01
+                    opacity: bar.levelReveal
+                    width: 300
+                    height: 26
+                    x: (centerClock.visible ? centerClock.x + centerClock.width / 2 : controls.width / 2) - width / 2
+                    y: (34 - height) / 2
+                    SvgIcon {
+                        x: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 14
+                        height: 14
+                        name: OsdState.kind === "brightness" ? "brightness" : Desk.muted ? "mute" : "volume"
+                    }
+                    Rectangle {
+                        id: track
+                        x: 36
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - 36 - 44
+                        height: 4
+                        radius: 2
+                        color: "#333333"
+                        Rectangle {
+                            width: parent.width * level.shown / 100
+                            height: parent.height
+                            radius: 2
+                            color: Desk.muted && OsdState.kind === "volume" ? "#6a6a6a" : "#e8e8e8"
+                        }
+                    }
+                    InkLabel {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 26
+                        height: 18
+                        horizontalAlignment: Text.AlignRight
+                        text: OsdState.available ? Math.round(level.amount) : "—"
+                        font.family: Theme.font
+                        font.pixelSize: 11
+                        color: "#9c9c9c"
+                    }
+                    // Scrolling here keeps adjusting the same level.
+                    WheelHandler {
+                        onWheel: event => {
+                            OsdState.railMove(level.amount + (event.angleDelta.y > 0 ? 2 : event.angleDelta.y < 0 ? -2 : 0));
+                            event.accepted = true;
+                        }
                     }
                 }
                 Key {

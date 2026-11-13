@@ -245,7 +245,7 @@ ShellRoot {
             }
 
             function test_sidebar_brightness_idle() {
-                const timer = findChild(sidebar, "sidebar-brightness-refresh");
+                const timer = findChild(sidebar, "brightness-refresh");
                 sidebar.screen = ({name: "HDMI-A-1"});
                 sidebar.previewMode = false;
                 verify(!timer.running);

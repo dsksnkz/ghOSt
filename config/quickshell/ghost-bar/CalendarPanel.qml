@@ -262,7 +262,7 @@ Item {
     }
     Process {
         id: telemetry
-        command: ["python3", Quickshell.shellPath("metrics.py"), "all"]
+        command: ["python3", Quickshell.shellPath("metrics.py")]
         stdout: SplitParser {
             onRead: data => {
                 try {

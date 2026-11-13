@@ -39,13 +39,21 @@ def detect_bus(connector):
 def read_cache():
     try:
         with open(CACHE) as file:
-            return json.load(file)
-    except (OSError, ValueError):
+            cache = json.load(file)
+        return cache if all(isinstance(entry, dict) for entry in cache.values()) else {}
+    except (OSError, ValueError, AttributeError):
         return {}
 
 
-# Detection takes seconds and buses can change, so it runs once and again after a failure.
-def with_bus(connector, action):
+def read_vcp(bus):
+    # Brief output: VCP 10 C <current> <maximum>
+    _, _, _, current, maximum = ddc("--bus", bus, "--brief", "getvcp", "10").split()
+    return int(current), int(maximum)
+
+
+# Detection takes seconds and buses can change, so the bus and the monitor's
+# maximum are found once, remembered, and found again after a failure.
+def with_display(connector, action):
     cache = read_cache()
     if connector in cache:
         try:
@@ -55,22 +63,16 @@ def with_bus(connector, action):
     bus = detect_bus(connector)
     if bus is None:
         raise LookupError(connector)
-    cache[connector] = bus
+    cache[connector] = {"bus": bus, "maximum": read_vcp(bus)[1]}
     with open(CACHE, "w") as file:
         json.dump(cache, file)
-    return action(bus)
-
-
-def read_vcp(bus):
-    # Brief output: VCP 10 C <current> <maximum>
-    _, _, _, current, maximum = ddc("--bus", bus, "--brief", "getvcp", "10").split()
-    return int(current), int(maximum)
+    return action(cache[connector])
 
 
 def get(connector):
     if connector.startswith("eDP-"):
         return int(run("brightnessctl", "-m").split(",")[3].rstrip("%"))
-    current, maximum = with_bus(connector, read_vcp)
+    current, maximum = with_display(connector, lambda display: read_vcp(display["bus"]))
     return round(current * 100 / maximum)
 
 
@@ -78,12 +80,8 @@ def set_brightness(connector, percent):
     if connector.startswith("eDP-"):
         run("brightnessctl", "set", f"{percent}%")
         return
-
-    def write(bus):
-        _, maximum = read_vcp(bus)
-        ddc("--bus", bus, "--noverify", "setvcp", "10", str(round(percent * maximum / 100)))
-
-    with_bus(connector, write)
+    with_display(connector, lambda display: ddc(
+        "--bus", display["bus"], "--noverify", "setvcp", "10", str(round(percent * display["maximum"] / 100))))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import Quickshell
-import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import "Corners.js" as Corners
@@ -16,8 +15,6 @@ Item {
     readonly property bool dnd: Notifications.dnd
     readonly property bool notificationsAvailable: Notifications.ready
     readonly property int notificationCount: Notifications.count
-    property var brightnessPercent: null
-    property var pendingBrightness: null
     property var entranceOrder: [0, 1, 2, 3, 4, 5]
     property real entranceTime: 900
     function beginEntrance() {
@@ -48,60 +45,20 @@ Item {
     // The native window focuses this root, not necessarily the scaled child.
     focus: opened
     Keys.onEscapePressed: closeRequested()
-    function refresh() {
-        if (previewMode || !opened)
-            return;
-        if (screen?.name && !brightnessQuery.running && !brightnessWrite.running)
-            brightnessQuery.running = true;
-    }
-    // A monitor takes a moment per command, so a drag only sends its latest value.
-    function setBrightness(percent) {
-        brightnessPercent = percent;
-        pendingBrightness = percent;
-        flushBrightness();
-    }
-    function flushBrightness() {
-        if (pendingBrightness === null || brightnessWrite.running)
-            return;
-        brightnessWrite.command = ["python3", Quickshell.shellPath("brightness.py"), "set", screen.name, String(pendingBrightness)];
-        pendingBrightness = null;
-        brightnessWrite.running = true;
-    }
     onOpenedChanged: {
         if (opened)
             beginEntrance();
         else
             itemEntrance.stop();
-        refresh();
     }
     Component.onCompleted: {
         if (opened)
             beginEntrance();
-        refresh();
     }
-    Process {
-        id: brightnessQuery
-        command: ["python3", Quickshell.shellPath("brightness.py"), "get", sidebar.screen?.name ?? ""]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const value = parseInt(text.trim());
-                // A monitor can be busy for a moment; keep the last known value.
-                if (isFinite(value))
-                    sidebar.brightnessPercent = value;
-            }
-        }
-    }
-    Process {
-        id: brightnessWrite
-        onRunningChanged: if (!running)
-            Qt.callLater(sidebar.flushBrightness)
-    }
-    Timer {
-        objectName: "sidebar-brightness-refresh"
-        interval: 3000
-        repeat: true
-        running: sidebar.opened && !sidebar.previewMode && !!sidebar.screen?.name?.startsWith("eDP-")
-        onTriggered: sidebar.refresh()
+    DisplayBrightness {
+        id: display
+        screenName: sidebar.screen?.name ?? ""
+        active: sidebar.opened && !sidebar.previewMode
     }
 
     // The Figma artboard is 1920 × 1080. This panel occupies x=0..354;
@@ -630,11 +587,11 @@ Item {
             padding: 0
             from: 0
             to: 100
-            value: sidebar.previewMode ? 75 : sidebar.brightnessPercent ?? 0
-            enabled: sidebar.previewMode || sidebar.brightnessPercent !== null
+            value: sidebar.previewMode ? 75 : display.percent ?? 0
+            enabled: sidebar.previewMode || display.percent !== null
             opacity: sidebar.itemProgress(4) * (enabled ? 1 : .4)
             onMoved: if (!sidebar.previewMode)
-                sidebar.setBrightness(Math.round(value))
+                display.set(Math.round(value))
             Accessible.name: "Display brightness"
             background: G2Surface {
                 x: brightness.leftPadding

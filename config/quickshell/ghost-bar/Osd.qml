@@ -140,11 +140,13 @@ PanelWindow {
             }
         }
     }
+    // The card's resting place, not its animated one: while it slides in, a
+    // pointer there must already belong to it, or the edge loses it and closes.
     mask: Region {
-        x: card.x * window.factor
-        y: card.y * window.factor
-        width: card.width * window.factor
-        height: card.height * window.factor
+        x: (OsdState.edgeSide === "right" ? 80 - 44 - 14 : 14) * window.factor
+        y: 8 * window.factor
+        width: 44 * window.factor
+        height: 294 * window.factor
     }
 
     Behavior on reveal {

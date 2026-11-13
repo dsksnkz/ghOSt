@@ -21,6 +21,8 @@ Singleton {
         })
     property string error: ""
     readonly property bool busy: change.running
+    // Actions requested while one is running wait their turn instead of being lost.
+    property var queued: []
     function widget(name) {
         return state.preferences?.widgets?.[name] !== false;
     }
@@ -60,10 +62,21 @@ Singleton {
             error = "Preview — system actions disabled";
             return;
         }
-        if (change.running)
+        if (change.running) {
+            // Only the latest value of a setting matters.
+            const key = name === "preference" ? String(value).split("=")[0] : name;
+            queued = queued.filter(entry => entry.key !== key).concat([{key: key, name: name, value: String(value)}]);
             return;
+        }
         change.command = ["python3", Quickshell.shellPath("settings_backend.py"), "action", name, String(value)];
         change.running = true;
+    }
+    function applyNext() {
+        if (!queued.length)
+            return;
+        const next = queued[0];
+        queued = queued.slice(1);
+        apply(next.name, next.value);
     }
     function preference(name, value) {
         apply("preference", name + "=" + String(value));
@@ -85,6 +98,8 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: settings.receive(text)
         }
+        onRunningChanged: if (!running)
+            Qt.callLater(settings.applyNext)
     }
     Process {
         id: sample

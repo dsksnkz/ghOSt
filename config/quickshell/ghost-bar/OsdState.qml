@@ -7,6 +7,10 @@ import Quickshell.Hyprland
 Singleton {
     id: osd
     property bool opened: false
+    // Key and app changes show in the top bar in place of the clock; the side
+    // OSD is only for the screen edge.
+    property bool railOpened: false
+    property string railScreen: ""
     property bool armed: false
     property bool interacting: false
     property string kind: "volume"
@@ -51,6 +55,13 @@ Singleton {
             opened = true;
             return;
         }
+        if (!side) {
+            kind = value;
+            railScreen = targetScreen || Hyprland.focusedMonitor?.name || Quickshell.screens[0]?.name || "";
+            railOpened = true;
+            railExpiry.restart();
+            return;
+        }
         edgeHeld = false;
         if (side) {
             edgeSide = side;
@@ -70,6 +81,16 @@ Singleton {
                 readBrightness.running = true;
         } else if (value === "volume")
             show(value);
+    }
+    function railMove(value) {
+        railExpiry.restart();
+        if (kind === "volume")
+            Desk.setVolume(Math.max(0, Math.min(100, value)) / 100);
+        else {
+            pendingBrightness = Math.max(1, Math.min(100, value));
+            brightness = pendingBrightness;
+            commit.restart();
+        }
     }
     function move(value) {
         keepVisible();
@@ -109,6 +130,11 @@ Singleton {
         interval: 800
         running: true
         onTriggered: osd.armed = true
+    }
+    Timer {
+        id: railExpiry
+        interval: 1600
+        onTriggered: osd.railOpened = false
     }
     Timer {
         id: expiry

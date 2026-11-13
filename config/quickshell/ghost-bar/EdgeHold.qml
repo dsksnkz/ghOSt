@@ -6,7 +6,8 @@ QtObject {
     property bool hovered: false
     property real pointerY: 0
     readonly property int dwellMs: 200
-    readonly property int exitGraceMs: 100
+    // Long enough to cover the pointer crossing from the strip onto the card.
+    readonly property int exitGraceMs: 300
     property bool latched: false
     signal activated(real y)
     signal released
