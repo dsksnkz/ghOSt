@@ -69,28 +69,10 @@ Item {
             }
         }
     }
-    Key {
-        visible: music.compact
-        y: 4
-        width: 18
-        height: 18
-        radius: 4
-        hoverFeedback: false
-        pressFeedback: false
-        hint: music.playing ? "pause" : "play"
-        enabled: !!music.player?.canTogglePlaying
-        onClicked: music.player.togglePlaying()
-        SvgIcon {
-            anchors.centerIn: parent
-            width: 14
-            height: 14
-            name: music.playing ? "pause" : "play"
-        }
-    }
     Item {
-        x: music.compact ? 21 : 34
+        x: music.compact ? 0 : 34
         y: music.compact ? 5 : 0
-        width: parent.width - (music.compact ? (music.player ? 67 : 21) : 114)
+        width: parent.width - (music.compact ? (music.player ? 70 : 0) : 114)
         height: music.compact ? 16 : 66
         Label {
             objectName: "music-title"
@@ -115,7 +97,7 @@ Item {
         spacing: 1
         visible: !music.compact || !!music.player
         Repeater {
-            model: music.compact ? ["previous", "next"] : ["previous", music.playing ? "pause" : "play", "next"]
+            model: ["previous", music.playing ? "pause" : "play", "next"]
             Key {
                 required property string modelData
                 required property int index

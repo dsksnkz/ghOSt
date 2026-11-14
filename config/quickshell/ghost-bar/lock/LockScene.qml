@@ -129,7 +129,6 @@ FocusScope {
             sourceSize.width: scene.width * scene.pixelScale
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            scale: (1.05 - .05 * scene.entrance) * (1 + .03 * scene.reveal * (1 - scene.exit))
             opacity: status === Image.Ready ? 1 : 0
         }
         // One blurred copy, rendered once; waking only fades it in.
@@ -139,7 +138,6 @@ FocusScope {
             sourceSize.width: scene.width * scene.pixelScale
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            scale: sharp.scale
             visible: scene.reveal * (1 - scene.exit) > .001
             opacity: scene.reveal * (1 - scene.exit)
             layer.enabled: visible
@@ -200,8 +198,6 @@ FocusScope {
             font.weight: Font.DemiBold
             font.letterSpacing: -2
             color: "#ffffff"
-            scale: 1 - .1 * scene.reveal
-            transformOrigin: Item.Top
         }
     }
 

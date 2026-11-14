@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Services.UPower
 import "RailLayout.js" as Layout
 
 Item {
@@ -192,13 +193,14 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
-                    x: bar.elementX("network", controls.width - 300)
+                    x: bar.elementX("network", controls.width - 210)
                     y: 2
-                    width: 38
+                    width: 28
                     height: 28
-                    hint: "Network controls"
-                    onClicked: Desk.toggleSidebar(bar.screenName)
+                    hint: "Wi-Fi"
+                    onClicked: bar.open("network", this)
                     SvgIcon {
+                        id: networkIcon
                         anchors.centerIn: parent
                         width: 16
                         height: 16
@@ -211,12 +213,12 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-bluetooth"
                     visible: bar.elementVisible("bluetooth")
-                    x: bar.elementX("bluetooth", controls.width - 260)
+                    x: bar.elementX("bluetooth", controls.width - 178)
                     y: 2
-                    width: 38
+                    width: 28
                     height: 28
-                    hint: "Bluetooth controls"
-                    onClicked: Desk.toggleSidebar(bar.screenName)
+                    hint: "Bluetooth"
+                    onClicked: bar.open("bluetooth", this)
                     SvgIcon {
                         anchors.centerIn: parent
                         width: 16
@@ -230,9 +232,9 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-volume"
                     visible: bar.elementVisible("volume")
-                    x: bar.elementX("volume", controls.width - 218)
+                    x: bar.elementX("volume", controls.width - 146)
                     y: 2
-                    width: 38
+                    width: 28
                     height: 28
                     hint: "Volume controls"
                     wheelEnabled: true
@@ -250,38 +252,65 @@ Item {
                     hoverFeedback: false
                     pressFeedback: false
                     objectName: "rail-element-battery"
-                    visible: bar.elementVisible("battery")
-                    x: bar.elementX("battery", controls.width - 172)
+                    id: batteryKey
+                    // A desktop without a battery has nothing to show here.
+                    visible: bar.elementVisible("battery") && (Desk.hasBattery || bar.previewMode)
+                    x: bar.elementX("battery", controls.width - 114)
                     y: 2
-                    width: 62
+                    width: 40
                     height: 28
-                    hint: "Battery controls"
+                    hint: "Battery " + Desk.charge + "%"
                     onClicked: Desk.toggleSidebar(bar.screenName)
-                    InkLabel {
-                        id: batteryText
-                        x: 4
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 36
-                        height: 28
-                        horizontalAlignment: Text.AlignHCenter
-                        text: bar.fixtureMode ? "100%" : Desk.hasBattery ? Desk.charge + "%" : "AC"
-                        font.family: Theme.font
-                        font.pixelSize: 12
-                        color: "#ffffff"
-                    }
+                    readonly property bool charging: Desk.battery?.state === UPowerDeviceState.Charging || Desk.battery?.state === UPowerDeviceState.PendingCharge
+                    // A horizontal battery with the level written inside it.
                     SvgIcon {
-                        id: batteryIcon
-                        x: 41
+                        visible: batteryKey.charging
+                        x: 0
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 16
-                        height: 16
-                        name: "battery"
-                        visible: Desk.hasBattery || bar.previewMode
+                        width: 10
+                        height: 10
+                        name: "lightning"
+                    }
+                    Rectangle {
+                        id: batteryBody
+                        x: 10
+                        y: 8
+                        width: 26
+                        height: 13
+                        radius: 4
+                        color: "transparent"
+                        border.width: 1
+                        border.color: Desk.charge <= 15 && !batteryKey.charging ? "#e08a8a" : "#bdbdbd"
+                        Rectangle {
+                            x: 2
+                            y: 2
+                            width: Math.round((parent.width - 4) * Math.max(0, Math.min(100, bar.fixtureMode ? 100 : Desk.charge)) / 100)
+                            height: parent.height - 4
+                            radius: 2
+                            color: "#ffffff"
+                            opacity: .16
+                        }
+                        Text {
+                            anchors.centerIn: parent
+                            text: bar.fixtureMode ? "100" : Desk.charge
+                            font.family: Theme.font
+                            font.pixelSize: 9
+                            font.weight: Theme.demiWeight
+                            color: "#ffffff"
+                        }
+                    }
+                    Rectangle {
+                        x: batteryBody.x + batteryBody.width + 1
+                        y: batteryBody.y + 4
+                        width: 2
+                        height: 5
+                        radius: 1
+                        color: "#bdbdbd"
                     }
                 }
                 Rectangle {
-                    x: controls.width - 76
-                    visible: !bar.layout
+                    x: bar.elementX("power", controls.width - 62) - 8
+                    visible: bar.elementVisible("power") && batteryKey.visible
                     y: 1
                     width: 1
                     height: 30
@@ -298,19 +327,6 @@ Item {
                     height: 28
                     hint: "Power"
                     onClicked: bar.open("session", this)
-                    Canvas {
-                        anchors.centerIn: parent
-                        width: 34
-                        height: 34
-                        onPaint: {
-                            const context = getContext("2d");
-                            const glow = context.createRadialGradient(17, 17, 3, 17, 17, 17);
-                            glow.addColorStop(0, Qt.rgba(1, 1, 1, .12));
-                            glow.addColorStop(1, Qt.rgba(1, 1, 1, 0));
-                            context.fillStyle = glow;
-                            context.fillRect(0, 0, width, height);
-                        }
-                    }
                     SvgIcon {
                         id: powerIcon
                         anchors.centerIn: parent
@@ -323,14 +339,13 @@ Item {
         }
     }
     function spacingStatus() {
-        const icons = [volumeIcon, batteryIcon, powerIcon];
+        const icons = [networkIcon, volumeIcon, powerIcon];
         return {
             clockOnly: true,
             railWidth: bar.width,
             clockCenterX: centerClock.mapToItem(bar, centerClock.width / 2, 0).x,
             clockInkCenter: railTime.mapToItem(bar, 0, railTime.inkCenterY).y,
-            batteryInkCenter: batteryText.mapToItem(bar, 0, batteryText.inkCenterY).y,
-            batteryIconCenter: batteryIcon.mapToItem(bar, 0, batteryIcon.height / 2).y,
+            batteryIconCenter: batteryBody.mapToItem(bar, 0, batteryBody.height / 2).y,
             rightIcons: icons.map(icon => ({
                         width: icon.width,
                         height: icon.height,

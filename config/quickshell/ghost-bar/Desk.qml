@@ -14,7 +14,6 @@ Singleton {
     property string panel: ""
     property string panelScreen: ""
     property real panelX: 0
-    property real panelOrigin: 196
     property string notice: ""
     property string performanceMetric: "cpu"
     property var weatherSummary: ({
@@ -102,7 +101,6 @@ Singleton {
         panelScreen = screenName;
         panelX = x;
         sidebarOpen = false;
-        panelOrigin = center === undefined ? 196 : Math.max(18, Math.min(374, center - x));
         notice = "";
         panel = name;
     }
@@ -132,9 +130,17 @@ Singleton {
     Binding {
         target: root.wifi
         property: "scannerEnabled"
-        value: root.networkScanRequested
+        value: root.networkScanRequested || scanLinger.running
         when: root.wifi !== null
     }
+    // Scanning outlives a closing network browser by its fade: stopping at once
+    // drops the networks it found and the closing menu collapsed mid-fade.
+    Timer {
+        id: scanLinger
+        interval: 500
+    }
+    onNetworkScanRequestedChanged: if (!networkScanRequested)
+        scanLinger.restart()
     function networkScanStatus() {
         return {
             available: wifi !== null,

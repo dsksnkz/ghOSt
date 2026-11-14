@@ -90,7 +90,8 @@ ShellRoot {
                 compare(spacing.rowHeight, 44);
                 compare(spacing.rowGap, 8);
                 compare(spacing.icons.length, 14);
-                for (const icon of spacing.icons) verify(Math.abs(icon.glyph / icon.well - 0.6) < 0.001)
+                // Whole-pixel glyphs, so every icon edge lands on a pixel.
+                for (const icon of spacing.icons) verify(icon.glyph === 18)
                 const selected = findChild(settingsPanel, "settings-navigation-general");
                 const unselected = findChild(settingsPanel, "settings-navigation-network");
                 verify(selected !== null && unselected !== null);

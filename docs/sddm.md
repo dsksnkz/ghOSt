@@ -1,8 +1,8 @@
 # SDDM theme
 
 `config/sddm/ghost/` is a self-contained SDDM greeter theme (Qt 6, SDDM 0.21+),
-built from the chosen login mockup (direction B, editorial left). It is **not
-installed or applied** by any ghOSt script; `scripts/install.py` never touches it.
+built from the chosen login mockup (direction B, editorial left). `./install.sh`
+installs and applies it; `--no-sddm` leaves the login screen alone.
 
 ![Preview](../config/sddm/ghost/preview.png)
 
@@ -42,14 +42,10 @@ SDDM's own preview opens a window on the desktop but does not change the login s
 sddm-greeter-qt6 --test-mode --theme config/sddm/ghost
 ```
 
-## Installing (manual, not done by ghOSt)
+## Installing
 
-Changing the login screen is a system change. ghOSt's rules exclude SDDM, so these
-steps are for the user to run deliberately, after the test-mode preview:
-
-```sh
-sudo cp -r config/sddm/ghost /usr/share/sddm/themes/ghost
-```
-
-Then set `Current=ghost` under `[Theme]` in a file in `/etc/sddm.conf.d/`. Keep a
-working theme name noted so it can be restored from a TTY if needed.
+The installer installs `sddm` and `qt6-virtualkeyboard` if missing, copies the theme to
+`/usr/share/sddm/themes/ghost`, and writes `/etc/sddm.conf.d/99-ghost.conf` with
+`Current=ghost`, which wins over other theme settings. It enables `sddm.service` only
+when no other display manager is enabled. `./install.sh --restore` removes the theme
+and that file, and disables SDDM again if the installer enabled it.

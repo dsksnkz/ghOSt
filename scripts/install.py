@@ -22,6 +22,7 @@ parser.add_argument("--no-packages", action="store_true", help="do not install m
 parser.add_argument("--progress", action="store_true", help="show a progress bar and keep details in the install log")
 parser.add_argument("--no-shell-config", action="store_true", help="keep existing bashrc, fish, fastfetch and cava configuration")
 parser.add_argument("--update", action="store_true", help="reinstall for ghost update, without showing the Intro again")
+parser.add_argument("--no-sddm", action="store_true", help="leave the login screen as it is")
 parser.add_argument("--list-missing", action="store_true", help="print the packages this install would add, then exit")
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[1]
@@ -55,6 +56,8 @@ PACKAGES = {"fastfetch": "fastfetch", "cava": "cava", "fish": "fish", "starship"
             # Without this plugin Qt cannot read WebP, including the default wallpaper.
             "/usr/lib/qt6/plugins/imageformats/libqwebp.so": "qt6-imageformats", "cliphist": "cliphist",
             "/usr/share/themes/adw-gtk3-dark": "adw-gtk-theme",
+            # The login screen and its optional on-screen keyboard.
+            "sddm": "sddm", "/usr/lib/qt6/qml/QtQuick/VirtualKeyboard": "qt6-virtualkeyboard",
             "/usr/share/fonts/TTF/JetBrainsMono-Regular.ttf": "ttf-jetbrains-mono",
             "kitty": "kitty", "firefox": "firefox", "nautilus": "nautilus", "zeditor": "zed", "hyprshot": "hyprshot"}
 # Not in the official repositories, so pacman would reject its whole command over them.
@@ -244,6 +247,46 @@ def install_theme(record):
     if icons.returncode:
         print("Folder icons not installed: " + icons.stderr)
 
+# System paths for the login theme; tests point them into a temporary folder.
+SDDM_ROOT = Path(os.environ.get("GHOST_SDDM_ROOT", "/"))
+SDDM_THEME = SDDM_ROOT / "usr/share/sddm/themes/ghost"
+SDDM_CONF = SDDM_ROOT / "etc/sddm.conf.d/99-ghost.conf"
+
+
+def install_sddm(record):
+    """The ghOSt login screen. Its own drop-in file wins over other theme settings,
+    and SDDM is enabled only when no other display manager is."""
+    if args.no_sddm or not shutil.which("sddm"):
+        return
+    sudo = [] if os.environ.get("GHOST_SDDM_ROOT") else ["sudo"]
+    if subprocess.run([*sudo, "rm", "-rf", str(SDDM_THEME)], check=False).returncode:
+        print("Login theme not installed")
+        return
+    subprocess.run([*sudo, "mkdir", "-p", str(SDDM_THEME.parent), str(SDDM_CONF.parent)], check=False)
+    subprocess.run([*sudo, "cp", "-r", str(repo / "config/sddm/ghost"), str(SDDM_THEME)], check=False)
+    subprocess.run([*sudo, "tee", str(SDDM_CONF)], input="# ghOSt login screen. Remove this file to use the previous theme.\n"
+                   "[Theme]\nCurrent=ghost\n", text=True, stdout=subprocess.DEVNULL, check=False)
+    record["sddm"] = True
+    # /etc/sddm.conf is read after the drop-in folder, so a theme set there still wins.
+    main = SDDM_ROOT / "etc/sddm.conf"
+    if main.exists() and re.search(r"^\s*Current\s*=\s*(?!ghost\s*$)", main.read_text(errors="replace"), re.M):
+        print("Login theme installed, but /etc/sddm.conf sets another theme; remove its Current= line to use ghOSt's")
+    other_manager = (SDDM_ROOT / "etc/systemd/system/display-manager.service").exists()
+    if not other_manager and shutil.which("systemctl") and not os.environ.get("GHOST_SDDM_ROOT"):
+        if subprocess.run([*sudo, "systemctl", "enable", "sddm.service"], check=False,
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
+            record["sddm_enabled"] = True
+
+
+def restore_sddm(record):
+    if not record.get("sddm"):
+        return
+    sudo = [] if os.environ.get("GHOST_SDDM_ROOT") else ["sudo"]
+    subprocess.run([*sudo, "rm", "-rf", str(SDDM_CONF), str(SDDM_THEME)], check=False)
+    if record.get("sddm_enabled"):
+        subprocess.run([*sudo, "systemctl", "disable", "sddm.service"], check=False)
+
+
 def install_wallpaper(record):
     """Make the bundled image the wallpaper, unless one was already chosen in Settings."""
     wallpaper = data / "ghost/wallpaper.webp"
@@ -277,6 +320,7 @@ if args.restore:
             shutil.copy2(entry["saved"], path)
         elif path.exists() and (path == launcher or entry.get("bundled")):
             path.unlink()
+    restore_sddm(record)
     print("Restored the previous bar and autostart. ghOSt source and snapshots are retained.")
     raise SystemExit(0)
 
@@ -335,6 +379,7 @@ if not args.no_shell_config:
     install_shell_config(record)
 fresh_desktop = not has_ghost_shortcuts()
 install_hypr_snippets(record)
+install_sddm(record)
 if fresh_desktop:
     install_wallpaper(record)
     install_theme(record)

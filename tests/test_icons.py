@@ -30,7 +30,7 @@ class IconTests(unittest.TestCase):
             result = subprocess.run(['quickshell', '-p', str(config / 'test.qml')],
                                     env=env, capture_output=True, text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn('PASS: cached high-resolution icons', result.stdout + result.stderr)
+        self.assertIn('PASS: icons rasterised at their on-screen pixel size', result.stdout + result.stderr)
 
     def test_weather_variants_use_official_light_outlines(self):
         for name in ("cloud", "brightness", "rain", "snow", "lightning", "storm"):

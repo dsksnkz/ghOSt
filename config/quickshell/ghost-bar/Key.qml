@@ -29,7 +29,6 @@ G2Surface {
     Keys.onReturnPressed: clicked()
     Keys.onSpacePressed: clicked()
     color: selected ? Theme.text : mouse.pressed && pressFeedback ? Theme.line : "transparent"
-    scale: mouse.pressed && pressFeedback ? 0.97 : 1
     Controls.ToolTip.visible: false
     Controls.ToolTip.delay: 550
     Controls.ToolTip.text: hint
@@ -88,10 +87,4 @@ G2Surface {
         }
     }
 
-    Behavior on scale {
-        NumberAnimation {
-            duration: Theme.reducedMotion ? 0 : Theme.fast
-            easing.type: Easing.OutCubic
-        }
-    }
 }

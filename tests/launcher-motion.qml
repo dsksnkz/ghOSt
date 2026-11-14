@@ -45,8 +45,6 @@ ShellRoot {
                 for (const amount of [0, .25, .6, 1]) {
                     popup.reveal = amount;
                     wait(30);
-                    compare(panel.transform[1].xScale, 1);
-                    compare(panel.transform[1].yScale, 1);
                     compare(panel.opacity, 1);
                     fuzzyCompare(panel.transform[0].y, Motion.slideOffset("launcher", amount, height), .001);
                     const start = panel.mapToItem(test, 0, 0);
@@ -66,8 +64,8 @@ ShellRoot {
                 }
                 popup.page = "none";
                 popup.reveal = .5;
-                compare(panel.transform[1].xScale, .59);
-                compare(panel.transform[1].yScale, .55);
+                // Other popups slide and fade; nothing scales.
+                compare(panel.transform[0].y, -4);
                 compare(panel.opacity, .5);
                 compare(Motion.topMargin("calendar", .5, height), 68);
                 compare(Motion.topMargin("audio", .5, height), 54);
@@ -83,8 +81,6 @@ ShellRoot {
                 popup.page = "media";
                 popup.reveal = .37;
                 wait(30);
-                compare(panel.transform[1].xScale, 1);
-                compare(panel.transform[1].yScale, 1);
                 compare(panel.opacity, 1);
                 compare(panel.transform[0].y, Motion.slideOffset("media", .37, panel.height));
                 popup.reveal = 1;

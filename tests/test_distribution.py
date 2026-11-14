@@ -375,6 +375,47 @@ exit 0
             self.assertIn("ghost shell", usage.stderr)
 
 
+class LoginScreenTests(unittest.TestCase):
+    """The installer sets up the ghOSt SDDM theme; system paths go to a temporary root."""
+
+    def test_install_sets_the_theme_and_restore_removes_it(self):
+        with tempfile.TemporaryDirectory(prefix="ghost-sddm-test-") as directory:
+            root = Path(directory)
+            home, system, bin_dir = root / "home", root / "system", root / "bin"
+            (home / ".config/hypr").mkdir(parents=True)
+            bin_dir.mkdir()
+            for name in ("sudo", "pacman", "quickshell", "sddm"):
+                (bin_dir / name).write_text("#!/bin/sh\nexit 0\n")
+                (bin_dir / name).chmod(0o755)
+            environment = {"HOME": str(home), "PATH": str(bin_dir) + ":/usr/bin", "XDG_CONFIG_HOME": str(home / ".config"),
+                           "XDG_DATA_HOME": str(home / ".local/share"), "XDG_STATE_HOME": str(home / ".local/state"),
+                           "GHOST_SDDM_ROOT": str(system)}
+            script = str(REPOSITORY / "scripts/install.py")
+            subprocess.run([sys.executable, script, "--activate", "--no-start", "--no-packages"], env=environment,
+                           check=True, capture_output=True)
+            self.assertTrue((system / "usr/share/sddm/themes/ghost/Main.qml").is_file())
+            self.assertIn("Current=ghost", (system / "etc/sddm.conf.d/99-ghost.conf").read_text())
+            subprocess.run([sys.executable, script, "--restore"], env=environment, check=True, capture_output=True)
+            self.assertFalse((system / "etc/sddm.conf.d/99-ghost.conf").exists())
+            self.assertFalse((system / "usr/share/sddm/themes/ghost").exists())
+
+    def test_no_sddm_leaves_the_login_screen(self):
+        with tempfile.TemporaryDirectory(prefix="ghost-sddm-test-") as directory:
+            root = Path(directory)
+            home, system, bin_dir = root / "home", root / "system", root / "bin"
+            (home / ".config/hypr").mkdir(parents=True)
+            bin_dir.mkdir()
+            for name in ("sudo", "pacman", "quickshell", "sddm"):
+                (bin_dir / name).write_text("#!/bin/sh\nexit 0\n")
+                (bin_dir / name).chmod(0o755)
+            environment = {"HOME": str(home), "PATH": str(bin_dir) + ":/usr/bin", "XDG_CONFIG_HOME": str(home / ".config"),
+                           "XDG_DATA_HOME": str(home / ".local/share"), "XDG_STATE_HOME": str(home / ".local/state"),
+                           "GHOST_SDDM_ROOT": str(system)}
+            subprocess.run([sys.executable, str(REPOSITORY / "scripts/install.py"), "--activate", "--no-start",
+                            "--no-packages", "--no-sddm"], env=environment, check=True, capture_output=True)
+            self.assertFalse(system.exists())
+
+
 class UpdateTests(unittest.TestCase):
     """ghost update against a local stand-in for GitHub; the installer is a stub."""
 

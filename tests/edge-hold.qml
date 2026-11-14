@@ -12,10 +12,10 @@ ShellRoot {
     TestCase {
         name: "EdgeHold"
         function test_dwell_latch_release() {
-            compare(edge.dwellMs, 200);
+            compare(edge.dwellMs, 120);
             edge.pointerY = 200;
             edge.hovered = true;
-            wait(80);
+            wait(50);
             compare(edge.latched, false);
             compare(OsdState.opened, false);
             edge.hovered = false;
@@ -23,9 +23,9 @@ ShellRoot {
             compare(activations.count, 0);
 
             edge.hovered = true;
-            wait(100);
+            wait(60);
             edge.pointerY = 450;
-            wait(50);
+            wait(30);
             compare(edge.latched, false);
             tryCompare(edge, "latched", true, 400);
             compare(activations.count, 1);

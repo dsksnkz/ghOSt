@@ -27,12 +27,13 @@ ShellRoot {
                     if (icon.modelData === undefined)
                         continue;
                     const raster = icon.children[0];
-                    if (icon.status !== Image.Ready || raster.sourceSize.width < 48
-                            || raster.sourceSize.width < icon.width * 2
-                            || icon.width !== icon.modelData)
-                        throw new Error("Icon texture resolution or logical size changed");
+                    // Rasterised at the size it is drawn on screen: no shrinking, no blur.
+                    const expected = Math.round(icon.width * .7 * Screen.devicePixelRatio);
+                    if (icon.status !== Image.Ready || Math.abs(raster.sourceSize.width - expected) > 1
+                            || raster.mipmap || icon.width !== icon.modelData)
+                        throw new Error("Icon raster " + raster.sourceSize.width + " for " + expected + " screen pixels");
                 }
-                console.log("PASS: cached high-resolution icons at fractional scale, unchanged logical size");
+                console.log("PASS: icons rasterised at their on-screen pixel size, unchanged logical size");
                 Qt.quit();
             }
         }

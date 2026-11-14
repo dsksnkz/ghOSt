@@ -424,7 +424,81 @@ Item {
                 y: 32
                 text: cal.selectedDate.toDateString() === cal.now.toDateString() ? "Today" : Qt.formatDateTime(cal.selectedDate, "yyyy")
             }
+            // Quick music controls between the date and the actions.
+            Item {
+                objectName: "calendar-music"
+                readonly property var player: cal.fixtureMode ? null : Desk.player
+                visible: !!player
+                anchors.right: actions.left
+                anchors.rightMargin: 28
+                width: 286
+                height: 40
+                opacity: cal.groupOpacity(5)
+                G2Image {
+                    id: calendarArt
+                    width: 40
+                    height: 40
+                    radius: 8
+                    source: parent.player?.trackArtUrl || ""
+                }
+                G2Surface {
+                    visible: !parent.player?.trackArtUrl
+                    width: 40
+                    height: 40
+                    radius: 8
+                    color: "#151515"
+                    SvgIcon {
+                        anchors.centerIn: parent
+                        width: 18
+                        height: 18
+                        name: "play"
+                        opacity: .5
+                    }
+                }
+                Column {
+                    x: 52
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 52 - 96
+                    spacing: 2
+                    Label {
+                        width: parent.width
+                        text: parent.parent.player?.trackTitle || parent.parent.player?.identity || ""
+                        font.pixelSize: 13
+                        color: Theme.text
+                    }
+                    Caption {
+                        width: parent.width
+                        elide: Text.ElideRight
+                        text: parent.parent.player?.trackArtist || ""
+                    }
+                }
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 0
+                    Repeater {
+                        model: ["previous", Desk.playing ? "pause" : "play", "next"]
+                        Key {
+                            required property string modelData
+                            readonly property var player: parent.parent.player
+                            width: 32
+                            height: 32
+                            radius: 7
+                            hint: modelData
+                            enabled: modelData === "previous" ? !!player?.canGoPrevious : modelData === "next" ? !!player?.canGoNext : !!player?.canTogglePlaying
+                            onClicked: modelData === "previous" ? player.previous() : modelData === "next" ? player.next() : player.togglePlaying()
+                            SvgIcon {
+                                anchors.centerIn: parent
+                                width: 16
+                                height: 16
+                                name: parent.modelData
+                            }
+                        }
+                    }
+                }
+            }
             Row {
+                id: actions
                 anchors.right: parent.right
                 spacing: 8
                 opacity: cal.groupOpacity(5)

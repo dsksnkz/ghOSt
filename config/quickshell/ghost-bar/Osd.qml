@@ -60,7 +60,6 @@ PanelWindow {
             color: "#151515"
             border.color: "#393939"
             border.width: 1
-            scale: 0.4 + 0.6 * window.reveal
             opacity: window.reveal
             HoverHandler {
                 onHoveredChanged: {
@@ -151,7 +150,7 @@ PanelWindow {
 
     Behavior on reveal {
         NumberAnimation {
-            duration: Theme.reducedMotion ? 0 : 280
+            duration: Theme.reducedMotion ? 0 : 160
             easing.type: Easing.OutCubic
         }
     }

@@ -20,17 +20,27 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     readonly property var monitor: Hyprland.monitorFor(screen)
+    // Once open, the strip keeps it open only beside the card: moving up or
+    // down along the edge, away from it, closes it like leaving the edge.
+    readonly property real cardTop: EdgeVolume.osdTop(screen.height, Math.round(310 * factor), OsdState.pointerY) + 8 * factor
+    // Closed by moving along the edge: it opens again only after the pointer
+    // has left the edge sideways, not at the new spot further along.
+    property bool blocked: false
+    readonly property bool nearCard: hit.mouseY > cardTop - 40 * factor && hit.mouseY < cardTop + 334 * factor
     FullscreenState { id: fullscreenState; monitor: edge.monitor }
     visible: !fullscreenState.active
 
     EdgeHold {
         id: hold
-        hovered: edge.visible && (hit.containsMouse ||
+        hovered: edge.visible && !edge.blocked && (hit.containsMouse && (!hold.latched || edge.nearCard) ||
             (OsdState.ownsEdge(edge.screen.name, edge.side) &&
                 (OsdState.cardHovered || OsdState.interacting)))
         pointerY: edge.margins.top + hit.mouseY
         onActivated: y => OsdState.holdEdge(edge.screen.name, edge.side, y)
-        onReleased: OsdState.releaseEdge(edge.screen.name, edge.side)
+        onReleased: {
+            edge.blocked = hit.containsMouse;
+            OsdState.releaseEdge(edge.screen.name, edge.side);
+        }
     }
     mask: Region {
         width: edge.width
@@ -49,6 +59,8 @@ PanelWindow {
         id: hit
         anchors.fill: parent
         hoverEnabled: true
+        onContainsMouseChanged: if (!containsMouse)
+            edge.blocked = false
         onWheel: event => {
             // Scrolling/clicking must not bypass the 200ms dwell.
             if (hold.latched && OsdState.ownsEdge(edge.screen.name, edge.side))

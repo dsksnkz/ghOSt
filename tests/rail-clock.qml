@@ -55,7 +55,8 @@ ShellRoot {
                     for (const icon of state.rightIcons)
                         compare(icon.height, 16);
                     verify(findChild(rail, "rail-element-volume").visible);
-                    compare(findChild(rail, "rail-element-network").visible, false);
+                    verify(findChild(rail, "rail-element-network").visible);
+                    verify(findChild(rail, "rail-element-bluetooth").visible);
                     verify(Math.abs(state.clockCenterX - width / 2) < 0.01);
                     Desk.close();
                     mouseClick(clock, clock.width / 2, clock.height / 2);

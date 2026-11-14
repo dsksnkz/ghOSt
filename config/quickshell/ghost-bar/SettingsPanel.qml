@@ -28,8 +28,6 @@ Item {
         inset: navigationInset,
         groupGap: navigationGroupGap
     })
-    // The new screenshot supersedes the old 40% glyph sizing.
-    readonly property real iconRatio: 0.6
     function navigationGroupHeight(count) {
         return Navigation.groupHeight(count, navigationMetrics);
     }
@@ -840,12 +838,13 @@ Item {
                             height: 28
                             radius: 8
                             smoothing: .6
-                            color: modelData.id === settings.page ? "#191919" : "#242424"
+                            // The icon stands alone, without a box behind it.
+                            color: "transparent"
                             SvgIcon {
                                 objectName: "settings-navigation-glyph"
                                 anchors.centerIn: parent
-                                width: parent.width * settings.iconRatio
-                                height: width
+                                width: 18
+                                height: 18
                                 name: modelData.icon
                             }
                         }

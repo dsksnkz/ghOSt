@@ -1,10 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import Quickshell
-import Quickshell.Wayland
-import Quickshell.Hyprland
-import Quickshell.Networking
-import Quickshell.Bluetooth
 import Quickshell.Services.UPower
 import "PanelMotion.js" as Motion
 
@@ -85,7 +81,9 @@ Item {
     }
     // Keep the launcher frame full-size even before its Loader has completed.
     // Calendar and media draw their own header inside the page.
-    readonly property bool ownHeader: popup.page === "calendar" || popup.page === "media"
+    // The Wi-Fi and Bluetooth menus draw their own header too, on the usual panel frame.
+    readonly property bool menuPage: popup.page === "network" || popup.page === "bluetooth"
+    readonly property bool ownHeader: popup.page === "calendar" || popup.page === "media" || menuPage
     implicitHeight: popup.page === "launcher" ? 328 : body.implicitHeight + (ownHeader ? 0 : 46)
     focus: true
     Keys.onEscapePressed: {
@@ -99,19 +97,12 @@ Item {
     // Launcher and media travel as full-size windows; other popups retain their motion.
     readonly property bool slides: popup.page === "launcher" || popup.page === "media"
     opacity: slides ? 1 : popup.reveal
-    transform: [
-        Translate {
-            y: content.slides ? Motion.slideOffset(popup.page, popup.reveal, content.height) : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
-        },
-        Scale {
-            origin.x: Desk.panelOrigin
-            origin.y: 0
-            xScale: popup.page === "calendar" || content.slides ? 1 : .18 + .82 * popup.reveal
-            yScale: popup.page === "calendar" || content.slides ? 1 : .1 + .9 * popup.reveal
-        }
-    ]
+    // Popups only slide; nothing grows or shrinks.
+    transform: Translate {
+        y: content.slides ? Motion.slideOffset(popup.page, popup.reveal, content.height) : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
+    }
     Material {
-        visible: !content.ownHeader && popup.page !== "launcher"
+        visible: (!content.ownHeader || content.menuPage) && popup.page !== "launcher"
         anchors.fill: parent
         anchors.margins: 1
         radius: Theme.outerRadius
@@ -333,89 +324,16 @@ Item {
     }
     Component {
         id: networkPage
-        Column {
-            spacing: 13
-            Row {
-                spacing: 12
-                Icon {
-                    width: 28
-                    height: 28
-                    name: Desk.wired ? "network" : "wifi"
-                    ink: Desk.connected ? Theme.text : Theme.faint
-                }
-                Column {
-                    spacing: 4
-                    Label {
-                        width: body.width - 52
-                        text: Desk.networkName
-                        font.pixelSize: 13
-                    }
-                    Caption {
-                        text: Desk.connected ? "CONNECTED" : "DISCONNECTED"
-                    }
-                }
-            }
-            Action {
-                text: "Wi-Fi                              " + (Networking.wifiEnabled ? "ON" : "OFF")
-                onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
-            }
-            Caption {
-                text: "SAVED / NEARBY"
-            }
-            Repeater {
-                model: Desk.wifi ? Desk.wifi.networks.values.slice().sort((a, b) => Number(b.connected) - Number(a.connected) || b.signalStrength - a.signalStrength).slice(0, 5) : []
-                delegate: Action {
-                    required property var modelData
-                    text: (modelData.connected ? "● " : "○ ") + modelData.name + (modelData.known ? "" : " ↗")
-                    ink: modelData.connected ? Theme.cream : Theme.muted
-                    onClicked: {
-                        if (modelData.connected)
-                            return;
-                        if (modelData.known) {
-                            modelData.connect();
-                            Desk.notice = "Connecting to " + modelData.name + "…";
-                        } else
-                            Desk.launch(["nm-connection-editor"]);
-                    }
-                    Connections {
-                        target: modelData
-                        function onConnectionFailed(reason) {
-                            Desk.notice = "Connection failed: " + ConnectionFailReason.toString(reason);
-                        }
-                        function onConnectedChanged() {
-                            if (modelData.connected)
-                                Desk.notice = "";
-                        }
-                    }
-                }
-            }
-            Action {
-                text: "Network settings ↗"
-                onClicked: Desk.launch(["nm-connection-editor"])
-            }
+        NetworkMenu {
+            previewMode: content.previewMode
+            active: popup.opened
         }
     }
     Component {
         id: bluetoothPage
-        Column {
-            spacing: 14
-            Action {
-                text: Desk.adapter ? "Bluetooth                          " + (Desk.adapter.enabled ? "ON" : "OFF") : "No Bluetooth adapter"
-                enabled: !!Desk.adapter
-                onClicked: Desk.adapter.enabled = !Desk.adapter.enabled
-            }
-            Repeater {
-                model: Bluetooth.devices.values.filter(d => d.paired || d.connected).slice(0, 6)
-                delegate: Action {
-                    required property var modelData
-                    text: (modelData.connected ? "● " : "○ ") + modelData.name
-                    onClicked: Desk.launch(["blueman-manager"])
-                }
-            }
-            Action {
-                text: "Pair & manage devices ↗"
-                onClicked: Desk.launch(["blueman-manager"])
-            }
+        BluetoothMenu {
+            previewMode: content.previewMode
+            active: popup.opened
         }
     }
     Component {
