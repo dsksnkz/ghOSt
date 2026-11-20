@@ -181,27 +181,37 @@ Item {
             }
         }
 
+        // Password field. It widens as dots are added, the placeholder slides
+        // aside, and a wrong password shakes it sideways. Slides and fades only.
         Item {
             id: shaker
-            x: 890
-            y: 608
-            width: 140
-            height: 24
-            readonly property real restX: 890
+            readonly property int shown: Math.min(password.text.length, 24)
+            property real offset: 0
+            width: Math.max(240, 96 + shown * 14)
+            height: 40
+            x: 960 - width / 2
+            y: 600
+            Behavior on width {
+                NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+            }
+            transform: Translate { x: shaker.offset }
             SequentialAnimation {
                 id: shake
-                NumberAnimation { target: shaker; property: "x"; to: shaker.restX - 8; duration: 50 }
-                NumberAnimation { target: shaker; property: "x"; to: shaker.restX + 7; duration: 60 }
-                NumberAnimation { target: shaker; property: "x"; to: shaker.restX - 4; duration: 60 }
-                NumberAnimation { target: shaker; property: "x"; to: shaker.restX; duration: 70 }
+                NumberAnimation { target: shaker; property: "offset"; to: -10; duration: 50 }
+                NumberAnimation { target: shaker; property: "offset"; to: 8; duration: 60 }
+                NumberAnimation { target: shaker; property: "offset"; to: -5; duration: 60 }
+                NumberAnimation { target: shaker; property: "offset"; to: 0; duration: 80 }
             }
             Rectangle {
+                id: fieldFrame
                 anchors.fill: parent
                 radius: height / 2
-                color: "#272727"
+                color: password.activeFocus ? "#232323" : "#1d1d1d"
                 border.width: 1
-                border.color: root.error ? "#8c8c8c" : "#3b3b3b"
-                opacity: root.busy ? .5 : 1
+                border.color: root.error ? "#b86b6b" : password.activeFocus ? "#5a5a5a" : "#333333"
+                Behavior on color { ColorAnimation { duration: 160 } }
+                Behavior on border.color { ColorAnimation { duration: 160 } }
+
                 TextInput {
                     id: password
                     objectName: "password"
@@ -219,28 +229,85 @@ Item {
                     Keys.onDownPressed: root.selectSession(root.sessionIndex + 1)
                     onTextEdited: root.error = ""
                 }
+
+                // Placeholder: slides left and fades as typing starts.
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: 22 - (password.text.length ? 12 : 0)
+                    opacity: password.text.length || root.busy ? 0 : 1
+                    text: "Password"
+                    font.family: root.sans
+                    font.pixelSize: 13
+                    color: root.muted
+                    Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                    Behavior on opacity { NumberAnimation { duration: 140 } }
+                }
+
+                // One dot per character; each slides in from the right as it fades in.
                 Row {
                     objectName: "password-dots"
-                    readonly property int shown: Math.min(password.text.length, 14)
-                    anchors.centerIn: parent
-                    spacing: shown > 1 ? Math.min(8, (124 - shown * 8) / (shown - 1)) : 0
+                    readonly property int shown: shaker.shown
+                    x: 22
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 6
+                    opacity: root.busy ? 0 : 1
+                    Behavior on opacity { NumberAnimation { duration: 140 } }
                     Repeater {
                         model: parent.shown
                         Rectangle {
+                            id: dot
                             width: 8
                             height: 8
                             radius: 4
                             color: "#e6e6e6"
+                            opacity: 0
+                            transform: Translate { id: dotSlide; x: 6 }
+                            Component.onCompleted: arrive.start()
+                            ParallelAnimation {
+                                id: arrive
+                                NumberAnimation { target: dot; property: "opacity"; to: 1; duration: 140 }
+                                NumberAnimation { target: dotSlide; property: "x"; to: 0; duration: 160; easing.type: Easing.OutCubic }
+                            }
                         }
                     }
                 }
+
+                // While signing in: three dots fading in turn.
+                Row {
+                    objectName: "busy"
+                    anchors.centerIn: parent
+                    spacing: 6
+                    opacity: root.busy ? 1 : 0
+                    visible: opacity > 0
+                    Behavior on opacity { NumberAnimation { duration: 140 } }
+                    Repeater {
+                        model: 3
+                        Rectangle {
+                            required property int index
+                            width: 6
+                            height: 6
+                            radius: 3
+                            color: "#e6e6e6"
+                            SequentialAnimation on opacity {
+                                running: root.busy
+                                loops: Animation.Infinite
+                                PauseAnimation { duration: index * 140 }
+                                NumberAnimation { from: .25; to: 1; duration: 280 }
+                                NumberAnimation { from: 1; to: .25; duration: 280 }
+                                PauseAnimation { duration: (2 - index) * 140 }
+                            }
+                        }
+                    }
+                }
+
             }
         }
 
         Rectangle {
             objectName: "keyboard-toggle"
             visible: keyboardLoader.status === Loader.Ready
-            x: 1040
+            // Follows the field as it widens.
+            x: shaker.x + shaker.width + 12
             y: 606
             width: 28
             height: 28
@@ -270,7 +337,9 @@ Item {
         Text {
             objectName: "status"
             x: 760
-            y: 644
+            y: 652
+            opacity: text ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 160 } }
             width: 400
             horizontalAlignment: Text.AlignHCenter
             text: root.error ? root.error : keyboard.capsLock ? "Caps Lock is on" : ""

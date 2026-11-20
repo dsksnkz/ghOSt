@@ -74,7 +74,8 @@ ShellRoot {
                 if (capture) {
                     saved = false;
                     findChild(theme, "password").text = "abcd";
-                    wait(50);
+                    // Let the dots finish sliding in before the capture.
+                    wait(400);
                     const zoom = Number(Quickshell.env("GHOST_SDDM_CAPTURE_SCALE") || 1);
                     theme.grabToImage(r => saved = r.saveToFile(capture), Qt.size(theme.width * zoom, theme.height * zoom));
                     tryCompare(test, "saved", true, 3000);
