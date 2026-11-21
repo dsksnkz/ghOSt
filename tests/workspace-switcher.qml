@@ -99,13 +99,15 @@ ShellRoot {
                 tryCompare(scene, "position", scene.target, 1500);
                 scene.scroll(120);
                 tryCompare(scene, "position", scene.target, 1500);
-                keyRelease(Qt.Key_Super_L);
-                compare(scene.superHeld, false);
-                compare(scene.picks.join(), "2");
-                keyClick(Qt.Key_Right);
-                compare(scene.picks.join(), "2");
+                // Letting go of Super never changes desktop; only Enter or a click does.
                 keyPress(Qt.Key_Super_L);
                 keyRelease(Qt.Key_Super_L);
+                keyClick(Qt.Key_Right);
+                keyPress(Qt.Key_Super_L);
+                keyRelease(Qt.Key_Super_L);
+                compare(scene.picks.join(), "2");
+                verify(scene.shown);
+                keyClick(Qt.Key_Return);
                 compare(scene.picks.join(), "2,2");
                 tryCompare(scene, "closes", 3, 1000);
                 reopen();

@@ -74,9 +74,11 @@ Singleton {
     property string switcherScreen: ""
     signal switcherStepped(int direction)
     signal switcherConfirmed
+    // Super+Tab opens the overview on the current desktop and closes it again.
+    // It never changes desktop by itself: Enter or a click does.
     function openSwitcher(screenName, direction) {
         if (switcherScreen) {
-            switcherStepped(direction);
+            closeSwitcher();
             return;
         }
         close();

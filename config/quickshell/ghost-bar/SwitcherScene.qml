@@ -38,9 +38,6 @@ Item {
     property real reveal: revealGate.open ? 1 : 0
     property int magicIndex: -1
     property real scrollRemainder: 0
-    // Super is down when the shortcut opens this; letting go after moving confirms.
-    property bool superHeld: true
-    property int startTarget: 0
     signal magicChosen(string special)
     // Set when the chosen card fills the screen: it matches the real desktop, so hide at once.
     property bool handedOver: false
@@ -83,8 +80,6 @@ Item {
         positionMotion.enabled = false;
         target = Math.max(0, ring.indexOf(current));
         positionMotion.enabled = true;
-        superHeld = true;
-        startTarget = target;
         prepared = true;
         input.forceActiveFocus();
     }
@@ -215,21 +210,8 @@ Item {
     Item {
         id: input
         focus: true
-        function isSuper(key) {
-            return key === Qt.Key_Meta || key === Qt.Key_Super_L || key === Qt.Key_Super_R;
-        }
-        Keys.onReleased: event => {
-            if (!isSuper(event.key))
-                return;
-            if (scene.superHeld && (scene.target !== scene.startTarget || scene.magicIndex >= 0))
-                scene.confirm();
-            scene.superHeld = false;
-            event.accepted = true;
-        }
         Keys.onPressed: event => {
-            if (isSuper(event.key))
-                scene.superHeld = true;
-            else if (event.key === Qt.Key_Escape)
+            if (event.key === Qt.Key_Escape)
                 scene.closed();
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
                 scene.confirm();
