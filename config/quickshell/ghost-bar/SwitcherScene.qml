@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 import "WorkspaceWheel.js" as Geometry
@@ -19,11 +18,11 @@ Item {
 
     readonly property real designScale: width / 1920
     readonly property real planeHeight: designScale > 0 ? height / designScale : 1080
-    // Cards are laid out at full size and scaled, so they expand without resampling.
-    // The shell Scale sizes the resting cards; a chosen card still opens to full screen.
+    // Every desktop card has one size; stepping only slides them. Side cards
+    // tuck behind the centre one and are dimmed. The shell Scale sizes them.
     readonly property real cardScale: Math.min(Theme.shellScale, 1.5)
-    readonly property real centreScale: 592 / 1920 * cardScale
-    readonly property real sideScale: 423 / 1920 * cardScale
+    readonly property real centreScale: 658 / 1920 * cardScale
+    readonly property real spacing: 520 * cardScale
     readonly property real magicScale: 293 / 1920 * cardScale
     readonly property var magic: [
         {key: "special:ai", special: "ai", name: "AI", x: 766},
@@ -73,6 +72,8 @@ Item {
                         at: (details.at ?? [0, 0]).slice(),
                         size: (details.size ?? [0, 0]).slice(),
                         focusHistoryID: details.focusHistoryID ?? 0,
+                        title: details.title ?? "",
+                        appClass: details.class ?? "",
                         source: window.wayland ?? null
                     };
                 });
@@ -129,6 +130,9 @@ Item {
     function windowsFor(workspace) {
         return windowMap[workspace] ?? [];
     }
+    // The desktop's most recently used window names the centre card.
+    readonly property var lead: windowsFor(selected).slice().sort((a, b) => a.focusHistoryID - b.focusHistoryID)[0] ?? null
+    readonly property var leadEntry: lead?.appClass ? DesktopEntries.heuristicLookup(lead.appClass) : null
 
     // Leave the Wayland/key signal and its binding evaluation before building
     // nested models. Coalesce repeated shortcuts into one setup pass.
@@ -185,21 +189,13 @@ Item {
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         visible: scene.shown
-        opacity: scene.reveal
-        layer.enabled: visible
-        layer.effect: MultiEffect {
-            autoPaddingEnabled: false
-            blurEnabled: true
-            blur: .6
-            blurMax: 24
-            brightness: -.18
-        }
+        opacity: scene.reveal * (1 - scene.expansion)
     }
     Rectangle {
         anchors.fill: parent
         visible: scene.shown
         color: "#000000"
-        opacity: (scene.wallpaper ? .35 : .85) * scene.reveal
+        opacity: (scene.wallpaper ? .3 : .85) * scene.reveal * (1 - scene.expansion)
     }
     MouseArea {
         anchors.fill: parent
@@ -244,28 +240,24 @@ Item {
                 required property int index
                 readonly property real offset: scene.offsetOf(index)
                 readonly property real distance: Math.abs(offset)
-                readonly property real nearness: Math.min(1, distance)
-                // The chosen card zooms from wherever it is, with no jump mid-way.
                 readonly property bool chosen: scene.leaving && modelData === scene.selected
-                readonly property real restScale: scene.centreScale + (scene.sideScale - scene.centreScale) * nearness
                 objectName: "switcher-card-" + modelData
                 width: 1920
                 height: plane.height
-                x: (offset < 0 ? -654 : 654) * scene.cardScale * Math.min(1.5, distance)
-                z: chosen ? 10 : 2 - distance
-                visible: distance < 1.5
-                opacity: (chosen ? 1 : Math.min(1, (1.5 - distance) / .5)) * scene.reveal * (chosen || scene.handedOver ? 1 : 1 - scene.expansion)
-                scale: (chosen ? restScale + (1 - restScale) * scene.expansion : restScale) * (.97 + .03 * scene.reveal)
-                Text {
-                    objectName: "switcher-number-" + card.modelData
-                    width: parent.width
-                    y: -150
-                    horizontalAlignment: Text.AlignHCenter
-                    text: card.modelData
-                    font.family: Theme.font
-                    font.pixelSize: 65
-                    color: "#ffffff"
-                    opacity: 1 - scene.expansion
+                // Slides only. A chosen desktop fades the overview away rather than zooming.
+                x: offset * scene.spacing
+                y: -40 * scene.cardScale
+                z: 10 - distance
+                visible: distance < 1.6
+                opacity: Math.min(1, (1.6 - distance) / .5) * scene.reveal * (scene.handedOver ? 1 : 1 - scene.expansion)
+                scale: scene.centreScale
+                // Side desktops turn their outer edge towards the viewer, as if on the inside of a curve.
+                transform: Rotation {
+                    origin.x: 960
+                    origin.y: plane.height / 2
+                    axis { x: 0; y: 1; z: 0 }
+                    angle: Math.max(-1, Math.min(1, card.offset)) * -40
+                    distanceToPlane: 2400
                 }
                 SwitcherPreview {
                     anchors.fill: parent
@@ -273,12 +265,19 @@ Item {
                     monitor: scene.monitor
                     wallpaper: scene.wallpaper
                 }
+                // Side desktops sit back: dimmed, not shrunk.
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 26
+                    color: "#000000"
+                    opacity: .12 * Math.min(1, card.distance)
+                }
                 Rectangle {
                     anchors.fill: parent
                     radius: 26
                     color: "transparent"
-                    border.width: 1 / card.scale
-                    border.color: Qt.rgba(1, 1, 1, (cardArea.containsMouse ? .6 : .32) * (1 - scene.expansion))
+                    border.width: 2 / card.scale
+                    border.color: Qt.rgba(1, 1, 1, cardArea.containsMouse ? .5 : .18)
                 }
                 MouseArea {
                     id: cardArea
@@ -287,6 +286,51 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: scene.pick(card.index)
                     onWheel: event => scene.scroll(event.angleDelta.y || event.angleDelta.x)
+                }
+            }
+        }
+        // Title above the centre card: desktop number, app icon and window title.
+        Rectangle {
+            objectName: "switcher-title"
+            readonly property real cardTop: plane.height / 2 - plane.height * scene.centreScale / 2 - 40 * scene.cardScale
+            visible: scene.shown && scene.magicIndex < 0
+            x: (1920 - width) / 2
+            y: cardTop - height - 14
+            width: titleRow.implicitWidth + 28
+            height: 38
+            radius: 10
+            color: "#141414"
+            opacity: .92 * scene.reveal * (1 - scene.expansion)
+            Row {
+                id: titleRow
+                anchors.centerIn: parent
+                spacing: 9
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: scene.selected
+                    font.family: Theme.font
+                    font.pixelSize: 14
+                    font.weight: Theme.demiWeight
+                    color: "#8a8a8a"
+                }
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 20
+                    height: 20
+                    visible: status === Image.Ready
+                    source: scene.leadEntry?.icon ? Quickshell.iconPath(scene.leadEntry.icon, true) : ""
+                    sourceSize: Qt.size(20 * Screen.devicePixelRatio, 20 * Screen.devicePixelRatio)
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.min(implicitWidth, 560)
+                    elide: Text.ElideRight
+                    text: !scene.lead ? "Empty desktop" : (scene.lead.title || scene.lead.appClass) + (scene.leadEntry?.name && scene.lead.title && scene.lead.title !== scene.leadEntry.name ? "  ·  " + scene.leadEntry.name : "")
+                    font.family: Theme.font
+                    font.pixelSize: 14
+                    color: "#ffffff"
                 }
             }
         }

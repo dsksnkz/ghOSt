@@ -49,13 +49,15 @@ ShellRoot {
                 const next = findChild(scene, "switcher-card-2");
                 const previous = findChild(scene, "switcher-card-5");
                 tryCompare(scene, "reveal", 1, 1500);
-                fuzzyCompare(centre.scale, 592 / 1920, .001);
-                fuzzyCompare(next.scale, 423 / 1920, .001);
-                fuzzyCompare(next.x - centre.x, 654, .01);
-                fuzzyCompare(centre.x - previous.x, 654, .01);
+                // One card size; side desktops sit beside the centre one, tilted.
+                fuzzyCompare(centre.scale, 658 / 1920, .001);
+                fuzzyCompare(next.scale, 658 / 1920, .001);
+                fuzzyCompare(next.x - centre.x, 520, .01);
+                fuzzyCompare(centre.x - previous.x, 520, .01);
+                verify(centre.z > next.z);
                 compare(next.y, centre.y);
                 compare(findChild(scene, "switcher-card-3").visible, false);
-                compare(findChild(scene, "switcher-number-1").text, "1");
+                verify(findChild(scene, "switcher-title").visible);
                 compare(findChild(scene, "switcher-magic-heading").text, "Magic Workspaces");
                 verify(findChild(scene, "switcher-magic-ai") !== null);
                 verify(findChild(scene, "switcher-magic-music") !== null);
@@ -69,7 +71,7 @@ ShellRoot {
                 compare(scene.selected, 2);
                 tryCompare(scene, "position", scene.target, 1500);
                 fuzzyCompare(findChild(scene, "switcher-card-2").offset, 0, .001);
-                fuzzyCompare(findChild(scene, "switcher-card-2").scale, 592 / 1920, .001);
+                fuzzyCompare(findChild(scene, "switcher-card-2").scale, 658 / 1920, .001);
                 keyClick(Qt.Key_Backtab);
                 keyClick(Qt.Key_Left);
                 compare(scene.selected, 5);
@@ -115,10 +117,11 @@ ShellRoot {
                 const side = findChild(scene, "switcher-card-5");
                 mouseClick(side, side.width / 2, side.height / 2);
                 compare(scene.picks.join(), "2,2,5");
-                // The clicked side card must start zooming at once, not jump near the centre.
+                // Choosing fades the overview away; nothing zooms.
                 verify(side.chosen);
-                tryVerify(() => scene.expansion > .2 && side.scale > 423 / 1920 + .05, 300);
-                verify(side.opacity > .9);
+                tryVerify(() => scene.expansion > .2, 300);
+                fuzzyCompare(side.scale, 658 / 1920, .001);
+                verify(side.opacity < 1);
                 tryCompare(scene, "closes", 4, 1000);
                 reopen();
                 const music = findChild(scene, "switcher-magic-music");
