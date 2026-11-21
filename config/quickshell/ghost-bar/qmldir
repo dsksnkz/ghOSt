@@ -17,7 +17,7 @@ singleton Notifications 1.0 Notifications.qml
 NotificationList 1.0 NotificationList.qml
 NotificationToast 1.0 NotificationToast.qml
 NotificationBanner 1.0 NotificationBanner.qml
-SidebarDismissal 1.0 SidebarDismissal.qml
+Dismissal 1.0 Dismissal.qml
 DismissArea 1.0 DismissArea.qml
 InkLabel 1.0 InkLabel.qml
 SettingsPanel 1.0 SettingsPanel.qml
@@ -46,8 +46,6 @@ SvgIcon 1.0 SvgIcon.qml
 WeatherGlyph 1.0 WeatherGlyph.qml
 CalendarPanel 1.0 CalendarPanel.qml
 CalendarWindow 1.0 CalendarWindow.qml
-Sidebar 1.0 Sidebar.qml
-SidebarFigmaBody 1.0 SidebarFigmaBody.qml
 PowerProfileControls 1.0 PowerProfileControls.qml
 WallpaperPicker 1.0 WallpaperPicker.qml
 IntroPanel 1.0 IntroPanel.qml
@@ -57,3 +55,9 @@ Scaled 1.0 Scaled.qml
 DisplayBrightness 1.0 DisplayBrightness.qml
 NetworkMenu 1.0 NetworkMenu.qml
 BluetoothMenu 1.0 BluetoothMenu.qml
+singleton AirPods 1.0 AirPods.qml
+ListeningMode 1.0 ListeningMode.qml
+MenuToggle 1.0 MenuToggle.qml
+LineGlyph 1.0 LineGlyph.qml
+BatteryMenu 1.0 BatteryMenu.qml
+PowerMenu 1.0 PowerMenu.qml

@@ -5,7 +5,7 @@ plus the ghOSt ghost brand mark. Both folder IDs share one Material
 folder. Six weather variants use Google's lighter weight 200; other controls use
 regular 400, unfilled. Third-party application logos retain their own identities.
 
-The rail, sidebar, Settings, calendar, built-in launcher, OSD and wallpaper chooser
+The rail, menus, Settings, calendar, built-in launcher, OSD and wallpaper chooser
 use the shared SVG component. Sizes, positions, actions and animation timing are
 unchanged. The existing Files folder overlay also uses Material folders; other
 system-theme icons inherit their previous theme. The separate, independently

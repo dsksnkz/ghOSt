@@ -929,7 +929,6 @@ Item {
                             accessibility: accessibilityPage,
                             sound: soundPage,
                             battery: batteryPage,
-                            widgets: widgetsPage,
                             brightness: brightnessPage,
                             wallpaper: wallpaperPage,
                             notifications: notificationsPage,
@@ -1204,52 +1203,6 @@ Item {
                 Note {
                     visible: !(settings.details.usage?.samples?.length)
                     text: "No history yet"
-                }
-            }
-        }
-    }
-    Component {
-        id: widgetsPage
-        ControlGroup {
-            padding: 8
-            Column {
-                width: parent.width
-                spacing: 6
-                Repeater {
-                    model: [
-                        {
-                            id: "network",
-                            name: "Wireless Network",
-                            icon: "wifi"
-                        },
-                        {
-                            id: "bluetooth",
-                            name: "Bluetooth",
-                            icon: "bluetooth"
-                        },
-                        {
-                            id: "volume",
-                            name: "Volume",
-                            icon: "volume"
-                        },
-                        {
-                            id: "brightness",
-                            name: "Brightness",
-                            icon: "brightness"
-                        },
-                        {
-                            id: "notifications",
-                            name: "Notifications",
-                            icon: "notifications"
-                        }
-                    ]
-                    ToggleRow {
-                        required property var modelData
-                        name: modelData.name
-                        icon: modelData.icon
-                        checked: Settings.widget(modelData.id)
-                        onToggled: value => settings.preference("widgets." + modelData.id, value)
-                    }
                 }
             }
         }

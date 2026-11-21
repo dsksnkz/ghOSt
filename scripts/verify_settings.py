@@ -45,12 +45,12 @@ call('page', 'calendar')
 call('calendar', 'reduced', 'false')
 call('page', 'settings')
 call('settings', 'reset', '')
-for page in ('general', 'sound', 'battery', 'widgets', 'brightness', 'wallpaper',
+for page in ('general', 'sound', 'battery', 'brightness', 'wallpaper',
              'notifications', 'network', 'bluetooth', 'airplane',
              'accessibility', 'storage', 'applications', 'about'):
     state = json.loads(call('settings', 'page', page))
     assert state['preview'] and state['visible'] and state['page'] == page
-    assert (state['width'], state['height'], state['categories']) == (1024, 699, 14)
+    assert (state['width'], state['height'], state['categories']) == (1024, 699, 13)
     assert (state['x'], state['y'], state['scale']) == (524, 212, 1)
     assert state['navHeight'] == 590 and state['navTop'] == 98
     assert (state['searchTop'], state['searchWidth']) == (56, 227)
@@ -65,7 +65,7 @@ time.sleep(.2)
 capture('settings-empty-search')
 call('settings', 'query', '')
 call('settings', 'page', 'general')
-for origin in ('sidebar', 'general'):
+for origin in ('general',):
     state = json.loads(call('settings', 'portrait', origin))
     assert state['portraitChooserRequested'] and state['portraitOrigin'] == origin
 state = json.loads(call('settings', 'portrait-select', state['portraitSource']))
@@ -100,19 +100,6 @@ state = json.loads(call('settings', 'query', 'sound'))
 assert state['groupCategories'] == [['sound']]
 capture('settings-search-sound')
 call('settings', 'query', '')
-call('page', 'sidebar')
-first = json.loads(call('sidebar', 'reveal'))
-second = json.loads(call('sidebar', 'reveal'))
-assert second['elapsed'] < 100
-assert sorted(second['order']) == list(range(6))
-assert first['order'] != second['order']
-time.sleep(1)
-assert json.loads(call('sidebar', 'normal'))['elapsed'] == 900
-capture('sidebar-frame')
-call('sidebar', 'long')
-time.sleep(.2)
-capture('sidebar-long-names')
-call('sidebar', 'normal')
 for page in ('desktop', 'calendar', 'rail', 'session'):
     call('page', page)
     time.sleep(1.6)
@@ -120,4 +107,4 @@ for page in ('desktop', 'calendar', 'rail', 'session'):
 call('page', 'calendar')
 call('calendar', 'navigate', 'settings')
 assert json.loads(call('settings', 'page', 'general'))['visible']
-print('PASS: 14 Settings pages, separate groups, portrait entry points, fixture-only name validation/save/cancel, search, sidebar, captures and calendar navigation')
+print('PASS: 13 Settings pages, separate groups, portrait entry point, fixture-only name validation/save/cancel, search, captures and calendar navigation')

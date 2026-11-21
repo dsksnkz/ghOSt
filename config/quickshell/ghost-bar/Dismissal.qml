@@ -7,7 +7,6 @@ import Quickshell.Wayland
 PanelWindow {
     id: dismissal
 
-    required property var sidebarWindow
     required property var calendarWindow
     required property var panelWindow
     required property var railWindow
@@ -25,10 +24,10 @@ PanelWindow {
             presses
         };
     }
-    visible: sidebarWindow.opened || calendarWindow.opened || pageOpened
+    visible: calendarWindow.opened || pageOpened
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "ghost-sidebar-dismissal"
+    WlrLayershell.namespace: "ghost-dismissal"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -55,14 +54,6 @@ PanelWindow {
         Region {
             width: dismissal.width
             height: dismissal.railWindow.height
-            intersection: Intersection.Subtract
-        }
-
-        Region {
-            x: dismissal.sidebarWindow.margins.left
-            y: dismissal.sidebarWindow.margins.top
-            width: dismissal.sidebarWindow.opened ? dismissal.sidebarWindow.width : 0
-            height: dismissal.sidebarWindow.opened ? dismissal.sidebarWindow.height : 0
             intersection: Intersection.Subtract
         }
 

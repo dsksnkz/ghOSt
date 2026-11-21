@@ -40,6 +40,20 @@ QtObject {
     readonly property color orange: text
     readonly property color cream: text
     readonly property color blue: text
+    // Wi-Fi, Bluetooth and battery menus share one spacing scale, by element class.
+    readonly property int menuWidth: 430
+    readonly property int menuEdge: 32          // Left and right margin of every row.
+    readonly property int menuTop: 30           // Header icon and title top.
+    readonly property int menuTextX: 82         // Header title and row names.
+    readonly property int menuRule: 100         // Header rule, or the battery level bar.
+    readonly property int menuSection: 24       // Between sections.
+    readonly property int menuGap: 12           // Between items in a section; heading to content.
+    readonly property int menuTight: 4          // Label to its value.
+    readonly property int menuRow: 48           // Network and device rows.
+    readonly property int menuButton: 32        // Button height.
+    readonly property int menuInner: menuWidth - 2 * menuEdge
+    readonly property int menuHeading: 14       // Section heading size.
+    readonly property color menuHeadingInk: "#8a8a8a"
     readonly property int fast: 90
     readonly property int motion: 150
     readonly property int panel: 220

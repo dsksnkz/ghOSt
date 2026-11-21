@@ -157,7 +157,7 @@ def main():
     magick(desk, "-resize", "1920x1080", runtime / "frames/wallpaper.png")
     art = runtime / "sample-art.png"
     magick(desk, "-crop", "1200x1200+1300+200", "+repage", "-resize", "528x528", "-brightness-contrast", "18x20", art)
-    render(runtime, ("rail", "calendar", "media", "sidebar", "settings", "launcher"))
+    render(runtime, ("rail", "calendar", "media", "settings", "launcher"))
 
     # Sample windows for the switcher cards: real panels placed on empty desktops.
     blank = ("-size", "1920x1080", "xc:none")
@@ -165,7 +165,7 @@ def main():
     magick(*blank, "(", WORK / "calendar.png", "-resize", "1400x", ")", "-gravity", "center", "-composite", runtime / "frames/2.png")
     magick(*blank, "(", WORK / "launcher.png", "-resize", "1000x", ")", "-gravity", "center", "-composite", runtime / "frames/5.png")
     magick(*blank, "(", WORK / "media.png", "-resize", "900x", ")", "-gravity", "center", "-composite", runtime / "frames/music.png")
-    magick(*blank, "(", WORK / "sidebar.png", "-resize", "x1000", ")", "-gravity", "east", "-geometry", "+24+0", "-composite", runtime / "frames/ai.png")
+    magick(*blank, runtime / "frames/ai.png")
     for name in (3, 4):
         magick(*blank, runtime / f"frames/{name}.png")
     render(runtime, ("switcher",))
@@ -180,7 +180,7 @@ def main():
     webp(WORK / "rail.png", "-crop", "900x70+0+0", "+repage", name="rail-left")
     webp(WORK / "rail.png", "-gravity", "east", "-crop", "560x70+0+0", "+repage", name="rail-right")
     webp(WORK / "switcher.png", "-resize", "2880x", name="switcher")
-    for name in ("calendar", "media", "launcher", "sidebar", "settings"):
+    for name in ("calendar", "media", "launcher", "settings"):
         webp(WORK / (name + ".png"), name=name)
     # The login theme, with the sample cover standing in for a profile picture.
     login = WORK / "login.png"

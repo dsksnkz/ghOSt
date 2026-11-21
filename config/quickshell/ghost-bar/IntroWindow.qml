@@ -22,8 +22,7 @@ FloatingWindow {
             onActionRequested: action => {
                 const screen = Quickshell.screens[0];
                 if (!screen) return;
-                if (action === "sidebar") Desk.toggleSidebar(screen.name);
-                else if (action === "calendar") Desk.toggle("calendar", screen.name, (screen.width - Theme.calendarWidth(screen.width, screen.height)) / 2);
+                if (action === "calendar") Desk.toggle("calendar", screen.name, (screen.width - Theme.calendarWidth(screen.width, screen.height)) / 2);
                 else Desk.openSettings(screen.name, action);
             }
         }

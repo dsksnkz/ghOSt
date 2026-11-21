@@ -25,7 +25,7 @@ avoidance. The historical `config/hypr/hyprland.lua` is not a deployment templat
 | Settings pages | `SettingsPanel.qml`, `Settings.qml`, `settings_backend.py` | Page controls, bounded state refresh, and explicit system actions |
 | Wallpaper browsing | `WallpaperPicker.qml` | Dark image/folder browser, bounded thumbnails and selection preview; only confirmation emits an apply request |
 | Top-bar customization | `TopBarEditor.qml`, `RailLayout.js` | Real rail preview, drag regions, hidden tray and pure ordering/placement; `settings_backend.py` validates and saves the full layout |
-| Calendar/sidebar/rail | `CalendarPanel.qml`, `CalendarWindow.qml`, `SidebarFigmaBody.qml`, `Rail.qml` | Their corresponding surfaces; shared icons and corner components stay separate |
+| Calendar/menus/rail | `CalendarPanel.qml`, `CalendarWindow.qml`, `NetworkMenu.qml`, `BluetoothMenu.qml`, `Rail.qml` | Their corresponding surfaces; shared icons and corner components stay separate |
 | Lock | `lock.qml`, `lock/` | Session lock/authentication ownership separated from visual scene components |
 | SDDM theme | `config/sddm/ghost/` | Standalone login greeter, not installed by ghOSt; see [sddm.md](sddm.md) |
 

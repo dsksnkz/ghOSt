@@ -12,11 +12,10 @@ entry = Path(__file__).resolve().parents[1] / "config/quickshell/ghost-bar/input
 result = subprocess.run(["quickshell", "-p", str(entry)], env=environment,
                         capture_output=True, text=True, timeout=15, check=True)
 output = result.stdout + result.stderr
-for assertion in ("PASS: sidebar Escape event", "PASS: outside pointer event",
-                  "PASS: external, closed and preview sidebar brightness timers stay stopped",
+for assertion in ("PASS: outside pointer event",
                   "PASS: per-output fullscreen visibility and restoration",
                   "PASS: Settings wheel propagation and Bezier selection movement",
-                  "PASS: Settings fixed header, search, portrait and all 14 pages",
+                  "PASS: Settings fixed header, search, portrait and all 13 pages",
                   "PASS: Settings live summaries, passive storage, all-page bounds and content scrolling",
                   "PASS: selected weather headline and temperature agree",
                   "PASS: weather blur midpoint, rapid scroll settlement, aligned list and reduced motion",

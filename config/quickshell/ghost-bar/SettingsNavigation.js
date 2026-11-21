@@ -10,7 +10,6 @@ function categories() {
         {id: "accessibility", name: "Accessibility", icon: "accessibility"},
         {id: "sound", name: "Sound", icon: "volume"},
         {id: "battery", name: "Battery", icon: "battery"},
-        {id: "widgets", name: "Sidebar widgets", icon: "appearance"},
         {id: "brightness", name: "Brightness", icon: "brightness"},
         {id: "wallpaper", name: "Wallpaper", icon: "wallpaper"},
         {id: "notifications", name: "Notifications", icon: "notifications"},
@@ -24,7 +23,7 @@ function groups() {
     return [
         ["network", "bluetooth", "general", "airplane", "accessibility"],
         ["sound", "battery", "brightness"],
-        ["widgets", "wallpaper", "notifications"],
+        ["wallpaper", "notifications"],
         ["storage", "applications", "about"]
     ];
 }

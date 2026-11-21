@@ -57,20 +57,13 @@ function place(layout, id, zone, target, after) {
     return copy;
 }
 
-var statusIds = ["network", "bluetooth", "volume", "battery"];
-
-// Status icons sit close together; every other neighbour keeps the wider gap.
-function spacing(a, b) {
-    return statusIds.includes(a.id) && statusIds.includes(b.id) ? 4 : 12;
-}
-
 function geometry(layout, width) {
     layout = layout.filter(entry => items.some(item => item.id === entry.id));
     var gap = 12, inset = 19, result = {}, groups = {}, sizes = {};
     for (var zone of zones.slice(0, 3)) {
         groups[zone] = layout.filter(entry => entry.zone === zone);
         sizes[zone] = groups[zone].reduce((sum, entry) => sum + items.find(item => item.id === entry.id).width, 0)
-            + groups[zone].slice(1).reduce((sum, entry, index) => sum + spacing(groups[zone][index], entry), 0);
+            + Math.max(0, groups[zone].length - 1) * gap;
     }
     var center = (width - sizes.center) / 2;
     // Keep the middle group centered unless a large side group needs room.
@@ -82,10 +75,7 @@ function geometry(layout, width) {
         var x = starts[group];
         for (var entry of groups[group]) {
             result[entry.id] = {x: x, visible: true};
-            x += items.find(item => item.id === entry.id).width;
-            var next = groups[group][groups[group].indexOf(entry) + 1];
-            if (next)
-                x += spacing(entry, next);
+            x += items.find(item => item.id === entry.id).width + gap;
         }
     }
     for (var entry of layout.filter(entry => entry.zone === "hidden"))

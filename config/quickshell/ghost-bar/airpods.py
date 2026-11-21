@@ -22,6 +22,16 @@ NOTIFICATIONS = bytes.fromhex("040004000f00ffffffffff")
 CONTROL = bytes.fromhex("040004000900")
 BATTERY = bytes.fromhex("040004000400")
 EAR = bytes.fromhex("040004000600")
+METADATA = bytes.fromhex("040004001d")
+# Apple model numbers sent in the metadata packet, as mapped by omarchy-pods and librepods.
+MODELS = {
+    **dict.fromkeys(("A1523", "A1722"), "AirPods"), **dict.fromkeys(("A2032", "A2031"), "AirPods 2"),
+    **dict.fromkeys(("A2565", "A2564"), "AirPods 3"), **dict.fromkeys(("A3053", "A3050", "A3054"), "AirPods 4"),
+    **dict.fromkeys(("A3056", "A3055", "A3057"), "AirPods 4 ANC"), **dict.fromkeys(("A2084", "A2083"), "AirPods Pro"),
+    **dict.fromkeys(("A2931", "A2699", "A2698", "A3047", "A3048", "A3049"), "AirPods Pro 2"),
+    **dict.fromkeys(("A3063", "A3064", "A3065"), "AirPods Pro 3"),
+    **dict.fromkeys(("A2096", "A3184"), "AirPods Max"), "A3454": "AirPods Max 2",
+}
 NOISE, CONVERSATION = 0x0D, 0x28
 MODES = {1: "off", 2: "anc", 3: "transparency", 4: "adaptive"}
 PARTS = {0x01: "headset", 0x02: "right", 0x04: "left", 0x08: "case"}
@@ -55,6 +65,12 @@ def parse(packet, state):
             if kind in PARTS and status != 4:
                 battery[PARTS[kind]] = {"level": level, "charging": status == 1}
         state["battery"] = battery
+    elif packet.startswith(METADATA) and len(packet) > len(METADATA) + 6:
+        # Six bytes, then the device name and the model number, each NUL-terminated.
+        strings = packet[len(METADATA) + 6:].split(b"\0")
+        if len(strings) > 1:
+            number = strings[1].decode(errors="replace")
+            state["model"] = MODELS.get(number, number)
     elif packet.startswith(EAR) and len(packet) > 7:
         state["ear"] = [EAR_STATES.get(packet[6], "unknown"), EAR_STATES.get(packet[7], "unknown")]
     elif packet.startswith(CONTROL) and len(packet) > 7:

@@ -9,7 +9,7 @@ FloatingWindow {
     // Capture actual native content only on pages without private lists/paths.
     // The method name stays stable for the existing captureSettings IPC.
     function captureGeneral(path) {
-        const safePages = ["general", "sound", "battery", "storage", "widgets", "about", "brightness", "accessibility", "airplane", "applications"];
+        const safePages = ["general", "sound", "battery", "storage", "about", "brightness", "accessibility", "airplane", "applications"];
         const page = content.page;
         const item = content.publicCaptureItem();
         if (!visible || !safePages.includes(page) || !item) {

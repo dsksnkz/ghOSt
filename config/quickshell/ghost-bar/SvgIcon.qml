@@ -12,7 +12,7 @@ Item {
     implicitWidth: 24
     implicitHeight: 24
     // Screen pixels per layout pixel, from every scaled parent (rail plane,
-    // sidebar fit, shell Scale). The SVG is rasterised at exactly that size:
+    // menus, shell Scale). The SVG is rasterised at exactly that size:
     // shrinking a larger raster is what made thin icon strokes look blurry.
     property real pixelScale: 1
     // The raster is drawn at whole screen pixels in size and position; a

@@ -22,7 +22,7 @@ def production(method, *arguments):
 
 def verify(page, button, escape=False, capture_dir=None):
     initial = json.loads(production('status'))
-    assert not (initial['sidebar'] or initial['panel'] or initial['settings']), 'Close ghOSt panels before testing'
+    assert not (initial['panel'] or initial['settings']), 'Close ghOSt panels before testing'
     cursor = json.loads(run('hyprctl', 'cursorpos', '-j'))
     environment = dict(os.environ, YDOTOOL_SOCKET=f'/run/user/{os.getuid()}/.ydotool_socket')
     process = subprocess.Popen(['quickshell', '-p', str(ROOT / 'tests/native-click-guard.qml')],
@@ -55,25 +55,12 @@ def verify(page, button, escape=False, capture_dir=None):
         click(1100, 700)
         assert guard() > control, 'Positive control: injected clicks did not reach the inert guard'
 
-        if page == 'sidebar':
-            production('sidebar')
-        else:
-            production('toggle', page)
+        production('toggle', page)
         time.sleep(.25)
         opened = json.loads(production('status'))
-        assert opened['sidebar'] if page == 'sidebar' else opened['panel'] == page, opened
+        assert opened['panel'] == page, opened
         before = json.loads(production('dismissal'))[0]
         protected = guard()
-        if capture_dir:
-            assert page == 'sidebar', 'Captures are deliberately limited to the privacy-safe header'
-            capture_dir.mkdir(parents=True, exist_ok=True)
-            run('grim', '-g', '0,100 380x83', str(capture_dir / 'sidebar-open-native.png'))
-        # Blank inner frame, no settings/radio/audio/session actions.
-        if page == 'sidebar' and not escape:
-            click(10, 200)
-            assert json.loads(production('status'))['sidebar'], 'Inside click dismissed Sidebar'
-            assert json.loads(production('dismissal'))[0]['presses'] == before['presses']
-            assert guard() == protected, 'Sidebar hole passed through to guard'
         if escape:
             run('ydotool', 'key', '1:1', '1:0', env=environment)
             time.sleep(.3)
@@ -81,13 +68,11 @@ def verify(page, button, escape=False, capture_dir=None):
             click(1100, 700)
         after = json.loads(production('status'))
         diagnostic = json.loads(production('dismissal'))[0]
-        assert not after['sidebar'] and not after['panel'], (page, after['sidebar'], diagnostic, protected, guard())
+        assert not after['panel'], (page, diagnostic, protected, guard())
         if not escape:
             assert (diagnostic['presses'] > before['presses'] or
                     diagnostic['focusDismissals'] > before['focusDismissals']), 'No native dismissal event received'
         assert guard() == protected, 'Outside press reached underlying guard'
-        if capture_dir:
-            run('grim', '-g', '0,100 380x83', str(capture_dir / 'sidebar-closed-native.png'))
         event = 'Escape' if escape else button
         print(f'PASS: native {page} {event}, closed, no click-through')
     finally:
@@ -108,7 +93,7 @@ def verify(page, button, escape=False, capture_dir=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native', action='store_true', help='explicitly permit a brief native input test')
-    parser.add_argument('--page', choices=['sidebar', 'calendar', 'media'], default='sidebar')
+    parser.add_argument('--page', choices=['calendar', 'media'], default='calendar')
     parser.add_argument('--button', choices=['0xC0', '0xC1', '0xC2'], default='0xC0')
     parser.add_argument('--escape', action='store_true', help='verify native Escape instead of an outside press')
     parser.add_argument('--capture-dir', type=Path, help='save safe header crops over the inert guard')

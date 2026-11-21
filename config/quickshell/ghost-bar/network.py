@@ -5,8 +5,10 @@ Every change goes through NetworkManager (nmcli) and applies to the saved
 connection, so it survives a reboot and is visible in any other network tool.
 """
 import json
+from pathlib import Path
 import subprocess
 import sys
+import time
 
 # DNS choices in the menu. Automatic uses whatever the network hands out.
 DNS = {
@@ -53,6 +55,92 @@ def details():
             'address': address.split(' | ')[0].split('/')[0], 'gateway': gateway,
             'dns': [server for server in dns.split(' | ') if server], 'provider': provider,
             'autoconnect': autoconnect != 'no', 'private': mac in ('random', 'stable')}
+
+
+def split_fields(line):
+    """nmcli -t separates fields with ':' and escapes ':' and '\\' inside them."""
+    fields, current, escaped = [], '', False
+    for char in line:
+        if escaped:
+            current += char
+            escaped = False
+        elif char == '\\':
+            escaped = True
+        elif char == ':':
+            fields.append(current)
+            current = ''
+        else:
+            current += char
+    return fields + [current]
+
+
+def signal_dbm(percent):
+    # NetworkManager reports strength as clamp(2 * (dBm + 100)) percent; this is its inverse.
+    return round(percent / 2 - 100)
+
+
+def networks(text, saved):
+    """Nearby networks from `nmcli -t -f IN-USE,SSID,SIGNAL,RATE,SECURITY dev wifi list`, strongest first."""
+    found = {}
+    for line in text.splitlines():
+        fields = split_fields(line)
+        if len(fields) < 5 or not fields[1]:
+            continue
+        in_use, name, signal, rate, security = fields[:5]
+        try:
+            signal = int(signal)
+        except ValueError:
+            continue
+        entry = {'name': name, 'connected': in_use.strip() == '*', 'known': name in saved,
+                 'secured': bool(security.strip()) and security.strip() != '--',
+                 'signal': signal, 'dbm': signal_dbm(signal),
+                 'rate': int(rate.split()[0]) if rate.split() and rate.split()[0].isdigit() else None}
+        # One entry per name: the access point in use, otherwise the strongest.
+        if name not in found or entry['connected'] or (not found[name]['connected'] and signal > found[name]['signal']):
+            found[name] = entry
+    return sorted(found.values(), key=lambda n: (not n['connected'], -n['signal'], n['name'].lower()))
+
+
+def saved_names():
+    return {fields[0] for fields in map(split_fields, nmcli('-t', '-f', 'NAME,TYPE', 'connection', 'show').splitlines())
+            if len(fields) > 1 and fields[1] == '802-11-wireless'}
+
+
+def active_device():
+    """The device carrying traffic: connected Wi-Fi first, otherwise a wired or other link."""
+    connected = [fields for fields in map(split_fields, nmcli('-t', '-f', 'DEVICE,TYPE,STATE', 'device').splitlines())
+                 if len(fields) > 2 and fields[2] == 'connected' and fields[1] not in ('loopback', 'wifi-p2p')]
+    connected.sort(key=lambda fields: fields[1] != 'wifi')
+    return connected[0][0] if connected else ''
+
+
+def traffic(device):
+    base = Path('/sys/class/net') / device / 'statistics'
+    try:
+        return int((base / 'rx_bytes').read_text()), int((base / 'tx_bytes').read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def watch():
+    """Once a second while the menu is open: nearby networks and the active link's live speeds."""
+    saved = saved_names()
+    previous, previous_time, previous_device = None, None, None
+    while True:
+        listing = nmcli('-t', '-f', 'IN-USE,SSID,SIGNAL,RATE,SECURITY', 'device', 'wifi', 'list', '--rescan', 'no')
+        device = active_device()
+        result = {'ok': True, 'device': device, 'networks': networks(listing, saved), 'down': None, 'up': None}
+        counters, now = traffic(device) if device else None, time.monotonic()
+        if device != previous_device:
+            previous = None
+        previous_device = device
+        if counters and previous and now > previous_time:
+            seconds = now - previous_time
+            result['down'] = round((counters[0] - previous[0]) * 8 / seconds / 1e6, 2)
+            result['up'] = round((counters[1] - previous[1]) * 8 / seconds / 1e6, 2)
+        previous, previous_time = counters, now
+        print(json.dumps(result), flush=True)
+        time.sleep(1)
 
 
 def set_dns(connection, provider):
@@ -304,6 +392,12 @@ def main():
     operation = sys.argv[1] if len(sys.argv) > 1 else ''
     arguments = sys.argv[2:]
     try:
+        if operation == 'watch':
+            try:
+                watch()
+            except BrokenPipeError:
+                pass
+            return
         if operation == 'details':
             result = details()
         elif operation == 'share' and len(arguments) == 1:

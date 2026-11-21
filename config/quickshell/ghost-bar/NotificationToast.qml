@@ -49,10 +49,7 @@ PanelWindow {
             transform: Translate {
                 y: -8 * (1 - popup.reveal)
             }
-            onActivated: {
-                Desk.toggleSidebar(popup.displayScreen.name);
-                Notifications.toast = null;
-            }
+            onActivated: Notifications.toast = null
             onDismissed: Notifications.toast = null
         }
     }

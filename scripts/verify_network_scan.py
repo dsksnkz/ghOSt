@@ -53,23 +53,20 @@ def verify():
                     assert actual == expected, (state, actual, expected)
 
                 configure({}, False, False)
-                configure({'sidebarOpen': True}, True, True)
-                configure({'sidebarOpen': True, 'sidebarNetworkEnabled': False}, False, False)
                 configure({'settingsOpen': True, 'settingsPage': 'network'}, True, True)
                 configure({'settingsOpen': True, 'settingsPage': 'sound'}, False, False)
                 configure({'panel': 'network'}, True, True)
                 configure({'panel': 'network', 'wifiEnabled': False}, False, False)
-                configure({'sidebarOpen': True}, True, True)
-                configure({'sidebarOpen': True, 'device': 'second'}, True, False, True)
-                configure({'sidebarOpen': True, 'device': 'none'}, False, False)
-                configure({'sidebarOpen': True}, True, True)
+                configure({'panel': 'network', 'device': 'second'}, True, False, True)
+                configure({'panel': 'network', 'device': 'none'}, False, False)
+                configure({'panel': 'network'}, True, True)
                 configure({}, False, False)
                 output = log_path.read_text()
                 assert 'WARN' not in output and 'ERROR' not in output, output
                 subprocess.run(
                     ['quickshell', 'ipc', '-i', instance, 'call', 'scan-test', 'stop'],
                     env=environment, check=True, capture_output=True, timeout=3)
-                print('PASS: 12 windowless Qt scan-demand, page, radio and device-swap transitions')
+                print('PASS: 9 windowless Qt scan-demand, page, radio and device-swap transitions')
             finally:
                 try:
                     process.wait(timeout=3)

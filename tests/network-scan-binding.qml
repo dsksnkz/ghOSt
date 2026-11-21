@@ -11,16 +11,12 @@ ShellRoot {
     property var device: firstAdapter
     property bool wifiEnabled: true
     property string panel: ""
-    property bool sidebarOpen: false
-    property bool sidebarNetworkEnabled: true
     property bool settingsOpen: false
     property string settingsPage: "general"
     readonly property bool requested: ScanPolicy.shouldScan({
         wifiAvailable: device !== null,
         wifiEnabled: wifiEnabled,
         panel: panel,
-        sidebarOpen: sidebarOpen,
-        sidebarNetworkEnabled: sidebarNetworkEnabled,
         networkSettingsVisible: settingsOpen && settingsPage === "network"
     })
     Binding {
@@ -35,8 +31,6 @@ ShellRoot {
             const state = JSON.parse(parameters);
             root.wifiEnabled = state.wifiEnabled ?? true;
             root.panel = state.panel ?? "";
-            root.sidebarOpen = state.sidebarOpen ?? false;
-            root.sidebarNetworkEnabled = state.sidebarNetworkEnabled ?? true;
             root.settingsOpen = state.settingsOpen ?? false;
             root.settingsPage = state.settingsPage ?? "general";
             root.device = state.device === "none" ? null

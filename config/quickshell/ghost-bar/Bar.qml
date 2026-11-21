@@ -29,7 +29,7 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.AllButtons
-        onPressed: if (Desk.sidebarOpen || Desk.panel === "calendar")
+        onPressed: if (Desk.panel === "calendar")
             Desk.close()
     }
 

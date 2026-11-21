@@ -89,7 +89,7 @@ Singleton {
                     "id": 1,
                     "app": "ghOSt",
                     "summary": "Desktop update",
-                    "body": "Rail, calendar, sidebar and Settings are ready.",
+                    "body": "Rail, calendar, menus and Settings are ready.",
                     "time": 0,
                     "owned": true,
                     "active": true,

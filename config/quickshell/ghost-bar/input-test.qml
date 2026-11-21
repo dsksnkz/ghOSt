@@ -16,14 +16,6 @@ ShellRoot {
             property int escapeEvents: 0
             property int actionRequests: 0
 
-            function test_sidebar_full_percentage() {
-                const percentage = findChild(sidebar, "sidebar-battery-percentage");
-                compare(percentage.text, "100%");
-                compare(percentage.elide, Text.ElideNone);
-                verify(percentage.contentWidth <= percentage.width);
-                console.info("PASS: sidebar 100% fits without ellipsis");
-            }
-
             function test_click_action() {
                 mouseClick(clickProbe, 30, 15);
                 compare(actionRequests, 1);
@@ -57,7 +49,6 @@ ShellRoot {
             }
 
             function test_settings_scroll_and_selection() {
-                sidebar.visible = false;
                 settingsPanel.visible = true;
                 settingsPanel.choose("general");
                 wait(350);
@@ -73,12 +64,10 @@ ShellRoot {
                 const settled = JSON.parse(settingsPanel.status());
                 compare(settled.selectionY, settled.selectionTarget);
                 settingsPanel.visible = false;
-                sidebar.visible = true;
                 console.info("PASS: Settings wheel propagation and Bezier selection movement");
             }
 
             function test_settings_reference_header() {
-                sidebar.visible = false;
                 settingsPanel.visible = true;
                 settingsPanel.choose("general");
                 wait(350);
@@ -89,7 +78,7 @@ ShellRoot {
                 const spacing = settingsPanel.spacingStatus();
                 compare(spacing.rowHeight, 44);
                 compare(spacing.rowGap, 8);
-                compare(spacing.icons.length, 14);
+                compare(spacing.icons.length, 13);
                 // Whole-pixel glyphs, so every icon edge lands on a pixel.
                 for (const icon of spacing.icons) verify(icon.glyph === 18)
                 const selected = findChild(settingsPanel, "settings-navigation-general");
@@ -126,7 +115,7 @@ ShellRoot {
                 verify(clear.visible);
                 mouseClick(clear, 10, 10);
                 compare(settingsPanel.query, "");
-                compare(settingsPanel.filteredCategories.length, 14);
+                compare(settingsPanel.filteredCategories.length, 13);
                 for (const category of settingsPanel.categories) {
                     settingsPanel.choose(category.id);
                     wait(10);
@@ -134,8 +123,7 @@ ShellRoot {
                 }
                 settingsPanel.choose("general");
                 settingsPanel.visible = false;
-                sidebar.visible = true;
-                console.info("PASS: Settings fixed header, search, portrait and all 14 pages");
+                console.info("PASS: Settings fixed header, search, portrait and all 13 pages");
             }
 
             function test_settings_revamp() {
@@ -151,7 +139,6 @@ ShellRoot {
                     for (const child of item.children || []) check(child)
                 }
 
-                sidebar.visible = false;
                 settingsPanel.visible = true;
                 settingsPanel.choose("general");
                 wait(200);
@@ -191,11 +178,9 @@ ShellRoot {
                 compare(JSON.parse(settingsPanel.status()).selectionY, JSON.parse(settingsPanel.status()).selectionTarget);
                 Theme.reducedMotion = false;
                 settingsPanel.visible = false;
-                sidebar.visible = true;
                 console.info("PASS: Settings live summaries, passive storage, all-page bounds and content scrolling");
             }
             function test_weather_switcher() {
-                sidebar.visible = false;
                 weatherSwitcher.visible = true;
                 weatherSwitcher.forecastIndex = 2;
                 weatherSwitcher.forecastSelected = false;
@@ -209,7 +194,6 @@ ShellRoot {
                 compare(weatherSwitcher.headlineCondition, "storm");
                 compare(weatherSwitcher.headlineTemperature, 15);
                 weatherSwitcher.visible = false;
-                sidebar.visible = true;
                 console.info("PASS: selected weather headline and temperature agree");
             }
 
@@ -243,29 +227,6 @@ ShellRoot {
                 weatherSwitcher.active = false;
                 weatherSwitcher.reducedMotion = Theme.reducedMotion;
                 console.info("PASS: weather blur midpoint, rapid scroll settlement, aligned list and reduced motion");
-            }
-
-            function test_sidebar_brightness_idle() {
-                const timer = findChild(sidebar, "brightness-refresh");
-                sidebar.screen = ({name: "HDMI-A-1"});
-                sidebar.previewMode = false;
-                verify(!timer.running);
-                sidebar.opened = false;
-                sidebar.screen = ({name: "eDP-1"});
-                verify(!timer.running);
-                sidebar.previewMode = true;
-                sidebar.opened = true;
-                verify(!timer.running);
-                console.info("PASS: external, closed and preview sidebar brightness timers stay stopped");
-            }
-
-            function test_escape_from_root() {
-                wait(20);
-                sidebar.forceActiveFocus();
-                verify(sidebar.activeFocus);
-                keyClick(Qt.Key_Escape);
-                compare(escapeEvents, 1);
-                console.info("PASS: sidebar Escape event");
             }
 
             function test_outside_pointer() {
@@ -316,7 +277,7 @@ ShellRoot {
                 Qt.quit();
             }
 
-            name: "SidebarInput"
+            name: "ShellInput"
             when: true
             visible: true
             width: 1024
@@ -351,19 +312,6 @@ ShellRoot {
 
                 monitor: fixtureMonitor
                 workspaces: [specialWorkspace]
-            }
-
-            SidebarFigmaBody {
-                id: sidebar
-
-                width: 354
-                height: 790
-                previewMode: true
-                opened: true
-                screen: ({
-                    "name": "test"
-                })
-                onCloseRequested: test.escapeEvents++
             }
 
             DismissArea {

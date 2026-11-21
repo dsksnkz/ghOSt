@@ -11,7 +11,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = ('network', 'bluetooth', 'general', 'airplane', 'accessibility',
-         'sound', 'battery', 'widgets', 'brightness', 'wallpaper',
+         'sound', 'battery', 'brightness', 'wallpaper',
          'notifications', 'storage', 'applications', 'about')
 FAST_PAGES = {'battery', 'brightness', 'storage'}
 

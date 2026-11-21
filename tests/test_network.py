@@ -78,7 +78,28 @@ class Network(unittest.TestCase):
                 network.share('Home')
 
 
+class NearbyNetworks(unittest.TestCase):
+    def test_escaped_names_dedupe_and_order(self):
+        listing = (" :Home\\:5G:40:130 Mbit/s:WPA2\n*:Home\\:5G:70:270 Mbit/s:WPA2\n"
+                   " :Cafe:90:54 Mbit/s:\n :Cafe:30:54 Mbit/s:\n :Weak:10:6 Mbit/s:WPA3\n")
+        result = network.networks(listing, {'Home:5G'})
+        self.assertEqual([n['name'] for n in result], ['Home:5G', 'Cafe', 'Weak'])
+        home, cafe, weak = result
+        self.assertTrue(home['connected'] and home['known'] and home['secured'])
+        self.assertEqual((home['signal'], home['dbm'], home['rate']), (70, -65, 270))
+        self.assertFalse(cafe['secured'] or cafe['known'])
+        self.assertEqual(cafe['signal'], 90)
+        self.assertEqual(weak['dbm'], -95)
+
+
 class AirPods(unittest.TestCase):
+    def test_model_from_metadata(self):
+        state = {}
+        airpods.parse(bytes.fromhex('040004001d') + bytes(6) + b'airbods\0A3064\0', state)
+        self.assertEqual(state['model'], 'AirPods Pro 3')
+        airpods.parse(bytes.fromhex('040004001d') + bytes(6) + b'x\0A9999\0', state)
+        self.assertEqual(state['model'], 'A9999')
+
     def test_battery_ear_and_mode_packets(self):
         state = {}
         packet = bytes.fromhex('040004000400') + bytes([3, 2, 1, 90, 2, 1, 4, 1, 85, 1, 1, 8, 1, 40, 4, 1])

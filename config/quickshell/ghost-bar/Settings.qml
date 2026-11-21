@@ -23,9 +23,6 @@ Singleton {
     readonly property bool busy: change.running
     // Actions requested while one is running wait their turn instead of being lost.
     property var queued: []
-    function widget(name) {
-        return state.preferences?.widgets?.[name] !== false;
-    }
     function refresh() {
         if (!fixture && !query.running && !change.running) {
             queryCount++;

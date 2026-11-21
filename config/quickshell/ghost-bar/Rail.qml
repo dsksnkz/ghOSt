@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Networking
 import Quickshell.Services.UPower
 import "RailLayout.js" as Layout
 
@@ -17,6 +18,7 @@ Item {
     function elementX(name, original) { return layout ? positions[name]?.x ?? original : original; }
     function elementVisible(name) { return layout ? positions[name]?.visible ?? false : Layout.items.find(item => item.id === name).zone !== "hidden"; }
     readonly property bool fixtureMode: previewMode && Quickshell.env("GHOST_CALENDAR_FIXTURE") === "1"
+    readonly property bool networkLit: fixtureMode || Networking.wifiEnabled || !!Desk.wired
     readonly property date displayTime: fixtureMode ? new Date(2026, 8, 29, 9, 21) : Desk.now
     readonly property int displayVolume: fixtureMode ? 33 : Desk.volume
     property bool fixtureMedia: false
@@ -59,7 +61,9 @@ Item {
     readonly property real planeWidth: width / designScale
     function open(name, item) {
         const center = item.mapToItem(bar, item.width / 2, 0).x;
-        Desk.toggle(name, screenName, Math.max(6, Math.min(width - 398 * designScale, center - 196 * designScale)), center);
+        // Panel width, design units: the Wi-Fi and Bluetooth menus are wider.
+        const panel = name === "network" || name === "bluetooth" || name === "battery" ? 430 : 392;
+        Desk.toggle(name, screenName, Math.max(6, Math.min(width - (panel + 6) * designScale, center - panel / 2 * designScale)), center);
     }
     Item {
         width: bar.planeWidth
@@ -193,19 +197,31 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-network"
                     visible: bar.elementVisible("network")
-                    x: bar.elementX("network", controls.width - 210)
+                    x: bar.elementX("network", controls.width - 229)
                     y: 2
                     width: 28
                     height: 28
                     hint: "Wi-Fi"
                     onClicked: bar.open("network", this)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 26
+                        height: 26
+                        radius: 13
+                        color: "#d9d9d9"
+                        // Lit while any link is up: Wi-Fi on, or a cable plugged in.
+                        opacity: bar.networkLit ? 1 : 0
+                        Behavior on opacity {
+                            NumberAnimation { duration: Theme.reducedMotion ? 0 : 140 }
+                        }
+                    }
                     SvgIcon {
                         id: networkIcon
                         anchors.centerIn: parent
                         width: 16
                         height: 16
-                        name: "wifi"
-                        opacity: bar.fixtureMode || Desk.connected ? 1 : .45
+                        name: Desk.wired && !Desk.network && !bar.fixtureMode ? "ethernet" : "wifi"
+                        black: bar.networkLit
                     }
                 }
                 Key {
@@ -213,18 +229,29 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-bluetooth"
                     visible: bar.elementVisible("bluetooth")
-                    x: bar.elementX("bluetooth", controls.width - 178)
+                    x: bar.elementX("bluetooth", controls.width - 187)
                     y: 2
                     width: 28
                     height: 28
                     hint: "Bluetooth"
                     onClicked: bar.open("bluetooth", this)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 26
+                        height: 26
+                        radius: 13
+                        color: "#d9d9d9"
+                        opacity: bar.fixtureMode || !!Desk.adapter?.enabled ? 1 : 0
+                        Behavior on opacity {
+                            NumberAnimation { duration: Theme.reducedMotion ? 0 : 140 }
+                        }
+                    }
                     SvgIcon {
                         anchors.centerIn: parent
                         width: 16
                         height: 16
                         name: "bluetooth"
-                        opacity: bar.fixtureMode || Desk.adapter?.enabled ? 1 : .45
+                        black: bar.fixtureMode || !!Desk.adapter?.enabled
                     }
                 }
                 Key {
@@ -232,13 +259,13 @@ Item {
                     pressFeedback: false
                     objectName: "rail-element-volume"
                     visible: bar.elementVisible("volume")
-                    x: bar.elementX("volume", controls.width - 146)
+                    x: bar.elementX("volume", controls.width - 150)
                     y: 2
                     width: 28
                     height: 28
                     hint: "Volume controls"
                     wheelEnabled: true
-                    onClicked: Desk.toggleSidebar(bar.screenName)
+                    onClicked: bar.open("audio", this)
                     onScrolled: delta => Desk.setVolume(Desk.volume / 100 + delta / 120 * .05)
                     SvgIcon {
                         id: volumeIcon
@@ -255,12 +282,12 @@ Item {
                     id: batteryKey
                     // A desktop without a battery has nothing to show here.
                     visible: bar.elementVisible("battery") && (Desk.hasBattery || bar.previewMode)
-                    x: bar.elementX("battery", controls.width - 114)
+                    x: bar.elementX("battery", controls.width - 122)
                     y: 2
                     width: 40
                     height: 28
                     hint: "Battery " + Desk.charge + "%"
-                    onClicked: Desk.toggleSidebar(bar.screenName)
+                    onClicked: bar.open("battery", this)
                     readonly property bool charging: Desk.battery?.state === UPowerDeviceState.Charging || Desk.battery?.state === UPowerDeviceState.PendingCharge
                     // A horizontal battery with the level written inside it.
                     SvgIcon {
@@ -309,7 +336,7 @@ Item {
                     }
                 }
                 Rectangle {
-                    x: bar.elementX("power", controls.width - 62) - 8
+                    x: bar.elementX("power", controls.width - 62) - 16
                     visible: bar.elementVisible("power") && batteryKey.visible
                     y: 1
                     width: 1

@@ -4,8 +4,8 @@ import Quickshell
 ShellRoot {
     Component.onCompleted: Qt.callLater(validate)
     function validate() {
-        const files = ["SettingsPanel.qml", "SidebarFigmaBody.qml", "CalendarPanel.qml",
-            "MusicBar.qml", "SwitcherScene.qml", "SwitcherPreview.qml", "WorkspaceSwitcher.qml", "MediaPanel.qml", "PanelContent.qml", "OsdState.qml", "Osd.qml", "EdgeHandle.qml", "IntroWindow.qml", "shell.qml", "lock.qml", "Panel.qml", "Bar.qml", "Rail.qml", "RailReservation.qml", "Sidebar.qml", "CalendarWindow.qml", "NotificationToast.qml", "SettingsWindow.qml", "Scaled.qml", "lock/LockScene.qml", "NetworkMenu.qml", "BluetoothMenu.qml", "DisplayBrightness.qml"];
+        const files = ["SettingsPanel.qml", "CalendarPanel.qml",
+            "MusicBar.qml", "SwitcherScene.qml", "SwitcherPreview.qml", "WorkspaceSwitcher.qml", "MediaPanel.qml", "PanelContent.qml", "OsdState.qml", "Osd.qml", "EdgeHandle.qml", "IntroWindow.qml", "shell.qml", "lock.qml", "Panel.qml", "Bar.qml", "Rail.qml", "RailReservation.qml", "CalendarWindow.qml", "NotificationToast.qml", "SettingsWindow.qml", "Scaled.qml", "lock/LockScene.qml", "NetworkMenu.qml", "BluetoothMenu.qml", "DisplayBrightness.qml", "AirPods.qml", "ListeningMode.qml", "MenuToggle.qml", "LineGlyph.qml", "BatteryMenu.qml", "PowerMenu.qml"];
         for (const file of files) {
             const component = Qt.createComponent(Qt.resolvedUrl(file));
             if (component.status !== Component.Ready) {

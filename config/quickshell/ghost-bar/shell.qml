@@ -85,17 +85,17 @@ ShellRoot {
         delegate: Scope {
             id: output
             required property var modelData
-            readonly property var sidebarSurface: sidebarWindow
             readonly property var calendarSurface: calendarWindow
             readonly property var panelSurface: panelWindow
             readonly property var railSurface: barWindow
             readonly property var dismissalSurface: dismissalWindow
             property int focusRevision: 0
             property int focusDismissals: 0
-            // Sidebar uses OnDemand layer focus: include it in this group so
+            // Panels use OnDemand layer focus: include them in this group so
             // Escape remains usable without trapping outside pointer events.
             // Media transport does not need a compositor keyboard grab.
-            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && (Desk.sidebarOpen || (Desk.panel !== "" && Desk.panel !== "media"))
+            // The power menu takes the keyboard itself, over the whole screen.
+            readonly property bool wantsFocus: Desk.panelScreen === modelData.name && Desk.panel !== "" && Desk.panel !== "media" && Desk.panel !== "session"
             function refreshFocus() {
                 focusRevision++;
                 if (wantsFocus)
@@ -107,9 +107,6 @@ ShellRoot {
             Connections {
                 target: Desk
                 function onPanelChanged() {
-                    output.refreshFocus();
-                }
-                function onSidebarOpenChanged() {
                     output.refreshFocus();
                 }
                 function onPanelScreenChanged() {
@@ -154,20 +151,16 @@ ShellRoot {
                 companion: barWindow
                 managedFocus: true
             }
-            Sidebar {
-                id: sidebarWindow
-                screen: output.modelData
-                companion: barWindow
-                managedFocus: true
-            }
-            SidebarDismissal {
+            Dismissal {
                 id: dismissalWindow
                 screen: output.modelData
-                sidebarWindow: output.sidebarSurface
                 calendarWindow: output.calendarSurface
                 panelWindow: output.panelSurface
                 railWindow: barWindow
                 notificationWindow: toastWindow
+            }
+            PowerMenu {
+                screen: output.modelData
             }
             CalendarWindow {
                 id: calendarWindow
@@ -177,7 +170,7 @@ ShellRoot {
             }
             HyprlandFocusGrab {
                 id: focusGrab
-                windows: [barWindow, panelWindow, sidebarWindow, calendarWindow]
+                windows: [barWindow, panelWindow, calendarWindow]
                 onCleared: {
                     const revision = output.focusRevision;
                     if (focusDelay.running)
@@ -231,11 +224,6 @@ ShellRoot {
         function close(): void {
             Desk.close();
         }
-        function sidebar(): void {
-            const screen = root.connectedScreens[0];
-            if (screen)
-                Desk.toggleSidebar(screen.name);
-        }
         function settings(page: string): void {
             const screen = root.connectedScreens[0];
             if (screen)
@@ -278,7 +266,6 @@ ShellRoot {
         function status(): string {
             return JSON.stringify({
                 panel: Desk.panel,
-                sidebar: Desk.sidebarOpen,
                 settings: Desk.settingsRequested,
                 volume: Desk.volume,
                 network: Desk.networkName,

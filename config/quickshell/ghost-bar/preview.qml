@@ -52,7 +52,7 @@ ShellRoot {
                 visible: controller.page === "notification"
                 notification: Notifications.toast
                 onDismissed: controller.page = "rail"
-                onActivated: controller.page = "sidebar"
+                onActivated: controller.page = "rail"
             }
             SettingsPanel {
                 id: settingsPreview
@@ -63,18 +63,6 @@ ShellRoot {
                 height: 699
                 previewMode: true
                 onCloseRequested: controller.page = "rail"
-            }
-            SidebarFigmaBody {
-                id: sidebarPreview
-                visible: controller.page === "sidebar" || preview.composition
-                x: 0
-                y: 146
-                width: 354
-                height: 790
-                screen: ({
-                        name: "HDMI-A-1"
-                    })
-                previewMode: true
             }
             PanelContent {
                 id: panel
@@ -87,7 +75,7 @@ ShellRoot {
                 y: controller.page === "calendar" ? 68 : 54
                 width: controller.page === "calendar" ? Theme.calendarWidth(frame.width, frame.height) : 392
                 height: implicitHeight
-                visible: !["rail", "icons", "sidebar", "settings", "notification"].includes(controller.page)
+                visible: !["rail", "icons", "settings", "notification"].includes(controller.page)
                 popup: QtObject {
                     id: controller
                     property string page: "calendar"
@@ -253,13 +241,11 @@ ShellRoot {
                     for (const child of item.children ?? [])
                         inspect(child, fonts, controls);
                 }
-                const railFonts = [], railControls = [], sidebarFonts = [], sidebarControls = [], panelFonts = [], panelControls = [];
+                const railFonts = [], railControls = [], panelFonts = [], panelControls = [];
                 inspect(rail, railFonts, railControls);
-                inspect(sidebarPreview, sidebarFonts, sidebarControls);
                 inspect(panel, panelFonts, panelControls);
                 return JSON.stringify({
                     railFonts,
-                    sidebarControls,
                     panelControls
                 });
             }
@@ -295,18 +281,6 @@ ShellRoot {
                     settingsPreview.portraitChooserRequested = false;
                 }
                 return settingsPreview.status();
-            }
-            function sidebar(action: string): string {
-                if (action === "reveal")
-                    sidebarPreview.beginEntrance();
-                if (action === "long")
-                    sidebarPreview.previewLongNames = true;
-                if (action === "normal")
-                    sidebarPreview.previewLongNames = false;
-                return JSON.stringify({
-                    order: sidebarPreview.entranceOrder,
-                    elapsed: sidebarPreview.entranceTime
-                });
             }
             function opened(value: bool): void {
                 controller.opened = value;

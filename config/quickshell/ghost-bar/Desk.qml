@@ -14,27 +14,20 @@ Singleton {
     property string panel: ""
     property string panelScreen: ""
     property real panelX: 0
+    property real panelCenter: 0          // Centre x of the bar button that opened the panel.
     property string notice: ""
     property string performanceMetric: "cpu"
     property var weatherSummary: ({
             condition: "unknown",
             temperature: null
         })
-    property bool sidebarOpen: false
     property bool settingsRequested: false
     property string settingsPage: "general"
     signal settingsNavigationRequested
     property bool networkSettingsVisible: false
-    function toggleSidebar(screenName) {
-        panelScreen = screenName;
-        panel = "";
-        settingsRequested = false;
-        sidebarOpen = !sidebarOpen;
-    }
     function openSettings(screenName, page = "general") {
         panelScreen = screenName;
         panel = "";
-        sidebarOpen = false;
         settingsPage = page;
         settingsRequested = true;
         settingsNavigationRequested();
@@ -52,8 +45,6 @@ Singleton {
         wifiAvailable: wifi !== null,
         wifiEnabled: Networking.wifiEnabled,
         panel: panel,
-        sidebarOpen: sidebarOpen,
-        sidebarNetworkEnabled: Settings.widget("network"),
         networkSettingsVisible: networkSettingsVisible
     })
     readonly property var wired: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected) ?? null
@@ -102,14 +93,13 @@ Singleton {
         }
         panelScreen = screenName;
         panelX = x;
-        sidebarOpen = false;
+        panelCenter = center ?? 0;
         notice = "";
         panel = name;
     }
     function close() {
         panel = "";
         switcherScreen = "";
-        sidebarOpen = false;
         settingsRequested = false;
     }
     function setVolume(value) {
@@ -127,7 +117,7 @@ Singleton {
     function setPerformanceMetric(value) {
         performanceMetric = value;
     }
-    // A one-time panel-change assignment missed Sidebar and Settings entirely.
+    // A one-time panel-change assignment missed Settings entirely.
     // Bind demand to all visible network browsers and release it when hidden.
     Binding {
         target: root.wifi
@@ -149,8 +139,7 @@ Singleton {
             wifiEnabled: Networking.wifiEnabled,
             requested: networkScanRequested,
             scannerEnabled: wifi?.scannerEnabled ?? false,
-            networkSettingsVisible: networkSettingsVisible,
-            sidebarOpen: sidebarOpen
+            networkSettingsVisible: networkSettingsVisible
         };
     }
 }

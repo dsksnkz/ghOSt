@@ -81,8 +81,8 @@ Item {
     }
     // Keep the launcher frame full-size even before its Loader has completed.
     // Calendar and media draw their own header inside the page.
-    // The Wi-Fi and Bluetooth menus draw their own header too, on the usual panel frame.
-    readonly property bool menuPage: popup.page === "network" || popup.page === "bluetooth"
+    // The Wi-Fi, Bluetooth and battery menus draw their own header too, on the usual panel frame.
+    readonly property bool menuPage: popup.page === "network" || popup.page === "bluetooth" || popup.page === "battery"
     readonly property bool ownHeader: popup.page === "calendar" || popup.page === "media" || menuPage
     implicitHeight: popup.page === "launcher" ? 328 : body.implicitHeight + (ownHeader ? 0 : 46)
     focus: true
@@ -102,10 +102,19 @@ Item {
         y: content.slides ? Motion.slideOffset(popup.page, popup.reveal, content.height) : (popup.page === "calendar" ? -24 : -8) * (1 - popup.reveal)
     }
     Material {
-        visible: (!content.ownHeader || content.menuPage) && popup.page !== "launcher"
+        visible: !content.ownHeader && popup.page !== "launcher"
         anchors.fill: parent
         anchors.margins: 1
         radius: Theme.outerRadius
+    }
+    // Wi-Fi and Bluetooth menus: the design's flat frame.
+    Rectangle {
+        visible: content.menuPage
+        anchors.fill: parent
+        radius: 10
+        color: "#0f0f0f"
+        border.width: 1
+        border.color: "#252525"
     }
     G2Surface {
         visible: popup.page === "launcher"
@@ -152,7 +161,7 @@ Item {
                 width: parent.width - 32
                 spacing: 5
                 Label {
-                    text: popup.page === "session" ? "ghOSt" : "ghOSt / " + popup.page.toUpperCase()
+                    text: "ghOSt / " + popup.page.toUpperCase()
                     color: Theme.muted
                     font.pixelSize: 9
                     font.letterSpacing: 1.1
@@ -165,8 +174,7 @@ Item {
                             bluetooth: "Bluetooth",
                             calendar: Qt.formatDateTime(Desk.now, "MMMM yyyy"),
                             media: "Now playing",
-                            battery: "Power",
-                            session: "Power"
+                            battery: "Power"
                         })[popup.page] || ""
                     font.pixelSize: 19
                     font.weight: Font.Normal
@@ -200,8 +208,7 @@ Item {
                     bluetooth: bluetoothPage,
                     calendar: calendarPage,
                     media: mediaPage,
-                    battery: batteryPage,
-                    session: sessionPage
+                    battery: batteryPage
                 })[popup.page] || null
             onLoaded: {
                 if (popup.page !== "calendar" && popup.page !== "launcher")
@@ -363,123 +370,9 @@ Item {
     }
     Component {
         id: batteryPage
-        Column {
-            PowerProfileControls {
-                width: body.width
-                previewMode: content.previewMode
-            }
-            spacing: 19
-            Label {
-                text: Desk.hasBattery ? Desk.charge + "%" : "AC"
-                font.pixelSize: 56
-                font.weight: Font.Light
-                color: Theme.cream
-            }
-            Meter {
-                count: 40
-                segmentWidth: 5
-                value: Desk.charge / 100
-                ink: Desk.charge < 20 ? Theme.orange : Theme.cream
-            }
-            Caption {
-                text: Desk.hasBattery ? UPowerDeviceState.toString(Desk.battery.state).toUpperCase() : "EXTERNAL POWER"
-            }
-            Label {
-                text: Desk.battery?.state === UPowerDeviceState.Discharging && Desk.battery.timeToEmpty > 0 && Desk.battery.timeToEmpty < 259200 ? Math.floor(Desk.battery.timeToEmpty / 3600) + "h " + Math.floor(Desk.battery.timeToEmpty % 3600 / 60) + "m remaining" : Desk.battery?.state === UPowerDeviceState.Charging && Desk.battery.timeToFull > 0 && Desk.battery.timeToFull < 259200 ? Math.ceil(Desk.battery.timeToFull / 60) + "m until full" : ""
-                visible: text !== ""
-                color: Theme.muted
-            }
-        }
-    }
-    Component {
-        id: sessionPage
-        Column {
-            id: sessionBody
-            property string pending: ""
-            width: body.width
-            spacing: 8
-            Repeater {
-                model: [
-                    {
-                        label: "Lock",
-                        icon: "lock",
-                        command: [Quickshell.env("HOME") + "/.local/bin/ghost", "lock"]
-                    },
-                    {
-                        label: "Sleep",
-                        icon: "sleep",
-                        command: ["systemctl", "suspend"]
-                    },
-                    {
-                        label: "Log out",
-                        icon: "logout",
-                        command: ["hyprctl", "dispatch", "exit"]
-                    },
-                    {
-                        label: "Restart",
-                        icon: "restart",
-                        command: ["systemctl", "reboot"]
-                    },
-                    {
-                        label: "Shut down",
-                        icon: "power",
-                        command: ["systemctl", "poweroff"]
-                    }
-                ]
-                Key {
-                    required property var modelData
-                    width: sessionBody.width
-                    height: 42
-                    radius: Theme.innerRadius(3)
-                    color: sessionBody.pending === modelData.label ? "#373737" : "#222222"
-                    border.color: Theme.line
-                    border.width: 1
-                    hint: modelData.label
-                    onClicked: {
-                        if (content.previewMode) {
-                            Desk.notice = "Preview — system actions disabled";
-                            return;
-                        }
-                        if (modelData.command.length === 0) {
-                            Desk.notice = "Lock needs an independent ghOSt configuration";
-                            return;
-                        }
-                        if (sessionBody.pending === modelData.label) {
-                            Desk.launch(modelData.command);
-                            return;
-                        }
-                        sessionBody.pending = modelData.label;
-                        Desk.notice = "Confirm " + modelData.label.toLowerCase() + " or cancel";
-                    }
-                    Row {
-                        x: 13
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 12
-                        SvgIcon {
-                            width: 19
-                            height: 19
-                            name: modelData.icon
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Label {
-                            text: sessionBody.pending === modelData.label ? "Confirm " + modelData.label : modelData.label
-                            font.pixelSize: 12
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-            }
-            Key {
-                width: sessionBody.width
-                height: 34
-                text: "Cancel"
-                visible: sessionBody.pending !== ""
-                hint: "Cancel power action"
-                onClicked: {
-                    sessionBody.pending = "";
-                    Desk.notice = "";
-                }
-            }
+        BatteryMenu {
+            previewMode: content.previewMode
+            active: popup.opened
         }
     }
 }

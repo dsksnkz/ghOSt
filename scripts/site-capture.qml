@@ -38,21 +38,6 @@ ShellRoot {
                     active: false
                 }
             }
-            Item {
-                id: sidebarFrame
-                visible: stage.scene === "sidebar"
-                width: 410
-                height: 914
-                SidebarFigmaBody {
-                    id: sidebar
-                    y: 2.3
-                    width: 407.7
-                    height: 909.4
-                    previewMode: true
-                    screen: ({name: "HDMI-A-1"})
-                    opened: sidebarFrame.visible
-                }
-            }
             SettingsPanel {
                 id: settings
                 visible: stage.scene === "settings"
@@ -112,11 +97,6 @@ ShellRoot {
                     calendar.order = [2, 0, 4, 1, 3, 5];
                     calendar.readings = {gpu: 34, cpu: 22, memory: 46, processor: 2800, maximum: 4600};
                     item = calendarFrame;
-                } else if (scene === "sidebar") {
-                    sidebar.reveal = 1;
-                    sidebar.entranceOrder = [3, 1, 4, 0, 2, 5];
-                    sidebar.entranceTime = 900;
-                    item = sidebarFrame;
                 } else if (scene === "settings") {
                     settings.choose("general");
                     item = settings;

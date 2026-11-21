@@ -395,6 +395,12 @@ if autostart.suffix == ".lua":
     text = autostart.read_text()
     if "-- ghOSt top bar" not in text:
         text += '\n-- ghOSt top bar\nhl.on("hyprland.start", function()\n  hl.exec_cmd(' + json.dumps(str(launcher)) + ')\nend)\n'
+    if "polkit" not in text:
+        text += ('\n-- ghOSt password prompts (charge limit); restarted if it ever exits.\nhl.on("hyprland.start", function()\n'
+                 '  hl.exec_cmd("systemd-run --user --unit=ghost-polkit-agent --collect -p Restart=always -p RestartSec=2 '
+                 '/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")\nend)\n')
+    if 'name = "ghost-power"' not in text:
+        text += '\n-- ghOSt power menu: blur the screen behind it.\nhl.layer_rule({ name = \"ghost-power\", match = { namespace = \"ghost-power\" }, blur = true, ignore_alpha = 0 })\n'
     if "-- ghOSt motion" not in text:
         text += '\n-- ghOSt motion: the QML surfaces own their animation timing.\nhl.layer_rule({ name = "ghost-motion", match = { namespace = "ghost-(bar|panel|calendar|sidebar|rail-reservation)" }, no_anim = true })\n'
     if 'name = "ghost-settings"' not in text:

@@ -23,7 +23,7 @@
 | **Top bar** | Desktops, clock, volume, battery and power. The current track appears only while audio plays. |
 | **Desktop switcher** | Super+Tab shows every desktop and Magic Workspace. Scroll or use the arrows, click to go there. |
 | **Calendar** | Dates, weather and live system readings under the clock. |
-| **Sidebar** | Network, Bluetooth, audio, brightness and notifications. |
+| **Wi-Fi and Bluetooth menus** | Networks with speed and signal, Wi-Fi sharing as a QR code, DNS, paired devices, AirPods battery and noise control. |
 | **Music player** | Artwork over a live spectrum of whatever is playing. |
 | **Launcher** | Super+Space searches installed apps and keeps pinned favourites. |
 | **Settings** | Fourteen pages and one search field, including wallpaper and the top bar layout. |

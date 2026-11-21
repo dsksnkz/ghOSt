@@ -10,15 +10,15 @@ const metrics = {rowHeight: 44, rowGap: 8, inset: 0, groupGap: 16};
 const grouped = groups.map(group => group.map(id => categories.find(category => category.id === id)));
 const layout = navigation.layout(grouped, metrics);
 
-assert.equal(categories.length, 14);
-assert.equal(new Set(categories.map(category => category.id)).size, 14);
+assert.equal(categories.length, 13);
+assert.equal(new Set(categories.map(category => category.id)).size, 13);
 assert.equal(groups[0].join(','), 'network,bluetooth,general,airplane,accessibility');
-assert.equal(layout.rows.length, 14);
+assert.equal(layout.rows.length, 13);
 assert.equal(layout.groups.length, 4);
-assert.equal(layout.height, 744);
+assert.equal(layout.height, 692);
 assert.equal(layout.rows.find(row => row.id === 'general').y, 104);
 assert.equal(layout.rows.find(row => row.id === 'sound').y, 268);
-assert.equal(layout.rows.find(row => row.id === 'about').y, 700);
+assert.equal(layout.rows.find(row => row.id === 'about').y, 648);
 assert.equal(navigation.groupHeight(3, metrics), 148);
 assert.equal(navigation.layout([], metrics).height, 0);
 

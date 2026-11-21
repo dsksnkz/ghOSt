@@ -4,7 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import "EdgeVolume.js" as EdgeVolume
 
-// Full-height two-pixel edge; no sidebar action, keyboard grab or motion polling.
+// Full-height two-pixel edge; no keyboard grab or motion polling.
 PanelWindow {
     id: edge
     property string side: "left"

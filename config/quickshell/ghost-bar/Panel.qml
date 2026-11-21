@@ -18,7 +18,7 @@ PanelWindow {
     property real reveal: revealGate.open ? 1 : 0
 
     function syncPanel() {
-        const show = Desk.panel !== "" && Desk.panel !== "calendar" && Desk.panelScreen === screen.name;
+        const show = Desk.panel !== "" && Desk.panel !== "calendar" && Desk.panel !== "session" && Desk.panelScreen === screen.name;
         if (show)
             page = Desk.panel;
 
@@ -38,7 +38,7 @@ PanelWindow {
     readonly property real factor: Theme.scaleFor(screen)
     margins.top: Math.round(Motion.topMargin(page, reveal, implicitHeight) * factor)
     margins.left: page === "calendar" || page === "launcher" ? Math.round((screen.width - implicitWidth) / 2) : Math.round(Math.max(6, Math.min(screen.width - implicitWidth - 6, Desk.panelX)))
-    implicitWidth: Math.round(Math.min(page === "launcher" ? 560 : page === "media" ? 420 : 392, (screen.width - 12) / factor) * factor)
+    implicitWidth: Math.round(Math.min(page === "launcher" ? 560 : page === "media" ? 420 : page === "network" || page === "bluetooth" || page === "battery" ? 430 : 392, (screen.width - 12) / factor) * factor)
     implicitHeight: Math.ceil((content.implicitHeight + Motion.windowLead(page)) * factor)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "ghost-panel"
